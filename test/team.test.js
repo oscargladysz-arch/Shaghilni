@@ -1,0 +1,132 @@
+/* Teams: several people in one company, with roles, invitations, requests to join, and a record of who did what. */
+import { test, after } from "node:test";
+import assert from "node:assert/strict";
+import http from "node:http";
+import { loadConfig } from "../server/config.js";
+import { openDb } from "../server/db.js";
+import { createApp } from "../server/app.js";
+import { seedDemo } from "../server/seed.js";
+import * as coreMod from "../server/core.js";
+
+const servers = [];
+after(() => { for (const s of servers) s.close(); });
+async function start(env = {}, extra = {}) {
+  const cfg = loadConfig({ skipDotEnv: true, isolated: true, env: { NODE_ENV: "test", ADMIN_PHONES: "+12025550199", ...env }, values: { powBits: 0, anthropicKey: "" } });
+  const db = openDb(":memory:"), texts = [];
+  seedDemo(db, () => {});
+  const app = createApp({ cfg, db, log: () => {}, sms: async (to, body) => { texts.push({ to, body }); }, ...extra }), server = http.createServer(app);
+  await new Promise(r => server.listen(0, "127.0.0.1", r)); servers.push(server);
+  const base = `http://127.0.0.1:${server.address().port}`;
+  const lastCode = phone => { const t = [...texts].reverse().find(x => x.to === phone); return t && /(\d{6})/.exec(t.body)[1]; };
+  const client = () => {
+    let cookie = "";
+    const call = async (method, path, body) => {
+      const res = await fetch(base + path, { method, headers: { "content-type": "application/json", "x-shaghilni": "1", ...(cookie ? { cookie } : {}) }, body: body === undefined ? undefined : JSON.stringify(body) });
+      const sc = res.headers.get("set-cookie"); if (sc) cookie = sc.split(";")[0];
+      const text = await res.text(); let json = null; try { json = JSON.parse(text); } catch {}
+      return { status: res.status, body: json, text };
+    };
+    return { get: p => call("GET", p), post: (p, b = {}) => call("POST", p, b), put: (p, b) => call("PUT", p, b), del: p => call("DELETE", p) };
+  };
+  const login = async (phone, role = "seeker") => {
+    const c = client(); const r = await c.post("/api/auth/code", { phone });
+    assert.equal((await c.post("/api/auth/verify", { phone, code: lastCode(r.body.phone), role, accept: true })).status, 200);
+    return c;
+  };
+  const core = typeof coreMod.loadCore === "function" ? coreMod.loadCore() : coreMod.core || coreMod.default;
+  return { db, texts, client, login, app, core };
+}
+async function publish(S, admin, e, over = {}) {
+  const job = (await e.post("/api/employer/jobs", { job: { ...JOB, ...over }, submit: true })).body.job;
+  await admin.post(`/api/admin/jobs/${job.id}/approve`); return job.id;
+}
+const STUDENT = { v: 1, role: "seeker", name: "Omar Nabil Al-Khatib", email: "omar@example.com", gov: "homs", langs: ["ar", "en"],
+  edu: { status: "student", uni: "homs", fac: "petroleum", year: 4, grad: 2027 },
+  exp: [{ id: "e1", role: "Field intern", org: "Orontes Energy", start: "2025-06", end: "2025-09", bullets: ["Logged pressure readings at 12 wells every day"] }],
+  acts: [], skills: ["Excel", "AutoCAD"], certs: [] };
+const GRAD = { ...STUDENT, name: "Lina Haddad", email: "lina@example.com", edu: { status: "bachelor", uni: "damascus", fac: "business", year: 0, grad: 2023 } };
+const JOB = { title: { en: "Field trainee" }, gov: "homs", type: "intern", level: "entry", pay: [1500000, 2000000], langs: ["ar"], summary: { en: "Train with our field team." } };
+const inDays = n => new Date(Date.now() + n * 86400e3).toISOString().slice(0, 10);
+async function employer(S, admin, phone, name, verify = true) {
+  const e = await S.login(phone, "employer");
+  await e.put("/api/employer/company", { company: { name: { en: name }, gov: "homs", regNo: `REG-${name}`, contactName: `Contact ${name}`, whatsapp: phone } });
+  await e.post("/api/employer/company/submit");
+  if (!verify) return { e };
+  const co = (await admin.get("/api/admin/companies?status=pending")).body.companies.find(c => c.name.en === name);
+  await admin.post(`/api/admin/companies/${co.id}/verify`, { screened: true });
+  const job = (await e.post("/api/employer/jobs", { job: JOB, submit: true })).body.job;
+  await admin.post(`/api/admin/jobs/${job.id}/approve`);
+  return { e, jobId: job.id };
+}
+
+
+const cid = (S, name) => S.db.get("SELECT id FROM companies WHERE json_extract(data, '$.name.en') = ?", name).id;
+const asEmployer = phone => S => S.login(phone, "employer");
+
+test("teams: seats on every plan, invitations by text, and roles enforced on the server", async () => {
+  const S = await start(), admin = await S.login("+12025550199"), { e: owner } = await employer(S, admin, "0955 800 001", "Qasioun Advisory");
+  const team = async () => (await owner.get("/api/employer/team")).body;
+  assert.deepEqual((await team()).seats, { used: 1, limit: 3 }, "Free: three people, counting the owner");
+  assert.equal((await owner.post("/api/employer/team", { phone: "0955 800 002", role: "recruiter" })).body.error, "name_required");
+  assert.equal((await owner.post("/api/employer/team", { name: "Lina", phone: "0955 800 002", role: "owner" })).body.error, "bad_role");
+  assert.equal((await owner.post("/api/employer/team", { name: "Lina", phone: "0955 800 002", role: "recruiter" })).status, 200);
+  assert.ok(S.texts.some(x => x.to.includes("955800002") && /invited you to join|عزمك/.test(x.body)), "the invitation goes by text");
+  assert.equal((await owner.post("/api/employer/team", { name: "Karim", phone: "0955 800 003", role: "hiring_manager" })).status, 200);
+  assert.equal((await owner.post("/api/employer/team", { name: "Fadi", phone: "0955 800 004", role: "recruiter" })).body.error, "team_full", "open invitations hold seats");
+  await admin.post(`/api/admin/companies/${cid(S, "Qasioun Advisory")}/plan`, { plan: "pro", months: 1 });
+  assert.equal((await team()).seats.limit, 10, "Pro: ten");
+  // Lina signs up fresh: the invitation makes her an employer, and she accepts
+  const lina = await S.login("0955 800 002");
+  const pend = (await lina.get("/api/employer")).body; assert.equal(pend.company, null); assert.deepEqual([pend.pending.status, pend.pending.role], ["invited", "recruiter"]);
+  assert.equal((await lina.post("/api/employer/membership/accept")).status, 200);
+  const mine = (await lina.get("/api/employer")).body; assert.equal(mine.company.name.en, "Qasioun Advisory"); assert.equal(mine.me.role, "recruiter");
+  const karim = await S.login("0955 800 003", "employer"); await karim.post("/api/employer/membership/accept");
+  // what each role may do
+  const job = (await lina.post("/api/employer/jobs", { job: JOB, submit: true })).body.job; assert.ok(job, "recruiters post jobs"); assert.equal(job.postedBy, "Lina"); assert.equal(job.mine, true);
+  await admin.post(`/api/admin/jobs/${job.id}/approve`);
+  assert.equal((await karim.post("/api/employer/jobs", { job: JOB })).body.error, "role_forbidden", "hiring managers don't post");
+  assert.equal((await lina.put("/api/employer/company", { company: {} })).body.error, "role_forbidden", "recruiters don't edit the company");
+  assert.equal((await lina.post("/api/employer/team", { name: "X", phone: "0955 800 009", role: "recruiter" })).body.error, "role_forbidden", "or the team");
+  assert.equal((await lina.post("/api/employer/plan/request", { plan: "enterprise", payMethod: "wallet" })).body.error, "role_forbidden", "or billing");
+  assert.equal((await karim.get("/api/employer/students")).body.error, "role_forbidden", "hiring managers don't search candidates");
+  const seeker = await S.login("0933 800 101"); await seeker.put("/api/me/profile", { profile: GRAD });
+  await seeker.post(`/api/jobs/${job.id}/apply`, { channel: "web", cvLang: "ar" });
+  const app = (await karim.get(`/api/employer/jobs/${job.id}/applications`)).body.applications[0]; assert.ok(app, "hiring managers see applicants");
+  assert.equal((await karim.put(`/api/employer/applications/${app.id}`, { status: "shortlisted" })).body.error, "role_forbidden", "but don't move them");
+  assert.equal((await karim.put(`/api/employer/applications/${app.id}`, { note: "Strong answers on the phone." })).status, 200, "they do leave notes");
+  await lina.put(`/api/employer/applications/${app.id}`, { status: "shortlisted" });
+  const seen = (await owner.get(`/api/employer/jobs/${job.id}/applications`)).body.applications[0];
+  assert.deepEqual([seen.movedBy, seen.noteBy], ["Lina", "Karim"], "everyone sees who moved them and who wrote the note");
+  const act = (await owner.get("/api/employer/activity")).body.activity;
+  assert.ok(act.some(x => x.action === "application.moved" && x.who === "Lina") && act.some(x => x.action === "team.joined"), "the activity log says who did what");
+  assert.equal((await karim.get("/api/employer/activity")).body.error, "role_forbidden");
+});
+
+test("teams: asking to join, duplicate companies, admins, transfer, leaving and removal", async () => {
+  const S = await start(), admin = await S.login("+12025550199"), { e: owner } = await employer(S, admin, "0955 801 001", "Halab Freight Co");
+  const regNo = S.db.get("SELECT json_extract(data, '$.regNo') AS r FROM companies WHERE id = ?", cid(S, "Halab Freight Co")).r;
+  const fadi = await S.login("0955 801 002", "employer");
+  const dup = await fadi.put("/api/employer/company", { company: { name: { en: "Halab Freight Company" }, regNo: " " + String(regNo).toLowerCase() + " " } });
+  assert.equal(dup.body.error, "company_exists", "a registration number already on Shaghilni points to joining instead");
+  const found = (await fadi.get("/api/employer/companies/search?q=halab freight")).body.companies; assert.equal(found.length, 1);
+  assert.equal((await fadi.post(`/api/employer/companies/${found[0].id}/join`, { name: "Fadi" })).body.status, "requested");
+  assert.ok(S.texts.some(x => x.to.includes("955801001") && /asked to join|ينضم/.test(x.body)), "the owner is told");
+  assert.equal((await fadi.post(`/api/employer/companies/${found[0].id}/join`, { name: "Fadi" })).body.error, "request_pending");
+  const T = (await owner.get("/api/employer/team")).body; assert.equal(T.requests.length, 1); assert.equal(T.requests[0].name, "Fadi");
+  assert.equal((await owner.post(`/api/employer/team/requests/${encodeURIComponent(T.requests[0].phone)}`, { decision: "yes", role: "admin" })).status, 200);
+  assert.equal((await fadi.get("/api/employer")).body.me.role, "admin");
+  // admins run the team but don't manage other admins or billing
+  assert.equal((await fadi.post("/api/employer/team", { name: "Sami", phone: "0955 801 003", role: "admin" })).status, 200, "admins invite");
+  const sami = await S.login("0955 801 003", "employer"); await sami.post("/api/employer/membership/accept");
+  assert.equal((await fadi.del("/api/employer/team/%2B963955801003")).body.error, "role_forbidden", "only the owner removes an admin");
+  assert.equal((await fadi.post("/api/employer/team/transfer", { phone: "+963955801003" })).body.error, "role_forbidden");
+  // the owner hands over
+  assert.equal((await owner.post("/api/employer/team/transfer", { phone: "+963955801002" })).status, 200);
+  assert.equal((await fadi.get("/api/employer")).body.me.role, "owner"); assert.equal((await owner.get("/api/employer")).body.me.role, "admin", "the old owner stays on as an admin");
+  assert.equal((await fadi.post("/api/employer/team/leave")).body.error, "owner_cannot_leave");
+  assert.equal((await owner.post("/api/employer/team/leave")).status, 200); assert.equal((await owner.get("/api/employer")).body.company, null, "leaving ends access");
+  assert.equal((await fadi.del("/api/employer/team/%2B963955801003")).status, 200); assert.equal((await sami.get("/api/employer")).body.company, null, "and so does removal");
+  // Enterprise has room for fifty
+  await admin.post(`/api/admin/companies/${cid(S, "Halab Freight Co")}/plan`, { plan: "enterprise", months: 1 });
+  assert.equal((await fadi.get("/api/employer/team")).body.seats.limit, 50);
+});

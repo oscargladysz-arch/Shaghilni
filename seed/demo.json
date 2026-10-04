@@ -1,0 +1,2085 @@
+{
+ "companies": [
+  {
+   "key": "Chevron",
+   "name": {
+    "en": "Chevron",
+    "ar": "شيفرون"
+   },
+   "abbr": "CVX",
+   "sector": "energy",
+   "cat": "multinational",
+   "gov": "deirezzor",
+   "about": {
+    "en": "Chevron is an integrated energy company.",
+    "ar": "شيفرون شركة طاقة متكاملة."
+   }
+  },
+  {
+   "key": "ConocoPhillips",
+   "name": {
+    "en": "ConocoPhillips",
+    "ar": "كونوكوفيليبس"
+   },
+   "abbr": "COP",
+   "sector": "energy",
+   "cat": "multinational",
+   "gov": "homs",
+   "about": {
+    "en": "ConocoPhillips is one of the world's largest independent exploration and production companies.",
+    "ar": "كونوكوفيليبس من أكبر شركات التنقيب والإنتاج المستقلة في العالم."
+   }
+  },
+  {
+   "key": "Deloitte",
+   "name": {
+    "en": "Deloitte",
+    "ar": "ديلويت"
+   },
+   "abbr": "DTT",
+   "sector": "prof",
+   "cat": "multinational",
+   "gov": "damascus",
+   "about": {
+    "en": "Deloitte is a global network of firms providing audit, tax and consulting services.",
+    "ar": "ديلويت شبكة عالمية من الشركات تقدّم خدمات التدقيق والضرائب والاستشارات."
+   }
+  },
+  {
+   "key": "Al Jazeera",
+   "name": {
+    "en": "Al Jazeera",
+    "ar": "الجزيرة"
+   },
+   "abbr": "AJ",
+   "sector": "media",
+   "cat": "multinational",
+   "gov": "aleppo",
+   "about": {
+    "en": "Al Jazeera Media Network is an international broadcaster headquartered in Doha.",
+    "ar": "شبكة الجزيرة الإعلامية مؤسسة بث دولية مقرها الدوحة."
+   }
+  },
+  {
+   "key": "Abu Abdo",
+   "name": {
+    "en": "Abu Abdo",
+    "ar": "أبو عبدو"
+   },
+   "abbr": "عبدو",
+   "sector": "food",
+   "cat": "domestic",
+   "gov": "damascus",
+   "about": {
+    "en": "A family-run falafel counter near Souq al-Hamidiyah in old Damascus.",
+    "ar": "محل فلافل عائلي قرب سوق الحميدية في دمشق القديمة."
+   }
+  },
+  {
+   "key": "Cali Restaurant",
+   "name": {
+    "en": "Cali Restaurant",
+    "ar": "مطعم كالي"
+   },
+   "abbr": "CALI",
+   "sector": "food",
+   "cat": "domestic",
+   "gov": "latakia",
+   "about": {
+    "en": "A seafront restaurant on the Latakia corniche.",
+    "ar": "مطعم على واجهة البحر في كورنيش اللاذقية."
+   }
+  },
+  {
+   "key": "Syrian Arab Red Crescent",
+   "name": {
+    "en": "Syrian Arab Red Crescent",
+    "ar": "الهلال الأحمر العربي السوري"
+   },
+   "abbr": "SARC",
+   "sector": "aid",
+   "cat": "public",
+   "gov": "idlib",
+   "about": {
+    "en": "The Syrian Arab Red Crescent is Syria's largest humanitarian organisation, with branches across the governorates.",
+    "ar": "الهلال الأحمر العربي السوري أكبر منظمة إنسانية في سوريا، وله فروع في مختلف المحافظات."
+   }
+  },
+  {
+   "key": "Syriatel",
+   "name": {
+    "en": "Syriatel",
+    "ar": "سيريتل"
+   },
+   "abbr": "ST",
+   "sector": "tech",
+   "cat": "domestic",
+   "gov": "aleppo",
+   "about": {
+    "en": "Syriatel is one of Syria's mobile network operators.",
+    "ar": "سيريتل إحدى شركات الاتصالات الخلوية في سوريا."
+   }
+  },
+  {
+   "key": "Cham Construction",
+   "name": {
+    "en": "Cham Construction",
+    "ar": "الشام للإنشاءات"
+   },
+   "abbr": "CC",
+   "sector": "build",
+   "cat": "domestic",
+   "gov": "homs",
+   "about": {
+    "en": "A Syrian contractor working on donor-funded housing reconstruction in Homs and Aleppo.",
+    "ar": "مقاول سوري يعمل في إعادة إعمار المساكن بتمويل من الجهات المانحة في حمص وحلب."
+   }
+  },
+  {
+   "key": "UNDP Syria",
+   "name": {
+    "en": "UNDP Syria",
+    "ar": "برنامج الأمم المتحدة الإنمائي"
+   },
+   "abbr": "UNDP",
+   "sector": "aid",
+   "cat": "public",
+   "gov": "damascus",
+   "about": {
+    "en": "UNDP is the United Nations development agency, supporting early recovery and livelihoods in Syria.",
+    "ar": "برنامج الأمم المتحدة الإنمائي وكالة الأمم المتحدة للتنمية، ويدعم التعافي المبكر وسبل العيش في سوريا."
+   }
+  },
+  {
+   "key": "Bank of Syria and Overseas",
+   "name": {
+    "en": "Bank of Syria and Overseas",
+    "ar": "بنك سورية والمهجر"
+   },
+   "abbr": "BSO",
+   "sector": "finance",
+   "cat": "domestic",
+   "gov": "tartus",
+   "about": {
+    "en": "Bank of Syria and Overseas is a private commercial bank operating in Syria.",
+    "ar": "بنك سورية والمهجر مصرف تجاري خاص يعمل في سوريا."
+   }
+  },
+  {
+   "key": "Lattakia Labs",
+   "name": {
+    "en": "Lattakia Labs",
+    "ar": "مختبرات اللاذقية"
+   },
+   "abbr": "LL",
+   "sector": "tech",
+   "cat": "domestic",
+   "gov": "remote",
+   "about": {
+    "en": "A Syrian software studio of 22 people building for clients in the Gulf and Turkey.",
+    "ar": "استوديو برمجيات سوري يضم 22 شخصاً ويعمل لعملاء في الخليج وتركيا."
+   }
+  },
+  {
+   "key": "Sheikh Najjar Textiles",
+   "name": {
+    "en": "Sheikh Najjar Textiles",
+    "ar": "الشيخ نجار للنسيج"
+   },
+   "abbr": "SN",
+   "sector": "trade",
+   "cat": "domestic",
+   "gov": "aleppo",
+   "about": {
+    "en": "A textile plant in the Sheikh Najjar industrial city, restarting lines that have been idle for years.",
+    "ar": "معمل نسيج في مدينة الشيخ نجار الصناعية يعيد تشغيل خطوط متوقفة منذ سنوات."
+   }
+  },
+  {
+   "key": "Latakia University",
+   "name": {
+    "en": "Latakia University",
+    "ar": "جامعة اللاذقية"
+   },
+   "abbr": "LU",
+   "sector": "edu",
+   "cat": "public",
+   "gov": "latakia",
+   "about": {
+    "en": "Latakia University, formerly Tishreen University, is one of Syria's largest public universities.",
+    "ar": "جامعة اللاذقية، تشرين سابقاً، من أكبر الجامعات الحكومية في سوريا."
+   }
+  },
+  {
+   "key": "Katakit",
+   "name": {
+    "en": "Katakit",
+    "ar": "كتاكيت"
+   },
+   "abbr": "KK",
+   "sector": "trade",
+   "cat": "domestic",
+   "gov": "hama",
+   "about": {
+    "en": "A Syrian confectionery maker distributing across the central governorates.",
+    "ar": "شركة حلويات سورية توزّع منتجاتها في المحافظات الوسطى."
+   }
+  },
+  {
+   "key": "Ibn Zuhr Pharmacies",
+   "name": {
+    "en": "Ibn Zuhr Pharmacies",
+    "ar": "صيدليات ابن زهر"
+   },
+   "abbr": "IZ",
+   "sector": "aid",
+   "cat": "domestic",
+   "gov": "rifdimashq",
+   "about": {
+    "en": "A five-branch pharmacy chain in Rural Damascus, open late every day.",
+    "ar": "سلسلة صيدليات من خمسة فروع في ريف دمشق، تفتح حتى ساعة متأخرة يومياً."
+   }
+  },
+  {
+   "key": "Barada Logistics",
+   "name": {
+    "en": "Barada Logistics",
+    "ar": "بردى للنقل"
+   },
+   "abbr": "BL",
+   "sector": "trade",
+   "cat": "domestic",
+   "gov": "damascus",
+   "about": {
+    "en": "Refrigerated freight between Damascus and the coast.",
+    "ar": "شحن مبرّد بين دمشق والساحل."
+   }
+  }
+ ],
+ "jobs": [
+  {
+   "company": "Chevron",
+   "title": {
+    "en": "Summer Field Internship in Petroleum Engineering",
+    "ar": "تدريب ميداني صيفي في هندسة النفط"
+   },
+   "gov": "deirezzor",
+   "place": {
+    "en": "Deir ez-Zor, from the Hasakah staging camp",
+    "ar": "دير الزور، انطلاقاً من مخيّم الحسكة"
+   },
+   "type": "intern",
+   "level": "student",
+   "mode": "onsite",
+   "pay": [
+    50000,
+    50000
+   ],
+   "langs": [
+    "ar",
+    "en"
+   ],
+   "recruits": [
+    [
+     "homs",
+     "petroleum"
+    ],
+    [
+     "furat",
+     "petroleum"
+    ],
+    [
+     "damascus",
+     "geology"
+    ]
+   ],
+   "anyFaculty": false,
+   "noDegree": false,
+   "support": true,
+   "openings": 10,
+   "summary": {
+    "en": "Ten weeks on an active rotation from June 2027, working beside wellsite geologists and drilling engineers. Built for fourth-year petroleum students; three of last summer's interns joined the graduate intake.",
+    "ar": "عشرة أسابيع ضمن تناوب فعلي اعتباراً من حزيران 2027، إلى جانب جيولوجيي الآبار ومهندسي الحفر. مصمّم لطلاب السنة الرابعة في هندسة النفط، وانضم ثلاثة من متدربي الصيف الماضي إلى دفعة الخريجين."
+   },
+   "duties": {
+    "en": [
+     "Log cuttings and help call formation tops with the wellsite geologist",
+     "Sit in on the morning drilling call and write it up",
+     "Deliver a short technical report on one well in week ten"
+    ],
+    "ar": [
+     "توصيف فتات الحفر والمساعدة في تحديد رؤوس الطبقات مع جيولوجي البئر",
+     "حضور اجتماع الحفر الصباحي وتلخيصه",
+     "تقديم تقرير فني قصير عن بئر واحدة في الأسبوع العاشر"
+    ]
+   },
+   "needs": {
+    "en": [
+     "Fourth-year student in petroleum engineering or geology",
+     "Working English for daily reporting",
+     "Fit for field work and a rotation away from home"
+    ],
+    "ar": [
+     "طالب في السنة الرابعة في هندسة النفط أو الجيولوجيا",
+     "إنكليزية عملية للتقارير اليومية",
+     "لياقة للعمل الميداني والتناوب بعيداً عن المنزل"
+    ]
+   },
+   "provides": {
+    "en": [
+     "Flights to site and full camp accommodation",
+     "A monthly stipend, paid on the same date each month",
+     "Counts toward your faculty's field-training requirement"
+    ],
+    "ar": [
+     "تذاكر السفر إلى الموقع والسكن الكامل في المخيّم",
+     "مكافأة شهرية تُصرف في التاريخ نفسه كل شهر",
+     "يُحتسب ضمن متطلب التدريب الميداني في كليتك"
+    ]
+   },
+   "contact": {
+    "name": {
+     "en": "Kareem Mansour",
+     "ar": "كريم منصور"
+    },
+    "role": {
+     "en": "Subsurface Operations Lead, Levant",
+     "ar": "مدير عمليات باطن الأرض، بلاد الشام"
+    },
+    "status": {
+     "en": "Interviewing at Homs University in October",
+     "ar": "مقابلات في جامعة حمص خلال تشرين الأول"
+    }
+   },
+   "tags": "oil gas field rotation camp drilling geology intern internship summer نفط غاز حقل حفر تناوب تدريب صيفي",
+   "daysAgo": 0
+  },
+  {
+   "company": "Chevron",
+   "title": {
+    "en": "Field Geologist, Euphrates Block",
+    "ar": "جيولوجي حقول في منطقة الفرات"
+   },
+   "gov": "deirezzor",
+   "place": {
+    "en": "Deir ez-Zor, from the Hasakah staging camp",
+    "ar": "دير الزور، انطلاقاً من مخيّم الحسكة"
+   },
+   "type": "full",
+   "level": "mid",
+   "mode": "onsite",
+   "pay": [
+    340000,
+    440000
+   ],
+   "langs": [
+    "ar",
+    "en"
+   ],
+   "recruits": [
+    [
+     "homs",
+     "petroleum"
+    ],
+    [
+     "furat",
+     "petroleum"
+    ],
+    [
+     "damascus",
+     "geology"
+    ]
+   ],
+   "anyFaculty": false,
+   "noDegree": false,
+   "support": true,
+   "openings": 1,
+   "summary": {
+    "en": "Wellsite geology on a redeveloped block east of Deir ez-Zor, working 28 days on and 28 off from the Hasakah staging camp.",
+    "ar": "أعمال جيولوجيا الآبار في منطقة قيد إعادة التطوير شرق دير الزور، بنظام 28 يوم عمل و28 يوم راحة انطلاقاً من مخيّم الحسكة."
+   },
+   "duties": {
+    "en": [
+     "Log and describe cuttings, and call formation tops in real time",
+     "Write the daily geological report for the drilling superintendent",
+     "Flag hole problems early and hand over cleanly at each rotation"
+    ],
+    "ar": [
+     "توصيف فتات الحفر وتحديد رؤوس الطبقات لحظياً",
+     "كتابة التقرير الجيولوجي اليومي لمشرف الحفر",
+     "الإبلاغ المبكر عن مشاكل البئر وتسليم العمل بوضوح عند كل تناوب"
+    ]
+   },
+   "needs": {
+    "en": [
+     "Degree in geology or petroleum engineering",
+     "Four years at wellsite or in mudlogging",
+     "Working English for daily reporting"
+    ],
+    "ar": [
+     "شهادة في الجيولوجيا أو هندسة النفط",
+     "خبرة أربع سنوات في مواقع الآبار أو تسجيل الطين",
+     "إنكليزية عملية للتقارير اليومية"
+    ]
+   },
+   "provides": {
+    "en": [
+     "Rotation flights and full camp accommodation",
+     "The camp runs on its own generator and satellite link",
+     "Pay lands on the same date every month"
+    ],
+    "ar": [
+     "تذاكر التناوب والسكن الكامل في المخيّم",
+     "المخيّم يعمل على مولّدة خاصة ووصلة فضائية",
+     "الراتب يُصرف في التاريخ نفسه كل شهر"
+    ]
+   },
+   "contact": {
+    "name": {
+     "en": "Kareem Mansour",
+     "ar": "كريم منصور"
+    },
+    "role": {
+     "en": "Subsurface Operations Lead, Levant",
+     "ar": "مدير عمليات باطن الأرض، بلاد الشام"
+    },
+    "status": {
+     "en": "Reviewing applicants this week",
+     "ar": "يراجع المتقدمين هذا الأسبوع"
+    }
+   },
+   "tags": "geologist geology wellsite mudlogging oil gas rotation جيولوجي جيولوجيا آبار نفط غاز حفر تناوب",
+   "daysAgo": 1
+  },
+  {
+   "company": "ConocoPhillips",
+   "title": {
+    "en": "HSE Officer, Refinery Restart",
+    "ar": "مسؤول الصحة والسلامة لإعادة تشغيل المصفاة"
+   },
+   "gov": "homs",
+   "place": {
+    "en": "Homs, refinery north of the city",
+    "ar": "حمص، المصفاة شمال المدينة"
+   },
+   "type": "full",
+   "level": "mid",
+   "mode": "onsite",
+   "pay": [
+    230000,
+    290000
+   ],
+   "langs": [
+    "ar",
+    "en"
+   ],
+   "recruits": [
+    [
+     "homs",
+     "chemical"
+    ],
+    [
+     "damascus",
+     "industrial"
+    ],
+    [
+     "latakia",
+     "environmental"
+    ]
+   ],
+   "anyFaculty": false,
+   "noDegree": false,
+   "support": false,
+   "openings": 1,
+   "summary": {
+    "en": "Day-shift safety oversight as refinery units north of Homs come back online, covering roughly 400 people on site.",
+    "ar": "الإشراف على السلامة في الوردية الصباحية خلال إعادة تشغيل وحدات المصفاة شمال حمص، لنحو 400 عامل في الموقع."
+   },
+   "duties": {
+    "en": [
+     "Run permit-to-work and contractor inductions each morning",
+     "Walk the units and stop work when it isn't safe",
+     "Investigate incidents and write them up in both languages"
+    ],
+    "ar": [
+     "إدارة تصاريح العمل وتعريف المقاولين بإجراءات السلامة كل صباح",
+     "جولات ميدانية على الوحدات وإيقاف العمل عند انعدام السلامة",
+     "التحقيق في الحوادث وتوثيقها باللغتين"
+    ]
+   },
+   "needs": {
+    "en": [
+     "NEBOSH certificate or equivalent",
+     "Five years in refinery, plant or heavy-industry safety",
+     "Confident writing incident reports"
+    ],
+    "ar": [
+     "شهادة NEBOSH أو ما يعادلها",
+     "خمس سنوات في سلامة المصافي أو المعامل أو الصناعات الثقيلة",
+     "القدرة على كتابة تقارير الحوادث بثقة"
+    ]
+   },
+   "provides": {
+    "en": [
+     "NEBOSH and IOSH renewals paid for",
+     "Site bus from Homs city and al-Waer",
+     "Family health cover from day one"
+    ],
+    "ar": [
+     "تجديد شهادتي NEBOSH وIOSH على حساب الشركة",
+     "باص إلى الموقع من مدينة حمص والوعر",
+     "تأمين صحي للعائلة من اليوم الأول"
+    ]
+   },
+   "contact": {
+    "name": {
+     "en": "Samer Haddad",
+     "ar": "سامر حداد"
+    },
+    "role": {
+     "en": "HSE Manager, Syria assets",
+     "ar": "مدير الصحة والسلامة، أصول سوريا"
+    },
+    "status": {
+     "en": "Shortlisting now",
+     "ar": "يعدّ القائمة القصيرة الآن"
+    }
+   },
+   "tags": "hse safety nebosh refinery officer السلامة مصفاة سلامة مهنية",
+   "daysAgo": 3
+  },
+  {
+   "company": "Deloitte",
+   "title": {
+    "en": "Audit Associate",
+    "ar": "مدقق حسابات مبتدئ"
+   },
+   "gov": "damascus",
+   "place": {
+    "en": "Damascus, Kafarsouseh",
+    "ar": "دمشق، كفرسوسة"
+   },
+   "type": "full",
+   "level": "junior",
+   "mode": "hybrid",
+   "pay": [
+    110000,
+    160000
+   ],
+   "langs": [
+    "ar",
+    "en"
+   ],
+   "recruits": [
+    [
+     "damascus",
+     "economics"
+    ],
+    [
+     "hiba",
+     "business"
+    ],
+    [
+     "svu",
+     "economics"
+    ]
+   ],
+   "anyFaculty": false,
+   "noDegree": false,
+   "support": false,
+   "openings": 1,
+   "summary": {
+    "en": "Join the Damascus audit practice serving banks, telecom operators and donor-funded programmes.",
+    "ar": "الانضمام إلى فريق التدقيق في دمشق الذي يخدم المصارف ومشغلي الاتصالات والبرامج الممولة من الجهات المانحة."
+   },
+   "duties": {
+    "en": [
+     "Test balances and controls on client engagements",
+     "Build working papers a partner can sign off",
+     "Draft the findings memo in Arabic and English"
+    ],
+    "ar": [
+     "اختبار الأرصدة والضوابط في ملفات العملاء",
+     "إعداد أوراق عمل يعتمدها الشريك",
+     "صياغة مذكرة النتائج بالعربية والإنكليزية"
+    ]
+   },
+   "needs": {
+    "en": [
+     "Degree in accounting, finance or economics",
+     "Strong written and spoken English",
+     "Working Excel; audit software is taught"
+    ],
+    "ar": [
+     "شهادة في المحاسبة أو التمويل أو الاقتصاد",
+     "إتقان الإنكليزية كتابةً ومحادثة",
+     "إتقان جيد لبرنامج Excel، أما برامج التدقيق فتُعلَّم"
+    ]
+   },
+   "provides": {
+    "en": [
+     "ACCA exams and study leave paid for from year one",
+     "The office runs on uninterrupted power",
+     "Internet and power allowance for home days"
+    ],
+    "ar": [
+     "امتحانات ACCA وإجازة الدراسة على حساب الشركة من السنة الأولى",
+     "المكتب يعمل على كهرباء غير منقطعة",
+     "بدل إنترنت وكهرباء لأيام العمل من المنزل"
+    ]
+   },
+   "contact": {
+    "name": {
+     "en": "Lina Al-Husseini",
+     "ar": "لينا الحسيني"
+    },
+    "role": {
+     "en": "Senior Manager, Audit",
+     "ar": "مديرة أولى، التدقيق"
+    },
+    "status": {
+     "en": "Read 18 profiles today",
+     "ar": "اطّلعت على 18 ملفاً اليوم"
+    }
+   },
+   "tags": "audit auditor accountant accounting acca finance تدقيق مدقق محاسب محاسبة مالية",
+   "daysAgo": 1
+  },
+  {
+   "company": "Deloitte",
+   "title": {
+    "en": "Summer Consulting Internship",
+    "ar": "تدريب صيفي في الاستشارات"
+   },
+   "gov": "damascus",
+   "place": {
+    "en": "Damascus, Kafarsouseh",
+    "ar": "دمشق، كفرسوسة"
+   },
+   "type": "intern",
+   "level": "student",
+   "mode": "hybrid",
+   "pay": [
+    37000,
+    37000
+   ],
+   "langs": [
+    "ar",
+    "en"
+   ],
+   "recruits": [
+    [
+     "damascus",
+     "economics"
+    ],
+    [
+     "hiba",
+     "business"
+    ],
+    [
+     "damascus",
+     "mechanical"
+    ]
+   ],
+   "anyFaculty": true,
+   "noDegree": false,
+   "support": true,
+   "openings": 14,
+   "summary": {
+    "en": "Eight weeks from June 2027 with 14 seats for third and fourth-year students. Six of last year's fourteen interns were offered graduate contracts.",
+    "ar": "ثمانية أسابيع اعتباراً من حزيران 2027 بأربعة عشر مقعداً لطلاب السنتين الثالثة والرابعة. عُرضت عقود عمل على ستة من متدربي العام الماضي الأربعة عشر."
+   },
+   "duties": {
+    "en": [
+     "Sit on a live client team for all eight weeks",
+     "Build one piece of analysis and present it at the end",
+     "Rotate through two service lines"
+    ],
+    "ar": [
+     "العمل ضمن فريق عميل حقيقي طوال الأسابيع الثمانية",
+     "إعداد تحليل واحد وعرضه في نهاية التدريب",
+     "التنقل بين خطّي خدمة اثنين"
+    ]
+   },
+   "needs": {
+    "en": [
+     "Third or fourth year at a partner university",
+     "Any faculty; economics and engineering are most common",
+     "Free five days a week for all eight weeks"
+    ],
+    "ar": [
+     "طالب في السنة الثالثة أو الرابعة في جامعة شريكة",
+     "من أي كلية، والأكثر شيوعاً الاقتصاد والهندسة",
+     "التفرّغ خمسة أيام أسبوعياً طوال الأسابيع الثمانية"
+    ]
+   },
+   "provides": {
+    "en": [
+     "A paid stipend, not an unpaid placement",
+     "A schedule built around university exam weeks",
+     "Travel allowance for students from outside Damascus"
+    ],
+    "ar": [
+     "مكافأة مدفوعة، وليس تدريباً بلا أجر",
+     "جدول مُنسَّق مع أسابيع الامتحانات الجامعية",
+     "بدل سفر للطلاب من خارج دمشق"
+    ]
+   },
+   "contact": {
+    "name": {
+     "en": "Rasha Deeb",
+     "ar": "رشا ديب"
+    },
+    "role": {
+     "en": "Campus Recruiting",
+     "ar": "التوظيف الجامعي"
+    },
+    "status": {
+     "en": "Interviews in November",
+     "ar": "المقابلات في تشرين الثاني"
+    }
+   },
+   "tags": "consulting consultant intern internship summer student استشارات تدريب صيفي طلاب",
+   "daysAgo": 2
+  },
+  {
+   "company": "Al Jazeera",
+   "title": {
+    "en": "Field Producer, Northern Syria",
+    "ar": "منتج ميداني لشمال سوريا"
+   },
+   "gov": "aleppo",
+   "place": {
+    "en": "Aleppo bureau",
+    "ar": "مكتب حلب"
+   },
+   "type": "contract",
+   "level": "mid",
+   "mode": "onsite",
+   "pay": [
+    195000,
+    270000
+   ],
+   "langs": [
+    "ar",
+    "en"
+   ],
+   "recruits": [
+    [
+     "damascus",
+     "media"
+    ],
+    [
+     "aleppo",
+     "arts"
+    ]
+   ],
+   "anyFaculty": false,
+   "noDegree": false,
+   "support": false,
+   "openings": 1,
+   "summary": {
+    "en": "A twelve-month contract covering northern Syria from the Aleppo bureau: arranging access, booking contributors and producing packages for daily news and longer features.",
+    "ar": "عقد لاثني عشر شهراً لتغطية شمال سوريا من مكتب حلب: تأمين الوصول وترتيب المقابلات وإنتاج التقارير للنشرات اليومية والتحقيقات المطوّلة."
+   },
+   "duties": {
+    "en": [
+     "Find and verify stories across the governorate",
+     "Book contributors and arrange safe access",
+     "Cut packages to deadline with the Doha desk"
+    ],
+    "ar": [
+     "إيجاد القصص والتحقق منها في عموم المحافظة",
+     "ترتيب المقابلات وتأمين الوصول الآمن",
+     "إنجاز التقارير في مواعيدها بالتنسيق مع مكتب الدوحة"
+    ]
+   },
+   "needs": {
+    "en": [
+     "Four years in news production or field reporting",
+     "Deep knowledge of Aleppo and its countryside",
+     "Hostile-environment training, or willing to complete it"
+    ],
+    "ar": [
+     "أربع سنوات في الإنتاج الإخباري أو التغطية الميدانية",
+     "معرفة واسعة بحلب وريفها",
+     "دورة العمل في البيئات الخطرة أو الاستعداد لإتمامها"
+    ]
+   },
+   "provides": {
+    "en": [
+     "Camera and audio kit provided",
+     "Bureau generator and fibre uplink",
+     "Hostile-environment course paid for"
+    ],
+    "ar": [
+     "معدات التصوير والصوت مؤمّنة",
+     "مولّدة في المكتب ووصلة ألياف ضوئية",
+     "دورة البيئات الخطرة على حساب الشبكة"
+    ]
+   },
+   "contact": {
+    "name": {
+     "en": "Hadeel Barakat",
+     "ar": "هديل بركات"
+    },
+    "role": {
+     "en": "Bureau Chief, Aleppo",
+     "ar": "مديرة مكتب حلب"
+    },
+    "status": {
+     "en": "Interviewing next week",
+     "ar": "المقابلات الأسبوع القادم"
+    }
+   },
+   "tags": "journalist producer media news tv video reporter صحفي منتج إعلام أخبار تلفزيون مراسل",
+   "daysAgo": 4
+  },
+  {
+   "company": "Abu Abdo",
+   "title": {
+    "en": "Counter and prep staff",
+    "ar": "عامل مطبخ وكاشير"
+   },
+   "gov": "damascus",
+   "place": {
+    "en": "Damascus, Souq al-Hamidiyah",
+    "ar": "دمشق، سوق الحميدية"
+   },
+   "type": "full",
+   "level": "entry",
+   "mode": "onsite",
+   "pay": [
+    18000,
+    24000
+   ],
+   "langs": [
+    "ar"
+   ],
+   "recruits": [],
+   "anyFaculty": false,
+   "noDegree": true,
+   "support": false,
+   "openings": 2,
+   "summary": {
+    "en": "Two positions at the Hamidiyah branch, on the morning shift from six. Falafel prep, service and the till.",
+    "ar": "وظيفتان في فرع الحميدية، في الوردية الصباحية التي تبدأ في السادسة. تحضير الفلافل والخدمة والصندوق."
+   },
+   "duties": {
+    "en": [
+     "Prep and fry through the morning rush",
+     "Serve customers and run the till",
+     "Clean down and close out the shift"
+    ],
+    "ar": [
+     "التحضير والقلي خلال ذروة الصباح",
+     "خدمة الزبائن وتشغيل الصندوق",
+     "التنظيف وإغلاق الوردية"
+    ]
+   },
+   "needs": {
+    "en": [
+     "No experience needed; training is on the job",
+     "Able to start at six, six days a week",
+     "A health card, or we help you get one"
+    ],
+    "ar": [
+     "لا تُشترط خبرة، والتدريب أثناء العمل",
+     "القدرة على بدء الدوام في السادسة ستة أيام أسبوعياً",
+     "بطاقة صحية، أو نساعدك في استخراجها"
+    ]
+   },
+   "provides": {
+    "en": [
+     "Two meals on every shift",
+     "Paid weekly in cash, every Thursday",
+     "Health-card paperwork handled for you"
+    ],
+    "ar": [
+     "وجبتان في كل وردية",
+     "الأجر أسبوعي نقداً كل خميس",
+     "نتولّى عنك إجراءات البطاقة الصحية"
+    ]
+   },
+   "contact": {
+    "name": {
+     "en": "Nabil",
+     "ar": "نبيل"
+    },
+    "role": {
+     "en": "Owner",
+     "ar": "صاحب المحل"
+    },
+    "status": {
+     "en": "Walk in and ask for Nabil",
+     "ar": "تعال إلى المحل واسأل عن نبيل"
+    }
+   },
+   "tags": "falafel restaurant kitchen cashier cook food فلافل مطعم مطبخ كاشير طبخ",
+   "daysAgo": 0
+  },
+  {
+   "company": "Cali Restaurant",
+   "title": {
+    "en": "Shift supervisor",
+    "ar": "مشرف وردية"
+   },
+   "gov": "latakia",
+   "place": {
+    "en": "Latakia, on the corniche",
+    "ar": "اللاذقية، على الكورنيش"
+   },
+   "type": "full",
+   "level": "junior",
+   "mode": "onsite",
+   "pay": [
+    32000,
+    40000
+   ],
+   "langs": [
+    "ar",
+    "en"
+   ],
+   "recruits": [],
+   "anyFaculty": false,
+   "noDegree": true,
+   "support": false,
+   "openings": 1,
+   "summary": {
+    "en": "Running the evening floor on the Latakia corniche: the rota, cash-up, supplier deliveries and a team of eleven.",
+    "ar": "إدارة صالة المساء على كورنيش اللاذقية: جدول الورديات وإغلاق الصندوق واستلام التوريدات والإشراف على فريق من أحد عشر شخصاً."
+   },
+   "duties": {
+    "en": [
+     "Set the rota and cover gaps",
+     "Close the till and reconcile the night",
+     "Handle complaints and supplier deliveries"
+    ],
+    "ar": [
+     "إعداد جدول الورديات وتغطية النقص",
+     "إغلاق الصندوق وتسوية حساب الليلة",
+     "معالجة الشكاوى واستلام التوريدات"
+    ]
+   },
+   "needs": {
+    "en": [
+     "Two years in restaurants, at least one supervising",
+     "Comfortable taking orders in English",
+     "Available evenings and weekends"
+    ],
+    "ar": [
+     "سنتان في المطاعم، إحداهما على الأقل في الإشراف",
+     "الارتياح لاستقبال الطلبات بالإنكليزية",
+     "التفرّغ مساءً وفي عطلة نهاية الأسبوع"
+    ]
+   },
+   "provides": {
+    "en": [
+     "A share of the service charge",
+     "A staff meal every shift",
+     "Taxi home after a late close"
+    ],
+    "ar": [
+     "حصة من أجور الخدمة",
+     "وجبة للموظفين في كل وردية",
+     "أجرة تاكسي للعودة بعد الإغلاق المتأخر"
+    ]
+   },
+   "contact": {
+    "name": {
+     "en": "Rami Saadeh",
+     "ar": "رامي سعادة"
+    },
+    "role": {
+     "en": "General Manager",
+     "ar": "المدير العام"
+    },
+    "status": {
+     "en": "Interviews this week",
+     "ar": "المقابلات هذا الأسبوع"
+    }
+   },
+   "tags": "restaurant supervisor hospitality waiter manager مطعم مشرف ضيافة نادل",
+   "daysAgo": 5
+  },
+  {
+   "company": "Syrian Arab Red Crescent",
+   "title": {
+    "en": "Community health worker",
+    "ar": "عامل صحة مجتمعية"
+   },
+   "gov": "idlib",
+   "place": {
+    "en": "Idlib countryside, six villages",
+    "ar": "ريف إدلب، ست قرى"
+   },
+   "type": "contract",
+   "level": "entry",
+   "mode": "onsite",
+   "pay": [
+    67000,
+    85000
+   ],
+   "langs": [
+    "ar"
+   ],
+   "recruits": [
+    [
+     "furat",
+     "nursing"
+    ],
+    [
+     "aleppo",
+     "publichealth"
+    ]
+   ],
+   "anyFaculty": false,
+   "noDegree": false,
+   "support": false,
+   "openings": 1,
+   "summary": {
+    "en": "A nine-month contract across six villages in the Idlib countryside: immunisation outreach, malnutrition screening and referrals to the mobile clinic.",
+    "ar": "عقد لتسعة أشهر يغطي ست قرى في ريف إدلب: حملات التلقيح وفحص سوء التغذية والإحالة إلى العيادة المتنقلة."
+   },
+   "duties": {
+    "en": [
+     "Run immunisation outreach village by village",
+     "Screen under-fives for malnutrition",
+     "Refer urgent cases to the mobile clinic"
+    ],
+    "ar": [
+     "تنفيذ حملات التلقيح قرية بقرية",
+     "فحص الأطفال دون الخامسة للكشف عن سوء التغذية",
+     "إحالة الحالات العاجلة إلى العيادة المتنقلة"
+    ]
+   },
+   "needs": {
+    "en": [
+     "A nursing diploma, or a health-sciences student in year three or above",
+     "From the area, or able to reach it daily",
+     "A motorcycle licence is an advantage"
+    ],
+    "ar": [
+     "دبلوم تمريض، أو طالب علوم صحية في السنة الثالثة فما فوق",
+     "من أبناء المنطقة أو القدرة على الوصول إليها يومياً",
+     "رخصة دراجة نارية ميزة إضافية"
+    ]
+   },
+   "provides": {
+    "en": [
+     "Fuel reimbursed weekly",
+     "Field kit and phone credit",
+     "Counts as supervised clinical hours for nursing students"
+    ],
+    "ar": [
+     "تعويض الوقود أسبوعياً",
+     "حقيبة ميدانية ورصيد هاتف",
+     "تُحتسب ساعات سريرية تحت الإشراف لطلاب التمريض"
+    ]
+   },
+   "contact": {
+    "name": {
+     "en": "Dr Yusra Kanaan",
+     "ar": "الدكتورة يسرى كنعان"
+    },
+    "role": {
+     "en": "Field Health Coordinator",
+     "ar": "منسقة الصحة الميدانية"
+    },
+    "status": {
+     "en": "Rolling interviews",
+     "ar": "مقابلات مستمرة"
+    }
+   },
+   "tags": "health nurse nursing community vaccination ngo humanitarian صحة تمريض ممرض تلقيح إغاثة",
+   "daysAgo": 6
+  },
+  {
+   "company": "Syriatel",
+   "title": {
+    "en": "Network field technician",
+    "ar": "فني شبكات ميداني"
+   },
+   "gov": "aleppo",
+   "place": {
+    "en": "Across Aleppo governorate",
+    "ar": "في عموم محافظة حلب"
+   },
+   "type": "full",
+   "level": "junior",
+   "mode": "onsite",
+   "pay": [
+    26000,
+    34000
+   ],
+   "langs": [
+    "ar"
+   ],
+   "recruits": [
+    [
+     "aleppo",
+     "electrical"
+    ],
+    [
+     "aleppoti",
+     "telecom"
+    ]
+   ],
+   "anyFaculty": false,
+   "noDegree": false,
+   "support": false,
+   "openings": 6,
+   "summary": {
+    "en": "Restoring and maintaining base stations across Aleppo governorate, with some tower climbing once certified.",
+    "ar": "إصلاح الأبراج الخلوية وصيانتها في عموم محافظة حلب، مع بعض أعمال التسلق بعد الحصول على الشهادة."
+   },
+   "duties": {
+    "en": [
+     "Diagnose and repair site faults on call-out",
+     "Swap power units and keep batteries alive",
+     "Log every site visit before you leave"
+    ],
+    "ar": [
+     "تشخيص أعطال المواقع وإصلاحها عند الاستدعاء",
+     "تبديل وحدات الطاقة والحفاظ على البطاريات",
+     "توثيق كل زيارة موقع قبل مغادرته"
+    ]
+   },
+   "needs": {
+    "en": [
+     "A technical diploma in telecoms or electrical",
+     "A driving licence held at least two years",
+     "No fear of heights"
+    ],
+    "ar": [
+     "دبلوم فني في الاتصالات أو الكهرباء",
+     "إجازة قيادة منذ سنتين على الأقل",
+     "عدم الخوف من المرتفعات"
+    ]
+   },
+   "provides": {
+    "en": [
+     "Company vehicle, tools and a fuel allowance",
+     "Climbing certification paid for",
+     "Overtime paid at the legal rate"
+    ],
+    "ar": [
+     "سيارة من الشركة والعدد وبدل محروقات",
+     "شهادة التسلق على حساب الشركة",
+     "الساعات الإضافية تُدفع بالأجر القانوني"
+    ]
+   },
+   "contact": {
+    "name": {
+     "en": "Bassel Othman",
+     "ar": "باسل عثمان"
+    },
+    "role": {
+     "en": "Regional Network Manager",
+     "ar": "مدير الشبكة الإقليمي"
+    },
+    "status": {
+     "en": "Six posts open",
+     "ar": "ست وظائف شاغرة"
+    }
+   },
+   "tags": "telecom technician network tower electrical engineer اتصالات فني شبكات أبراج كهرباء",
+   "daysAgo": 7
+  },
+  {
+   "company": "Cham Construction",
+   "title": {
+    "en": "Site civil engineer",
+    "ar": "مهندس مدني مقيم"
+   },
+   "gov": "homs",
+   "place": {
+    "en": "Homs, Baba Amr",
+    "ar": "حمص، بابا عمرو"
+   },
+   "type": "full",
+   "level": "mid",
+   "mode": "onsite",
+   "pay": [
+    145000,
+    210000
+   ],
+   "langs": [
+    "ar",
+    "en"
+   ],
+   "recruits": [
+    [
+     "homs",
+     "civil"
+    ],
+    [
+     "damascus",
+     "civil"
+    ]
+   ],
+   "anyFaculty": false,
+   "noDegree": false,
+   "support": false,
+   "openings": 1,
+   "summary": {
+    "en": "Resident engineer on a 240-unit housing rebuild in Baba Amr, supervising three subcontractors.",
+    "ar": "مهندس مقيم في مشروع إعادة بناء 240 وحدة سكنية في بابا عمرو، مع الإشراف على ثلاثة مقاولين فرعيين."
+   },
+   "duties": {
+    "en": [
+     "Approve concrete pours and check rebar before closing",
+     "Hold subcontractors to the programme",
+     "Keep the donor progress report current"
+    ],
+    "ar": [
+     "اعتماد أعمال الصب وفحص التسليح قبل الإغلاق",
+     "إلزام المقاولين الفرعيين بالبرنامج الزمني",
+     "تحديث تقرير التقدم للجهة المانحة"
+    ]
+   },
+   "needs": {
+    "en": [
+     "Civil engineering degree and syndicate membership",
+     "Five years on site, at least two residential",
+     "AutoCAD, and reading structural drawings unaided"
+    ],
+    "ar": [
+     "شهادة في الهندسة المدنية وعضوية نقابة المهندسين",
+     "خمس سنوات ميدانية، منها سنتان في الأبنية السكنية",
+     "إتقان AutoCAD وقراءة المخططات الإنشائية باستقلالية"
+    ]
+   },
+   "provides": {
+    "en": [
+     "A site cabin with power and internet",
+     "Syndicate membership paid every year",
+     "Two site vehicles shared across the team"
+    ],
+    "ar": [
+     "كرفان في الموقع مع كهرباء وإنترنت",
+     "اشتراك النقابة على حساب الشركة سنوياً",
+     "سيارتان للموقع مشتركتان بين الفريق"
+    ]
+   },
+   "contact": {
+    "name": {
+     "en": "Eng. Maher Jaber",
+     "ar": "المهندس ماهر جابر"
+    },
+    "role": {
+     "en": "Project Director",
+     "ar": "مدير المشروع"
+    },
+    "status": {
+     "en": "Starts within the month",
+     "ar": "المباشرة خلال الشهر"
+    }
+   },
+   "tags": "civil engineer construction site reconstruction housing autocad مهندس مدني إنشاءات إعادة إعمار",
+   "daysAgo": 9
+  },
+  {
+   "company": "UNDP Syria",
+   "title": {
+    "en": "Livelihoods officer",
+    "ar": "مسؤول سبل العيش"
+   },
+   "gov": "damascus",
+   "place": {
+    "en": "Damascus, with field days in Rural Damascus",
+    "ar": "دمشق، مع أيام ميدانية في الريف"
+   },
+   "type": "contract",
+   "level": "mid",
+   "mode": "hybrid",
+   "pay": [
+    270000,
+    340000
+   ],
+   "langs": [
+    "ar",
+    "en"
+   ],
+   "recruits": [
+    [
+     "damascus",
+     "economics"
+    ],
+    [
+     "hiba",
+     "business"
+    ]
+   ],
+   "anyFaculty": false,
+   "noDegree": false,
+   "support": false,
+   "openings": 1,
+   "summary": {
+    "en": "A two-year fixed term running small-grant schemes for workshops and family businesses in Rural Damascus.",
+    "ar": "عقد محدد المدة لسنتين لإدارة برامج المنح الصغيرة للورش والمشاريع العائلية في ريف دمشق."
+   },
+   "duties": {
+    "en": [
+     "Assess grant applications and visit the businesses",
+     "Track what the money actually did",
+     "Report quarterly to the country office"
+    ],
+    "ar": [
+     "تقييم طلبات المنح وزيارة المنشآت",
+     "متابعة الأثر الفعلي للتمويل",
+     "رفع تقارير فصلية لمكتب البرنامج"
+    ]
+   },
+   "needs": {
+    "en": [
+     "Degree in economics, development or business",
+     "Five years with an NGO or UN agency",
+     "Reporting-standard English"
+    ],
+    "ar": [
+     "شهادة في الاقتصاد أو التنمية أو إدارة الأعمال",
+     "خمس سنوات مع منظمة غير حكومية أو وكالة أممية",
+     "إنكليزية بمستوى كتابة التقارير"
+    ]
+   },
+   "provides": {
+    "en": [
+     "UN salary scale and medical cover",
+     "A field vehicle and driver on visit days",
+     "Security training provided"
+    ],
+    "ar": [
+     "سلّم رواتب الأمم المتحدة وتأمين صحي",
+     "سيارة وسائق في الأيام الميدانية",
+     "تدريب أمني مؤمَّن"
+    ]
+   },
+   "contact": {
+    "name": {
+     "en": "Nour Abbas",
+     "ar": "نور عباس"
+    },
+    "role": {
+     "en": "Programme Manager, Livelihoods",
+     "ar": "مديرة برنامج سبل العيش"
+    },
+    "status": {
+     "en": "Longlist closes Friday",
+     "ar": "القائمة الطويلة تُغلق يوم الجمعة"
+    }
+   },
+   "tags": "undp un ngo development livelihoods grants economics أمم متحدة تنمية منح اقتصاد",
+   "daysAgo": 5
+  },
+  {
+   "company": "Bank of Syria and Overseas",
+   "title": {
+    "en": "Branch teller",
+    "ar": "أمين صندوق"
+   },
+   "gov": "tartus",
+   "place": {
+    "en": "Tartus city branch",
+    "ar": "فرع مدينة طرطوس"
+   },
+   "type": "full",
+   "level": "entry",
+   "mode": "onsite",
+   "pay": [
+    22000,
+    28000
+   ],
+   "langs": [
+    "ar",
+    "en"
+   ],
+   "recruits": [
+    [
+     "latakia",
+     "economics"
+    ],
+    [
+     "svu",
+     "economics"
+    ]
+   ],
+   "anyFaculty": false,
+   "noDegree": true,
+   "support": false,
+   "openings": 2,
+   "summary": {
+    "en": "Counter service at the Tartus city branch, with six weeks of paid training in Damascus before you start.",
+    "ar": "خدمة الزبائن في فرع مدينة طرطوس، مع ستة أسابيع من التدريب المدفوع في دمشق قبل المباشرة."
+   },
+   "duties": {
+    "en": [
+     "Handle deposits, withdrawals and transfers at the counter",
+     "Balance your drawer at the end of every day",
+     "Open accounts for first-time customers"
+    ],
+    "ar": [
+     "إجراء الإيداعات والسحوبات والحوالات على الشباك",
+     "تسوية الصندوق في نهاية كل يوم",
+     "فتح حسابات للعملاء الجدد"
+    ]
+   },
+   "needs": {
+    "en": [
+     "A secondary certificate; a commerce or banking diploma is an advantage",
+     "Accurate with cash and comfortable with numbers",
+     "A clean criminal-record certificate"
+    ],
+    "ar": [
+     "الشهادة الثانوية، ودبلوم التجارة أو المصارف ميزة إضافية",
+     "الدقة في التعامل مع النقد والأرقام",
+     "وثيقة لا حكم عليه"
+    ]
+   },
+   "provides": {
+    "en": [
+     "Six weeks of paid training with accommodation",
+     "Staff loan rates after one year",
+     "Fixed hours with no evening shifts"
+    ],
+    "ar": [
+     "ستة أسابيع تدريب مدفوع مع السكن",
+     "أسعار قروض تفضيلية للموظفين بعد سنة",
+     "دوام ثابت بلا ورديات مسائية"
+    ]
+   },
+   "contact": {
+    "name": {
+     "en": "Ghada Sleiman",
+     "ar": "غادة سليمان"
+    },
+    "role": {
+     "en": "Branch Manager",
+     "ar": "مديرة الفرع"
+    },
+    "status": {
+     "en": "Two posts open",
+     "ar": "وظيفتان شاغرتان"
+    }
+   },
+   "tags": "bank teller cashier banking finance بنك مصرف أمين صندوق",
+   "daysAgo": 11
+  },
+  {
+   "company": "Lattakia Labs",
+   "title": {
+    "en": "Frontend developer",
+    "ar": "مطوّر واجهات أمامية"
+   },
+   "gov": "remote",
+   "place": {
+    "en": "Remote, anywhere in Syria",
+    "ar": "عن بُعد، من أي مكان في سوريا"
+   },
+   "type": "full",
+   "level": "junior",
+   "mode": "remote",
+   "pay": [
+    135000,
+    220000
+   ],
+   "langs": [
+    "ar",
+    "en"
+   ],
+   "recruits": [
+    [
+     "svu",
+     "informatics"
+    ],
+    [
+     "latakia",
+     "informatics"
+    ],
+    [
+     "hiast",
+     "informatics"
+    ]
+   ],
+   "anyFaculty": false,
+   "noDegree": false,
+   "support": false,
+   "openings": 1,
+   "summary": {
+    "en": "Remote from anywhere in Syria, building Arabic-first interfaces for logistics clients in the Gulf.",
+    "ar": "عمل عن بُعد من أي مكان في سوريا، لبناء واجهات عربية أولاً لعملاء في قطاع الخدمات اللوجستية في الخليج."
+   },
+   "duties": {
+    "en": [
+     "Build and ship right-to-left React interfaces",
+     "Review a teammate's pull request every day",
+     "Join one client call a week in English"
+    ],
+    "ar": [
+     "بناء واجهات React تعمل من اليمين إلى اليسار وإطلاقها",
+     "مراجعة طلب دمج لأحد الزملاء يومياً",
+     "حضور مكالمة أسبوعية مع العميل بالإنكليزية"
+    ]
+   },
+   "needs": {
+    "en": [
+     "Two years with React or a similar framework",
+     "At least one right-to-left interface shipped",
+     "Six hours' overlap with Gulf working hours"
+    ],
+    "ar": [
+     "سنتان في React أو إطار عمل مماثل",
+     "إطلاق واجهة واحدة على الأقل من اليمين إلى اليسار",
+     "تداخل ست ساعات مع دوام دول الخليج"
+    ]
+   },
+   "provides": {
+    "en": [
+     "Power bank and router allowance",
+     "A laptop shipped to you",
+     "Hours that flex around the outage schedule"
+    ],
+    "ar": [
+     "بدل بطارية احتياطية وراوتر",
+     "حاسوب محمول يُرسل إليك",
+     "ساعات مرنة حسب جدول التقنين"
+    ]
+   },
+   "contact": {
+    "name": {
+     "en": "Tarek Ismail",
+     "ar": "طارق إسماعيل"
+    },
+    "role": {
+     "en": "Engineering Lead",
+     "ar": "قائد الفريق الهندسي"
+    },
+    "status": {
+     "en": "Take-home task instead of a whiteboard interview",
+     "ar": "مهمة منزلية بدل المقابلة التقنية"
+    }
+   },
+   "tags": "developer frontend react javascript software programmer remote rtl مطور برمجة واجهات عن بعد مبرمج",
+   "daysAgo": 2
+  },
+  {
+   "company": "Sheikh Najjar Textiles",
+   "title": {
+    "en": "Loom operator",
+    "ar": "عامل نول"
+   },
+   "gov": "aleppo",
+   "place": {
+    "en": "Aleppo, Sheikh Najjar industrial city",
+    "ar": "حلب، مدينة الشيخ نجار الصناعية"
+   },
+   "type": "full",
+   "level": "entry",
+   "mode": "onsite",
+   "pay": [
+    19000,
+    25000
+   ],
+   "langs": [
+    "ar"
+   ],
+   "recruits": [],
+   "anyFaculty": false,
+   "noDegree": true,
+   "support": false,
+   "openings": 40,
+   "summary": {
+    "en": "Forty positions across two shifts as the plant brings a third production line back online.",
+    "ar": "أربعون وظيفة على ورديتين مع إعادة تشغيل خط الإنتاج الثالث في المعمل."
+   },
+   "duties": {
+    "en": [
+     "Run and watch four looms across the shift",
+     "Re-thread and clear jams without stopping the line",
+     "Flag defects to the shift leader"
+    ],
+    "ar": [
+     "تشغيل أربعة أنوال ومراقبتها خلال الوردية",
+     "إعادة تمرير الخيوط وفك الانحشار دون إيقاف الخط",
+     "الإبلاغ عن العيوب لرئيس الوردية"
+    ]
+   },
+   "needs": {
+    "en": [
+     "No experience needed; three weeks of paid training",
+     "Comfortable standing through an eight-hour shift",
+     "Willing to alternate morning and evening shifts"
+    ],
+    "ar": [
+     "لا تُشترط خبرة، مع ثلاثة أسابيع تدريب مدفوع",
+     "القدرة على الوقوف طوال وردية من ثماني ساعات",
+     "الاستعداد للتناوب بين الوردية الصباحية والمسائية"
+    ]
+   },
+   "provides": {
+    "en": [
+     "A works bus from Aleppo city and Hreitan",
+     "A canteen meal on every shift",
+     "Social insurance from the first day"
+    ],
+    "ar": [
+     "باص للعمال من مدينة حلب وحريتان",
+     "وجبة في المقصف كل وردية",
+     "تأمينات اجتماعية من اليوم الأول"
+    ]
+   },
+   "contact": {
+    "name": {
+     "en": "Hazem Qassab",
+     "ar": "حازم قصاب"
+    },
+    "role": {
+     "en": "Production Manager",
+     "ar": "مدير الإنتاج"
+    },
+    "status": {
+     "en": "Forty posts, hiring weekly",
+     "ar": "أربعون وظيفة، والتوظيف أسبوعي"
+    }
+   },
+   "tags": "factory textile loom production worker operator معمل نسيج نول إنتاج عامل",
+   "daysAgo": 3
+  },
+  {
+   "company": "Latakia University",
+   "title": {
+    "en": "Laboratory Internship in Marine Sciences",
+    "ar": "تدريب مخبري في العلوم البحرية"
+   },
+   "gov": "latakia",
+   "place": {
+    "en": "Latakia coast, marine biology department",
+    "ar": "ساحل اللاذقية، قسم الأحياء البحرية"
+   },
+   "type": "intern",
+   "level": "student",
+   "mode": "onsite",
+   "pay": null,
+   "langs": [
+    "ar"
+   ],
+   "recruits": [
+    [
+     "latakia",
+     "marine"
+    ],
+    [
+     "latakia",
+     "chemistry"
+    ],
+    [
+     "latakia",
+     "biology"
+    ]
+   ],
+   "anyFaculty": false,
+   "noDegree": false,
+   "support": false,
+   "openings": 8,
+   "summary": {
+    "en": "Twelve weeks and eight seats, unpaid. Water-quality sampling along the Latakia coast with the marine biology department.",
+    "ar": "اثنا عشر أسبوعاً وثمانية مقاعد، دون أجر. أخذ عينات لجودة المياه على ساحل اللاذقية مع قسم الأحياء البحرية."
+   },
+   "duties": {
+    "en": [
+     "Collect and label samples at four coastal points",
+     "Run basic water chemistry in the lab",
+     "Keep the sampling log clean enough to publish from"
+    ],
+    "ar": [
+     "جمع العينات وترقيمها في أربع نقاط ساحلية",
+     "إجراء تحاليل كيمياء المياه الأساسية في المخبر",
+     "الحفاظ على سجل العينات بدقة تصلح للنشر"
+    ]
+   },
+   "needs": {
+    "en": [
+     "Year two or above in marine sciences, biology or chemistry",
+     "Able to swim",
+     "Two mornings a week on the coast in any weather"
+    ],
+    "ar": [
+     "السنة الثانية فما فوق في العلوم البحرية أو الأحياء أو الكيمياء",
+     "إجادة السباحة",
+     "صباحان أسبوعياً على الساحل في أي طقس"
+    ]
+   },
+   "provides": {
+    "en": [
+     "Transport to the sampling sites",
+     "Named credit on any resulting paper",
+     "Counts toward your faculty's field requirement"
+    ],
+    "ar": [
+     "النقل إلى مواقع أخذ العينات مؤمّن",
+     "ذكر اسمك في أي بحث ينتج عن العمل",
+     "يُحتسب ضمن متطلب التدريب الميداني في كليتك"
+    ]
+   },
+   "contact": {
+    "name": {
+     "en": "Dr Salma Ayoub",
+     "ar": "الدكتورة سلمى أيوب"
+    },
+    "role": {
+     "en": "Department of Marine Biology",
+     "ar": "قسم الأحياء البحرية"
+    },
+    "status": {
+     "en": "Eight seats, 41 applied",
+     "ar": "ثمانية مقاعد، وتقدّم 41"
+    }
+   },
+   "tags": "marine biology chemistry lab laboratory research internship student بحري أحياء كيمياء مخبر تدريب طلاب",
+   "daysAgo": 4
+  },
+  {
+   "company": "Katakit",
+   "title": {
+    "en": "Regional sales representative",
+    "ar": "مندوب مبيعات"
+   },
+   "gov": "hama",
+   "place": {
+    "en": "Hama and its countryside",
+    "ar": "حماة وريفها"
+   },
+   "type": "full",
+   "level": "junior",
+   "mode": "onsite",
+   "pay": [
+    20000,
+    36000
+   ],
+   "langs": [
+    "ar"
+   ],
+   "recruits": [],
+   "anyFaculty": false,
+   "noDegree": true,
+   "support": false,
+   "openings": 1,
+   "summary": {
+    "en": "Covering Hama and its countryside: shop visits, order-taking and merchandising for about ninety retail accounts. Base pay plus commission.",
+    "ar": "تغطية حماة وريفها: زيارة المحلات وأخذ الطلبيات وترتيب العرض لنحو تسعين نقطة بيع. راتب أساسي مع عمولة."
+   },
+   "duties": {
+    "en": [
+     "Visit twenty shops a day on a fixed route",
+     "Take orders and collect cash accurately",
+     "Keep the shelves in order at every account"
+    ],
+    "ar": [
+     "زيارة عشرين محلاً يومياً على خط ثابت",
+     "أخذ الطلبيات وتحصيل النقد بدقة",
+     "الحفاظ على ترتيب الرفوف في كل نقطة بيع"
+    ]
+   },
+   "needs": {
+    "en": [
+     "A driving licence and knowledge of the governorate's roads",
+     "One year in sales, distribution or retail",
+     "Honest and accurate with daily cash"
+    ],
+    "ar": [
+     "إجازة قيادة ومعرفة بطرقات المحافظة",
+     "سنة خبرة في المبيعات أو التوزيع أو التجزئة",
+     "الأمانة والدقة في النقد اليومي"
+    ]
+   },
+   "provides": {
+    "en": [
+     "A motorcycle, with fuel and maintenance",
+     "Monthly commission on top of base pay",
+     "Phone credit covered"
+    ],
+    "ar": [
+     "دراجة نارية مع الوقود والصيانة",
+     "عمولة شهرية فوق الراتب الأساسي",
+     "رصيد الهاتف مغطى"
+    ]
+   },
+   "contact": {
+    "name": {
+     "en": "Firas Halabi",
+     "ar": "فراس حلبي"
+    },
+    "role": {
+     "en": "Regional Sales Manager",
+     "ar": "مدير المبيعات الإقليمي"
+    },
+    "status": {
+     "en": "Interviewing in Hama",
+     "ar": "المقابلات في حماة"
+    }
+   },
+   "tags": "sales representative distribution retail salesman مبيعات مندوب توزيع",
+   "daysAgo": 8
+  },
+  {
+   "company": "Ibn Zuhr Pharmacies",
+   "title": {
+    "en": "Pharmacy assistant",
+    "ar": "مساعد صيدلي"
+   },
+   "gov": "rifdimashq",
+   "place": {
+    "en": "Rural Damascus, Jaramana",
+    "ar": "ريف دمشق، جرمانا"
+   },
+   "type": "part",
+   "level": "entry",
+   "mode": "onsite",
+   "pay": [
+    11000,
+    15000
+   ],
+   "langs": [
+    "ar"
+   ],
+   "recruits": [
+    [
+     "damascus",
+     "pharmacy"
+    ]
+   ],
+   "anyFaculty": false,
+   "noDegree": true,
+   "support": false,
+   "openings": 1,
+   "summary": {
+    "en": "Evening shifts from five until eleven at the Jaramana branch. Suits a pharmacy student.",
+    "ar": "ورديات مسائية من الخامسة حتى الحادية عشرة في فرع جرمانا، وتناسب طالب صيدلة."
+   },
+   "duties": {
+    "en": [
+     "Serve customers and handle the till",
+     "Rotate stock and check expiry dates",
+     "Support the pharmacist on dispensing"
+    ],
+    "ar": [
+     "خدمة الزبائن وتشغيل الصندوق",
+     "تدوير المخزون ومراقبة تواريخ الصلاحية",
+     "مساعدة الصيدلي في صرف الأدوية"
+    ]
+   },
+   "needs": {
+    "en": [
+     "A pharmacy student, or a secondary certificate with retail experience",
+     "Six evenings a week",
+     "Careful with names and dosages"
+    ],
+    "ar": [
+     "طالب صيدلة، أو شهادة ثانوية مع خبرة في البيع",
+     "ست أمسيات أسبوعياً",
+     "الدقة في أسماء الأدوية والجرعات"
+    ]
+   },
+   "provides": {
+    "en": [
+     "Shifts scheduled around lectures and exams",
+     "Counts toward pharmacy practice hours",
+     "Taxi fare covered after the late close"
+    ],
+    "ar": [
+     "ورديات مُنسَّقة مع المحاضرات والامتحانات",
+     "تُحتسب ضمن ساعات التطبيق الصيدلاني",
+     "أجرة التاكسي مغطاة بعد الإغلاق المتأخر"
+    ]
+   },
+   "contact": {
+    "name": {
+     "en": "Dr Hanan Zein",
+     "ar": "الدكتورة حنان زين"
+    },
+    "role": {
+     "en": "Supervising Pharmacist",
+     "ar": "الصيدلانية المشرفة"
+    },
+    "status": {
+     "en": "Start any week",
+     "ar": "المباشرة في أي أسبوع"
+    }
+   },
+   "tags": "pharmacy pharmacist assistant part-time evening student صيدلية صيدلي دوام جزئي مسائي",
+   "daysAgo": 3
+  },
+  {
+   "company": "Barada Logistics",
+   "title": {
+    "en": "Truck driver, Damascus to Tartus",
+    "ar": "سائق شاحنة على خط دمشق طرطوس"
+   },
+   "gov": "damascus",
+   "place": {
+    "en": "Damascus, on the coastal route",
+    "ar": "دمشق، على الطريق الساحلي"
+   },
+   "type": "full",
+   "level": "junior",
+   "mode": "onsite",
+   "pay": [
+    28000,
+    35000
+   ],
+   "langs": [
+    "ar"
+   ],
+   "recruits": [],
+   "anyFaculty": false,
+   "noDegree": true,
+   "support": false,
+   "openings": 1,
+   "summary": {
+    "en": "Three return runs a week on the coastal route with refrigerated loads.",
+    "ar": "ثلاث رحلات ذهاب وإياب أسبوعياً على الطريق الساحلي بحمولات مبرّدة."
+   },
+   "duties": {
+    "en": [
+     "Drive the Damascus to Tartus route on a fixed schedule",
+     "Check the refrigeration temperature at every stop",
+     "Help the crew load and unload"
+    ],
+    "ar": [
+     "قيادة خط دمشق طرطوس وفق جدول ثابت",
+     "فحص حرارة التبريد عند كل توقف",
+     "المساعدة في التحميل والتفريغ مع الفريق"
+    ]
+   },
+   "needs": {
+    "en": [
+     "A heavy-vehicle licence held three years or more",
+     "A clean record on the coastal route",
+     "Able to load and unload with the crew"
+    ],
+    "ar": [
+     "إجازة قيادة شاحنات منذ ثلاث سنوات أو أكثر",
+     "سجل نظيف على الطريق الساحلي",
+     "القدرة على التحميل والتفريغ مع الفريق"
+    ]
+   },
+   "provides": {
+    "en": [
+     "Overnight stay in Tartus covered",
+     "The truck is maintained and insured by the company",
+     "Diesel arranged, so no queueing yourself"
+    ],
+    "ar": [
+     "المبيت في طرطوس مؤمّن",
+     "صيانة الشاحنة وتأمينها على الشركة",
+     "المازوت مؤمّن دون الوقوف في الطوابير"
+    ]
+   },
+   "contact": {
+    "name": {
+     "en": "Adnan Rifai",
+     "ar": "عدنان الرفاعي"
+    },
+    "role": {
+     "en": "Fleet Supervisor",
+     "ar": "مشرف الأسطول"
+    },
+    "status": {
+     "en": "Start this week",
+     "ar": "المباشرة هذا الأسبوع"
+    }
+   },
+   "tags": "driver truck lorry logistics transport freight سائق شاحنة نقل شحن",
+   "daysAgo": 1
+  }
+ ],
+ "demoSeeker": {
+  "v": 1,
+  "demo": true,
+  "role": "student",
+  "name": "Omar Nabil Al-Khatib",
+  "nameAr": "عمر نبيل الخطيب",
+  "phone": "+963 900 123 456",
+  "email": "omar.demo@shaghilni.sy",
+  "gov": "homs",
+  "relocate": false,
+  "langs": [
+   "ar",
+   "en"
+  ],
+  "edu": {
+   "status": "student",
+   "uni": "homs",
+   "uniName": "",
+   "fac": "petroleum",
+   "year": 4,
+   "grad": 2027,
+   "gpa": "78/100",
+   "course": "Drilling engineering, Reservoir engineering, Well logging",
+   "honors": ""
+  },
+  "prefs": {
+   "types": [
+    "intern",
+    "full"
+   ],
+   "fields": [
+    "energy"
+   ],
+   "level": "none"
+  },
+  "exp": [
+   {
+    "id": "e1",
+    "role": "Summer trainee",
+    "org": "Orontes Drilling Services",
+    "place": "Homs",
+    "start": "2025-07",
+    "end": "2025-08",
+    "current": false,
+    "bullets": [
+     "Responsible for logging daily drilling reports for 3 wells",
+     "Helped the wellsite geologist describe cuttings samples",
+     "Worked on a spreadsheet to track mud weight readings"
+    ]
+   },
+   {
+    "id": "e2",
+    "role": "Private tutor",
+    "org": "Self-employed",
+    "place": "Homs",
+    "start": "2023-09",
+    "end": "",
+    "current": true,
+    "bullets": [
+     "Tutor 6 secondary students in maths and physics each week",
+     "Prepare exam practice sheets in Arabic and English"
+    ]
+   }
+  ],
+  "acts": [
+   {
+    "id": "a1",
+    "role": "Treasurer",
+    "org": "Petroleum Engineering Student Society, Homs University",
+    "place": "Homs",
+    "start": "2024-10",
+    "end": "",
+    "current": true,
+    "bullets": [
+     "Manage a budget of 15,000 SYP for 4 technical workshops a year",
+     "Organise site visits with local engineering companies"
+    ]
+   }
+  ],
+  "skills": [
+   "Excel",
+   "AutoCAD",
+   "Technical report writing"
+  ],
+  "certs": [
+   "IOSH Working Safely (2025)"
+  ],
+  "tailor": {}
+ }
+}

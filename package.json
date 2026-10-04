@@ -1,0 +1,22 @@
+{
+  "name": "shaghilni",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Shaghilni: verified jobs and internships in Syria. MVP web app with a zero-dependency Node.js server.",
+  "type": "module",
+  "engines": {
+    "node": ">=22.13"
+  },
+  "scripts": {
+    "start": "node --disable-warning=ExperimentalWarning server/index.js",
+    "dev": "node --disable-warning=ExperimentalWarning --watch-path=server server/index.js",
+    "test": "node --disable-warning=ExperimentalWarning --test \"test/*.test.js\"",
+    "test:e2e": "node --disable-warning=ExperimentalWarning test/e2e/browser-flow.mjs",
+    "backup": "node --disable-warning=ExperimentalWarning scripts/backup.js",
+    "demo:remove": "node --disable-warning=ExperimentalWarning scripts/remove-demo.js",
+    "security:check": "node --disable-warning=ExperimentalWarning scripts/security-check.js",
+    "demo-accounts:purge": "node --disable-warning=ExperimentalWarning scripts/demo-accounts.js purge",
+    "demo-accounts:uninstall": "node scripts/demo-accounts.js uninstall"
+  },
+  "license": "UNLICENSED"
+}

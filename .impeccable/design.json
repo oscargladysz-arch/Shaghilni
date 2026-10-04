@@ -1,0 +1,711 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-02T20:20:39+00:00",
+  "title": "Design System: Shaghilni",
+  "extensions": {
+    "colorMeta": {
+      "qasioun-pine": {
+        "role": "primary",
+        "displayName": "Qasioun Pine",
+        "canonical": "oklch(46.8% 0.101 160.0)",
+        "tonalRamp": [
+          "#000F06",
+          "#002F1C",
+          "#065335",
+          "#227752",
+          "#4B9C74",
+          "#71C298",
+          "#94E6BA",
+          "#C5FEDE"
+        ]
+      },
+      "qasioun-pine-deep": {
+        "role": "primary",
+        "displayName": "Deep Pine",
+        "canonical": "oklch(41.8% 0.090 160.0)",
+        "tonalRamp": [
+          "#000F07",
+          "#022F1C",
+          "#0B5235",
+          "#2F7654",
+          "#549A76",
+          "#79C09A",
+          "#9CE4BD",
+          "#C3FFDD"
+        ]
+      },
+      "on-pine": {
+        "role": "primary",
+        "displayName": "On Pine",
+        "canonical": "oklch(100.0% 0.000 89.9)",
+        "tonalRamp": [
+          "#0B0B0B",
+          "#262626",
+          "#454545",
+          "#666666",
+          "#898989",
+          "#AEAEAE",
+          "#D1D1D1",
+          "#EEEEEE"
+        ]
+      },
+      "pine-soft": {
+        "role": "primary",
+        "displayName": "Pine Soft"
+      },
+      "pine-line": {
+        "role": "primary",
+        "displayName": "Pine Line"
+      },
+      "amber-notice": {
+        "role": "secondary",
+        "displayName": "Amber Notice",
+        "canonical": "oklch(52.9% 0.119 64.3)",
+        "tonalRamp": [
+          "#150800",
+          "#3B1F00",
+          "#643904",
+          "#91560E",
+          "#BA7830",
+          "#E29D57",
+          "#FCC590",
+          "#FEEBD9"
+        ]
+      },
+      "amber-soft": {
+        "role": "secondary",
+        "displayName": "Amber Soft"
+      },
+      "rose-alert": {
+        "role": "secondary",
+        "displayName": "Rose Alert",
+        "canonical": "oklch(50.0% 0.182 29.5)",
+        "tonalRamp": [
+          "#1F0000",
+          "#500000",
+          "#840904",
+          "#B7271C",
+          "#E25242",
+          "#FB8978",
+          "#FDC0B5",
+          "#FFE9E5"
+        ]
+      },
+      "rose-soft": {
+        "role": "secondary",
+        "displayName": "Rose Soft"
+      },
+      "noticeboard-paper": {
+        "role": "neutral",
+        "displayName": "Noticeboard Paper",
+        "canonical": "oklch(96.7% 0.003 106.4)",
+        "tonalRamp": [
+          "#0B0B0A",
+          "#262625",
+          "#454543",
+          "#666664",
+          "#898987",
+          "#AEAEAC",
+          "#D1D1CF",
+          "#EEEEEC"
+        ]
+      },
+      "card-white": {
+        "role": "neutral",
+        "displayName": "Card White",
+        "canonical": "oklch(100.0% 0.000 89.9)",
+        "tonalRamp": [
+          "#0B0B0B",
+          "#262626",
+          "#454545",
+          "#666666",
+          "#898989",
+          "#AEAEAE",
+          "#D1D1D1",
+          "#EEEEEE"
+        ]
+      },
+      "quiet-white": {
+        "role": "neutral",
+        "displayName": "Quiet White",
+        "canonical": "oklch(97.9% 0.003 106.4)",
+        "tonalRamp": [
+          "#0B0B0A",
+          "#262625",
+          "#454543",
+          "#666664",
+          "#898987",
+          "#AEAEAC",
+          "#D1D1CF",
+          "#EEEEEC"
+        ]
+      },
+      "pressed-grey": {
+        "role": "neutral",
+        "displayName": "Pressed Grey",
+        "canonical": "oklch(94.2% 0.004 106.5)",
+        "tonalRamp": [
+          "#0B0B09",
+          "#272724",
+          "#454543",
+          "#666664",
+          "#898987",
+          "#AEAEAB",
+          "#D1D1CE",
+          "#EFEFEC"
+        ]
+      },
+      "charcoal-ink": {
+        "role": "neutral",
+        "displayName": "Charcoal Ink",
+        "canonical": "oklch(20.3% 0.004 229.0)",
+        "tonalRamp": [
+          "#0A0B0C",
+          "#252728",
+          "#434547",
+          "#646668",
+          "#878A8B",
+          "#ACAEB0",
+          "#CFD1D3",
+          "#ECEFF0"
+        ]
+      },
+      "slate-ink": {
+        "role": "neutral",
+        "displayName": "Slate Ink",
+        "canonical": "oklch(39.9% 0.009 248.0)",
+        "tonalRamp": [
+          "#080C0F",
+          "#23272A",
+          "#424549",
+          "#62676B",
+          "#858A8E",
+          "#AAAEB3",
+          "#CDD2D6",
+          "#EAEFF4"
+        ]
+      },
+      "muted-ink": {
+        "role": "neutral",
+        "displayName": "Muted Ink",
+        "canonical": "oklch(51.5% 0.010 248.0)",
+        "tonalRamp": [
+          "#080C0F",
+          "#23272B",
+          "#41464A",
+          "#62676C",
+          "#858A8F",
+          "#A9AFB4",
+          "#CCD2D7",
+          "#E9EFF5"
+        ]
+      },
+      "faint-ink": {
+        "role": "neutral",
+        "displayName": "Faint Ink",
+        "canonical": "oklch(70.0% 0.008 241.7)",
+        "tonalRamp": [
+          "#080C0E",
+          "#23272A",
+          "#414649",
+          "#62676A",
+          "#858A8E",
+          "#AAAFB3",
+          "#CCD2D6",
+          "#EAEFF4"
+        ]
+      },
+      "hairline": {
+        "role": "neutral",
+        "displayName": "Hairline"
+      },
+      "hairline-strong": {
+        "role": "neutral",
+        "displayName": "Hairline Strong"
+      },
+      "scrim": {
+        "role": "neutral",
+        "displayName": "Scrim"
+      },
+      "qasioun-pine-night": {
+        "role": "primary",
+        "displayName": "Qasioun Pine Night",
+        "canonical": "oklch(73.1% 0.147 161.3)",
+        "tonalRamp": [
+          "#000F07",
+          "#012F1D",
+          "#095237",
+          "#177852",
+          "#14A26E",
+          "#3DCA90",
+          "#68EFB2",
+          "#C2FFDF"
+        ]
+      },
+      "qasioun-pine-night-ink": {
+        "role": "primary",
+        "displayName": "Qasioun Pine Night Ink",
+        "canonical": "oklch(80.1% 0.130 163.1)",
+        "tonalRamp": [
+          "#000F07",
+          "#022F1E",
+          "#0C5239",
+          "#007954",
+          "#1AA172",
+          "#50C796",
+          "#77ECB9",
+          "#C3FFE1"
+        ]
+      },
+      "on-pine-night": {
+        "role": "primary",
+        "displayName": "On Pine Night",
+        "canonical": "oklch(17.4% 0.028 164.6)",
+        "tonalRamp": [
+          "#010F08",
+          "#192B23",
+          "#374A41",
+          "#586B62",
+          "#7A8F85",
+          "#9FB4A9",
+          "#C1D7CC",
+          "#DEF5EA"
+        ]
+      },
+      "amber-notice-night": {
+        "role": "primary",
+        "displayName": "Amber Notice Night",
+        "canonical": "oklch(77.7% 0.146 71.5)",
+        "tonalRamp": [
+          "#140800",
+          "#372103",
+          "#603C03",
+          "#8B5A0D",
+          "#BB7903",
+          "#E79C2E",
+          "#FCC683",
+          "#FEEBD5"
+        ]
+      },
+      "rose-alert-night": {
+        "role": "primary",
+        "displayName": "Rose Alert Night",
+        "canonical": "oklch(70.9% 0.170 26.5)",
+        "tonalRamp": [
+          "#1F0001",
+          "#4D0507",
+          "#85030E",
+          "#B32E2C",
+          "#DD574F",
+          "#FC877C",
+          "#FEBFB8",
+          "#FEE9E6"
+        ]
+      },
+      "night-ground": {
+        "role": "neutral",
+        "displayName": "Night Ground",
+        "canonical": "oklch(16.3% 0.003 248.0)",
+        "tonalRamp": [
+          "#0A0B0C",
+          "#252728",
+          "#444546",
+          "#656667",
+          "#88898B",
+          "#ADAEAF",
+          "#D0D1D3",
+          "#EDEFF0"
+        ]
+      },
+      "night-surface": {
+        "role": "neutral",
+        "displayName": "Night Surface",
+        "canonical": "oklch(20.3% 0.004 229.0)",
+        "tonalRamp": [
+          "#0A0B0C",
+          "#252728",
+          "#434547",
+          "#646668",
+          "#878A8B",
+          "#ACAEB0",
+          "#CFD1D3",
+          "#ECEFF0"
+        ]
+      },
+      "night-surface-2": {
+        "role": "neutral",
+        "displayName": "Night Surface 2",
+        "canonical": "oklch(22.5% 0.005 248.0)",
+        "tonalRamp": [
+          "#0A0B0D",
+          "#252729",
+          "#434548",
+          "#646669",
+          "#87898C",
+          "#ABAEB1",
+          "#CED1D4",
+          "#ECEFF2"
+        ]
+      },
+      "night-sunk": {
+        "role": "neutral",
+        "displayName": "Night Sunk",
+        "canonical": "oklch(14.9% 0.003 248.1)",
+        "tonalRamp": [
+          "#0A0B0C",
+          "#252728",
+          "#444546",
+          "#656667",
+          "#88898B",
+          "#ACAEAF",
+          "#CFD1D3",
+          "#EDEFF0"
+        ]
+      },
+      "night-ink-1": {
+        "role": "neutral",
+        "displayName": "Night Ink 1",
+        "canonical": "oklch(94.9% 0.002 247.8)",
+        "tonalRamp": [
+          "#0B0B0C",
+          "#262627",
+          "#444546",
+          "#656667",
+          "#88898A",
+          "#ADAEAF",
+          "#D0D1D2",
+          "#EDEEEF"
+        ]
+      },
+      "night-ink-2": {
+        "role": "neutral",
+        "displayName": "Night Ink 2",
+        "canonical": "oklch(80.2% 0.009 247.9)",
+        "tonalRamp": [
+          "#080C0F",
+          "#23272B",
+          "#41464A",
+          "#62676B",
+          "#858A8E",
+          "#AAAFB3",
+          "#CCD2D7",
+          "#EAEFF4"
+        ]
+      },
+      "night-ink-3": {
+        "role": "neutral",
+        "displayName": "Night Ink 3",
+        "canonical": "oklch(65.7% 0.011 248.0)",
+        "tonalRamp": [
+          "#080C10",
+          "#22272C",
+          "#40464B",
+          "#61676C",
+          "#848A90",
+          "#A8AFB5",
+          "#CBD2D8",
+          "#E9EFF6"
+        ]
+      },
+      "night-ink-4": {
+        "role": "neutral",
+        "displayName": "Night Ink 4",
+        "canonical": "oklch(51.4% 0.012 248.1)",
+        "tonalRamp": [
+          "#070C10",
+          "#22272C",
+          "#40464B",
+          "#61676D",
+          "#848A90",
+          "#A8AFB5",
+          "#CBD2D9",
+          "#E8EFF6"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "The welcome screen's headline only."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Page titles."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Sheet and dialog titles; the resume page's column heading."
+      },
+      "title-small": {
+        "displayName": "Title Small",
+        "purpose": "Section and card headings."
+      },
+      "subtitle": {
+        "displayName": "Subtitle",
+        "purpose": "Sub-headings inside a card or column; job titles in lists."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Reading text."
+      },
+      "body-small": {
+        "displayName": "Body Small",
+        "purpose": "Meta lines, helper text and captions."
+      },
+      "control": {
+        "displayName": "Control",
+        "purpose": "Buttons and navigation items."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Pills, badges, counts, tab labels and fact labels; the 12px floor."
+      }
+    },
+    "themes": {
+      "dark": {
+        "description": "Dark mode swaps these tokens for their night values; everything else is identical.",
+        "map": {
+          "noticeboard-paper": "night-ground",
+          "card-white": "night-surface",
+          "quiet-white": "night-surface-2",
+          "pressed-grey": "night-sunk",
+          "charcoal-ink": "night-ink-1",
+          "slate-ink": "night-ink-2",
+          "muted-ink": "night-ink-3",
+          "faint-ink": "night-ink-4",
+          "qasioun-pine": "qasioun-pine-night",
+          "qasioun-pine-deep": "qasioun-pine-night-ink",
+          "on-pine": "on-pine-night",
+          "amber-notice": "amber-notice-night",
+          "rose-alert": "rose-alert-night"
+        }
+      }
+    },
+    "shadows": [
+      {
+        "name": "resting",
+        "value": "0 0 0 1px rgba(21,23,24,.08), 0 1px 2px rgba(0,0,0,.04)",
+        "purpose": "Cards, list cards, the current rail item, the selected segment."
+      },
+      {
+        "name": "raised",
+        "value": "0 0 0 1px rgba(21,23,24,.08), 0 6px 16px -4px rgba(0,0,0,.08), 0 2px 4px -2px rgba(0,0,0,.04)",
+        "purpose": "Popovers and menus."
+      },
+      {
+        "name": "floating",
+        "value": "0 0 0 1px rgba(21,23,24,.08), 0 28px 56px -16px rgba(0,0,0,.22), 0 10px 20px -10px rgba(0,0,0,.10)",
+        "purpose": "Sheets and dialogs, over the scrim."
+      },
+      {
+        "name": "primary-button",
+        "value": "0 1px 2px rgba(0,0,0,.12), inset 0 1px 0 rgba(255,255,255,.14)",
+        "purpose": "The primary button's subtle lift and inner highlight."
+      },
+      {
+        "name": "input-focus",
+        "value": "inset 0 0 0 1.5px #0E6B46, 0 0 0 4px rgba(14,107,70,.09)",
+        "purpose": "Focused inputs: a pine ring with a soft halo."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease-out",
+        "value": "cubic-bezier(0.23,1,0.32,1)",
+        "purpose": "Entrances, exits and state changes; never ease-in."
+      },
+      {
+        "name": "ease-in-out",
+        "value": "cubic-bezier(0.77,0,0.175,1)",
+        "purpose": "Movement between two on-screen positions."
+      },
+      {
+        "name": "ease-drawer",
+        "value": "cubic-bezier(0.32,0.72,0,1)",
+        "purpose": "Sheets sliding up and down on phones."
+      },
+      {
+        "name": "duration-quick",
+        "value": "160ms",
+        "purpose": "Press and hover feedback."
+      },
+      {
+        "name": "duration-standard",
+        "value": "200ms",
+        "purpose": "Most state changes; all UI motion stays under 300ms, exits faster than entrances."
+      },
+      {
+        "name": "rules",
+        "value": "transform, opacity and clip-path only; hover only on fine pointers; changes made from the keyboard don't animate; reduced motion is respected",
+        "purpose": "How motion is used."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "phone-small",
+        "value": "420px"
+      },
+      {
+        "name": "phone",
+        "value": "560px"
+      },
+      {
+        "name": "phablet",
+        "value": "640px"
+      },
+      {
+        "name": "tablet",
+        "value": "700px"
+      },
+      {
+        "name": "rail",
+        "value": "900px",
+        "note": "the tab bar becomes the side rail; list and detail side by side"
+      },
+      {
+        "name": "wide",
+        "value": "1100px"
+      }
+    ],
+    "layout": {
+      "tabbar": "64px",
+      "rail": "232px",
+      "focusOutline": "2px solid Qasioun Pine, 2px offset"
+    }
+  },
+  "components": [
+    {
+      "name": "Primary button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The one main action in an area: apply, save, publish.",
+      "html": "<button class=\"ds-btn-primary\" type=\"button\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"m5 12.5 4.5 4.5L19 7.5\"/></svg>Send application</button>",
+      "css": ".ds-btn-primary{font-family:\"IBM Plex Sans Arabic\",system-ui,-apple-system,\"Segoe UI\",Roboto,Tahoma,Arial,sans-serif;display:inline-flex;align-items:center;justify-content:center;gap:8px;height:40px;padding:0 16px;border:0;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;transition:transform 160ms cubic-bezier(0.23,1,0.32,1),background 160ms cubic-bezier(0.23,1,0.32,1);background:var(--accent,#0E6B46);color:var(--on-accent,#FFFFFF);box-shadow:0 1px 2px rgba(0,0,0,.12),inset 0 1px 0 rgba(255,255,255,.14)}.ds-btn-primary:hover{background:color-mix(in srgb,var(--accent,#0E6B46) 88%,black)}.ds-btn-primary:active{transform:scale(.97)}.ds-btn-primary:focus-visible{outline:2px solid var(--accent,#0E6B46);outline-offset:2px}"
+    },
+    {
+      "name": "Soft button",
+      "kind": "button",
+      "refersTo": "button-soft",
+      "description": "A useful second action, such as tailoring a resume or seeing plans.",
+      "html": "<button class=\"ds-btn-soft\" type=\"button\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M7 3.5h7l4 4V20a.6.6 0 0 1-.6.6H7.6A.6.6 0 0 1 7 20V3.5Z\"/><path d=\"M14 3.5V8h4M9.6 12h5M9.6 15.6h5\"/></svg>Tailor my resume for this job</button>",
+      "css": ".ds-btn-soft{font-family:\"IBM Plex Sans Arabic\",system-ui,-apple-system,\"Segoe UI\",Roboto,Tahoma,Arial,sans-serif;display:inline-flex;align-items:center;justify-content:center;gap:8px;height:40px;padding:0 16px;border:0;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;transition:transform 160ms cubic-bezier(0.23,1,0.32,1),background 160ms cubic-bezier(0.23,1,0.32,1);background:var(--accent-soft,rgba(14,107,70,.09));color:var(--accent-ink,#0B5B3B)}.ds-btn-soft:hover{background:var(--accent-line,rgba(14,107,70,.26))}.ds-btn-soft:active{transform:scale(.97)}.ds-btn-soft:focus-visible{outline:2px solid var(--accent,#0E6B46);outline-offset:2px}"
+    },
+    {
+      "name": "Ghost button",
+      "kind": "button",
+      "refersTo": "button-ghost",
+      "description": "Quiet actions in toolbars and card footers.",
+      "html": "<button class=\"ds-btn-ghost\" type=\"button\">Withdraw</button>",
+      "css": ".ds-btn-ghost{font-family:\"IBM Plex Sans Arabic\",system-ui,-apple-system,\"Segoe UI\",Roboto,Tahoma,Arial,sans-serif;display:inline-flex;align-items:center;justify-content:center;gap:8px;height:40px;padding:0 16px;border:0;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;transition:transform 160ms cubic-bezier(0.23,1,0.32,1),background 160ms cubic-bezier(0.23,1,0.32,1);background:transparent;color:var(--ink-2,#44484C)}.ds-btn-ghost:hover{background:var(--sunk,#ECECE9)}.ds-btn-ghost:focus-visible{outline:2px solid var(--accent,#0E6B46);outline-offset:2px}"
+    },
+    {
+      "name": "Search field",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Inputs: white, hairline ring, pine ring and halo on focus.",
+      "html": "<label class=\"ds-search\"><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"11\" cy=\"11\" r=\"7.2\"/><path d=\"m20 20-3.7-3.7\"/></svg><input class=\"ds-input\" placeholder=\"Search roles, skills or companies\"></label>",
+      "css": ".ds-search{position:relative;display:block;max-width:360px;color:var(--ink-3,#63686D)}.ds-search svg{position:absolute;inset-inline-start:12px;top:13px}.ds-input{font-family:\"IBM Plex Sans Arabic\",system-ui,-apple-system,\"Segoe UI\",Roboto,Tahoma,Arial,sans-serif;width:100%;min-height:44px;padding:10px 12px 10px 38px;border:0;border-radius:10px;background:var(--surface,#FFFFFF);color:var(--ink-1,#151718);font-size:15px;box-shadow:inset 0 0 0 1px var(--hair-2,rgba(21,23,24,.13));outline:0;caret-color:var(--accent,#0E6B46)}.ds-input::placeholder{color:var(--ink-3,#63686D)}.ds-input:focus{box-shadow:inset 0 0 0 1.5px var(--accent,#0E6B46),0 0 0 4px var(--accent-soft,rgba(14,107,70,.09))}"
+    },
+    {
+      "name": "Filter chips",
+      "kind": "chip",
+      "refersTo": "chip",
+      "description": "Filters with counts; the selected one is solid pine.",
+      "html": "<div class=\"ds-chips\"><button class=\"ds-chip\" aria-pressed=\"true\">All <span>23</span></button><button class=\"ds-chip\" aria-pressed=\"false\">Internships <span>5</span></button><button class=\"ds-chip\" aria-pressed=\"false\">For returnees <span>4</span></button></div>",
+      "css": ".ds-chips{display:flex;gap:6px;flex-wrap:wrap}.ds-chip{font-family:\"IBM Plex Sans Arabic\",system-ui,-apple-system,\"Segoe UI\",Roboto,Tahoma,Arial,sans-serif;display:inline-flex;align-items:center;gap:6px;min-height:28px;padding:4px 10px;border:0;border-radius:999px;background:var(--sunk,#ECECE9);color:var(--ink-2,#44484C);font-size:12.5px;font-weight:500;cursor:pointer}.ds-chip span{font-variant-numeric:tabular-nums;opacity:.8}.ds-chip[aria-pressed=\"true\"]{background:var(--accent,#0E6B46);color:var(--on-accent,#FFFFFF)}.ds-chip:focus-visible{outline:2px solid var(--accent,#0E6B46);outline-offset:2px}"
+    },
+    {
+      "name": "Status pills",
+      "kind": "chip",
+      "refersTo": "pill",
+      "description": "Small status badges: neutral, verified and pending.",
+      "html": "<div class=\"ds-pills\"><span class=\"ds-pill\">Sent</span><span class=\"ds-pill ds-pill--good\"><svg width=\"12\" height=\"12\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"m5 12.5 4.5 4.5L19 7.5\"/></svg>Shortlisted</span><span class=\"ds-pill ds-pill--warn\">Waiting</span></div>",
+      "css": ".ds-pills{display:flex;gap:6px;flex-wrap:wrap}.ds-pill{font-family:\"IBM Plex Sans Arabic\",system-ui,-apple-system,\"Segoe UI\",Roboto,Tahoma,Arial,sans-serif;display:inline-flex;align-items:center;gap:4px;min-height:22px;padding:2px 9px;border-radius:999px;background:var(--sunk,#ECECE9);color:var(--ink-2,#44484C);font-size:12px;font-weight:600;letter-spacing:.012em;white-space:nowrap}.ds-pill--good{background:var(--accent-soft,rgba(14,107,70,.09));color:var(--accent-ink,#0B5B3B)}.ds-pill--warn{background:var(--amber-soft,rgba(168,97,0,.11));color:var(--amber,#9A5A00)}"
+    },
+    {
+      "name": "Card with rows",
+      "kind": "card",
+      "refersTo": "card",
+      "description": "A card; lists inside it are rows divided by hairlines, never boxes in a box.",
+      "html": "<section class=\"ds-card\"><h2 class=\"ds-card-h\">Your plan</h2><div class=\"ds-card-row\"><span>Candidate invitations this month</span><b>2 of 50</b></div><div class=\"ds-card-row\"><span>Sponsored listings running</span><b>1 of 2</b></div></section>",
+      "css": ".ds-card{font-family:\"IBM Plex Sans Arabic\",system-ui,-apple-system,\"Segoe UI\",Roboto,Tahoma,Arial,sans-serif;max-width:420px;padding:18px;border-radius:20px;background:var(--surface,#FFFFFF);box-shadow:0 0 0 1px var(--hair,rgba(21,23,24,.08)),0 1px 2px rgba(0,0,0,.04);color:var(--ink-2,#44484C)}.ds-card-h{margin:0 0 6px;font-size:17px;font-weight:600;letter-spacing:-.01em;color:var(--ink-1,#151718)}.ds-card-row{display:flex;justify-content:space-between;gap:12px;padding:10px 0;font-size:13.5px}.ds-card-row + .ds-card-row{border-top:1px solid var(--hair,rgba(21,23,24,.08))}.ds-card-row b{color:var(--ink-1,#151718);font-variant-numeric:tabular-nums}"
+    },
+    {
+      "name": "Job row",
+      "kind": "custom",
+      "refersTo": "job-row",
+      "description": "The signature noticeboard row: company tile, title, meta, pay, fit ring and bookmark.",
+      "html": "<div class=\"ds-row\" aria-current=\"true\"><span class=\"ds-tile\">YT</span><span class=\"ds-row-main\"><b>Operations intern, fuel distribution</b><span>Yasmin Trading, Homs</span><span class=\"ds-pay\">40,000–55,000 SYP / mo</span></span><span class=\"ds-fit\"><span class=\"ds-ring\" style=\"--p:97\"></span>97%</span><button class=\"ds-mark\" aria-label=\"Save\"><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M6.5 3.8h11a1 1 0 0 1 1 1v15.4l-6.5-4-6.5 4V4.8a1 1 0 0 1 1-1Z\"/></svg></button></div>",
+      "css": ".ds-row{font-family:\"IBM Plex Sans Arabic\",system-ui,-apple-system,\"Segoe UI\",Roboto,Tahoma,Arial,sans-serif;display:grid;grid-template-columns:40px minmax(0,1fr) auto auto;align-items:center;gap:12px;max-width:520px;padding:12px 10px;border-radius:12px;color:var(--ink-2,#44484C)}.ds-row:hover{background:var(--surface-2,#F8F8F6)}.ds-row[aria-current=\"true\"]{background:var(--accent-soft,rgba(14,107,70,.09))}.ds-tile{width:40px;height:40px;border-radius:10px;display:grid;place-items:center;background:#5C4636;color:#FFFFFF;font-size:12px;font-weight:700}.ds-row-main{display:flex;flex-direction:column;min-width:0;font-size:12.5px}.ds-row-main b{font-size:14.5px;font-weight:600;color:var(--ink-1,#151718)}.ds-pay{font-weight:600;color:var(--ink-1,#151718)}.ds-fit{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--ink-1,#151718);font-variant-numeric:tabular-nums}.ds-ring{width:22px;height:22px;border-radius:50%;background:conic-gradient(var(--accent,#0E6B46) calc(var(--p)*1%),var(--sunk,#ECECE9) 0);-webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 4px),#000 calc(100% - 4px));mask:radial-gradient(farthest-side,transparent calc(100% - 4px),#000 calc(100% - 4px))}.ds-mark{border:0;background:transparent;color:var(--ink-3,#63686D);cursor:pointer;padding:6px;border-radius:8px}.ds-mark:focus-visible{outline:2px solid var(--accent,#0E6B46);outline-offset:2px}"
+    },
+    {
+      "name": "Bottom tab bar",
+      "kind": "nav",
+      "refersTo": "tab-item",
+      "description": "Phone navigation: icon over label, pine for the current tab, a count badge when something is new.",
+      "html": "<nav class=\"ds-tabs\"><a class=\"ds-tab\" aria-current=\"page\"><svg width=\"22\" height=\"22\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><rect x=\"3\" y=\"7.4\" width=\"18\" height=\"12.4\" rx=\"2.4\"/><path d=\"M8.6 7.4V5.8a1.6 1.6 0 0 1 1.6-1.6h3.6a1.6 1.6 0 0 1 1.6 1.6v1.6\"/><path d=\"M3 12.6h18\"/></svg>Jobs</a><a class=\"ds-tab\"><svg width=\"22\" height=\"22\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M3.5 13.5 6 5.5h12l2.5 8V19a.6.6 0 0 1-.6.6H4.1a.6.6 0 0 1-.6-.6v-5.5Z\"/><path d=\"M3.5 13.5h5l1.2 2.2h4.6l1.2-2.2h5\"/></svg>Applications</a><a class=\"ds-tab\"><svg width=\"22\" height=\"22\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"9\" cy=\"8.4\" r=\"3.2\"/><path d=\"M3.4 19.2a5.8 5.8 0 0 1 11.2 0\"/><path d=\"M16.4 5.6a3.2 3.2 0 0 1 0 6\"/><path d=\"M17.6 13.8a5.8 5.8 0 0 1 3 5.4\"/></svg><span class=\"ds-badge\">1</span>Recruiters</a><a class=\"ds-tab\"><svg width=\"22\" height=\"22\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M7 3.5h7l4 4V20a.6.6 0 0 1-.6.6H7.6A.6.6 0 0 1 7 20V3.5Z\"/><path d=\"M14 3.5V8h4M9.6 12h5M9.6 15.6h5\"/></svg>Resume</a><a class=\"ds-tab\"><svg width=\"22\" height=\"22\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"8.4\" r=\"3.6\"/><path d=\"M5 20a7 7 0 0 1 14 0\"/></svg>Profile</a></nav>",
+      "css": ".ds-tabs{font-family:\"IBM Plex Sans Arabic\",system-ui,-apple-system,\"Segoe UI\",Roboto,Tahoma,Arial,sans-serif;display:grid;grid-template-columns:repeat(5,1fr);max-width:400px;height:64px;background:var(--surface,#FFFFFF);box-shadow:0 0 0 1px var(--hair,rgba(21,23,24,.08))}.ds-tab{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:12px;font-weight:600;color:var(--ink-3,#63686D);text-decoration:none;cursor:pointer}.ds-tab[aria-current=\"page\"]{color:var(--accent,#0E6B46)}.ds-tab:focus-visible{outline:2px solid var(--accent,#0E6B46);outline-offset:-2px}.ds-badge{position:absolute;top:6px;inset-inline-start:calc(50% + 5px);min-width:18px;height:18px;padding:0 5px;border-radius:999px;background:var(--accent,#0E6B46);color:var(--on-accent,#FFFFFF);font-size:12px;line-height:18px;text-align:center}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Verified Noticeboard",
+    "overview": "Shaghilni looks like a public noticeboard that someone has already checked. Plain paper, notices pinned in clean rows, and a quiet green mark on everything that has been verified. The design recedes so that what people came for (the job, what it pays, who is hiring and where each application stands) is what they read first. The feel is calm, plain and trustworthy: nothing flashy competes with a stressful search, and nothing looks like an advertisement.\n\nIt is a working tool, built for a cheap Android phone held in one hand, often on a slow connection. Density is compact but never cramped: rows scan quickly, text never drops below 12px, and every state is spelled out in words as well as colour. Arabic comes first, so every layout mirrors cleanly from right to left, and light and dark mode come from the same set of tokens rather than separate designs.\n\nOne accent carries meaning. Qasioun Pine marks the primary action, the current selection and anything verified; amber marks what is pending or sponsored; rose marks errors and destructive actions. Everything else is ink on paper.",
+    "keyCharacteristics": [
+      "One family (IBM Plex Sans Arabic) for every role, in both scripts.",
+      "One accent, Qasioun Pine, used only for action, selection and verified status.",
+      "Layered depth: soft paper ground, white surfaces, hairline rings instead of borders.",
+      "Gently rounded forms at five fixed sizes; pills for status and counts.",
+      "Compact rows built for scanning on small phones; right-to-left first."
+    ],
+    "rules": [
+      {
+        "name": "The One Pine Rule",
+        "body": "Qasioun Pine means \"act here\", \"you are here\" or \"this is verified\". It is never decoration, and a screen has at most one primary pine button per area.",
+        "section": "colors"
+      },
+      {
+        "name": "The Ink Floor Rule",
+        "body": "No text is lighter than Muted Ink, in either mode. Faint Ink is for disabled controls and decoration only, so every piece of text clears 4.5:1 on every surface it sits on.",
+        "section": "colors"
+      },
+      {
+        "name": "The Same Tokens, Both Lights Rule",
+        "body": "Dark mode is the same tokens with night values, never hand-picked colours. Text on pine always uses On Pine, and nothing hard-codes white or a fallback colour.",
+        "section": "colors"
+      },
+      {
+        "name": "The Clear Step Rule",
+        "body": "Each heading level is visibly bigger than the next (28, 22, 20, 17, 15). Two roles never share a size and weight within one view.",
+        "section": "typography"
+      },
+      {
+        "name": "The Hairline Rule",
+        "body": "Surfaces are separated by a one-pixel hairline ring, never by heavy borders, coloured side stripes or hard offset shadows.",
+        "section": "elevation"
+      },
+      {
+        "name": "The One Surface Rule",
+        "body": "Inside a card, a sheet or a column, content sits on that surface as rows divided by hairlines. A box never sits inside another box.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "**Do** use Qasioun Pine only for the primary action, the current selection and verified status, with text on it in On Pine.",
+      "**Do** keep every piece of text at 12px or more, and no lighter than Muted Ink.",
+      "**Do** separate surfaces with hairline rings and, inside a surface, with hairline dividers between rows.",
+      "**Do** step headings clearly: 28 (welcome), 22 (page), 20 (sheet), 17 (section), 15 (sub-heading and body).",
+      "**Do** take every colour from the tokens, so light and dark mode stay correct automatically.",
+      "**Do** lay out with start and end, so every screen mirrors for Arabic.",
+      "**Do** draw icons from the app's single 24px stroke set, never with emoji or text symbols."
+    ],
+    "donts": [
+      "**Don't** put a card, tile or bordered box inside another card, sheet or column.",
+      "**Don't** use a thick coloured stripe down one side of a card, message or alert.",
+      "**Don't** stack an icon in a rounded tile above a heading; put the icon beside the words or leave it out.",
+      "**Don't** put a small label above a heading; the heading speaks for itself, with any meta line underneath.",
+      "**Don't** hard-code white, hex colours or fallback colours in component styles.",
+      "**Don't** use Faint Ink for text, or set any text below 12px.",
+      "**Don't** use hard offset shadows, coloured glows, glass effects or gradient text."
+    ]
+  }
+}
