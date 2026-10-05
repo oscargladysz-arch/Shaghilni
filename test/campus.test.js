@@ -132,3 +132,13 @@ test("universities: employers see verified students, partner with universities a
   await admin.post(`/api/admin/applications/${apps[0].id}/confirm-hire`, {});
   const T = (await office.get("/api/campus")).body.stats; assert.deepEqual([T.internsHired, T.hires, T.employers], [1, 1, 1], "a confirmed intern hire is counted");
 });
+
+test("universities: a verification code typed with Arabic-Indic digits is accepted (U-034)", async () => {
+  const S = await start({}, EMAIL), admin = await S.login("+12025550199");
+  await admin.post("/api/admin/campus/domains", { uni: "homs", domain: "hu.example" });
+  const a = await S.login("0933 785 101"); await a.put("/api/me/profile", { profile: profileAt("homs") });
+  assert.equal((await a.post("/api/me/verify-student", { email: "omar@hu.example" })).status, 200);
+  const arabic = s => String(s).replace(/[0-9]/g, d => "٠١٢٣٤٥٦٧٨٩"[d]);
+  const ok = await a.post("/api/me/verify-student/confirm", { code: arabic(codeFor("omar@hu.example")) });
+  assert.equal(ok.status, 200, ok.text); assert.equal(ok.body.verification.status, "verified", "the right code in Arabic-Indic digits verifies the student");
+});

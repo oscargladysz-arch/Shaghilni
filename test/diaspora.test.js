@@ -140,3 +140,12 @@ test("diaspora: the shipped .env.example keeps the default destinations (Syria p
   const cfg = loadConfig({ skipDotEnv: true, isolated: true, env: { ...template, NODE_ENV: "test" } });
   for (const p of ["+963", "+49", "+90", "+961", "+1"]) assert.ok(cfg.smsAllowedPrefixes.includes(p), `${p} is allowed with the template settings (got ${cfg.smsAllowedPrefixes.join(",")})`);
 });
+
+test("diaspora: an international number typed with Arabic-Indic or Persian digits signs in and can be invited to a team (D-19)", async () => {
+  const S = await start(), admin = await S.login("+12025550199"), c = S.client();
+  const r1 = await c.post("/api/auth/code", { phone: "+٤٩١٥١٢٣٤٥٦٧٨٩" }); assert.equal(r1.status, 200, r1.text); assert.equal(r1.body.phone, "+4915123456789", "Arabic-Indic digits");
+  const r2 = await c.post("/api/auth/code", { phone: "+۴۹۱۵۱۲۳۴۵۶۷۸۸" }); assert.equal(r2.status, 200, r2.text); assert.equal(r2.body.phone, "+4915123456788", "Persian digits");
+  const { e } = await employer(S, admin, "0955 745 001", "Digits Co");
+  assert.equal((await e.post("/api/employer/team", { name: "Hans", phone: "+٤٩١٥١٢٣٤٥٦٧٨٠", role: "recruiter" })).status, 200, "a teammate abroad can be invited with Arabic-Indic digits");
+  assert.equal((await e.get("/api/employer/team")).body.invites[0].phone, "+4915123456780", "and is stored in E.164");
+});
