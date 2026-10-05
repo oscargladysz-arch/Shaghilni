@@ -126,6 +126,7 @@ export function makeAuth({ db, cfg, core, sms, limit, audit, log, guard }) {
     if (!s) return;
     const u = db.get("SELECT * FROM users WHERE id = ? AND deleted_at IS NULL", s.user_id);
     if (!u) return;
+    if (u.role === "admin" && !cfg.adminPhones.includes(u.phone)) { db.run("DELETE FROM sessions WHERE user_id = ?", u.id); return; }   // taken out of ADMIN_PHONES: every session ends now, the role at the next sign-in (D-17)
     ctx.user = u; ctx.sessionHash = s.token_hash;
   }
 

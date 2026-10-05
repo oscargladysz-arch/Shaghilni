@@ -402,7 +402,7 @@ test("16 · sample listings are never seeded in production, whatever SEED_DEMO s
   assert.deepEqual(countDemo(db), { companies: 0, jobs: 0 }, "nothing left after npm run demo:remove");
 });
 
-test("17 · a number taken out of ADMIN_PHONES loses the admin role at its next sign-in, and its open sessions end (D-17)", async () => {
+test("17 · a number taken out of ADMIN_PHONES loses its open sessions at once and the admin role at its next sign-in (D-17)", async () => {
   const S = await start(), admin = await S.login("+12025550199");
   assert.equal((await admin.get("/api/admin/overview")).status, 200, "an admin while the number is listed");
   // the same database served by a second process whose ADMIN_PHONES no longer lists the number (a redeploy with a changed setting)
@@ -411,6 +411,8 @@ test("17 · a number taken out of ADMIN_PHONES loses the admin role at its next 
   await new Promise(r => srv2.listen(0, "127.0.0.1", r)); servers.push(srv2);
   const base2 = `http://127.0.0.1:${srv2.address().port}`; let jar = "";
   const call2 = async (method, path, body) => { const res = await realFetch(base2 + path, { method, headers: { "content-type": "application/json", "x-shaghilni": "1", ...(jar ? { cookie: jar } : {}) }, body: body === undefined ? undefined : JSON.stringify(body) }); const sc = res.headers.get("set-cookie"); if (sc) jar = sc.split(";")[0]; return { status: res.status, body: await res.json().catch(() => null) }; };
+  const old = await realFetch(base2 + "/api/admin/overview", { headers: { cookie: admin.cookie, "x-shaghilni": "1" } });
+  assert.equal(old.status, 401, "D-17: the session opened while the number was an admin ends at the first request a process without the number sees, before any sign-in");
   const r = await call2("POST", "/api/auth/code", { phone: "+12025550199" }); assert.equal(r.status, 200);
   const v = await call2("POST", "/api/auth/verify", { phone: "+12025550199", code: S.lastCode("+12025550199"), role: "seeker", accept: true });
   assert.equal(v.status, 200); assert.equal(v.body.user.role, "seeker", "D-17: signed in as an ordinary account, not an admin");
