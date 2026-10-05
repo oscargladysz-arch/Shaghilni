@@ -36,6 +36,8 @@ test("policy admin: company review needs screening to verify and a note to rejec
   const rj = await S.login("0955 910 003", "employer"); const rjId = (await rj.put("/api/employer/company", { company: { name: { en: "Review Rejected" }, gov: "aleppo", regNo: "REG-Review-Rej", contactName: "Contact Rej", whatsapp: "0955 910 003" } })).body.company.id;
   assert.equal((await rj.post("/api/employer/company/submit")).status, 200); assert.equal((await admin.post(`/api/admin/companies/${rjId}/reject`, { note: "Registration number unclear" })).status, 200);
   assert.deepEqual((r => [r.status, r.body.error])(await admin.post(`/api/admin/companies/${rjId}/verify`, { screened: true })), [409, "bad_state"], "U-046: a rejected company must resubmit first");
+  assert.deepEqual((r => [r.status, r.body.error])(await admin.post(`/api/admin/companies/${rjId}/reject`, { note: "Again" })), [409, "bad_state"], "a rejected company is not rejected twice");
+  assert.deepEqual((r => [r.status, r.body.error])(await admin.post(`/api/admin/companies/${dId}/suspend`, { note: "Never submitted" })), [409, "bad_state"], "a draft cannot be suspended, so suspend-then-verify cannot reach verified around the state check (review)");
   assert.equal((await rj.post("/api/employer/company/submit")).body.company.status, "pending"); assert.equal((await admin.post(`/api/admin/companies/${rjId}/verify`, { screened: true })).body.company.status, "verified", "resubmitted, then verified");
   // suspend with a note: the listing leaves the public site, the note is kept and audited
   const sus = await admin.post(`/api/admin/companies/${A.companyId}/suspend`, { note: "Policy test suspension" }); assert.equal(sus.status, 200, sus.text);

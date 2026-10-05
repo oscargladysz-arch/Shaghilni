@@ -160,3 +160,12 @@ test("policy recruit: seeker B never sees A's invitation and gets 404 on respond
   assert.ok(!(await C.B.e.get("/api/employer/invitations")).text.includes(PHONE_A.slice(4)), "B, who was not accepted, never sees the number");
   assert.ok(!(await C.A.e.get("/api/employer/students")).text.includes(PHONE_A.slice(4)), "and the search card still carries no number");
 });
+
+test("policy recruit: rejecting a company withdraws its open invitations too (U-017)", async () => {
+  const S = await start(), C = await cast(S), I = C.ids;
+  assert.ok((await C.seekerA.get("/api/me/invitations")).body.invitations.some(i => i.id === I.invA), "control: seeker A holds A's open invitation");
+  assert.equal((await C.admin.post(`/api/admin/companies/${I.companyA}/reject`, { note: "Registration document unclear" })).status, 200);
+  assert.ok(!(await C.seekerA.get("/api/me/invitations")).body.invitations.some(i => i.id === I.invA), "the invitation leaves the inbox");
+  assert.deepEqual((r => [r.status, r.body.error])(await C.seekerA.post(`/api/me/invitations/${I.invA}/respond`, { answer: "yes" })), [409, "bad_transition"], "and cannot be answered");
+  assert.deepEqual(S.db.all("SELECT data FROM audit WHERE action = 'invitation.withdrawn' AND entity_id = ?", I.invA).map(x => JSON.parse(x.data)), [{ reason: "company_rejected" }], "audited with its reason");
+});

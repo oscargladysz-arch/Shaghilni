@@ -50,6 +50,7 @@ export function registerAdmin(r, deps) {
     if (!c) fail(404, "not_found");
     const note = String(ctx.body.note || "").trim().slice(0, 1000);
     if ((status === "rejected" || status === "suspended") && !note) fail(422, "note_required");
+    if ((status === "rejected" || status === "suspended") && (c.is_demo || !["pending", "verified"].includes(c.status))) fail(409, "bad_state");   // only a submitted or verified company is rejected or suspended, so nothing reaches "verified" through a suspension (review of U-046)
     db.run(`UPDATE companies SET status = ?, review_note = ?, updated_at = ?, screened_at = COALESCE(?, screened_at), screened_by = COALESCE(?, screened_by),
             verified_at = COALESCE(?, verified_at), verified_by = COALESCE(?, verified_by) WHERE id = ?`,
       status, note, now(), extra.screened_at ?? null, extra.screened_by ?? null, extra.verified_at ?? null, extra.verified_by ?? null, c.id);
