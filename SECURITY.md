@@ -5,7 +5,7 @@ This file maps the 13-item *30-Minute Pre-Launch Security Checklist* onto Shaghi
 Run both commands before every launch and after every change:
 
 ```bash
-npm test                                             # 133 tests in 30 files (API, security, route policy, recruiters, import, Lite, payments, plans, universities, teams, events, demo, diaspora, applying, insights, traffic, i18n, ratchets)
+npm test                                             # 147 tests in 30 files (API, security, route policy, recruiters, import, Lite, payments, plans, universities, teams, events, demo, diaspora, applying, insights, traffic, i18n, ratchets)
 npm run security:check -- --url https://your-domain  # the code, your settings and the live site
 ```
 
@@ -355,7 +355,7 @@ It exits with an error when anything fails, so it can gate a deploy. Security te
 
 1. **Sign everyone out:** `node -e "new (require('node:sqlite').DatabaseSync)(process.env.DB_PATH || 'data/shaghilni.db').exec('DELETE FROM sessions')"`. On Docker, run it inside the container: `docker exec shaghilni node -e "…"`.
 2. **Rotate any key that may be exposed** (item 9), and change `OTP_PEPPER`.
-3. **Find out what happened.** Signed in as an admin, open `https://your-domain/api/admin/audit?limit=200` to read the audit log, and read the server log alongside it. Keep copies of both.
+3. **Find out what happened.** Signed in as an admin, open the *Audit log* tab of the admin screen (filters by action, item, account and day; *Older entries* pages back through the whole log; the spreadsheet export keeps a copy), or `https://your-domain/api/admin/audit?limit=200&before=<id>` for the raw rows, and read the server log alongside it. Keep copies of both.
 4. **Tell the people affected and the authorities, as the law requires.** Summaries of Law No. 12 of 2024 say breaches that may cause harm must be reported to the data-protection authority and to the people affected, within set time limits. Agree the exact steps with your lawyer now, not during an incident.
 5. **Fix the cause,** add a test that reproduces the problem, and write down what changed.
 
@@ -383,8 +383,8 @@ The launch checklist, with who owns each item (agent, owner, lawyer or provider)
 - **Nothing here touches job seekers' chances.** Sponsored listings are at most two, lifted to the top and labelled *Sponsored*, only for a signed-in job seeker whose fit score is 60% or more; everyone else sees them in the usual order, unlabelled. No job seeker can pay for anything.
 - **Teammates** are matched by phone number. A number that belongs to a job seeker, an admin or another company can't be added. Only the company owner can request or pay for plans and hand the company over. The owner and admins edit company details and manage the team (only the owner changes, removes or approves admins, though an admin can still invite one: `docs/agent/DEFECTS.md`, D-31); removing a teammate ends their access immediately, and a former teammate (removed, left or deleted) is shown as "former teammate" in the activity log and on listings and applicants, never by number.
 - **Placement fees are computed on the server** at the moment an admin confirms a hire, from the invitation and application records, and only once per hire.
-- **Reports** contain no candidate names or contact details: placements list dates, job title, governorate, type and pay range; the compliance record lists company submission, verification, rejection, suspension and plan changes, listing approvals, rejections and sponsorships, and hire confirmations (its sanctions-screening column is not filled in yet: see `docs/agent/DEFECTS.md`, D-07).
-- **Every plan change, charge update, sponsorship start and end, and team change is in the audit log.**
+- **Reports** contain no candidate names or contact details: placements list dates, job title, governorate, type and pay range; the compliance record lists company submission, verification, rejection, suspension and plan changes, listing approvals, rejections and sponsorships, and hire confirmations, with the sanctions-screening column filled in for every verification since Stage 3 (D-07).
+- **Every plan change, charge update, sponsorship start and team change is in the audit log,** and so is a sponsorship switched off; a sponsorship that ends because the listing was closed, edited or rejected is in the log as that action.
 
 
 ## Demo accounts

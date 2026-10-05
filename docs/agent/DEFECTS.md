@@ -10,12 +10,14 @@ Reproduction scripts named below live in the Stage 0 scratchpad (`/tmp/claude-0/
 
 | Verdict | Count | By severity (verifier's) |
 |---|---|---|
-| CONFIRMED | 29 | P0 1 · P1 12 · P2 15 · P3 1 |
+| CONFIRMED | 29 | P0 1 · P1 12 · P2 15 · P3 1 — all 29 (and D-09) closed by the end of Stage 3; see the Status rows |
 | UNPROVEN | 0 | D-09 was confirmed by test in Stage 3 (1 SYP after a pay edit) and fixed (S3-4) |
 | REFUTED | 0 | — |
 | No verdict (verify file missing) | 0 | all 30 `verify-D-*.json` files present |
 | Not verified (dropped by the cap of 30) | 210 | P2 62 · P3 148 · all UNVERIFIED at Stage 0; Stage 2 tests confirmed 11 of them (3 fixed: U-016, U-128, U-165; 8 open: U-007, U-017, U-041, U-046, U-048, U-083, U-084, U-129), 199 remain UNVERIFIED |
-| Found by the Stage 2 tests | 7 | D-31 to D-37, all P3, all open (section below) |
+| Found by the Stage 2 tests | 7 | D-31 to D-37, all P3; D-32 fixed in Stage 3, the rest open (section below) |
+| Found at the Stage 3 gate | 1 | D-38 (P2): the browser flow stops at the applications view after a hire, on `main` too (section below) |
+| Fixed by Stage 3 | 33 | D-02, D-04 to D-10, D-12, D-13, D-15 to D-17, D-19 to D-30, D-32; U-007, U-017, U-034, U-041 (page), U-045, U-046, U-048 (Status rows). With Stages 1 and 2, all thirty D-01 to D-30 are closed. The Stage 3 review then fixed six P1/P2 follow-ups inside the same fixes (D-17 live sessions, D-09 on a note, D-30 numbers in the audit log and false positives, audit filters with Arabic-Indic digits, suspend-then-verify) |
 
 Severity changed by the verifier: D-03 P1 → P2; D-20 P2 → P3. All others kept the reporter's tier.
 
@@ -599,7 +601,7 @@ Field order in every entry below: ID · Severity (verifier's; reporter's noted i
 
 ## Found by the Stage 2 tests
 
-Behaviours the route-policy tests met that no Stage 0 candidate names. Each is asserted as today's behaviour (the word *today*, *recorded* or *policy note* in the message) so a fix flips the assertion in its own `test:` commit. All P3, all open.
+Behaviours the route-policy tests met that no Stage 0 candidate names, plus D-38 from the first browser run at the Stage 3 gate. Each is asserted as today's behaviour (the word *today*, *recorded* or *policy note* in the message) so a fix flips the assertion in its own `test:` commit. All P3, all open.
 
 | # | Sev | Status | Title | Test | Files cited |
 |---|---|---|---|---|---|
@@ -610,6 +612,7 @@ Behaviours the route-policy tests met that no Stage 0 candidate names. Each is a
 | D-35 | P3 | CONFIRMED by test, open | On `/lite/hire` a signed-in career office is told its number "is registered as a job seeker"; the page has no university wording although `uniHere` exists and `/lite/me` uses it | `test/policy-lite.test.js` (gating table, office row) | `server/lite.js:17,319,496` |
 | D-36 | P3 | CONFIRMED by test, open | A crafted Arabic-Indic graduation year posted to Lite's profile step 2 is stored as 0 (`Number()`); the form is a `<select>`, so no browser sends one | `test/policy-lite.test.js` ("Arabic-Indic") | `server/lite.js:348,415` |
 | D-37 | P3 | CONFIRMED by test, open | A create-and-submit refused for fee wording leaves the draft behind; a second attempt makes a second draft (the text never reaches review) | `test/policy-employer-listings.test.js` ("posting checks on the server") | `server/routes/employer.js` create + submit |
+| D-38 | P2 | CONFIRMED at the Stage 3 gate (browser run), open for Stage 4 | The browser flow (`npm run test:e2e`) stops at the job seeker's applications view after the employer hires and the admin confirms: `.acard .pill` never renders within the wait, on `stage-3/integration` and on `main` alike (35 checks pass before it; no browser errors reported). Either the view fails for a hired application in a real browser or the script's navigation is stale; not reproduced by the API tests, which read the same route | `test/e2e/browser-flow.mjs:260` | `public/js/app-seeker.js` renderApplications · `test/e2e/browser-flow.mjs:260-262` |
 
 ---
 

@@ -103,6 +103,8 @@ Each task: plan → implement → tests → independent adversarial review (auth
 
 Stage 3 gate per task (brief): plan, tests, adversarial review notes, integration result. Expected `npm test` growth: ≥ +18 over Stage 2's count (one or more tests per task).
 
+**Stage 3 closed (2026-10-05).** S3-1 to S3-13 done in the listed order, each on its own branch stacked on the previous one and fast-forwarded into `stage-3/integration` (A-44), most as a red `test:` commit followed by the `fix:`/`feat:` commit with its docs (S3-1, S3-5 and the review follow-ups carry test and fix in one commit); four more tasks closed the P2 holes Stage 2 confirmed (S3-14 U-017 + D-32, S3-15 U-046, S3-16 U-007, S3-17 U-041 page). 147 tests (+14 over Stage 2). D-09 was re-verified and is real (fixed with migration 16). A seven-lens adversarial review of the diff returned 35 items; the six P1/P2 ones were fixed on the branch, the P3 doc points corrected, two recorded (A-45); the browser suite was run for the first time and stops at a pre-existing step (D-38). Every Stage 0 verified defect D-01 to D-30 is now closed. Open for Stage 4: the e2e run and the accessibility pass, D-31 and D-33 to D-37 (P3), S4-2's 199 unverified candidates.
+
 ## 4 · Stage 4 · Verification and handover · branch `stage-4/verification` · one workflow
 
 | ID | Scope | Files | Tests first | Risk | Owner | Depends on | Gate evidence |

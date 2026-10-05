@@ -15,14 +15,16 @@ Status meaning:
 
 **Stage 2 status (2026-10-05).** Guardrails: every registered route has a policy row (`test/policy/route-policy.js`, completeness test), the generated cross-role, cross-account, revocation and junk-input tests run over every route, nine route-family files pin the rules per area, the i18n parity test and the design ratchets exist (`test/ratchets.json`). Fixed: D-03, D-11, U-016, U-128, U-165 (rows marked *Stage 2*). Confirmed by the tests and left open: U-007, U-017, U-041, U-046, U-048, U-083, U-084, U-129 and the new D-31 to D-37. CI VERIFIED on GitHub (two green runs). 133 tests.
 
-Defect ids `D-01`…`D-37` refer to `docs/agent/DEFECTS.md`.
+**Stage 3 status (2026-10-05).** Product gaps closed on `stage-3/integration` (41 commits, 147 tests): every one of the thirty Stage 0 verified defects is now fixed (D-02, D-04 to D-10, D-12, D-13, D-15 to D-17, D-19 to D-30 in Stage 3; D-01, D-14, D-18 in Stage 1; D-03, D-11 in Stage 2), plus D-32, U-007, U-017, U-034, U-041 (the page), U-045, U-046 and U-048 from the Stage 2 confirmations. Built: the Lite legal pages (P1-2) and the admin Audit log tab (P1-3). Migration 16 (`applications.hire_pay_mid`). Open and recorded: D-31, D-33 to D-37 (P3), U-083/U-084 (records), U-129 (documented), the 199 unverified candidates (S4-2). A seven-lens adversarial review of the diff returned 35 items: the six P1/P2 ones are fixed (a live admin session survived removal from `ADMIN_PHONES`; a note re-recorded the placement-fee basis; contact flags put numbers into the audit log; contact flags fired on years and salaries; audit filters ignored Arabic-Indic digits; suspend-then-verify went around the state check), the P3 doc points are corrected, and two are recorded as choices (A-45). Rows marked *Stage 3* carry the evidence.
+
+Defect ids `D-01`…`D-38` refer to `docs/agent/DEFECTS.md`.
 
 ## Summary
 
 | Area | VERIFIED | PARTIAL | MISSING | UNVERIFIED | Rows |
 |---|---|---|---|---|---|
-| 1 · Accounts, sign-in by SMS code, proof-of-work, sessions, consent | 22 | 16 | 1 | 0 | 39 |
-| 2 · Job board, engine rules, fit score, search, saved jobs, job alerts | 8 | 7 | 0 | 0 | 15 |
+| 1 · Accounts, sign-in by SMS code, proof-of-work, sessions, consent | 24 | 15 | 0 | 0 | 39 |
+| 2 · Job board, engine rules, fit score, search, saved jobs, job alerts | 10 | 5 | 0 | 0 | 15 |
 | 3 · Applying, applications, pipeline, notifications, contact reveal | 22 | 12 | 0 | 0 | 34 |
 | 4 · Resume, tailoring, translation editor, Claude features, CV import | 11 | 10 | 0 | 0 | 21 |
 | 5 · Recruiter candidate search, opt-in, invitations, block | 16 | 8 | 0 | 2 | 26 |
@@ -32,11 +34,11 @@ Defect ids `D-01`…`D-37` refer to `docs/agent/DEFECTS.md`.
 | 9 · Campus and student verification | 16 | 8 | 2 | 0 | 26 |
 | 10 · Events, tickets, check-in | 13 | 14 | 1 | 0 | 28 |
 | 11 · Admin, insights, traffic, system, audit API | 15 | 12 | 2 | 0 | 29 |
-| 12 · Shaghilni Lite | 27 | 17 | 1 | 0 | 45 |
-| 13 · Security headers, CSRF, rate limits, caps, retention, export, deletion, legal, lockdown | 19 | 15 | 1 | 1 | 36 |
+| 12 · Shaghilni Lite | 28 | 16 | 1 | 0 | 45 |
+| 13 · Security headers, CSRF, rate limits, caps, retention, export, deletion, legal, lockdown | 20 | 15 | 0 | 1 | 36 |
 | 14 · i18n, RTL, design-system conformance, accessibility, theme | 3 | 21 | 0 | 2 | 26 |
-| 15 · Tests, scripts, seeding, demo accounts, Docker, deploy, docs | 8 | 12 | 1 | 0 | 21 |
-| **Total** | **234** | **184** | **12** | **5** | **435** |
+| 15 · Tests, scripts, seeding, demo accounts, Docker, deploy, docs | 9 | 11 | 0 | 1 | 21 |
+| **Total** | **241** | **179** | **9** | **6** | **435** |
 
 Brief `<features>` letters → areas: A → 1, 13 · B → 1, 2, 3, 4, 5, 14 · C → 12 · D → 5, 6 · E → 7 · F → 8 · G → 9 · H → 10 · I → 11 · J → 13, 15.
 
@@ -380,7 +382,7 @@ Brief `<features>` letters → areas: A → 1, 13 · B → 1, 2, 3, 4, 5, 14 · 
 | Hire confirmation by phone → confirmed-hires metric; fee/programme charge once | VERIFIED | `admin.js:104-129` | api: "pipeline…" :184-192; plans :98-112; insights :72; campus; events | Repeat confirm rewrites `hire_confirmed_by` and adds a second audit row (probe) |
 | Hires list (pending/confirmed, employer call button, programme picker) | PARTIAL | `admin.js:92-103`; `app-admin.js:67-69,75,93,95` | api :184-186; security test 3 | Confirmed-state list never asserted |
 | Admin overview API (counts, queues, 8-week series) and nav badge | PARTIAL | `admin.js:10-38`; `boot.js:237-240`; `app.js:101` | api :187-192,232; security test 2 :131,133 | `drawOverview` (8-week chart) never called (`app-admin.js:20,23-37`); `counts` do not exclude demo-listing applications |
-| Audit log written for privileged actions; API only, no screen | PARTIAL | `app.js:36-37`; `db.js:93-102`; `admin.js:131-134` | api: "audit log records who did what"; security :157,174-175 | `limit` 1..200 only; no filters/pagination; no client reads it (grep `admin/audit` in `public/` → none) |
+| Audit log written for privileged actions; API only, no screen | VERIFIED (Stage 3) | `app.js:36-37`; `db.js:93-102`; `admin.js:131-134` | api: "audit log records who did what"; security :157,174-175 | Stage 3: the admin Audit log tab reads it with filters, a `before` cursor and a spreadsheet export; `test/policy-admin.test.js` covers the API's limit, filters, cursor and masking |
 | Billing tab data | VERIFIED | `admin.js:137-147`; `app-plans.js:92-101` | plans :83,104; insights :74 | — |
 | Admin sets plan/length; closes requests; optional charge | VERIFIED | `admin.js:148-158` | plans; team; insights | `months` 0 → no expiry |
 | Mark charge paid/void | VERIFIED | `admin.js:159-164` | plans :105; insights :74 | — |
@@ -400,7 +402,7 @@ Brief `<features>` letters → areas: A → 1, 13 · B → 1, 2, 3, 4, 5, 14 · 
 | Area strings in both languages | PARTIAL | `i18n4.js` (probe: 250 keys present, 0 placeholder mismatches) | none | Stage 3: `err_not_hired`, `err_bad_plan` and seven more added (D-21 fixed) |
 | Failed texts surfaced to admins | PARTIAL | `insights.js:53`; `app-insights.js:25`; `admin.js:29` | none | — |
 | Admin editing of listings | MISSING | `admin.js` has only approve (:71) and reject (:81) | none | Documented as absent (README.md:252; backlog P2-2) |
-| Admin audit-log screen | MISSING | `app-admin.js:7` tabs have no audit entry; no client reference to `admin/audit` | none | Documented as absent (README.md:241; backlog P1-3) |
+| Admin audit-log screen | VERIFIED (Stage 3) | `app-admin.js:7` tabs have no audit entry; no client reference to `admin/audit` | none | Built in Stage 3 (P1-3): `public/js/app-audit.js`, tab in `app-admin.js`; the API is tested, the screen itself only by reading (no browser run covers it yet) |
 
 ## Area 12 · Shaghilni Lite (brief C)
 
@@ -474,7 +476,7 @@ Brief `<features>` letters → areas: A → 1, 13 · B → 1, 2, 3, 4, 5, 14 · 
 | Retention sweep at start-up and hourly (OTPs 24 h, sessions, texts 90 d, usage 60 d, traffic 180 d) | VERIFIED | `retention.js:5,7-17`; `index.js:12-13`; `app.js:118` | security test 1 :99-104; traffic :96 | `email_codes` (hold the student's address) and `email_sends` never swept (probe D1); usage sweep untested |
 | Account export `GET /api/me/export` (JSON attachment) | PARTIAL | `me.js:101-133`; `app-seeker.js:7,35-46` | security test 1 :91-98; test 2 :129; diaspora :110 | Omits plan/charges/payments/requests, own team membership, invitations sent, partners, blocked companies, `campus_offices` (probe C); SECURITY.md:44 says "everything" |
 | Account deletion `DELETE /api/me` (erase personal data, keep anonymous records, close listings, sign out; admin refused; hold-to-delete UI) | PARTIAL | `me.js:136-167`; `app-seeker.js:8,47-54`; `motion.js:226-229` | api: "account deletion…" :226-236; security :105-111; recruit :129; events :94; campus :97 | D-22 (`campus_offices` row kept); `applyPhone`/`applyEmail` kept in `companies.data`; `email_sends` kept; `admin_cannot_delete` has no string and no test |
-| Privacy notice and terms (`LEGAL` object) at `/#/privacy`, `/#/terms`, linked from welcome, sign-in, profile | PARTIAL | `legal.js:6-208`; `boot.js:199`; `app.js:135`; `app-account.js:5-9,57,61`; `app-seeker.js:24` | e2e D :427-436 only (not run) | D-12 for Lite |
+| Privacy notice and terms (`LEGAL` object) at `/#/privacy`, `/#/terms`, linked from welcome, sign-in, profile | PARTIAL | `legal.js:6-208`; `boot.js:199`; `app.js:135`; `app-account.js:5-9,57,61`; `app-seeker.js:24` | e2e D :427-436 only (not run) | D-12 for Lite; Stage 3: the same object is served without JavaScript at `/lite/privacy` and `/lite/terms` through `core.LEGAL` |
 | Legal placeholders from `LEGAL_NAME`/`CONTACT_EMAIL`/`SESSION_DAYS`; date from `TERMS_VERSION` | PARTIAL | `legal.js:193,198`; `public.js:36`; `config.js:22`; `i18n4.js:909-910/1895-1896` | security :79-80 (`termsVersion` only) | Substitution untested |
 | Consent wording and `TERMS_VERSION` recording | VERIFIED | `i18n4.js:908/1894`; `auth.js:89,93-94,100-104` | security test 1 :70-81 | — |
 | Production lockdown: pepper ≥ 32, https `BASE_URL` | VERIFIED | `config.js:72-75` | security test 10 :279-285 | — |
@@ -497,7 +499,7 @@ Brief `<features>` letters → areas: A → 1, 13 · B → 1, 2, 3, 4, 5, 14 · 
 
 | Feature | Status | Evidence | Tests | Notes or gap |
 |---|---|---|---|---|
-| `STR.en`/`STR.ar` parity (1,658 keys each after Stage 3, same placeholders, no empty Arabic) | PARTIAL | `i18n.js:6-7`; `i18n3.js:2,15`; `demo.js:3,10` (+23 keys at runtime); probe: 0 one-sided keys, 0 placeholder mismatches, 0 empty, 8 Arabic values without Arabic letters | none (import.test.js:12 only loads the files) | 17 EN / 18 AR keys defined twice with different values (`trPrivacy`, `tmAdd`, `err_phone_region`, `err_bad_code`, `err_code_expired`, …); D-04 `edu_student` and `coGovL` missing |
+| `STR.en`/`STR.ar` parity (1,680 keys each after Stage 3, same placeholders, no empty Arabic) | VERIFIED (Stage 2) | `i18n.js:6-7`; `i18n3.js:2,15`; `demo.js:3,10` (+23 keys at runtime); probe: 0 one-sided keys, 0 placeholder mismatches, 0 empty, 8 Arabic values without Arabic letters | none (import.test.js:12 only loads the files) | `test/i18n.test.js` holds parity and placeholders; 1,680 keys after Stage 3; 8 Latin-only Arabic values allow-listed; the duplicate-key ratchet is at en 7 / ar 6 |
 | Plural forms as CLDR objects rendered by `tn()` | PARTIAL | `engine.js:27-38,40`; `i18n3.js:5,18` | none | Numbers always `en-US` (`engine.js:19`) |
 | `t()` lookup with English fallback then the key itself | PARTIAL | `engine.js:18,39,318` | none | Raw key shown on a miss (`coGovL`, `edu_student`) |
 | Language switch (header, settings, localStorage + `PUT /api/me/lang`, re-render) | PARTIAL | `index.html:29`; `app.js:108-109`; `boot.js:22-32,67-68,250`; `me.js:28-33`; `db.js:11` | security test 3 (junk) | Happy path untested; device language overrides the account on every load |
@@ -530,7 +532,7 @@ Brief `<features>` letters → areas: A → 1, 13 · B → 1, 2, 3, 4, 5, 14 · 
 |---|---|---|---|---|
 | `npm test`: node:test over 15 files, in-memory databases | VERIFIED | `package.json:13`; every file opens `:memory:` | 60 tests (api 11, security 12, import 6, lite 4, payments 4, plans 4, campus 3, demo 3, diaspora 3, events 3, recruit 2, team 2, contact 1, insights 1, traffic 1); BASELINE: 60 pass | README.md:230 / SECURITY.md:8 say "34 test groups" |
 | Central security matrix (test 2 cross-role, test 3 junk input) | PARTIAL | `test/security.test.js:114-139,141-182,152-160` | security tests 2 and 3 | 35 entries = 34 distinct routes of 109; test 2 touches 19 routes; 68 routes in neither (see ROUTES.md) |
-| Browser e2e (`npm run test:e2e`, Puppeteer: seeker phone/ar, employer, admin, legal browsers + Lite no-JS page) | UNVERIFIED | `package.json:14`; `test/e2e/browser-flow.mjs:1-447` (79 lines with `check(`, 80 call sites; 4 `actor(` browsers) | not run (puppeteer absent; network forbidden in Stage 0) | README.md:236 / SECURITY.md:32 say "54 checks", "three browsers"; stale Google Fonts allowance (`:33,40`); dead path `/home/claude/mvp` (`:299`) |
+| Browser e2e (`npm run test:e2e`, Puppeteer: seeker phone/ar, employer, admin, legal browsers + Lite no-JS page) | PARTIAL (Stage 3) | `package.json:14`; `test/e2e/browser-flow.mjs:1-447` (79 lines with `check(`, 80 call sites; 4 `actor(` browsers) | not run (puppeteer absent; network forbidden in Stage 0) | Run at the Stage 3 gate after `npm install --no-save puppeteer`: 35 checks pass (the client bundle loads, no browser errors), then the script stops at the job seeker's applications view after a hire, on `main` too (D-38, Stage 4) |
 | Test fixtures: six synthetic resumes | VERIFIED | `test/fixtures/*` | import :40-68 | — |
 | Security scanner (secrets, risky patterns, settings audit, `--env file`, `--url`, exit 1 on FAIL) | PARTIAL | `scripts/security-check.js:26-144`; `package.json:17` | security test 10 :278-292; test 13 :351-359; test 9 :275 | `liveCheck` never run; `SEED_DEMO` unset in production is only a WARN (`:93`); `--env file` works (probe) |
 | Production lockdown in `loadConfig` | VERIFIED | `config.js:72-84` | security :278-292, :220-225; payments :120 | — |
@@ -563,7 +565,7 @@ Items of `<verified_facts>` and `<features>` that the maps contradict or refine.
 | VF5 | 1,646 keys each, in sync, no test | Confirmed, with: 17 EN / 18 AR keys defined twice with different values (`i18n4.js:78/907 trPrivacy`, `:262/666 tmAdd`, `:748/911 err_phone_region`, `:256/927`, `:258/929`); 8 Arabic values with no Arabic letters; `edu_student` and `coGovL` missing in both (D-04); 9 server error codes without `err_*` (D-21); `demo.js` adds 23 keys at runtime; Lite's 189 LT keys live outside STR | maps 1, 4, 8, 10, 12, 14 probes |
 | VF7 | Only TODOs in `server/payments.js` | Confirmed | BASELINE |
 | VF8 | Docs contradict themselves (listed items) | Confirmed, plus: README "Not built yet" also wrongly lists "Telegram and SMS job alerts" (SMS digests exist, `server/alerts.js:38-41`) and "Resume file uploads" (on-device import exists); SECURITY.md:41 says 26 and 28 September while `TERMS_VERSION` is `2026-10-04`; README.md:236 / SECURITY.md:32 "54 checks", "three browsers" vs 79 lines (80 call sites) and four browsers | DOC_DRIFT.md |
-| VF9 | Verified absent: audit screen, listing editing, Telegram, public resume links, Lite events/campus/teams; Lite legal links JS-only | All confirmed. Refinements: Lite also lacks block (`lite.js:258,265`), plans/billing, job posting, alert channel choice; `GET /api/me/events` exists but no client screen uses it; public resume links absent but `engine.js:177` builds a `shaghilni.sy/cv/<slug>` string (D-20); manual office verification is absent though README.md:310 and SECURITY.md:407-408 describe it | maps 5, 7, 9, 10, 11, 12 |
+| VF9 | Verified absent: audit screen, listing editing, Telegram, public resume links, Lite events/campus/teams; Lite legal links JS-only | All confirmed. Refinements: Lite also lacks block (`lite.js:258,265`), plans/billing, job posting, alert channel choice; `GET /api/me/events` exists but no client screen uses it; public resume links absent but `engine.js:177` builds a `shaghilni.sy/cv/<slug>` string (D-20); manual office verification is absent though README.md:310 and SECURITY.md:407-408 describe it | maps 5, 7, 9, 10, 11, 12; Stage 3 built the audit screen and the Lite legal pages |
 | VF11 | Known by design: in-memory limits, one process | Confirmed for the limiter (`http.js:100-110`); the proof-of-work used-list is also in memory (`auth.js:27`): a solved challenge is reusable after a restart within 5 minutes (probe) | map 1 |
 | A | "Codes stored as salted hashes" | `sha256(OTP_PEPPER:phone:code)`: keyed with the pepper, no random per-code salt | `server/auth.js:19` |
 | A | "about 19 diaspora countries" | Exactly 19 (`DIAL` has 20 entries incl. Syria); `+1` labelled United States only | `public/js/lookups.js:136-137` |
@@ -591,13 +593,13 @@ Items of `<verified_facts>` and `<features>` that the maps contradict or refine.
 
 | Item | Evidence | Claimed where |
 |---|---|---|
-| Admin audit-log screen | `public/js/app-admin.js:7` tab list; no client reference to `admin/audit` | README.md:241 says so; backlog P1-3 |
+| Admin audit-log screen | built in Stage 3: `public/js/app-audit.js` and the Audit log tab | built in Stage 3 (`public/js/app-audit.js`, the Audit log tab); closed in Stage 3 |
 | Admin editing of listings | `server/routes/admin.js` mutates listings only at :71 (approve) and :81 (reject) | README.md:252 says so; backlog P2-2 |
 | Telegram alerts | no code (grep `telegram` → none) | README.md:247 says so |
 | Public resume links | no route; `engine.js:177` builds a display string `shaghilni.sy/cv/<slug>` (D-20) | no route; the dead `shaghilni.sy/cv/<slug>` display string is gone since Stage 3 (D-20 fixed); README.md says not built |
 | Lite pages for events, career offices, teams | `server/lite.js:601-611` route table | Brief C; README.md:13 silent on teams |
 | Lite: block a company, plans/billing/analytics, job posting, alert channel choice or edit, withdraw an application, privacy/terms pages | `lite.js:258,265` (yes/no only); no plan/jobs/alerts-edit routes; `:144,450` link to `/#/…` | README.md:11 (block, general); D-12 |
-| Server-rendered legal pages (`/lite/privacy`, `/lite/terms`) | not in `lite.js:601-611` | Backlog P1-2 |
+| Server-rendered legal pages (`/lite/privacy`, `/lite/terms`) | built in Stage 3: `server/lite.js` legalPage | closed in Stage 3 |
 | QNB Syria payment adapter | `server/payments.js:33-47` `ready = false` | README.md:335; brief E |
 | Continuous integration | `.github/workflows/ci.yml` added in Stage 1 (S1-3); two GitHub runs green in Stage 2 | closed in Stage 2 |
 | i18n parity test; CSS ratchets (`test/ratchets.json`) | no such tests | Backlog P1-1 |

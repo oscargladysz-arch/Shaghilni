@@ -21,8 +21,8 @@ No item marked owner, lawyer or provider is ever ticked by an agent.
 
 | # | Item | Owner | How to verify | Status |
 |---|---|---|---|---|
-| B1 | `npm test` green. | agent | 133 of 133 at the Stage 2 gate (66 at Stage 1; `docs/agent/BASELINE.md` has the Stage 0 60). | Done |
-| B2 | The browser flow passes (`npm run test:e2e`, 80 checks, four browsers plus a Lite page without JavaScript). | agent, owner | Run the *Browser end-to-end* job by hand from the CI workflow, or locally after `npm install --no-save puppeteer`. | UNVERIFIED |
+| B1 | `npm test` green. | agent | 147 of 147 at the Stage 3 gate (133 at Stage 2, 66 at Stage 1; `docs/agent/BASELINE.md` has the Stage 0 60). | Done |
+| B2 | The browser flow passes (`npm run test:e2e`, 80 checks, four browsers plus a Lite page without JavaScript). | agent, owner | Run the *Browser end-to-end* job by hand from the CI workflow, or locally after `npm install --no-save puppeteer`. Run at the Stage 3 gate: 35 checks pass, then the script stops at the job seeker's applications view after the hire (`.acard .pill` never appears); the same stop happens on `main` before Stage 3, so it is a pre-existing gap in the flow or the script (D-38, Stage 4). | Partial |
 | B3 | `npm run security:check -- --url https://your-domain` shows no FAIL once deployed. | owner | Paste the output into the launch record. | Open |
 | B4 | External scans: MDN HTTP Observatory (aim A+), SSL Labs (aim A), the OWASP ZAP baseline scan, GitHub secret scanning. | owner | Reports saved. | Open |
 | B5 | The four review prompts in SECURITY.md items 6–9 re-run against the current code. | agent | Stage 4 of the launch work updates SECURITY.md with the results and the date. | Open |
@@ -37,7 +37,7 @@ No item marked owner, lawyer or provider is ever ticked by an agent.
 | C2 | `LEGAL_NAME` and `CONTACT_EMAIL` set to the real operating entity and a monitored mailbox. | owner | The scanner's `Legal name:` and `Privacy contact:` lines. | Blocked on D4 and D6 |
 | C3 | A named person responsible for personal data, and a breach plan. | owner | Written down and named in the privacy notice if the lawyer asks for it. | Open |
 | C4 | The employment-office licence application is under way. | owner | | Open |
-| C5 | Native Arabic review of every new or changed string. | owner, reviewer | Every row of `docs/agent/ARABIC_REVIEW.md` ticked. | Open (one string so far) |
+| C5 | Native Arabic review of every new or changed string. | owner, reviewer | Every row of `docs/agent/ARABIC_REVIEW.md` ticked. | Open (37 rows so far) |
 | C6 | Lite users can read the terms they consent to without JavaScript. | agent | `/lite/privacy` and `/lite/terms` (Stage 3, P1-2); `test/lite.test.js` checks both languages, the filled-in details and the links. | Done |
 
 ## D · Providers and money
@@ -66,8 +66,8 @@ No item marked owner, lawyer or provider is ever ticked by an agent.
 | F1 | What happens to the sample data (remove, or replace the real organisations' names; staging), decision D1. | owner | `docs/agent/QUESTIONS.md`. | Blocked on D1 |
 | F2 | The two real names in the demo accounts (a relief society, an event venue) replaced with fictional ones. | agent | `grep -n "Red Crescent\|Four Seasons" server/demo.js` finds nothing. | Open (after D1) |
 | F3 | Which universities issue student email, and their domains. | owner | Admin → Universities → Student email lists them. | Open |
-| F4 | Who screens companies against the OFAC list; every company screened before verification. | owner | The compliance report's sanctions column (filled in since Stage 3, D-07) and the audit log. | Open |
-| F5 | The "invoiced by our US company" copy removed from the app and the README (no entity exists). | agent | README done in Stage 1; the app strings follow in Stage 3. | Partial |
+| F4 | Who screens companies against the OFAC list; every company screened before verification. | owner | The compliance report's sanctions column (filled in since Stage 3, D-07) and the admin's Audit log tab log. | Open |
+| F5 | The "invoiced by our US company" copy removed from the app and the README (no entity exists). | agent | README in Stage 1; the two app strings in Stage 3 (D-20); security test 18 keeps it out. | Done |
 
 ## G · Quality and reach
 
