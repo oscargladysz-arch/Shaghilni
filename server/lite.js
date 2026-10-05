@@ -444,7 +444,7 @@ ${editing != null ? `<form method="post" action="/lite/profile/exp/delete">${hid
 
   /* ---------- signing in ---------- */
   function phoneForm(ctx, { roleWanted = "seeker", next = "", error = "", phone = "" } = {}) {
-    const lg = ctx.lang, ch = auth.challenge(ctx);
+    const lg = ctx.lang, ch = auth.challenge(ctx, { count: false });   // a page view is not a sign-in attempt (D-24); sending the code is still limited
     return `<form method="post" action="/lite/signin" id="ltPhone" data-bits="${ch.bits}" class="cd">${hidden(ctx, { role: roleWanted, next, pow_challenge: ch.challenge, pow_nonce: "" })}
 ${error ? `<p class="er" role="alert">${esc(error)}</p>` : ""}<label for="ph">${esc(tr(lg, "phoneL"))}</label><input id="ph" name="phone" type="tel" inputmode="tel" autocomplete="tel" dir="ltr" required value="${esc(phone)}" placeholder="09xx xxx xxx">
 <label class="ckl" style="margin-top:10px"><input type="checkbox" name="consent" value="1" required><span>${esc(tr(lg, "consent"))} <a href="/lite/terms">${esc(tr(lg, "terms"))}</a> · <a href="/lite/privacy">${esc(tr(lg, "privacy"))}</a></span></label>
@@ -466,7 +466,7 @@ ${error ? `<p class="er" role="alert">${esc(error)}</p>` : ""}<label for="ph">${
     const phone = r.phone || b.phone;
     return page(ctx, tr(lg, "signin"), `<h1>${esc(tr(lg, "signin"))}</h1>${r.devCode ? `<p class="fl">${esc(tr(lg, "devCode", { code: r.devCode }))}</p>` : ""}
 <form method="post" action="/lite/signin/code" class="cd">${hidden(ctx, { phone, role: roleWanted, next })}<label for="code">${esc(tr(lg, "codeL", { phone }))}</label>
-<input id="code" name="code" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" maxlength="6" dir="ltr" required autofocus style="font-size:22px;letter-spacing:6px;text-align:center">
+<input id="code" name="code" inputmode="numeric" autocomplete="one-time-code" maxlength="6" dir="ltr" required autofocus style="font-size:22px;letter-spacing:6px;text-align:center">
 <button class="bt" type="submit">${esc(tr(lg, "verify"))}</button></form><a class="b3" href="/lite/signin?role=${roleWanted}${next ? "&next=" + encodeURIComponent(next) : ""}">${esc(tr(lg, "otherNumber"))}</a>`, { tab: "profile" });
   }
   async function codePost(ctx) {

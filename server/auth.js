@@ -26,8 +26,8 @@ export function makeAuth({ db, cfg, core, sms, limit, audit, log, guard }) {
      thousands of requests pays for every one. No third party, no puzzle for people, works offline. */
   const usedPow = new Map();
   const powSig = (exp, salt) => createHmac("sha256", cfg.otpPepper).update(`pow:${exp}.${salt}.${cfg.powBits}`).digest("hex").slice(0, 16);
-  function challenge(ctx) {
-    if (!limit(`pow-ip:${ctx.ip}`, 60, 600e3)) fail(429, "rate_limited");
+  function challenge(ctx, { count = true } = {}) {   // count: false for a challenge embedded in a Lite page view; the API route always counts (D-24)
+    if (count && !limit(`pow-ip:${ctx.ip}`, 60, 600e3)) fail(429, "rate_limited");
     const exp = (Date.now() + POW_TTL).toString(36), salt = randomBytes(6).toString("hex");
     return { challenge: `${exp}.${salt}.${powSig(exp, salt)}`, bits: cfg.powBits };
   }

@@ -442,6 +442,7 @@ Field order in every entry below: ID · Severity (verifier's; reporter's noted i
 | Regression test | `test/lite.test.js` (browser() helper `:46-53`): the served `<input id="code">` has no `pattern` (or, if kept, `new RegExp('^(?:'+pattern+')$','v')` matches `٠١٢٣٤٥` and `۰۱۲۳۴۵`); POST `/lite/signin/code` with the code in Arabic-Indic digits → 303 `/lite/me`. |
 | Docs (R15) | None (no README/PRODUCT/SECURITY claim about digit handling in Lite; README.md:358 is the unrelated ticket-code line). No new Arabic string. |
 | Privacy/legal (R13) | None. |
+| **Status** | **FIXED in Stage 3 (S3-8)**: the `pattern` attribute is gone from Lite's code input; `inputmode`, `maxlength` and `required` stay and the server validates. Test: `test/lite.test.js` sign-in test (a code in Arabic-Indic digits signs in). |
 | Notes | UNVERIFIED: which Arabic/Persian keyboards emit U+0660-0669 / U+06F0-06F9 under `inputmode=numeric`; a real-device check (P3 human testing) would settle practical impact. The refusal message is the browser's own localized text. Also reported by probe:auth, probe:lite and probe:platform (A13-13). |
 
 ### D-24 · P2 · Every GET of the Lite sign-in / hire page spends one of the 60 proof-of-work challenges per address per 10 minutes; the page itself then returns 429
@@ -459,6 +460,7 @@ Field order in every entry below: ID · Severity (verifier's; reporter's noted i
 | Regression test | `test/lite.test.js` fresh start(): 61× `b.get('/lite/signin')` all 200 each containing `name="pow_challenge"`; then `b.get('/lite/hire')` 200; then GET `/api/auth/challenge` (x-shaghilni: 1) still 200. Optionally 60 GET `/api/auth/challenge` → 200 then 429 (cf. `security.test.js:318-330`). |
 | Docs (R15) | SECURITY.md:284 row "Sign-in challenges, per address \| 60 per 10 minutes \| fixed": add "(API; Lite sign-in page views are not counted)". |
 | Privacy/legal (R13) | None. |
+| **Status** | **FIXED in Stage 3 (S3-8)**: `auth.challenge(ctx, { count: false })` for the challenge embedded in a Lite page; `GET /api/auth/challenge` still counts. Test: `test/lite.test.js` (61 page views, then the API challenge still answers 200). |
 | Notes | Each failed POST `/lite/signin` (missing consent or API error) re-renders phoneForm via `again` (`:461`) and also spends a challenge. With TRUST_PROXY unset behind a reverse proxy (`config.js:69` default false) every visitor shares one ip — a deployment setting, not this defect. UNVERIFIED: how commonly target users share one public address (campus Wi-Fi, carrier NAT). |
 
 ### D-25 · P2 · "Why it suits you" summary reads "living in ." / "مقيم في ." for anyone living outside Syria
