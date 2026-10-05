@@ -4,6 +4,8 @@ Every claim below was checked against the code at commit `9683221` (code = `b842
 
 Summary: README.md 61 rows · SECURITY.md 41 · PRODUCT.md 7 · .env.example 7 · Dockerfile 1 · DESIGN.md 3 · **120 rows**, plus 8 R6 flags.
 
+**Status (Stage 1, S1-4): applied.** Every row was applied to the documents with an assert-once replacement script (118 replacements: README 60, SECURITY 42, PRODUCT 7, `.env.example` 5, Dockerfile 1, DESIGN 3), with these departures from the "Corrected text" column: the README deploy-block row (115-127) and the `.env.example` rows 29-30 and 41-42 were superseded by the Stage 1 fixes (S1-1 gates seeding in production, S1-2 comments out the prefix line and explains `NODE_ENV`); the Dockerfile row became a comment because the gate now exists in code; rows offering "or fix the code" took the docs-only wording with a pointer to `DEFECTS.md` (A-36); the "Before you go live" lists in README and SECURITY.md were replaced by a link to `docs/LAUNCH.md`; the three README "Demo:" bullets moved inside the demo-accounts markers (A-35). The R6 code halves (`server/config.js`, `public/js/engine.js`, `public/js/i18n4.js`, `public/js/app-employer.js`, `server/demo.js`, `server/notify.js`) wait for Stage 3; `seed/demo.json` waits for D1. The line numbers below are those of the files before Stage 1.
+
 ## README.md
 
 | Line | Claim (quoted) | Reality (evidence) | Corrected text |

@@ -1,11 +1,11 @@
 # Security and privacy checklist
 
-This file maps the 13-item *30-Minute Pre-Launch Security Checklist* onto Shaghilni. For each item it covers three things: what the code does, which test proves it, and what you still have to do yourselves. It was last reviewed on 28 September 2026, against this version of the code.
+This file maps the 13-item *30-Minute Pre-Launch Security Checklist* onto Shaghilni. For each item it covers three things: what the code does, which test proves it, and what you still have to do yourselves. It was last reviewed on 28 September 2026. On 5 October 2026 (Stage 0 of the launch work) every claim below was re-checked against the code at terms version 2026-10-04 and the ones that had drifted were corrected; the four review prompts (items 6–9) are re-run in Stage 4, which updates this line.
 
 Run both commands before every launch and after every change:
 
 ```bash
-npm test                                             # 34 test groups: 11 API, 12 security, 2 recruiters, 6 import, 3 Lite
+npm test                                             # 65 tests in 15 files (API, security, recruiters, import, Lite, payments, plans, universities, teams, events, demo, diaspora, applying, insights, traffic)
 npm run security:check -- --url https://your-domain  # the code, your settings and the live site
 ```
 
@@ -29,7 +29,7 @@ npm run security:check -- --url https://your-domain  # the code, your settings a
 | 12 | CAPTCHA and CORS restrictions | Built, with an invisible proof-of-work challenge instead of a picture CAPTCHA | Security test 12; browser flow |
 | 13 | Built-in security scanner check | Built: `npm run security:check`. **Also run the free external scanners** | Security test 13 |
 
-The security tests are in `test/security.test.js`, numbered after this list. The browser flow (`npm run test:e2e`, 54 checks) repeats the most important ones in real browsers.
+The security tests are in `test/security.test.js`, numbered after this list. The browser flow (`npm run test:e2e`, 80 checks) repeats the most important ones in real browsers.
 
 ---
 
@@ -38,21 +38,24 @@ The security tests are in `test/security.test.js`, numbered after this list. The
 **Built**
 
 - **The documents.** A privacy notice and terms of use, in Arabic and English, at `/#/privacy` and `/#/terms`. They're linked from the welcome screen, the sign-in step and the profile page, and live in `public/js/legal.js`. They describe what this code actually does: what's collected, who sees it, which providers receive what, and how long each thing is kept. That accuracy matters, because a privacy notice that doesn't match reality is itself a legal risk. In the US, the FTC treats a false privacy promise as a deceptive practice.
-- **Kept current.** On 26 September 2026 the notice and terms were updated to cover resume translation, and `TERMS_VERSION` was changed with them, so sign-in records acceptance of the new version. On 28 September 2026 they were updated again for Recruiters (now open to every job seeker, not only students) and resume uploads: what students who switch it on share, and the rule that employers may invite students only to real jobs and to events that are free for them. `TERMS_VERSION` changed again.
-- **Explicit consent at sign-in.** The box reads: *"I'm 18 or older and I agree to the Terms of use and the Privacy notice, including my data being stored and processed outside Syria."* No code is sent until it's ticked, and the server won't create an account without it. The version and time of acceptance are stored with the account. When you change either document, change `TERMS_VERSION` in `server/config.js`, and sign-in records acceptance of the new version.
-- **Minimisation.** Employers see a job seeker only after that person applies, and only the snapshot sent with that application. The public board carries no private company data; test 2 checks this.
-- **Download my data.** On the profile page. It gives everything the account holds, as a JSON file.
+- **Kept current.** On 26 September 2026 the notice and terms were updated to cover resume translation, and `TERMS_VERSION` was changed with them, so sign-in records acceptance of the new version. On 28 September 2026 they were updated again for Recruiters (now open to every job seeker, not only students) and resume uploads: what students who switch it on share, and the rule that employers may invite students only to real jobs and to events that are free for them. `TERMS_VERSION` changed again. The current version, 2026-10-04, also covers job alerts, teams and billing, sponsored listings, visit counts, events, university-email verification, card payments and email alerts; `public/js/legal.js` is the record of the current wording.
+- **Explicit consent at sign-in.** The box reads: *"I'm 18 or older and I agree to the Terms of use and the Privacy notice, including my data being stored and processed outside Syria."* The app and Shaghilni Lite send no code until the box is ticked, and the server creates no account unless the acceptance flag arrives with a correct code. The version and time of acceptance are stored with the account. When you change either document, change `TERMS_VERSION` in `server/config.js`, and sign-in records acceptance of the new version.
+- **Minimisation.** Employers see a job seeker's details only after that person applies: the profile snapshot sent with that application, the account's phone number and the current verified-student badge. People who switch on *Let recruiters find me* also appear as short cards in candidate search (item 8). The public board carries no private company data; test 2 checks this.
+- **Download my data.** On the profile page. It gives the account, profile, saved jobs, applications with the resume sent, invitations received, student verification, event tickets, job alerts and text records (job seekers), or the company page and listings (company owners), as a JSON file. Plan, charges, team membership, partnerships, blocked companies and a career office's record are not in it yet (see `docs/agent/DEFECTS.md`).
 - **Deletion.**
-  - A person deleting their account erases their profile, saved jobs, sessions, text-message records and any leftover sign-in codes. Their applications survive only as anonymous counts.
-  - An employer deleting their account also closes their listings and removes their contact details from the company page.
-- **Automatic retention.** `server/retention.js` runs hourly and deletes:
+  - A person deleting their account erases their profile, saved jobs, sessions, text-message records, leftover sign-in codes, invitations, job alerts, student verification, event tickets, team membership and blocked companies. Each application survives only as an anonymous record (status and dates; the resume sent and the employer's note are erased).
+  - An employer deleting their account also closes their listings and removes the contact name and WhatsApp number from the company page (the application phone number and email are not yet cleared: see `docs/agent/DEFECTS.md`).
+- **Automatic retention.** `server/retention.js` runs at start-up and every hour and deletes:
   - sign-in codes, with the IP addresses stored alongside them, after 24 hours;
   - expired sessions;
   - text-message records after 90 days;
-  - usage counters after 60 days.
+  - usage counters after 60 days;
+  - visit counts, link-share counts and browser error reports after 180 days.
+
+  Email verification codes (which hold the typed university address) are not swept yet (see `docs/agent/DEFECTS.md`).
 
   These are the periods the privacy notice promises, so keep the two in step.
-- **No tracking.** There's no advertising and no analytics. Fonts are served from your own server, so visitors' addresses no longer go to Google. The only cookie is the session cookie.
+- **No tracking.** There's no advertising and no analytics. Fonts are served from your own server, so visitors' addresses no longer go to Google. The full app sets only the session cookie. Shaghilni Lite also sets a form-protection cookie (`lt`, one year, no personal data) and, if you pick a language, a language cookie (`ll`); the notice's own sentence on cookies is to be aligned (see `docs/agent/LEGAL_PROPOSALS.md`).
 
 **Why the consent mentions storage outside Syria.** Syria's Law No. 12 of 2024 on the Protection of Electronic Personal Data is in force. Reported penalties reach 12 million Syrian pounds and three years in prison. Secondary summaries say the law:
 
@@ -76,7 +79,7 @@ Your hosting, text-message provider and Claude are probably all outside Syria, s
 
 ## 2. Row Level Security on Supabase
 
-Shaghilni doesn't use Supabase, and the browser never talks to the database. Every read and write goes through the server. There, every query that touches an account's data is limited to that account (`WHERE owner_id = ?`, `WHERE user_id = ?`), and every route checks the person's role. That gives the same protection Row Level Security gives a Supabase app, enforced in one place.
+Shaghilni doesn't use Supabase, and the browser never talks to the database. Every read and write goes through the server. There, every query that touches an account's data is limited to that account (`WHERE user_id = ?`) or, for employers, to the one company the person owns or is an active member of (`plans.companyFor`), and every employer route then checks the person's team role. That gives the same protection Row Level Security gives a Supabase app, enforced in one place.
 
 Security test 2 attacks it:
 
@@ -85,7 +88,7 @@ Security test 2 attacks it:
 - Every role tries the other roles' endpoints and is refused (403). Guests trying private endpoints are asked to sign in (401).
 - The public board is searched for private company fields: WhatsApp number, registration number and contact name.
 - Shaghilni Lite (`test/lite.test.js`) runs every action through the same API handlers in-process, so access control, validation and rate limits are identical. Its HTML forms can't send the API's custom header, so each form carries a token signed with the server secret and tied to a per-browser cookie. Posts without it, or sent from another site, are refused. A job seeker's number never becomes a recruiter account, and candidate search in Lite waits for verification.
-- Recruiter search (`test/recruit.test.js`): only students who switched it on are listed, only to verified companies, and never to a company the student blocked. Anyone with a profile can switch it on, and nobody is listed otherwise. Seekers, employers and guests are refused on each other's recruiter endpoints.
+- Recruiter search (`test/recruit.test.js`): only job seekers who switched it on are listed, only to verified companies (and only to their owner, admins and recruiters), and never to a company the person blocked. Anyone with a profile can switch it on, and nobody is listed otherwise. Seekers, employers and guests are refused on each other's recruiter endpoints.
 
 **If you ever move to Supabase or Postgres,** turn on Row Level Security on every table the browser can reach, and keep these tests.
 
@@ -93,7 +96,7 @@ Security test 2 attacks it:
 
 Every endpoint rebuilds its input field by field (`server/validate.js`). It checks types, lengths, allowed values, phone formats and pay ranges, and runs the listing checks for fees and discriminatory wording. The browser's checks exist only for convenience; the server's are the ones that count. Bodies over 256 KB are refused, and so is anything that isn't JSON.
 
-Security test 3 sends more than 1,000 junk requests to every endpoint, as a guest, a job seeker, an employer and an admin. The junk includes wrong types, arrays, objects nested 500 levels deep, prototype-pollution payloads, NoSQL-style operators, SQL fragments and bad IDs. The test requires that:
+Security test 3 sends more than 1,000 junk requests to 34 of the API's endpoints (the list in `test/security.test.js`; the newer families are not in it yet, see `docs/agent/ROUTES.md`), as a guest, a job seeker, an employer and an admin. The junk includes wrong types, arrays, objects nested 500 levels deep, prototype-pollution payloads, NoSQL-style operators, SQL fragments and bad IDs. The test requires that:
 
 - no request crashes the server;
 - the real profile survives;
@@ -106,10 +109,10 @@ The review and this test found two bugs, both fixed:
 
 ## 4. Error handling that does not leak data
 
-- **Expected problems** return a short code, such as `{"error":"wrong_code"}`, which the app turns into a friendly message in the person's language.
+- **Expected problems** return a short code, such as `{"error":"wrong_code"}`, which the app turns into a message in the person's language (a code without a translation shows the general "something went wrong" message).
 - **Unexpected problems** return only `{"error":"server_error"}`. The details go to the server log. Security test 4 breaks the database on purpose and checks that the answer contains no stack trace, file path or SQL.
 - **Account existence.** Sign-in never reveals whether a number has an account. Someone else's listing or application answers "not found", so its existence isn't confirmed.
-- **Logs.** The server log masks phone numbers (`+9639•••222`).
+- **Logs.** The server log masks phone numbers (`+9639•••222`), except the development `console` text provider, which prints each message whole (never use it in production; the scanner fails it), and the path of an unexpected error on the team routes, which is to be masked (see `docs/agent/DEFECTS.md`).
 
 ## 5. Auth failure case testing
 
@@ -118,7 +121,7 @@ Covered in security test 5 and the API tests:
 - **Codes:**
   - wrong, expired, reused and wrong-number codes are refused;
   - each code allows five attempts;
-  - requests are limited per number and per address;
+  - requests are limited per number (tested) and per address: 30 codes and 60 checks an hour, 60 challenges per 10 minutes (not yet covered by a test);
   - malformed numbers and codes get clear errors.
 - **Sessions:** forged, oversized and expired session tokens don't work.
 - **Sign-out:** signing out ends the session on the server, so a copied cookie stops working. Deleted accounts lose their sessions.
@@ -149,7 +152,7 @@ with file and line. Don't suggest rewriting working code unless there is a concr
   - phone sign-in with hashed, peppered, expiring codes;
   - random session tokens stored only as hashes, in HttpOnly SameSite cookies;
   - access checks on the server for every route;
-  - a strict Content-Security-Policy, with no inline scripts and nothing loaded from other sites;
+  - a strict Content-Security-Policy: no inline scripts and nothing loaded from other sites (inline styles are still allowed);
   - an audit log of account, company, listing, application and hire actions.
 - **Fixed in this pass:**
   - consent recording, data export and retention jobs;
@@ -182,7 +185,7 @@ present, point to the code, and list any gaps with a fix and a test that would p
 | **A03 Software Supply Chain Failures** | No runtime dependencies at all. Fonts and code are served from your own server. The Docker image uses the official `node:22-alpine` and runs as the unprivileged `node` user. | Rebuild the image monthly to pick up Node and Alpine security patches. Puppeteer is a test-only install. |
 | **A04 Cryptographic Failures** | HTTPS enforced with HSTS. Codes stored as SHA-256 with a secret pepper. Session tokens come from `crypto.randomBytes` and are stored only as hashes. Constant-time comparisons; HMAC-signed challenges. | The app doesn't encrypt the database file. Use an encrypted disk (most hosts encrypt by default) and keep backups private. |
 | **A05 Injection** | Bound SQL parameters everywhere. The four places that build SQL text are reviewed, marked and contain no user input, and the scanner fails on any new one. All HTML goes through one escaping template; strict CSP; no `eval` and no shell. | None known |
-| **A06 Insecure Design** | Threats handled by design: employer verification with a recorded sanctions-screening step, review of every listing and edit, the no-fees rule in the listing checks, SMS-pumping guards, consent and minimisation. | Verification and sanctions screening are manual, so they're only as good as the people doing them |
+| **A06 Insecure Design** | Threats handled by design: employer verification with a recorded sanctions-screening step, review of every listing (edits made while a listing awaits review or is closed are not re-checked yet), the no-fees rule in the listing checks, SMS-pumping guards, consent and minimisation. | Verification and sanctions screening are manual, so they're only as good as the people doing them |
 | **A07 Authentication Failures** | See item 5 | An admin account is only as safe as the admin's phone number. Ask your carrier for a SIM-swap PIN and keep `ADMIN_PHONES` short. |
 | **A08 Software or Data Integrity Failures** | No scripts from CDNs. Built files are named by content hash. Database migrations are versioned and run in transactions. The audit log records who changed what. | None known |
 | **A09 Security Logging and Alerting Failures** | The audit log records sign-ups, consent, deletions, company and listing changes and decisions, and every application move and hire confirmation. The server log records errors, failed texts and reached caps. | **No automatic alerts yet,** and the admin screens don't show the audit log (it's at `/api/admin/audit`). Watch the log, or add an alert on your host. |
@@ -202,12 +205,14 @@ or left behind after deletion.
 
 | Data | Who can see it | Where else it goes |
 |---|---|---|
-| Job seeker's profile and phone | The seeker; employers they apply to (as a snapshot); admins | The text provider gets the phone number. Anthropic gets only the text the person asks it to work on: bullet points and the job text for suggestions, or the resume's text for a translation. It never gets the name or phone number (tested). |
-| Company registration number, contact name, WhatsApp | The employer and admins. The WhatsApp number is released only to a signed-in applicant. | Never on the public board (tested) |
-| Employer notes on applicants | That employer only | Erased when the applicant deletes their account |
-| Candidate cards in recruiter search | Verified employers, and only for people who switched on *Let recruiters find me*: first name and last initial, education, experience level, recent job titles, governorate, skills and languages. Never the phone number or email | Nowhere else. Hidden again as soon as the student switches it off or blocks the company |
+| Job seeker's profile and phone | The seeker; employers they apply to (as a snapshot); admins | The text provider gets the phone number. Anthropic gets only the text the person asks it to work on: for suggestions, the bullet points with their job titles and the job text; for a translation, the resume's text. The server never adds the name or phone number (tested for translation; the suggestion prompt is not yet covered by a test). |
+| Company registration number, contact name, WhatsApp number, application phone number and email | The company's team and admins. The WhatsApp number, application phone number and email are released only to a signed-in applicant, and only for the ways the company switched on. | Never on the public board (tested) |
+| Employer notes on applicants | The company's team (owner, admins, recruiters and hiring managers) | Erased when the applicant deletes their account; not in the audit log |
+| Candidate cards in recruiter search | Verified employers' owners, admins and recruiters (not hiring managers), and only for people who switched on *Let recruiters find me*: first name and last initial, education, experience level, recent job titles, governorate, skills and languages. Never the phone number or email | Nowhere else. Hidden again as soon as the student switches it off or blocks the company |
 | Uploaded resume files | Nobody. The file is read in the browser and never uploaded; the importer makes no network calls (tested) | Only the details the person chooses to add are saved, exactly like typed ones |
 | Invitations and replies | The student, and the company that sent them. That company gets the student's full name and number only after the student says yes to an event | The student gets a text. Deleted with the student's account; withdrawn when the employer deletes theirs |
+| Event sign-ups (ticket code, check-in time) | The person; the event's organiser sees name, university and faculty to check them in; confirmed companies see only attendees who switched on *Let recruiters find me* | In the export; the code goes by text; reports hold totals only; deleted with the account |
+| University email address | The student (masked); never the career office or employers | The email service, for the code; kept so it verifies one account; deleted with the account |
 | IP addresses | Nobody, through the app | Stored with sign-in codes for 24 hours; kept in memory for rate limits; your host's logs |
 | Sessions | Nobody | Stored only as a hash, with the browser type; deleted at sign-out or when they expire |
 | Text messages | The recipient, in their export | The text provider; kept for 90 days |
@@ -260,7 +265,7 @@ hard-coded or committed.
 
 ## 10. Environment variable lockdown
 
-- In production the server **refuses to start** if `OTP_PEPPER` is missing or shorter than 32 characters, or if `BASE_URL` isn't an `https://` address.
+- In production the server **refuses to start** if `OTP_PEPPER` is missing or shorter than 32 characters, if `BASE_URL` isn't an `https://` address, if `PAY_PROVIDER=test`, or if a card provider is set without `PLAN_PRO_MONTHLY` and `PLAN_ENTERPRISE_MONTHLY`.
 - It warns if:
   - no admins are set;
   - texts only go to the log;
@@ -284,16 +289,17 @@ hard-coded or committed.
 | Sign-in challenges, per address | 60 per 10 minutes | fixed |
 | **Where texts may go** | Syria plus the main diaspora countries; admin numbers anywhere | `SMS_ALLOWED_PREFIXES` |
 | **Texts per day, whole site** | 1,000 | `SMS_DAILY_CAP` |
+| **Texts per day to numbers outside Syria** | 150 | `SMS_INTL_DAILY_CAP` |
 | Claude calls (suggestions and translations), per person | 10 an hour, 30 a day | `AI_USER_DAILY_CAP` (daily) |
 | **Claude calls per day, whole site** | 300 | `AI_DAILY_CAP` |
 | Request size | 256 KB | fixed |
 
-The destination rule matters most. In SMS pumping, bots request codes to premium-rate international numbers, and it's the most common way a small app gets a surprise bill. The daily caps are counted in the database, so they survive restarts. When the text cap is reached, sign-in pauses until midnight UTC and the server log says so. AI calls are capped at 4,000 output tokens each, so the most you can spend in a day is 300 calls at that size. Check that against your model's price.
+The destination rule matters most. In SMS pumping, bots request codes to premium-rate international numbers, and it's the most common way a small app gets a surprise bill. The daily caps are counted in the database, so they survive restarts. When the text cap is reached, sign-in pauses until midnight UTC and the server log says so. Each AI call is capped at 4,000 output tokens and carries at most about 8,000 characters of input, so 300 calls a day bounds the daily spend. Check that against your model's price.
 
 **You must** also set caps at the providers, in case of a bug here:
 
 - [ ] Anthropic Console: a monthly spend limit.
-- [ ] Twilio, if you use it: Messaging Geographic Permissions set to Syria only, and a usage alert.
+- [ ] Twilio, if you use it: Messaging Geographic Permissions limited to the countries in `SMS_ALLOWED_PREFIXES` (Syria only if you narrow that list), and a usage alert.
 - [ ] textbee: texts go out through your Android phone's SIM, so its plan caps your cost. Pick one that fits your volume.
 
 ## 12. CAPTCHA and CORS restrictions
@@ -304,12 +310,12 @@ The destination rule matters most. In SMS pumping, bots request codes to premium
 - needs no third party (picture CAPTCHAs such as reCAPTCHA depend on an outside service that may be unreliable in Syria, and they send visitors' data to it);
 - makes every automated request cost computing time.
 
-Each challenge works once and expires after five minutes. The difficulty is `OTP_POW_BITS`: each +1 doubles the work. A determined attacker can still pay that cost, which is why the destination rule and daily caps sit behind it. If abuse appears anyway, add Cloudflare Turnstile to the sign-in step; it would need updates to the privacy notice and the Content-Security-Policy.
+Each challenge works once per server process and expires after five minutes (the used list is kept in memory, so a restart within five minutes allows one reuse). The difficulty is `OTP_POW_BITS`: each +1 doubles the work. A determined attacker can still pay that cost, which is why the destination rule and daily caps sit behind it. If abuse appears anyway, add Cloudflare Turnstile to the sign-in step; it would need updates to the privacy notice and the Content-Security-Policy.
 
 **CORS and requests from other sites.**
 
 - The API gives no cross-origin permission to anyone, so other sites can't read its responses.
-- Every change needs a custom header that other sites can't send without permission. In production, the request's `Origin` must also match `BASE_URL`.
+- Every change needs a custom header that other sites can't send without permission. When `BASE_URL` is set (always, in production), a request that carries an `Origin` header must match it.
 - Cookies are `SameSite=Lax`.
 - The page can't be embedded in other sites (`frame-ancestors 'none'`).
 
@@ -354,21 +360,12 @@ It exits with an error when anything fails, so it can gate a deploy. Security te
 ## Keeping this file true
 
 - When you change what's collected, who receives it or how long it's kept, update `public/js/legal.js`, `server/retention.js`, `TERMS_VERSION` and this file together.
-- When you add an endpoint, add it to the access-control and junk-input tests (security tests 2 and 3).
+- Every endpoint must appear in the access-control and junk-input tests (security tests 2 and 3). Today their hard-coded list covers 34 of 109 routes (`docs/agent/ROUTES.md`); Stage 2 (P1-1) replaces it with a generated check that fails when a route is missing.
 - Re-run the four prompts (items 6–9) after big changes, and update their results here.
 
 ## Before you go live
 
-- [ ] `npm test` and the browser flow pass, on Node 22.13 or newer.
-- [ ] `npm run security:check -- --url https://your-domain` shows no FAIL.
-- [ ] A lawyer has reviewed the privacy notice and terms, and `LEGAL_NAME` and `CONTACT_EMAIL` are set.
-- [ ] A person responsible for personal data is named, and the breach plan is agreed.
-- [ ] Provider spend limits are set (item 11).
-- [ ] The external scans are done (item 13).
-- [ ] Demo listings are removed: `npm run demo:remove`.
-- [ ] Every company is screened against the OFAC list before approval. The admin checkbox records it, but the check itself is manual.
-- [ ] The employment-office licence application is under way (see the startup-cost document).
-- [ ] Backups are scheduled with a retention period, and one restore has been tested.
+The launch checklist, with who owns each item (agent, owner, lawyer or provider) and how it is verified, is in [docs/LAUNCH.md](docs/LAUNCH.md). It merges the list that used to be here with the README's, the human-only items and what Stage 0 found.
 
 
 ## Texts abroad and email alerts
@@ -381,22 +378,22 @@ It exits with an error when anything fails, so it can gate a deploy. Security te
 
 ## Plans, teams and billing
 
-- **Nothing here touches job seekers' chances.** Sponsored listings change only the order a *matching* job seeker sees, and are always labelled; no job seeker can pay for anything.
-- **Teammates** are matched by phone number. A number that belongs to a job seeker, an admin or another company can't be added. Only the company owner can edit company details, request plans or manage the team; removing a teammate ends their access immediately.
+- **Nothing here touches job seekers' chances.** Sponsored listings are at most two, lifted to the top and labelled *Sponsored*, only for a signed-in job seeker whose fit score is 60% or more; everyone else sees them in the usual order, unlabelled. No job seeker can pay for anything.
+- **Teammates** are matched by phone number. A number that belongs to a job seeker, an admin or another company can't be added. Only the company owner can request or pay for plans and hand the company over. The owner and admins edit company details and manage the team (only the owner changes, removes or approves admins); removing a teammate ends their access immediately.
 - **Placement fees are computed on the server** at the moment an admin confirms a hire, from the invitation and application records, and only once per hire.
-- **Reports** contain no candidate names or contact details: placements list dates, job title, governorate, type and pay range; the compliance record lists verification, sanctions-screening, listing-review and hire-confirmation events.
-- **Every plan change, charge update, sponsorship and team change is in the audit log.**
+- **Reports** contain no candidate names or contact details: placements list dates, job title, governorate, type and pay range; the compliance record lists company submission, verification, rejection, suspension and plan changes, listing approvals, rejections and sponsorships, and hire confirmations (its sanctions-screening column is not filled in yet: see `docs/agent/DEFECTS.md`, D-07).
+- **Every plan change, charge update, sponsorship start and team change is in the audit log** (switching a sponsorship off is not yet recorded: see `docs/agent/DEFECTS.md`, D-28).
 
 
 ## Demo accounts
 
-- The demo sign-in (`POST /api/auth/demo`) exists only when `DEMO_ACCOUNTS=true` and `SEED_DEMO=true`, and never in production: in production the route isn't registered at all, and no demo accounts are created. Tests check both.
-- It signs in only as the three fixed demo numbers, with the usual session cookie and rate limits.
+- The demo sign-in (`POST /api/auth/demo`) exists only in development with demo accounts on (the default there; `DEMO_ACCOUNTS=false` turns them off) and `SEED_DEMO` not `false`, and never in production: in production the route isn't registered at all, and no demo accounts are created. Tests check both.
+- It signs in only as the four fixed demo numbers (student, job seeker, company, university career office), with the usual session cookie and rate limits.
 
 
 ## Card payments
 
-- **No card data touches Shaghilni.** Card details are entered on the bank's hosted page; we store only the amount, currency, dates, plan and the bank's reference.
+- **No card data touches Shaghilni.** Card details are entered on the bank's hosted page; we store only the company, plan, months, amount, currency, dates, status, the provider's name and reference, and which team member started the payment.
 - **Only the bank's signed result switches a plan on.** Results arrive at `/pay/callback/<provider>`, outside `/api` (so without the CSRF header), and each is checked on its own: the signature, that the payment exists, and that the amount and currency match what we asked for. A result is applied once; repeats change nothing. The return page (`/pay/return`) never changes anything.
 - **The test payment page can't reach production:** the server refuses to start with `PAY_PROVIDER=test` when `NODE_ENV=production`, and card payments need both monthly prices to be set.
 - **Every checkout and every card payment is in the audit log.**
@@ -404,15 +401,15 @@ It exits with an error when anything fails, so it can gate a deploy. Security te
 
 ## Universities
 
-- **Career offices see only their own university** (or faculty): every portal query is scoped to the office, and requests from other universities can't be verified (404).
-- **Names only with consent:** for students in general, offices get counts only. Names, student numbers and activity appear only for students who asked that office to verify them, who see exactly what's shared before asking and can withdraw at any time.
+- **Career offices see only their own university** (or faculty): every portal query is scoped to the office, and a partnership request made to another university can't be approved or declined by it (404).
+- **Names only with consent:** for students in general, offices get counts only. Names and activity (faculty, year, how many applications and interviews, confirmed hires) appear only for students who verified themselves with their university email; they are told exactly what the office will see before they ask for the code, and can remove the verification at any time.
 - **Verification is tied to the profile's university**, so it can't be carried to another university; deleting an account deletes its verification records. Every verification, partnership and office change is in the audit log.
 - **Roles stay apart:** career offices can't reach employer, job seeker or admin routes, and the reverse. Accounts are created only by the admin.
 
 
 ## Events
 
-- **The camera** is allowed for Shaghilni's own pages only (`Permissions-Policy: camera=(self)`), and only to scan event tickets. The browser asks the organiser before it turns on; nothing is recorded or uploaded.
+- **The camera** is allowed for Shaghilni's own pages only (`Permissions-Policy: camera=(self)`), and only to scan event tickets. The browser asks the organiser before it turns on; the picture is read on the phone and never recorded or uploaded, and only the decoded ticket text is sent to the check-in endpoint.
 - **Tickets** are random six-character codes, unique per event. Check-in accepts the code or the QR content (`SHG-EV-<event>-<code>`); a ticket for another event, a cancelled ticket and a repeat scan are each recognised.
 - **Who sees what:** organisers see the name, university and faculty of people who signed up (they're told when they sign up). Attending companies see only attendees who chose to be found by recruiters, and only once the organiser has confirmed them. Reports contain no names. Career offices can manage only their own university's events.
 - **Tickets are part of the person's data:** they're in the data export and deleted with the account.

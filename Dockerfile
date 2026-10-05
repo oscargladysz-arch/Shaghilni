@@ -1,4 +1,5 @@
 # Shaghilni in one small container. The database lives in /data: mount a volume there.
+# Sample listings are never seeded when NODE_ENV=production (server/config.js); seed/ is copied for development runs of the image.
 FROM node:22-alpine
 ENV NODE_ENV=production PORT=3000 HOST=0.0.0.0 DB_PATH=/data/shaghilni.db
 WORKDIR /app

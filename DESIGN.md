@@ -38,7 +38,7 @@ colors:
 typography:
   display:
     fontFamily: '"IBM Plex Sans Arabic", system-ui, -apple-system, "Segoe UI", Roboto, Tahoma, Arial, sans-serif'
-    fontSize: 28px
+    fontSize: 32px  # 28px under the phone media query (public/css/app.css)
     fontWeight: 600
     lineHeight: 1.1
     letterSpacing: -0.022em
@@ -239,7 +239,7 @@ A warm neutral paper-and-ink palette with a single deep green accent and two qui
 
 **The Ink Floor Rule.** No text is lighter than Muted Ink, in either mode. Faint Ink is for disabled controls and decoration only, so every piece of text clears 4.5:1 on every surface it sits on.
 
-**The Same Tokens, Both Lights Rule.** Dark mode is the same tokens with night values, never hand-picked colours. Text on pine always uses On Pine, and nothing hard-codes white or a fallback colour.
+**The Same Tokens, Both Lights Rule.** Dark mode is the same tokens with night values, never hand-picked colours. Text on pine always uses On Pine, and nothing hard-codes white or a fallback colour. (Stage 0 counted 28 places in the shipped CSS and scripts that still do, the ticket QR background among them, which must stay white for scanners; the Stage 2 ratchet test records that count and only lets it fall.)
 
 ## Typography
 
@@ -332,7 +332,7 @@ A 22px circular gauge in Qasioun Pine on Pressed Grey, beside a percentage. The 
 - **Do** step headings clearly: 28 (welcome), 22 (page), 20 (sheet), 17 (section), 15 (sub-heading and body).
 - **Do** take every colour from the tokens, so light and dark mode stay correct automatically.
 - **Do** lay out with start and end, so every screen mirrors for Arabic.
-- **Do** draw icons from the app's single 24px stroke set, never with emoji or text symbols.
+- **Do** draw icons from the app's single 24px stroke set, never with emoji or text symbols. (The job header's three category markers still use emoji today and are to be replaced: `public/js/app.js`, see `docs/agent/DOC_DRIFT.md`.)
 
 ### Don't:
 - **Don't** put a card, tile or bordered box inside another card, sheet or column.
