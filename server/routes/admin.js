@@ -1,9 +1,10 @@
 import { fail } from "../http.js";
 import { now, J } from "../db.js";
 import { companyOut, employerJobOut, applicantCounts } from "../serialize.js";
+import { checkJob } from "../validate.js";
 
 export function registerAdmin(r, deps) {
-  const { db, auth, audit } = deps, plans = deps.plans;
+  const { db, auth, audit, core } = deps, plans = deps.plans;
   const admin = auth.need("admin");
   const WEEK = 7 * 86400e3;
 
@@ -73,6 +74,7 @@ export function registerAdmin(r, deps) {
     if (!j) fail(404, "not_found");
     if (j.status !== "pending") fail(409, "bad_state");
     if (j.c_status !== "verified") fail(409, "company_not_verified");
+    const check = checkJob(core, J(j.data) || {}); if (check.fee) fail(422, "fee_requested", check.fee);   // the posting checks run again at approval, whatever reached the queue (D-05)
     db.run("UPDATE jobs SET status = 'published', published_at = COALESCE(published_at, ?), reviewed_by = ?, review_note = ?, updated_at = ? WHERE id = ?",
       now(), ctx.user.id, String(ctx.body.note || "").slice(0, 1000), now(), j.id);
     audit(ctx.user.id, "job.approved", "job", j.id, null);
@@ -83,7 +85,7 @@ export function registerAdmin(r, deps) {
     if (!j) fail(404, "not_found");
     const note = String(ctx.body.note || "").trim().slice(0, 1000);
     if (!note) fail(422, "note_required");
-    db.run("UPDATE jobs SET status = 'rejected', review_note = ?, reviewed_by = ?, updated_at = ? WHERE id = ?", note, ctx.user.id, now(), j.id);
+    db.run("UPDATE jobs SET status = 'rejected', sponsored_until = NULL, review_note = ?, reviewed_by = ?, updated_at = ? WHERE id = ?", note, ctx.user.id, now(), j.id);   // a rejected listing holds no sponsored slot (D-29)
     audit(ctx.user.id, "job.rejected", "job", j.id, { note });
     return { ok: true };
   });

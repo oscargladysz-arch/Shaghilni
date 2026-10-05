@@ -97,8 +97,8 @@ export function registerEmployer(r, deps) {
   r.put("/api/employer/jobs/:id", employer, ctx => {
     const { c, j } = myJob(ctx, ctx.params.id); plans.allow(ctx, c, "hire");
     const data = sanitizeJob(core, ctx.body.job);
-    const back = j.status === "published" || j.status === "rejected" ? "draft" : j.status === "closed" ? "closed" : j.status;
-    db.run("UPDATE jobs SET data = ?, status = ?, flags = ?, updated_at = ? WHERE id = ?", JSON.stringify(data), back, JSON.stringify(checkJob(core, data).flags), now(), j.id);
+    const back = ["published", "rejected", "pending", "closed"].includes(j.status) ? "draft" : j.status;   // new text is reviewed again, whatever state it was in (D-05, D-06); a sponsorship ends with the edit (D-29)
+    db.run("UPDATE jobs SET data = ?, status = ?, flags = ?, sponsored_until = NULL, updated_at = ? WHERE id = ?", JSON.stringify(data), back, JSON.stringify(checkJob(core, data).flags), now(), j.id);
     audit(ctx.user.id, "job.updated", "job", j.id, { from: j.status, to: back });
     if (ctx.body.submit) submitJob(ctx, c, j, data);
     return { job: jobsOf(c, ctx.user.id).find(x => x.id === j.id), check: checkJob(core, data) };
@@ -115,7 +115,7 @@ export function registerEmployer(r, deps) {
     plans.allow(ctx, myCompany(ctx), "hire");
     const { c, j } = myJob(ctx, ctx.params.id);
     if (j.status !== "published") fail(409, "bad_state");
-    db.run("UPDATE jobs SET status = 'closed', updated_at = ? WHERE id = ?", now(), j.id);
+    db.run("UPDATE jobs SET status = 'closed', sponsored_until = NULL, updated_at = ? WHERE id = ?", now(), j.id);   // a closed listing holds no sponsored slot (D-29)
     audit(ctx.user.id, "job.closed", "job", j.id, null);
     return { job: jobsOf(c).find(x => x.id === j.id) };
   });
@@ -183,7 +183,7 @@ export function registerEmployer(r, deps) {
   r.post("/api/employer/jobs/:id/sponsor", employer, ctx => {
     const { c, j } = myJob(ctx, ctx.params.id); plans.allow(ctx, c, "manage");
     if (c.status !== "verified") fail(409, "company_not_verified");
-    if (!ctx.body.on) { db.run("UPDATE jobs SET sponsored_until = NULL WHERE id = ?", j.id); return { ok: true, sponsoredUntil: null }; }
+    if (!ctx.body.on) { db.run("UPDATE jobs SET sponsored_until = NULL WHERE id = ?", j.id); if (j.sponsored_until > now()) audit(ctx.user.id, "job.unsponsored", "job", j.id, null); return { ok: true, sponsoredUntil: null }; }   // the end is logged like the start (D-28)
     if (j.status !== "published") fail(409, "not_published");
     const L = plans.limits(c); if (!L.sponsored) fail(403, "plan_required");
     if (!(j.sponsored_until > now()) && plans.sponsoredUsed(c.id) >= L.sponsored) fail(409, "sponsor_limit");

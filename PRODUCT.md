@@ -34,7 +34,7 @@ Success means confirmed hires: people hired, verified by the Shaghilni team, thr
 
 What a neighbouring product couldn't truthfully copy:
 
-- every employer verified (with sanctions screening) and every listing reviewed by a person before it's published (edits made to a closed or pending listing are not re-reviewed yet: `docs/agent/DEFECTS.md`, D-05 and D-06);
+- every employer verified (with sanctions screening) and every listing reviewed by a person before it's published, and reviewed again after any edit, whatever state the listing was in;
 - the pay shown on every listing, always;
 - confirmed-hire data, and official university partnerships with verified student identities.
 

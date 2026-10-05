@@ -219,9 +219,9 @@ Brief `<features>` letters → areas: A → 1, 13 · B → 1, 2, 3, 4, 5, 14 · 
 | Target universities + programme dates (`unis`, `progStart/End`), faculty targets | VERIFIED | `validate.js:117-118`; `serialize.js:20`; `app-employer.js:135-140` | campus: "universities: employers see verified students, partner…" :123-126 | — |
 | Apply channels on the company page | VERIFIED | `validate.js:88-92,102-105`; `serialize.js:5-8` | contact :67-81 | — |
 | Every listing reviewed: submit → pending; admin approve (company verified) / reject with note | VERIFIED | `employer.js:76-83,107-113`; `admin.js:64-89` | api :135, :152-161; security :59-68 helper | No employer "withdraw from review" |
-| Edits to a live/rejected listing → draft, off the board | VERIFIED | `employer.js:97-105` | api :196-199 | pending → pending and closed → closed keep new text unchecked (D-05, D-06) |
+| Edits to a live/rejected listing → draft, off the board | VERIFIED | `employer.js:97-105` | api :196-199 | Since Stage 3 an edit while pending or closed is a draft again too, and the sponsorship ends with the edit (D-05, D-06, D-29 fixed) |
 | Close a published listing | PARTIAL | `employer.js:114-121` | security test 2 :125 (cross-tenant 404 only) | No success-path test; not in matrix test 3 |
-| Reopen a closed listing (published if it had been, else draft; company verified) | PARTIAL | `employer.js:122-130` | security :125 (404 only) | D-06: republishes edited text without review; D-29: closed sponsored listing keeps its slot |
+| Reopen a closed listing (published if it had been, else draft; company verified) | PARTIAL | `employer.js:122-130` | security :125 (404 only) | Stage 3: an edited closed listing is a draft, so reopen answers bad_state and the text goes through review (D-06 fixed); closing clears the sponsored slot (D-29 fixed) |
 | Admin company verification with screening checkbox; reject/suspend with note | PARTIAL | `admin.js:40-62`; `app-admin.js:49-50,86-90` | api :143-147; security test 3 (reject fuzz) | `suspend` has no test anywhere; `reject` only fuzzed |
 | Employer dashboard (status pill, submit, listings with flags/notes/postedBy, role-gated actions) | PARTIAL | `app-employer.js:30-58`; `employer.js:24-37` | team :85,117; api :202 | Client untested; `jobs@company.com` placeholder (`app-employer.js:81`, R6); hex fallback colour |
 | Role gating of employer actions on the server (billing/manage/hire/view) | VERIFIED | `plans.js:16-17,32`; `employer.js:40,64,88,98,108,115,123,133,151` | team: "teams: seats on every plan, invitations by text, and roles enforced on the server" :85-96 | — |
@@ -239,7 +239,7 @@ Brief `<features>` letters → areas: A → 1, 13 · B → 1, 2, 3, 4, 5, 14 · 
 | Plan tiers Free/Pro/Enterprise with limits (invites 5/50/∞, sponsored 0/2/10, seats 3/10/50, analytics, reports, fee Free only); expiry at `plan_until` | VERIFIED | `server/plans.js:7-11,22`; `db.js:152-153` | plans: all 4 tests; team :69,77,131 | Enterprise 10-sponsored and unlimited invites untested |
 | Sponsor on (manage role, verified, published, plan limit, 30 days) and automatic expiry; public `sponsored` flag | VERIFIED | `employer.js:183-191`; `plans.js:26`; `serialize.js:19` | plans: "plans: sponsored listings are for paid plans, limited, labelled, and expire" :118-127 | `SPONSOR_DAYS` exported but the route hard-codes 30 |
 | Sponsored lift and label (top 2, fit ≥ 60, signed-in seeker, not Saved; app and Lite) | PARTIAL | `app.js:177-183,189,255`; `lite.js:169-170,183` | none | See area 2 |
-| Sponsorship switched off | PARTIAL | `employer.js:186` | none | D-28: no audit row; D-29: closed listing keeps its slot |
+| Sponsorship switched off | PARTIAL | `employer.js:186` | none | Stage 3: `job.unsponsored` audit row when it was sponsored (D-28 fixed); closing, editing or rejecting clears `sponsored_until` (D-29 fixed) |
 | Team seats by plan | VERIFIED | `plans.js:27`; `team.js:20,27,37,53` | team :69,75-77,130-131 | — |
 | Monthly invitation allowance | VERIFIED | `plans.js:24-25`; `recruit.js:94-95` | plans :73-76 | — |
 | Hiring free on every plan | VERIFIED | `employer.js:85-161` (no plan gates); `plans.js:1-3` | plans :100 | — |
@@ -375,7 +375,7 @@ Brief `<features>` letters → areas: A → 1, 13 · B → 1, 2, 3, 4, 5, 14 · 
 | Company verification requires the screening checkbox; who/when recorded | VERIFIED | `server/routes/admin.js:54,57-59`; `app-admin.js:3,46-47,86-88` | api: "admin: verification needs sanctions screening; review publishes listings" :146-147 | No state machine: a never-submitted draft or a suspended company can be verified directly (probe) |
 | Company reject (note required) | PARTIAL | `admin.js:49-50,61` | security test 3 (junk only) | Never asserted |
 | Company suspend (note required; listings leave the board) | PARTIAL | `admin.js:62`; `public.js:9,16` | none | Sessions not revoked; jobs stay `published` in the DB (probe); not in matrix |
-| Listing approve (pending listings of verified companies) | VERIFIED | `admin.js:64-79` | api :152-161; api :198-199; helpers in 8 suites | Does not re-run `checkJob` (D-05) |
+| Listing approve (pending listings of verified companies) | VERIFIED | `admin.js:64-79` | api :152-161; api :198-199; helpers in 8 suites | Stage 3: approve re-runs `checkJob` and answers 422 fee_requested (D-05 fixed) |
 | Listing reject (note) and gender flags shown | PARTIAL | `admin.js:81-89`; `app-admin.js:59` | api :153-154 (`note_required` only) | Status `rejected`/`review_note`/audit never asserted |
 | Hire confirmation by phone → confirmed-hires metric; fee/programme charge once | VERIFIED | `admin.js:104-129` | api: "pipeline…" :184-192; plans :98-112; insights :72; campus; events | Repeat confirm rewrites `hire_confirmed_by` and adds a second audit row (probe) |
 | Hires list (pending/confirmed, employer call button, programme picker) | PARTIAL | `admin.js:92-103`; `app-admin.js:67-69,75,93,95` | api :184-186; security test 3 | Confirmed-state list never asserted |
@@ -575,7 +575,7 @@ Items of `<verified_facts>` and `<features>` that the maps contradict or refine.
 | C | "no JavaScript beyond the sign-in check" | A one-line print script also loads on the resume page; with the default `OTP_POW_BITS=14` signing in needs the script (no-JS form → `pow_required`) | `server/lite.js:145,307,315,451,462-465` |
 | C | "about 2–3 KB a page after (a test checks)" | Measured max 2,650 B; the test ratchet was 6,000 B, now 3,072 B (Stage 2, A-21) | `test/lite.test.js:82`; map 12 sizes |
 | D | "pay and place required" | Pay and governorate (plus title, a language, a summary); free-text `place` is optional | `server/validate.js:126-136` |
-| D | "edits go back for review" | Only for published and rejected listings; edits while pending or closed are kept without re-check (D-05, D-06) | `server/routes/employer.js:100-104,127` |
+| D | "edits go back for review" | Only for published and rejected listings; edits while pending or closed are kept without re-check (D-05, D-06) | `server/routes/employer.js` edit: every edit is a draft again since Stage 3 (D-05, D-06 fixed) |
 | D | "registration number unique (otherwise 'ask to join')" | Checked only when the caller has no company yet; an existing company may edit its number to another's | `server/routes/employer.js:40-46` |
 | E | "Placement fee … only for a hire invited through candidate search" | Any accepted invitation from the company counts (event or another job) | `server/routes/admin.js:113-119` |
 | E | "placement and compliance spreadsheet reports Enterprise" | Compliance report's sanctions column is always empty (D-07) | `admin.js:54`; `employer.js:216` |

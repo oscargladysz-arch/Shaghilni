@@ -121,7 +121,7 @@ export function registerTeam(r, deps) {
   });
 
   /* ---------- who did what: the team's activity, for owners and admins ---------- */
-  const LABEL = { "job.created": 1, "job.updated": 1, "job.submitted": 1, "job.closed": 1, "job.reopened": 1, "job.sponsored": 1, "application.moved": 1, "company.updated": 1, "company.submitted": 1,
+  const LABEL = { "job.created": 1, "job.updated": 1, "job.submitted": 1, "job.closed": 1, "job.reopened": 1, "job.sponsored": 1, "job.unsponsored": 1, "application.moved": 1, "company.updated": 1, "company.submitted": 1,
     "team.invited": 1, "team.joined": 1, "team.requested": 1, "team.request_approved": 1, "team.request_declined": 1, "team.role_changed": 1, "team.removed": 1, "team.left": 1, "team.invite_cancelled": 1, "team.ownership_transferred": 1, "plan.requested": 1, "invite.sent": 1 };
   r.get("/api/employer/activity", employer, ctx => {
     const c = active(ctx); plans.allow(ctx, c, "manage");

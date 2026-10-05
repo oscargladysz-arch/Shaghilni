@@ -83,8 +83,8 @@ Column meanings:
 | POST | `/api/employer/jobs` | employer; company exists; hire role | `server/routes/employer.js:85` | api :132; team :40,57,85,87; campus :123; diaspora :115; security :65,154; 8 helpers | 3 | `job.created` :92; `job.submitted` :82 when `submit:true` | — |
 | PUT | `/api/employer/jobs/:id` | employer; own company's job (404); hire | `server/routes/employer.js:97` | api :148,150,155,196; security :124 (404), :154 | 2+3 | `job.updated` {from,to} :102; `job.submitted` when `submit:true` | D-05: pending stays pending unchecked; D-06: closed stays closed |
 | POST | `/api/employer/jobs/:id/submit` | employer; hire; draft or rejected; company verified; `checkJob` | `server/routes/employer.js:107` | api :135,198; security :125 (404), :154 | 2+3 | `job.submitted` {flags} :82 | Only place the fee block fails a request |
-| POST | `/api/employer/jobs/:id/close` | employer; hire; published only | `server/routes/employer.js:114` | security :125 (404 only) | 2 | `job.closed` :119 | No success-path test; D-29 (sponsored slot kept) |
-| POST | `/api/employer/jobs/:id/reopen` | employer; hire; closed only; company verified | `server/routes/employer.js:122` | security :125 (404 only) | 2 | `job.reopened` :128 | D-06: republishes edited text without review |
+| POST | `/api/employer/jobs/:id/close` | employer; hire; published only | `server/routes/employer.js:114` | security :125 (404 only) | 2 | `job.closed` :119 | Stage 3: clears `sponsored_until` (D-29 fixed); success path in plans and policy-employer-listings tests |
+| POST | `/api/employer/jobs/:id/reopen` | employer; hire; closed only; company verified | `server/routes/employer.js:122` | security :125 (404 only) | 2 | `job.reopened` :128 | Stage 3: an edited closed listing is a draft, so reopen answers bad_state (D-06 fixed) |
 | GET | `/api/employer/jobs/:id/applications` | employer; own job; view role | `server/routes/employer.js:132` | api :168,229; team :94,98; contact :78,81; campus :129; plans :95; security :121 (404), :155 | 2+3 | none | — |
 | PUT | `/api/employer/applications/:id` | employer; own company's application; hire for a status move, view for a note | `server/routes/employer.js:145` | api :174-181; team :95-97; security :89,122 (404), :155; campus :131; events :117; insights :71; plans :65 | 2+3 | `application.moved` {from,to} :156 only when status changes | Note-only edits write none and accept non-strings |
 
@@ -163,7 +163,7 @@ Column meanings:
 | POST | `/api/admin/companies/:id/reject` | admin; note required | `server/routes/admin.js:61` | security :156 (junk only) | 3 | `company.rejected` {note} :54 | Never asserted |
 | POST | `/api/admin/companies/:id/suspend` | admin; note required | `server/routes/admin.js:62` | **none** | — | `company.suspended` {note} :54 | Sessions not revoked; listings stay `published` in the DB |
 | GET | `/api/admin/jobs` | admin | `server/routes/admin.js:64` | api :152 | — | none | Pending queue, `is_demo = 0` |
-| POST | `/api/admin/jobs/:id/approve` | admin; pending; company verified | `server/routes/admin.js:71` | api :156,199; security :66,156; helpers in 8 suites | 3 | `job.approved` :78 | Does not re-run `checkJob` (D-05) |
+| POST | `/api/admin/jobs/:id/approve` | admin; pending; company verified | `server/routes/admin.js:71` | api :156,199; security :66,156; helpers in 8 suites | 3 | `job.approved` :78 | Stage 3: re-runs `checkJob` → 422 fee_requested (D-05 fixed) |
 | POST | `/api/admin/jobs/:id/reject` | admin; note required | `server/routes/admin.js:81` | api :154 (`note_required` only); security :156 | 3 | `job.rejected` {note} :87 | — |
 | GET | `/api/admin/hires` | admin; `?state=confirmed` | `server/routes/admin.js:92` | api :184; security :157 (`?state=%00`) | 3 | none | LIMIT 200 |
 | POST | `/api/admin/applications/:id/confirm-hire` | admin; application `hired` | `server/routes/admin.js:104` | api :189; insights :72; plans :98-112; campus; events; security :156 | 3 | `hire.confirmed` {note} :110 (also on repeat calls) | Fee/programme charges gated by `first` (:108); charge rows carry no audit of their own (D-08 context) |
@@ -291,7 +291,7 @@ Routes with **no test at all** (any file): `PUT /api/me/alerts/:id`, `PUT /api/e
 | `DELETE /api/events/:id/rsvp` | no | RSVP is audited, cancellation is not |
 | `POST /api/t`, `POST /api/t/error` | no | beacons |
 | `POST /api/auth/demo` | no (dev only) | session only |
-| `POST /api/employer/jobs/:id/sponsor` with `on:false` | **flag** | privileged (manage role, money-related); returns before the audit call (`employer.js:186` vs `:191`) — D-28; SECURITY.md:388 says every sponsorship change is logged |
+| `POST /api/employer/jobs/:id/sponsor` with `on:false` | **flag** | Stage 3: `job.unsponsored` audit row when it was sponsored (D-28 fixed) |
 | `PUT /api/employer/applications/:id` note-only | **flag** | employer action on an applicant's record with no row (`employer.js:155`); README.md:199 says employer actions are recorded |
 | `POST /api/jobs/:id/apply` re-apply branch | no | second application after a withdrawal (`me.js:65-67`) writes nothing; first does |
 | `GET /api/me/invitations` | no | not a write route, but has the side effect `sent → seen` (`recruit.js:166`) |

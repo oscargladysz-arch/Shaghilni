@@ -133,6 +133,7 @@ Field order in every entry below: ID · Severity (verifier's; reporter's noted i
 | Regression test | `test/api.test.js` next to "edits send live listings and renamed companies back to review" (`:195`): edit a pending listing with fee text → status `draft`; approve → 409 bad_state / 422 fee_requested; listing absent from GET /api/jobs. Existing `api.test.js:148-156` covers fee text at submit time only, which is why the suite is green. |
 | Docs (R15) | None required: BRIEF.md:122, PRODUCT.md:60, SECURITY.md:185 already describe the fixed behaviour. If ROUTES.md/STATE.md describe the PUT state machine, state "pending → draft on edit" (UNVERIFIED: those files not read). |
 | Privacy/legal (R13) | None. |
+| **Status** | **FIXED in Stage 3 (S3-3)**: an edit while pending makes the listing a draft (`employer.js` edit), so the text goes through submit's checks again; approve re-runs `checkJob` and answers 422 fee_requested as defence in depth. Test: `test/policy-employer-listings.test.js` state machine. |
 | Notes | Also reported as map:employer D1. Not P0: the admin queue does show the edited text (`employerJobOut` includes needs), so a careful reviewer can catch it; the company is already verified. The flags column the admin relies on reads `[]`. |
 
 ### D-06 · P1 · A closed listing can be rewritten while closed and reopened straight to "published" with no review
@@ -150,6 +151,7 @@ Field order in every entry below: ID · Severity (verifier's; reporter's noted i
 | Regression test | `test/api.test.js` extend `:187` or sibling: approve → close → PUT changed body (no submit) → `status === 'draft'` → reopen 409 bad_state → GET `/api/jobs/:id` 404 → submit + approve → 200. `test/security.test.js:125` (cross-tenant close/reopen) unaffected. |
 | Docs (R15) | README.md:15 and PRODUCT.md:37 already state the intent; optional clause "including closed listings" in README.md:15 (hot). |
 | Privacy/legal (R13) | None. |
+| **Status** | **FIXED in Stage 3 (S3-3)**: an edit while closed makes the listing a draft; reopen on it answers 409 bad_state and the text goes submit → approve. Test: `test/policy-employer-listings.test.js` state machine. |
 | Notes | Not P0: attacker must be a verified, sanctions-screened employer with a once-approved listing; audit records `job.updated{from:closed,to:closed}` + `job.reopened`. In passing: the PUT returns `check.fee` to the client at `:104` but the server never persists `fee` for admin review on any path. |
 
 ### D-07 · P1 · Compliance report's sanctions-screened column is always empty: the verification audit entry never stores `screened`
@@ -518,6 +520,7 @@ Field order in every entry below: ID · Severity (verifier's; reporter's noted i
 | Regression test | `test/plans.test.js` beside "plans: sponsored listings are for paid plans, limited, labelled, and expire" (`:115-128`, has `S.db`): post `{on:false}` and assert a `job.unsponsored` row for the job; optionally that GET `/api/employer/activity` lists it. No existing test exercises `{on:false}`. |
 | Docs (R15) | None if fixed (SECURITY.md:388 becomes true); otherwise narrow SECURITY.md:388 (hot). New Arabic string `ta_job_unsponsored` → ARABIC_REVIEW.md. |
 | Privacy/legal (R13) | None. The row records actor id, action, job id; no personal data. |
+| **Status** | **FIXED in Stage 3 (S3-3)**: `POST /api/employer/jobs/:id/sponsor {on:false}` writes `job.unsponsored` when the listing was sponsored (none otherwise); `team.js` LABEL and `ta_job_unsponsored` (en/ar, ARABIC_REVIEW.md) show it in the activity log. Test: `test/plans.test.js` sponsored listings. |
 | Notes | The three co-reports (map:board, probe:board, map:plans) describe this single defect. Not P1: no seeker affected, no money moves, authorization intact (`employer.js:184-185`). |
 
 ### D-29 · P2 · A sponsored listing that leaves the board (closed, edited back to draft, or rejected) keeps its sponsored slot and 30-day clock; the client offers no Stop button for it
@@ -535,6 +538,7 @@ Field order in every entry below: ID · Severity (verifier's; reporter's noted i
 | Regression test | `test/plans.test.js` extend `:115`: sponsor two on Pro, close one → `usage.sponsored` 1 and a third sponsor 200; repeat for an edit of a published sponsored job and for an admin rejection. |
 | Docs (R15) | README.md:282 stays true; add near README.md:290 that closing, editing or rejecting a sponsored listing ends its sponsorship and frees the slot. |
 | Privacy/legal (R13) | None (`legal.js:19` sponsored-fit disclosure unaffected). |
+| **Status** | **FIXED in Stage 3 (S3-3)**: `sponsored_until` is cleared when a listing is closed, edited or rejected, so the slot frees at once. Test: `test/plans.test.js` sponsored listings. |
 | Notes | "No way to release it" is true of the client only: the API accepts `{on:false}` on a closed job (block C) because `:186` runs before the status check at `:187`; UI workaround reopen → Stop → close. Adding `AND status = 'published'` to `plans.js:26` instead would let a reopen put the company over its limit (reopen does not re-check slots) and leave `sponsored:true` on off-board jobs. |
 
 ### D-30 · P2 · Employer phone numbers, emails and street addresses can be published in listing free text before anyone applies; `place`, `contact.*` and `tags` are never shown to the reviewer and never scanned by the listing checks
