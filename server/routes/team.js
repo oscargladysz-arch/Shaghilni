@@ -130,6 +130,6 @@ export function registerTeam(r, deps) {
     const appJob = new Map(apps.map(a => [a.id, a.job_id])), ph = a => a.map(() => "?").join(",") || "NULL";
     const rows = db.all(/* sql-safe: only "?" placeholders */ `SELECT actor_id, action, entity, entity_id, data, created_at FROM audit WHERE (entity = 'company' AND entity_id = ?) OR (entity = 'job' AND entity_id IN (${ph(jobIds)})) OR (entity = 'application' AND entity_id IN (${ph(apps.map(a => a.id))})) ORDER BY created_at DESC LIMIT 150`, c.id, ...jobIds, ...apps.map(a => a.id));
     return { activity: rows.filter(x => LABEL[x.action]).slice(0, 100).map(x => { const d = J(x.data) || {}, jid = x.entity === "job" ? x.entity_id : x.entity === "application" ? appJob.get(x.entity_id) : null;
-      return { at: x.created_at, who: plans.memberName(c, x.actor_id) || "—", action: x.action, job: jid ? title.get(jid) || null : null, from: d.from || null, to: d.to || null, role: d.role || null }; }) };
+      return { at: x.created_at, who: plans.memberName(c, x.actor_id, ctx.user.lang) || "—", action: x.action, job: jid ? title.get(jid) || null : null, from: d.from || null, to: d.to || null, role: d.role || null }; }) };
   });
 }

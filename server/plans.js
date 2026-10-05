@@ -31,11 +31,13 @@ export function makePlans({ db, cfg }) {
     const m = db.get("SELECT role FROM company_members WHERE company_id = ? AND phone = ? AND status = 'active'", c.id, user.phone || ""); return m ? m.role : null; };
   const allow = (ctx, c, level) => { const r = roleOf(c, ctx.user); if (!r || !LEVELS[level].includes(r)) fail(403, "role_forbidden", { need: level }); return r; };
   const can = (c, user, level) => LEVELS[level].includes(roleOf(c, user));
-  // How a person shows up to their team: the name they were added with, or the company's contact for the owner.
-  const memberName = (c, userId) => { if (!c || !userId) return null;
+  // How a person shows up to their team: the name they were added with, or the company's contact for the owner. Someone who was removed, left or
+  // deleted their account is "a former teammate" in the viewer's language, never a phone number or a deletion marker (U-007).
+  const FORMER = { en: "former teammate", ar: "زميل سابق" };
+  const memberName = (c, userId, lang = "en") => { if (!c || !userId) return null;
     if (c.owner_id === userId) { const d = JSON.parse(c.data || "{}"); return d.contactName || "Owner"; }
     const u = db.get("SELECT phone FROM users WHERE id = ?", userId); if (!u) return null;
-    const m = db.get("SELECT name FROM company_members WHERE company_id = ? AND phone = ?", c.id, u.phone); return (m && m.name) || u.phone; };
+    const m = u.phone.startsWith("deleted:") ? null : db.get("SELECT name FROM company_members WHERE company_id = ? AND phone = ? AND status = 'active'", c.id, u.phone); return (m && m.name) || FORMER[lang === "ar" ? "ar" : "en"]; };
   const summary = c => {
     const p = planOf(c), L = PLANS[p], due = db.get("SELECT COUNT(*) AS n, COALESCE(SUM(amount_syp), 0) AS syp FROM charges WHERE company_id = ? AND status = 'due' AND programme_id IS NULL", c.id);   // a programme-billed placement is the programme's charge, not the employer's (D-08)
     return { plan: p, planUntil: p === "free" ? null : c.plan_until || null, limits: L, usage: { invites: invitesUsed(c.id), sponsored: sponsoredUsed(c.id), team: teamUsed(c.id) },
