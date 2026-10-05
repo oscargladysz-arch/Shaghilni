@@ -61,6 +61,8 @@ export function registerAdmin(r, deps) {
   };
   r.post("/api/admin/companies/:id/verify", admin, ctx => {
     if (ctx.body.screened !== true) fail(422, "screening_required");   // checked against the US sanctions list
+    const c = db.get("SELECT status, is_demo FROM companies WHERE id = ?", Number(ctx.params.id)); if (!c) fail(404, "not_found");
+    if (c.is_demo || !["pending", "suspended"].includes(c.status)) fail(409, "bad_state");   // verification needs a submitted company; a suspension is lifted here, since the employer cannot resubmit (U-046)
     return setCompany(ctx, "verified", { screened_at: now(), screened_by: ctx.user.id, verified_at: now(), verified_by: ctx.user.id });
   });
   r.post("/api/admin/companies/:id/reject", admin, ctx => setCompany(ctx, "rejected"));

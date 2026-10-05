@@ -159,7 +159,7 @@ Column meanings:
 |---|---|---|---|---|---|---|---|
 | GET | `/api/admin/overview` | admin | `server/routes/admin.js:10` | api :142,187,190,232; security :131 (403), :133 (401) | 2 | none | `counts` include demo-listing applications; client uses `queues` only |
 | GET | `/api/admin/companies` | admin | `server/routes/admin.js:40` | api :143; security :63,131 (403), :155 (`?status=%27;drop`); helpers in 12 suites | 2+3 | none | — |
-| POST | `/api/admin/companies/:id/verify` | admin; `screened === true` | `server/routes/admin.js:57` | api :146-147; security :64,155; helpers in 12 suites | 3 | `company.verified` {note} :54 | Stage 3: audit data `{note, screened: true}` (D-07 fixed) |
+| POST | `/api/admin/companies/:id/verify` | admin; `screened === true`; company pending or suspended (409 bad_state otherwise, U-046 fixed in Stage 3) | `server/routes/admin.js:57` | api :146-147; security :64,155; helpers in 12 suites | 3 | `company.verified` {note} :54 | Stage 3: audit data `{note, screened: true}` (D-07 fixed) |
 | POST | `/api/admin/companies/:id/reject` | admin; note required | `server/routes/admin.js:61` | security :156 (junk only) | 3 | `company.rejected` {note} :54 | Stage 3: withdraws the company's open invitations, audited with the reason (U-017 fixed) |
 | POST | `/api/admin/companies/:id/suspend` | admin; note required | `server/routes/admin.js:62` | **none** | — | `company.suspended` {note} :54 | Stage 3: withdraws the company's open invitations, audited with the reason (U-017 fixed) |
 | GET | `/api/admin/jobs` | admin | `server/routes/admin.js:64` | api :152 | — | none | Pending queue, `is_demo = 0` |
