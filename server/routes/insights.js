@@ -2,6 +2,7 @@
    Sample listings and demo accounts are left out unless asked for, so the numbers show real activity. */
 import { fail } from "../http.js";
 import { J, now } from "../db.js";
+import { countDemo } from "../seed.js";
 
 const DAY = 86400e3, WEEK = 7 * DAY;
 export function registerInsights(r, deps) {
@@ -50,7 +51,9 @@ export function registerInsights(r, deps) {
         paidSyp: money(null, "paid", "amount_syp", since), paidUsd: money(null, "paid", "amount_usd", since) },
       attention: { companies: cos("c.status = 'pending'"), jobs: jobs("j.status = 'pending'"), hires: apps("a.status = 'hired' AND a.hire_confirmed_at IS NULL"),
         planRequests: n("SELECT COUNT(*) AS n FROM plan_requests WHERE handled_at IS NULL"), chargesDue: n("SELECT COUNT(*) AS n FROM charges WHERE status = 'due'"),
-        failedTexts: n("SELECT COUNT(*) AS n FROM notifications WHERE status = 'failed' AND created_at >= ?", t - 7 * DAY) },
+        failedTexts: n("SELECT COUNT(*) AS n FROM notifications WHERE status = 'failed' AND created_at >= ?", t - 7 * DAY),
+        // Sample data left in a production database (expected in development, so reported as 0 there): npm run demo:remove clears it.
+        ...(d => ({ sampleCompanies: d.companies, sampleJobs: d.jobs }))(cfg.prod ? countDemo(db) : { companies: 0, jobs: 0 }) },
       weeks,
       users: { seekers: users("u.role = 'seeker'"), employers: users("u.role = 'employer'"), careerOffices: users("u.role = 'university'"),
         withProfile: profs.length, students: profs.filter(x => (x.p.edu || {}).status === "student").length, graduatesAndWorkers: profs.filter(x => (x.p.edu || {}).status !== "student").length,

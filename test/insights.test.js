@@ -89,3 +89,18 @@ test("insights: the team sees how the platform is doing, in totals only, without
   assert.ok(all.headline.liveJobs > I.headline.liveJobs, "sample listings appear only when asked for"); assert.equal(all.period.days, 365);
   assert.equal((await admin.get("/api/admin/insights?days=12")).body.period.days, 30, "unknown periods fall back to 30 days");
 });
+
+test("insights: sample data left in a production database is a needs-attention item; in development it is expected", async () => {
+  const prodEnv = { NODE_ENV: "production", OTP_PEPPER: "p".repeat(40), BASE_URL: "https://shaghilni.test", SMS_PROVIDER: "textbee", TEXTBEE_API_KEY: "k", CONTACT_EMAIL: "privacy@example.com" };
+  const quiet = console.warn; console.warn = () => {};
+  let P; try { P = await start(prodEnv); } finally { console.warn = quiet; }   // the harness seeds the 17 companies and 19 listings itself
+  const admin = await P.login("+12025550199");
+  const A = (await admin.get("/api/admin/insights")).body.attention;
+  assert.deepEqual([A.sampleCompanies, A.sampleJobs], [17, 19], "the sample companies and listings still in the database are flagged");
+  P.db.run("DELETE FROM jobs WHERE is_demo = 1"); P.db.run("DELETE FROM companies WHERE is_demo = 1");
+  const B = (await admin.get("/api/admin/insights")).body.attention;
+  assert.deepEqual([B.sampleCompanies, B.sampleJobs], [0, 0], "and gone once npm run demo:remove has run");
+  const S = await start(), dev = await S.login("+12025550199");
+  const D = (await dev.get("/api/admin/insights")).body.attention;
+  assert.deepEqual([D.sampleCompanies, D.sampleJobs], [0, 0], "in development the sample data is expected, so there is no item");
+});

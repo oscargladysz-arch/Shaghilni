@@ -65,7 +65,7 @@ export function loadConfig(overrides = {}) {
     writeRateLimit: num(e.WRITE_RATE_LIMIT, 240),          // of which changes (POST, PUT, DELETE)
     legalName: e.LEGAL_NAME || "",                          // your registered company name, shown in the privacy notice and terms
     contactEmail: e.CONTACT_EMAIL || "",
-    seedDemo: e.SEED_DEMO !== "false",
+    seedDemo: !prod && e.SEED_DEMO !== "false",            // sample listings: development and tests only; never in production, whatever SEED_DEMO says
     trustProxy: e.TRUST_PROXY === "true",
     ...overrides.values
   };
@@ -79,6 +79,7 @@ export function loadConfig(overrides = {}) {
     if (cfg.sms.provider === "console") console.warn("[config] SMS_PROVIDER is 'console' in production: codes are only written to the log.");
     if (!cfg.contactEmail) console.warn("[config] CONTACT_EMAIL is empty: the privacy notice and terms need a contact address.");
     if (e.OTP_DEV_ECHO === "true") console.warn("[config] OTP_DEV_ECHO is ignored in production.");
+    if (e.SEED_DEMO === "true") console.warn("[config] SEED_DEMO is ignored in production: sample listings are never added there.");
     if (!cfg.smsAllowedPrefixes.length) console.warn("[config] SMS_ALLOWED_PREFIXES is empty: sign-in texts can go to any country (a toll-fraud risk).");
     try { const envFile = path.join(ROOT, ".env"); if (existsSync(envFile) && (statSync(envFile).mode & 0o077)) console.warn("[config] .env is readable by other users on this machine: run chmod 600 .env"); } catch { /* not a POSIX file system */ }
   }

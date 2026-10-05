@@ -64,6 +64,7 @@ Field order in every entry below: ID · Severity (verifier's; reporter's noted i
 
 | Field | Content |
 |---|---|
+| **Status** | **FIXED in Stage 1 (S1-1)**: `server/config.js` gates `seedDemo` on `!prod` and warns when `SEED_DEMO=true` is set in production; `countDemo` in `server/seed.js` counts leftover rows, logged at start by `server/index.js` and shown on the Insights "Needs attention" card (`attention.sampleCompanies` / `sampleJobs`, production only); the scanner's `SEED_DEMO` WARN is gone. Tests: `test/demo.test.js` "sample listings: never seeded in production…", `test/insights.test.js` "sample data left in a production database…", `test/security.test.js` test 14. `seed/demo.json` untouched (D1). |
 | Severity | **P0** (reporter P0; brief backlog P0-1, CLAUDE.md:36) |
 | Lens | sample data reaching production · docs versus code · R6/R7/R8 |
 | Rule broken | R6 (no invented facts: 17 real organisations shown as verified companies with published roles they never posted); R7/R8 (truthful product, "every employer checked"); R15 (PRODUCT.md:83 says the sample data "must be removed before launch", yet the documented deploy seeds it); R12 spirit (unsafe default) |

@@ -360,3 +360,12 @@ test("13 · the built-in scanner finds the problems it is meant to find, and the
   assert.deepEqual(scanSecrets(), [], "no secrets in the shipped code");
   assert.deepEqual(scanCode(), [], "no unreviewed risky patterns in the shipped code");
 });
+
+test("14 · the scanner stays clean for a correct production setup whether or not SEED_DEMO is set: sample listings are never seeded in production", () => {
+  const good = { NODE_ENV: "production", OTP_PEPPER: "p".repeat(40), BASE_URL: "https://shaghilni.test", ADMIN_PHONES: "+963944000000", SMS_PROVIDER: "textbee",
+    TEXTBEE_API_KEY: "key", CONTACT_EMAIL: "privacy@example.com", LEGAL_NAME: "Example Org (not a real entity)", TRUST_PROXY: "true" };
+  for (const seed of [undefined, "true", "false"]) {
+    const rows = auditSettings(seed === undefined ? good : { ...good, SEED_DEMO: seed });
+    assert.deepEqual(rows.filter(r => r[0] !== "PASS"), [], `SEED_DEMO=${seed}: ${JSON.stringify(rows)}`);
+  }
+});

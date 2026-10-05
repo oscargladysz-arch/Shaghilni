@@ -1,5 +1,7 @@
-/* Demo data: the 19 sample listings as verified demo companies, so a fresh install is not empty.
-   Demo rows are flagged is_demo and never counted in the admin metrics. Set SEED_DEMO=false to skip. */
+/* Demo data: the 19 sample listings as verified demo companies, so a fresh development install is not empty.
+   Demo rows are flagged is_demo and never counted in the admin metrics. Set SEED_DEMO=false to skip in development.
+   Never seeded in production (server/config.js gates seedDemo on NODE_ENV); a production database that still holds
+   demo rows is reported at start-up and on the admin Insights screen until npm run demo:remove has run. */
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { ROOT } from "./config.js";
@@ -28,6 +30,11 @@ function seedDemoBase(db, log = console.log) {
   db.run("INSERT INTO audit (action, data, created_at) VALUES ('demo.seeded', ?, ?)", JSON.stringify({ companies: seed.companies.length, jobs: seed.jobs.length }), now());
   log(`[seed] ${seed.companies.length} demo companies and ${seed.jobs.length} demo jobs added`);
   return true;
+}
+
+/* How many demo rows a database still holds (the start-up log and the admin Insights screen use it). */
+export function countDemo(db) {
+  return { companies: db.get("SELECT COUNT(*) AS n FROM companies WHERE is_demo = 1").n, jobs: db.get("SELECT COUNT(*) AS n FROM jobs WHERE is_demo = 1").n };
 }
 
 /* The demo marks jobs at international companies as welcoming Syrians coming home, so the filter has something to show. */

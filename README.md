@@ -126,6 +126,8 @@ LEGAL_NAME=<your registered company>
 CONTACT_EMAIL=<privacy@your-domain>
 ```
 
+Sample data is never added in production: with `NODE_ENV=production` the 19 sample listings are not seeded, whatever `SEED_DEMO` says. If a database that was first used in development still holds them, the server says so at start-up and the Insights screen shows a "Needs attention" note until `npm run demo:remove` has run.
+
 **Option B: Docker on a small VPS.**
 
 ```bash
