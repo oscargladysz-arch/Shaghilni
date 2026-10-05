@@ -209,3 +209,17 @@ test("lite: the privacy notice and the terms are readable without JavaScript, in
   for (const p of ["/lite/signin", "/lite", "/lite/hire"]) { const t = (await b.get(p)).text; assert.match(t, /href="\/lite\/terms"/); assert.match(t, /href="\/lite\/privacy"/); assert.doesNotMatch(t, /\/#\/(terms|privacy)/, p + " no longer points at the JavaScript-only pages"); }
   for (const p of ["/lite/privacy", "/lite/terms", "/lite/privacy?lang=ar", "/lite/terms?lang=ar"]) { const w = await S.raw(p); assert.equal(w.headers["content-encoding"], "gzip"); assert.ok(w.bytes < 6144, `${p}: long-form text, its own budget of 6 KB over the wire (${w.bytes} bytes)`); }
 });
+
+test("lite: the code field takes Arabic-Indic digits, and looking at the sign-in page spends no challenge (D-23, D-24)", async () => {
+  const S = await start(), b = S.browser();
+  const pg = await b.get("/lite/signin");
+  const r1 = await b.post("/lite/signin", { csrf: b.csrf(pg.text), phone: "0933 790 001", consent: "1", role: "seeker", next: "", pow_challenge: /name="pow_challenge" value="([^"]+)"/.exec(pg.text)[1], pow_nonce: "" });
+  const input = /<input id="code"[^>]*>/.exec(r1.text)[0];
+  assert.doesNotMatch(input, /pattern=/, "D-23: no pattern attribute, so a browser lets Arabic-Indic digits through to the server, which accepts them");
+  const arabic = c => String(c).replace(/[0-9]/g, d => "٠١٢٣٤٥٦٧٨٩"[d]);
+  assert.equal((await b.post("/lite/signin/code", { csrf: b.csrf(r1.text), phone: "+963933790001", code: arabic(/(\d{6})/.exec([...S.texts].reverse().find(x => x.to === "+963933790001").body)[1]), role: "seeker", next: "" })).location, "/lite/me", "the code in Arabic-Indic digits signs in");
+  const v = S.browser();   // D-24: sixty-one views of the sign-in page and one of the recruiter page, then the API's challenge is still there
+  for (let i = 1; i <= 61; i++) { const r = await v.get("/lite/signin"); assert.equal(r.status, 200, `view ${i} of the sign-in page`); assert.match(r.text, /name="pow_challenge"/); }
+  assert.equal((await v.get("/lite/hire")).status, 200);
+  assert.equal((await S.client().get("/api/auth/challenge")).status, 200, "D-24: page views do not spend the address's sixty challenges");
+});
