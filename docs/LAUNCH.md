@@ -33,12 +33,12 @@ No item marked owner, lawyer or provider is ever ticked by an agent.
 
 | # | Item | Owner | How to verify | Status |
 |---|---|---|---|---|
-| C1 | A lawyer reviews the privacy notice and terms (`public/js/legal.js`, shown at `/#/privacy` and `/#/terms`) under Syrian Law No. 12 of 2024, including a governing-law clause. Any change bumps `TERMS_VERSION` and moves `server/retention.js` and SECURITY.md with it. | lawyer, owner | Signed-off wording; `docs/agent/LEGAL_PROPOSALS.md` is the agenda of known gaps. | Open |
+| C1 | A lawyer reviews the privacy notice and terms (`public/js/legal.js`, shown at `/#/privacy` and `/#/terms`, and at `/lite/privacy` and `/lite/terms`) under Syrian Law No. 12 of 2024, including a governing-law clause. Any change bumps `TERMS_VERSION` and moves `server/retention.js` and SECURITY.md with it. | lawyer, owner | Signed-off wording; `docs/agent/LEGAL_PROPOSALS.md` is the agenda of known gaps. | Open |
 | C2 | `LEGAL_NAME` and `CONTACT_EMAIL` set to the real operating entity and a monitored mailbox. | owner | The scanner's `Legal name:` and `Privacy contact:` lines. | Blocked on D4 and D6 |
 | C3 | A named person responsible for personal data, and a breach plan. | owner | Written down and named in the privacy notice if the lawyer asks for it. | Open |
 | C4 | The employment-office licence application is under way. | owner | | Open |
 | C5 | Native Arabic review of every new or changed string. | owner, reviewer | Every row of `docs/agent/ARABIC_REVIEW.md` ticked. | Open (one string so far) |
-| C6 | Lite users can read the terms they consent to without JavaScript. | agent | Stage 3 (P1-2) adds `/lite/privacy` and `/lite/terms`; a test checks both languages. | Open |
+| C6 | Lite users can read the terms they consent to without JavaScript. | agent | `/lite/privacy` and `/lite/terms` (Stage 3, P1-2); `test/lite.test.js` checks both languages, the filled-in details and the links. | Done |
 
 ## D · Providers and money
 

@@ -8,7 +8,7 @@ import { createHmac, randomBytes, timingSafeEqual } from "node:crypto";
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { HttpError, send, parseCookies, clientIp } from "./http.js";
-import { ROOT } from "./config.js";
+import { ROOT, TERMS_VERSION } from "./config.js";
 import { listPublished, getPublished } from "./routes/public.js";
 import { LITE_CSS, LITE_CSS_V, LITE_SPRITE, LITE_SPRITE_V, LITE_PRINT_JS, LITE_PRINT_V } from "./lite-assets.js";
 
@@ -141,7 +141,7 @@ export function makeLite({ db, cfg, core, auth, limit, log }, router) {
 <meta name="color-scheme" content="light dark"><title>${esc(title)} · ${esc(tr(lg, "brand"))} ${esc(tr(lg, "lite"))}</title><link rel="icon" href="/favicon.svg"><link rel="stylesheet" href="${CSS_URL}"></head><body>
 <header>${lead}${o.headEnd || ""}<a class="hl${o.headEnd ? "" : " end"}" href="${esc(ctx.url.pathname + "?" + q)}" lang="${other}">${other === "ar" ? "العربية" : "English"}</a></header>
 <main>${o.flash ? `<p class="fl" role="status">${esc(o.flash)}</p>` : ""}${o.error ? `<p class="fl er" role="alert">${esc(o.error)}</p>` : ""}${body}</main>
-<footer><p>${esc(tr(lg, "liteNote"))} <a href="/">${esc(tr(lg, "full"))}</a> · <a href="/#/privacy">${esc(tr(lg, "privacy"))}</a> · <a href="/#/terms">${esc(tr(lg, "terms"))}</a>${r === "guest" ? ` · <a href="/lite/hire">${esc(tr(lg, "hire"))}</a>` : ""}</p></footer>
+<footer><p>${esc(tr(lg, "liteNote"))} <a href="/">${esc(tr(lg, "full"))}</a> · <a href="/lite/privacy">${esc(tr(lg, "privacy"))}</a> · <a href="/lite/terms">${esc(tr(lg, "terms"))}</a>${r === "guest" ? ` · <a href="/lite/hire">${esc(tr(lg, "hire"))}</a>` : ""}</p></footer>
 ${nav}${o.pow ? `<script src="/lite/pow.js" defer></script>` : ""}${o.print ? `<script src="${PRINT_URL}" defer></script>` : ""}</body></html>`;
   }
   const hidden = (ctx, extra = {}) => [`<input type="hidden" name="csrf" value="${csrfOf(ctx.anon)}">`, ...Object.entries(extra).map(([k, v]) => `<input type="hidden" name="${esc(k)}" value="${esc(v)}">`)].join("");
@@ -447,7 +447,7 @@ ${editing != null ? `<form method="post" action="/lite/profile/exp/delete">${hid
     const lg = ctx.lang, ch = auth.challenge(ctx);
     return `<form method="post" action="/lite/signin" id="ltPhone" data-bits="${ch.bits}" class="cd">${hidden(ctx, { role: roleWanted, next, pow_challenge: ch.challenge, pow_nonce: "" })}
 ${error ? `<p class="er" role="alert">${esc(error)}</p>` : ""}<label for="ph">${esc(tr(lg, "phoneL"))}</label><input id="ph" name="phone" type="tel" inputmode="tel" autocomplete="tel" dir="ltr" required value="${esc(phone)}" placeholder="09xx xxx xxx">
-<label class="ckl" style="margin-top:10px"><input type="checkbox" name="consent" value="1" required><span>${esc(tr(lg, "consent"))} <a href="/#/terms">${esc(tr(lg, "terms"))}</a> · <a href="/#/privacy">${esc(tr(lg, "privacy"))}</a></span></label>
+<label class="ckl" style="margin-top:10px"><input type="checkbox" name="consent" value="1" required><span>${esc(tr(lg, "consent"))} <a href="/lite/terms">${esc(tr(lg, "terms"))}</a> · <a href="/lite/privacy">${esc(tr(lg, "privacy"))}</a></span></label>
 <button class="bt" type="submit" data-busy="${esc(tr(lg, "checking"))}">${esc(tr(lg, "sendCode"))}</button>${ch.bits ? `<p class="mu">${esc(tr(lg, "jsNote"))}</p>` : ""}</form>`;
   }
   async function signinPage(ctx) {
@@ -604,12 +604,21 @@ ${jobs.length ? `<label for="jb">${esc(tr(lg, "rcJobL"))}</label><select id="jb"
     ["GET", /^\/lite\/me$/, mePage], ["GET", /^\/lite\/profile$/, profilePage], ["POST", /^\/lite\/profile$/, profilePost], ["POST", /^\/lite\/profile\/exp$/, expPost], ["POST", /^\/lite\/profile\/exp\/delete$/, expDelete],
     ["POST", /^\/lite\/alerts$/, alertPost], ["POST", /^\/lite\/alerts\/(\d+)\/delete$/, alertDelete, ["id"]],
     ["POST", /^\/lite\/invite\/(\d+)$/, invitePost, ["id"]], ["POST", /^\/lite\/recruit$/, recruitPost],
+    ["GET", /^\/lite\/privacy$/, ctx => legalPage(ctx, "privacy")], ["GET", /^\/lite\/terms$/, ctx => legalPage(ctx, "terms")],
     ["GET", /^\/lite\/signin$/, signinPage], ["POST", /^\/lite\/signin$/, signinPost], ["POST", /^\/lite\/signin\/code$/, codePost], ["POST", /^\/lite\/signout$/, signoutPost],
     ["GET", /^\/lite\/hire$/, hirePage], ["GET", /^\/lite\/hire\/company$/, companyPage], ["POST", /^\/lite\/hire\/company$/, companyPost],
     ["GET", /^\/lite\/candidates$/, candidatesPage], ["GET", /^\/lite\/candidates\/sent$/, sentPage], ["GET", /^\/lite\/candidates\/(\d+)\/invite$/, invitePage, ["id"]],
     ["POST", /^\/lite\/candidates\/(\d+)\/invite$/, inviteSend, ["id"]], ["POST", /^\/lite\/invitations\/(\d+)\/withdraw$/, withdrawPost, ["id"]]
   ];
   const DONE = { alerted: "alerted", applied: "appliedDone", saved: "saved", answered: "answered", submitted: "submitted", invited: "invitedDone", withdrawn: "withdrawn" };
+  /* The privacy notice and the terms: the same LEGAL texts the full app shows, rendered without JavaScript (D-12). Long-form, so outside the per-page budget. */
+  function legalPage(ctx, key) {
+    const lg = ctx.lang, D = (core.LEGAL[lg] || core.LEGAL.en)[key], [y, m, d] = String(TERMS_VERSION).split("-").map(Number);
+    const vars = { name: cfg.legalName || tr(lg, "legalNameDefault"), contact: cfg.contactEmail || tr(lg, "legalNoContact"), days: cfg.sessionDays || 30 }, f = s => esc(core.fill(s, vars));
+    const other = key === "terms" ? ["privacy", "privacyTitle"] : ["terms", "termsTitle"];
+    const body = `<article class="cd"><h1>${esc(D.title)}</h1><p class="mu">${esc(tr(lg, "legalUpdated", { date: `${d} ${core.MONTHS[lg][m - 1]} ${y}` }))}</p><p>${f(D.intro)}</p>${D.sections.map(s => `<h2>${esc(s.h)}</h2>${(s.p || []).map(x => `<p>${f(x)}</p>`).join("")}${s.ul ? `<ul>${s.ul.map(x => `<li>${f(x)}</li>`).join("")}</ul>` : ""}${(s.after || []).map(x => `<p>${f(x)}</p>`).join("")}`).join("")}<p><a class="b2" href="/lite/${other[0]}">${esc(tr(lg, other[1]))}</a></p></article>`;
+    return page(ctx, D.title, body, { back: "/lite", head: D.title, tabs: false });
+  }
   const readForm = req => new Promise((resolve, reject) => {
     let size = 0; const parts = [];
     // Past the limit: stop buffering and answer 413 (the page needs the socket alive; the answer closes it and ends the upload, as server/http.js readJson does)

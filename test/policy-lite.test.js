@@ -50,6 +50,8 @@ test("policy Lite gating: every GET page × guest, seeker, owner, recruiter, hir
       office: r => r.status === 200 && /university career office/.test(r.text) && !/<nav class="tb"/.test(r.text), admin: r => r.status === 200 && adminNote.test(r.text) && !/<nav class="tb"/.test(r.text) }],
     ["/lite/profile", { guest: gate("/lite/profile"), seeker: /name="name"/, owner: toMe, recruiter: toMe, hiring: toMe, pending: toMe, office: toMe, admin: toMe }],
     ["/lite/profile?step=3", { guest: gate("/lite/profile"), seeker: /action="\/lite\/profile\/exp"/, owner: toMe, office: toMe, admin: toMe }],
+    ["/lite/privacy", Object.fromEntries(["guest", "seeker", "owner", "recruiter", "hiring", "pending", "office", "admin"].map(r => [r, /<h1>(Privacy notice|إشعار الخصوصية)<\/h1>/]))],   // the legal pages are for everyone, in the visitor's language (D-12)
+    ["/lite/terms", Object.fromEntries(["guest", "seeker", "owner", "recruiter", "hiring", "pending", "office", "admin"].map(r => [r, /<h1>(Terms of use|شروط الاستخدام)<\/h1>/]))],
     ["/lite/signin", { guest: /name="pow_challenge"/, seeker: toMe, owner: toHire, recruiter: toHire, hiring: toHire, pending: toHire, office: toMe, admin: toMe }],
     ["/lite/signin?role=employer", { guest: /name="role" value="employer"/, seeker: toMe, owner: toHire }],
     ["/lite/signin?next=%2Flite%2Fresume", { guest: /name="next" value="\/lite\/resume"/, seeker: "/lite/resume" }],

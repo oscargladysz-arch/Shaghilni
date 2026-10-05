@@ -439,7 +439,7 @@ Brief `<features>` letters → areas: A → 1, 13 · B → 1, 2, 3, 4, 5, 14 · 
 | Candidate search (verified employers; filters; cards without contact details) | VERIFIED | `lite.js:519-525,538-554` | lite :154,157-158 | D-04 raw `edu_student` |
 | Invite a candidate (job or event; errors; fee refused) | VERIFIED | `lite.js:555-582` | lite :159-165; policy-lite (U-016) | Job-kind untested; the lookup is by id since Stage 2 (U-016), no longer the first 60 unfiltered rows |
 | Invitations sent (phone after event yes; withdraw) | PARTIAL | `lite.js:583-599` | lite :164 | Withdraw and phone reveal untested |
-| Legal links in footer and consent box | PARTIAL | `lite.js:144,450` | none | D-12: point at JavaScript-only `/#/privacy`, `/#/terms`; no `/lite/privacy`/`/lite/terms` |
+| Legal links in footer and consent box | VERIFIED (Stage 3) | `lite.js:144,450` | none | Stage 3: footer and consent box link to `/lite/privacy` and `/lite/terms`, server-rendered from the same `LEGAL` object (D-12 fixed); 2.0–4.3 KB gzipped a page |
 | Flash messages after redirects | PARTIAL | `lite.js:612,634,143` | none | Language switch keeps `?done=` so the flash repeats |
 | 404 page | VERIFIED | `lite.js:638-639` | lite :88 | — |
 | HEAD answered like GET | PARTIAL | `lite.js:638`; `http.js:223` | none | — |

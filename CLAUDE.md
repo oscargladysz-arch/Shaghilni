@@ -34,7 +34,7 @@ Before changing anything read `docs/agent/BRIEF.md` (the full brief: rules R1–
 - Privacy is a four-file change: `public/js/legal.js`, `server/retention.js`, `TERMS_VERSION` in `server/config.js`, `SECURITY.md`.
 - Scanner markers: `/* sql-safe: … */` on template SQL, `html-safe` on a raw HTML write. The scanner skips `test/`.
 - `seedDemo` in `server/config.js` is `!prod && SEED_DEMO !== "false"`: sample listings (under real organisations' names, owner decision D1) are never seeded in production. Leftover rows are counted by `countDemo` in `server/seed.js`, logged at start and shown on the Insights screen (Stage 1, D-01).
-- Lite (`/lite/*`, `server/lite.js`) is server-rendered and calls the same handlers in-process. First visit < 15 KB, about 2–3 KB a page after (a test checks). Its legal links point at the JavaScript-only `/#/privacy` and `/#/terms`.
+- Lite (`/lite/*`, `server/lite.js`) is server-rendered and calls the same handlers in-process. First visit < 15 KB, about 2–3 KB a page after (a test checks). Its privacy notice and terms are at `/lite/privacy` and `/lite/terms` (the same `LEGAL` texts, loaded by `server/core.js`), outside the per-page budget.
 - Demo hooks are marked `// demo-accounts`; `npm run demo-accounts:uninstall` must keep working.
 - Route modules export `registerX(r, deps)`; handlers take `ctx`; errors are `fail(status, code, detail)`; role guards are middleware. Flexible fields live as JSON in `data` columns.
 
