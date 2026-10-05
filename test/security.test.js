@@ -11,7 +11,7 @@ import { createHash } from "node:crypto";
 import { loadConfig, TERMS_VERSION } from "../server/config.js";
 import { openDb, now } from "../server/db.js";
 import { createApp } from "../server/app.js";
-import { seedDemo } from "../server/seed.js";
+import { seedDemo, countDemo } from "../server/seed.js";
 import { leadingZeroBits } from "../server/auth.js";
 import { scanSecrets, scanCode, auditSettings, parseEnvFile } from "../scripts/security-check.js";
 
@@ -380,4 +380,24 @@ test("15 · the scanner fails settings that would run a public host in developme
   const template = parseEnvFile(new URL("../.env.example", import.meta.url).pathname);
   assert.ok(failsOn(auditSettings(template), /NODE_ENV/), "the template copied unchanged to a server is caught");
   assert.equal(template.OTP_DEV_ECHO, undefined, "the template does not switch on code echo by itself");
+});
+
+test("16 · sample listings are never seeded in production, whatever SEED_DEMO says; development and tests unchanged; leftover rows are counted", () => {
+  const prodEnv = { NODE_ENV: "production", OTP_PEPPER: "p".repeat(40), BASE_URL: "https://shaghilni.test", ADMIN_PHONES: "+963944000000", SMS_PROVIDER: "textbee", TEXTBEE_API_KEY: "k", CONTACT_EMAIL: "privacy@example.com" };
+  const cfgOf = env => { const quiet = console.warn, warned = []; console.warn = m => warned.push(String(m)); try { return { cfg: loadConfig({ skipDotEnv: true, isolated: true, env }), warned }; } finally { console.warn = quiet; } };
+  assert.equal(cfgOf(prodEnv).cfg.seedDemo, false, "production with SEED_DEMO unset never seeds");
+  const loud = cfgOf({ ...prodEnv, SEED_DEMO: "true" });
+  assert.equal(loud.cfg.seedDemo, false, "production with SEED_DEMO=true still never seeds");
+  assert.ok(loud.warned.some(m => /SEED_DEMO/.test(m)), "and says so in the log: " + JSON.stringify(loud.warned));
+  assert.equal(cfgOf({ ...prodEnv, SEED_DEMO: "false" }).cfg.seedDemo, false);
+  assert.equal(cfgOf({ NODE_ENV: "development" }).cfg.seedDemo, true, "development seeds by default");
+  assert.equal(cfgOf({ NODE_ENV: "test" }).cfg.seedDemo, true, "so do tests");
+  assert.equal(cfgOf({ NODE_ENV: "development", SEED_DEMO: "false" }).cfg.seedDemo, false, "and both can opt out");
+  // A database that already holds sample rows is counted, so the start-up log and the admin screen can say so.
+  const db = openDb(":memory:");
+  assert.deepEqual(countDemo(db), { companies: 0, jobs: 0 });
+  seedDemo(db, () => {});
+  assert.deepEqual(countDemo(db), { companies: 17, jobs: 19 });
+  db.run("DELETE FROM jobs WHERE is_demo = 1"); db.run("DELETE FROM companies WHERE is_demo = 1");
+  assert.deepEqual(countDemo(db), { companies: 0, jobs: 0 }, "nothing left after npm run demo:remove");
 });
