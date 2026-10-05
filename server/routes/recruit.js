@@ -125,7 +125,7 @@ export function registerRecruit(r, deps) {
   });
 
   r.get("/api/employer/invitations", ctx => {
-    const co = verified(ctx);
+    const co = hiring(ctx);   // the sent list carries full names and numbers after an event yes: hire level, like search (D-03)
     const rows = db.all(`SELECT i.*, p.data AS p_data, u.phone AS u_phone, j.data AS j_data FROM invitations i
       JOIN users u ON u.id = i.user_id LEFT JOIN profiles p ON p.user_id = i.user_id LEFT JOIN jobs j ON j.id = i.job_id
       WHERE i.company_id = ? ORDER BY i.created_at DESC LIMIT 200`, co.id);
@@ -139,7 +139,7 @@ export function registerRecruit(r, deps) {
   });
 
   r.post("/api/employer/invitations/:id/withdraw", ctx => {
-    const co = verified(ctx);
+    const co = hiring(ctx);   // the sent list carries full names and numbers after an event yes: hire level, like search (D-03)
     const i = db.get("SELECT * FROM invitations WHERE id = ? AND company_id = ?", Number(ctx.params.id), co.id);
     if (!i) fail(404, "not_found");
     if (!OPEN.includes(i.status)) fail(409, "bad_transition");

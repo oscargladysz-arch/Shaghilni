@@ -295,6 +295,7 @@ Field order in every entry below: ID · Severity (verifier's; reporter's noted i
 
 | Field | Content |
 |---|---|
+| **Status** | **FIXED in Stage 2 (S2-7)**: `GET /api/employer/invitations` and `POST /api/employer/invitations/:id/withdraw` now use `hiring(ctx)` (hire level: owner, admins, recruiters), like candidate search (`server/routes/recruit.js`). Found by the generated cross-role test (`test/policy-access.test.js`: two unexpected 200s), which is the regression test; the policy row in `test/policy/route-policy.js` states the rule. SECURITY.md item 8 row "Invitations and replies" updated. |
 | Severity | **P2** (reporter P1; lowered — see Notes) |
 | Lens | authorization (team roles) · privacy/opt-in leak |
 | Rule broken | R12 intent (the role matrix: README.md:382 and `i18n4.js:270` say a hiring manager sees jobs and applicants and writes notes; withdraw is a hire-level write); R7 weakly (consent text speaks at company level) |
