@@ -2,6 +2,7 @@
 import { test, after } from "node:test";
 import assert from "node:assert/strict";
 import http from "node:http";
+import { readFileSync } from "node:fs";
 import { loadConfig } from "../server/config.js";
 import { openDb } from "../server/db.js";
 import { createApp } from "../server/app.js";
@@ -107,4 +108,14 @@ test("demo accounts: never in production, and no demo sign-in without demo mode"
   assert.equal(demoOn({ demoAccounts: true, seedDemo: true, prod: true }), false, "demo accounts are never made in production");
   assert.equal(demoOn({ demoAccounts: false, seedDemo: true, prod: false }), false, "or unless asked for");
   assert.equal(demoOn({ demoAccounts: true, seedDemo: true, prod: false }), true);
+});
+
+test("demo accounts: the uninstall step leaves no mention of them in the README", () => {
+  const readme = readFileSync(new URL("../README.md", import.meta.url), "utf8");
+  const blocks = readme.match(/<!-- demo-accounts:start -->[\s\S]*?<!-- demo-accounts:end -->/g) || [];
+  assert.ok(blocks.length >= 2, `the README marks every demo-account passage (${blocks.length} blocks found)`);
+  const after = readme.replace(/<!-- demo-accounts:start -->[\s\S]*?<!-- demo-accounts:end -->\n?/g, "");   // the same expression scripts/demo-accounts.js uses
+  const left = after.match(/demo accounts?|demo-accounts|demo\.js\b|auth\/demo|Explore the demo|DEMO_ACCOUNTS/gi) || [];   // demo.json (the sample listings) is a different feature
+  assert.deepEqual(left, [], "after npm run demo-accounts:uninstall the README no longer describes deleted code");
+  assert.ok(after.includes("npm run demo:remove"), "the sample listings and their removal are a separate feature and stay documented");
 });

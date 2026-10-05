@@ -1,5 +1,7 @@
 # Baseline · Stage 0.4 · measured 2026-10-04
 
+**Superseded in part by Stage 1 (record kept as measured).** After Stage 1: `npm test` → 66 pass; the scanner with no environment prints two FAILs (`NODE_ENV` and `OTP_PEPPER`); the `SEED_DEMO` WARN no longer exists; the fake production environment uses `LEGAL_NAME="Example Org (not a real entity)"` and still exits 0 with one WARN. The Stage 1 gate report and `docs/agent/STATE.md` carry the current numbers.
+
 Measured in this session, not copied from the brief. Commit `b8425b2` ("Initial commit: Shaghilni MVP"), branch `stage-0/ground-truth` (identical to `main` and `origin/main`). Node v22.22.0, npm 10.9.4. No `node_modules`, no lockfile.
 
 ## Commands run

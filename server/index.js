@@ -3,11 +3,12 @@ import http from "node:http";
 import { loadConfig } from "./config.js";
 import { openDb } from "./db.js";
 import { createApp } from "./app.js";
-import { seedDemo } from "./seed.js";
+import { seedDemo, countDemo } from "./seed.js";
 
 const cfg = loadConfig();
 const db = openDb(cfg.dbPath);
 if (cfg.seedDemo) seedDemo(db);
+if (cfg.prod) { const d = countDemo(db); if (d.companies || d.jobs) console.warn(`[seed] This production database still holds ${d.companies} sample companies and ${d.jobs} sample listings. Remove them before real employers arrive: npm run demo:remove`); }
 const app = createApp({ cfg, db });
 const swept = () => { try { const r = app.cleanup(); if (Object.values(r).some(Boolean)) console.log("[retention] removed", JSON.stringify(r)); } catch (err) { console.error("[retention]", err.message); } };
 swept(); setInterval(swept, 3600e3).unref();

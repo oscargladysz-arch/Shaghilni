@@ -64,6 +64,7 @@ Field order in every entry below: ID · Severity (verifier's; reporter's noted i
 
 | Field | Content |
 |---|---|
+| **Status** | **FIXED in Stage 1 (S1-1)**: `server/config.js` gates `seedDemo` on `!prod` and warns when `SEED_DEMO=true` is set in production; `countDemo` in `server/seed.js` counts leftover rows, logged at start by `server/index.js` and shown on the Insights "Needs attention" card (`attention.sampleCompanies` / `sampleJobs`, production only); the scanner's `SEED_DEMO` WARN is gone. Tests: `test/security.test.js` test 16 "sample listings are never seeded in production…" (moved out of `test/demo.test.js`, which `npm run demo-accounts:uninstall` deletes, R17), `test/insights.test.js` "sample data left in a production database…", `test/security.test.js` test 14. `seed/demo.json` untouched (D1). |
 | Severity | **P0** (reporter P0; brief backlog P0-1, CLAUDE.md:36) |
 | Lens | sample data reaching production · docs versus code · R6/R7/R8 |
 | Rule broken | R6 (no invented facts: 17 real organisations shown as verified companies with published roles they never posted); R7/R8 (truthful product, "every employer checked"); R15 (PRODUCT.md:83 says the sample data "must be removed before launch", yet the documented deploy seeds it); R12 spirit (unsafe default) |
@@ -255,6 +256,7 @@ Field order in every entry below: ID · Severity (verifier's; reporter's noted i
 
 | Field | Content |
 |---|---|
+| **Status** | **FIXED in Stage 1 (S1-2)**: `scripts/security-check.js` now FAILs when `NODE_ENV` is not `production` (checked before the lockdown, so it shows even when the pepper is missing) and exports `parseEnvFile`; `.env.example` explains the setting and ships `OTP_DEV_ECHO` commented out; README Option B says the `--env-file` must say production; SECURITY.md items 10 and 13 updated. Test: `test/security.test.js` test 15 (development and unset both FAIL; the template copied as is is caught; a correct setup still passes). No `server/` change. |
 | Severity | **P1** (reporter P1) |
 | Lens | docs versus code · deploy notes · authorization (code echo = account takeover) · scanner |
 | Rule broken | R12/R15: the lockdown described at README.md:48 and SECURITY.md:263 is bypassed by the shipped template; the designated gate (SECURITY.md:363 "shows no FAIL") exits 0 |
@@ -344,6 +346,7 @@ Field order in every entry below: ID · Severity (verifier's; reporter's noted i
 
 | Field | Content |
 |---|---|
+| **Status** | **FIXED in Stage 1 (S1-2)**: `.env.example` no longer sets `SMS_ALLOWED_PREFIXES` (the active `+963` line is now a commented example under a note that the default is Syria plus the diaspora countries); SECURITY.md item 11 says the same. Test: `test/diaspora.test.js` "the shipped .env.example keeps the default destinations". D-16's duplicate-key dedupe stays in Stage 3. |
 | Severity | **P2** (reporter P2) |
 | Lens | configuration · docs versus code R15 · diaspora product promise |
 | Rule broken | R15 (SECURITY.md:285 "Syrian numbers (+963); admin numbers anywhere" vs SECURITY.md:376 and README.md:60 "Syria plus the main diaspora countries"; the code default `config.js:49` is Syria+diaspora, so `:285` is the false line); PRODUCT.md:15 names "Syrians abroad" as an audience while the documented setup refuses them |

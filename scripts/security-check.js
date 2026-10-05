@@ -61,7 +61,7 @@ export function scanCode(root = ROOT) {
 }
 
 /* 3. Production settings */
-function parseEnvFile(file) {
+export function parseEnvFile(file) {
   const env = {};
   for (const line of readFileSync(file, "utf8").split(/\r?\n/)) {
     const m = /^\s*([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.*)\s*$/.exec(line);
@@ -72,12 +72,13 @@ function parseEnvFile(file) {
 export function auditSettings(env) {
   const out = [], add = (level, msg) => out.push([level, msg]);
   let cfg;
+  // Anything but production runs the server in development mode: sign-in codes can be returned in the API response and a built-in pepper is used.
+  if (env.NODE_ENV !== "production") add("FAIL", "NODE_ENV is not 'production': the server would run in development mode (codes in the API response, a built-in pepper). Set NODE_ENV=production on any public host.");
   const origWarn = console.warn; console.warn = () => {};
   try { cfg = loadConfig({ skipDotEnv: true, isolated: true, env: { ...env, NODE_ENV: "production" } }); }
   catch (err) { console.warn = origWarn; add("FAIL", err.message); return out; }
   console.warn = origWarn;
   add("PASS", "OTP_PEPPER is long enough and BASE_URL uses https");
-  if (env.NODE_ENV !== "production") add("WARN", "NODE_ENV is not 'production' in these settings");
   add(cfg.adminPhones.length ? "PASS" : "FAIL", cfg.adminPhones.length ? `ADMIN_PHONES has ${cfg.adminPhones.length} number(s)` : "ADMIN_PHONES is empty");
   add(cfg.sms.provider !== "console" ? "PASS" : "FAIL", cfg.sms.provider !== "console" ? `Texts go out through ${cfg.sms.provider}` : "SMS_PROVIDER is 'console': nobody receives sign-in codes");
   if (cfg.sms.provider === "textbee" && !cfg.sms.textbeeKey) add("FAIL", "TEXTBEE_API_KEY is missing");
@@ -90,7 +91,7 @@ export function auditSettings(env) {
   add(env.LEGAL_NAME ? "PASS" : "WARN", env.LEGAL_NAME ? `Legal name: ${env.LEGAL_NAME}` : "LEGAL_NAME is not set: the documents say 'Shaghilni'; use your registered company name");
   add(env.TRUST_PROXY === "true" ? "PASS" : "WARN", env.TRUST_PROXY === "true" ? "TRUST_PROXY is on (right behind Render, Railway, Fly, nginx or Caddy)" : "TRUST_PROXY is off: correct only if nothing sits in front of the server");
   if (env.OTP_DEV_ECHO === "true") add("WARN", "OTP_DEV_ECHO=true is ignored in production; remove it");
-  if (env.SEED_DEMO !== "false") add("WARN", "Demo listings are on (SEED_DEMO): remove them before real employers arrive (npm run demo:remove)");
+  // SEED_DEMO is not checked: sample listings are never seeded in production (server/config.js). A database that already holds them is reported at start-up and on the Insights screen.
   return out;
 }
 

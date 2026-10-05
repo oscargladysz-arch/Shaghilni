@@ -7,6 +7,7 @@ import { openDb } from "../server/db.js";
 import { createApp } from "../server/app.js";
 import { seedDemo } from "../server/seed.js";
 import * as coreMod from "../server/core.js";
+import { parseEnvFile } from "../scripts/security-check.js";
 
 const servers = [];
 after(() => { for (const s of servers) s.close(); });
@@ -115,4 +116,10 @@ test("returnees: employers can say they welcome Syrians coming home, and people 
   const jid = await publish(S, admin, e, { returnees: true });
   const j = (await S.client().get("/api/jobs")).body.jobs.find(x => x.id === jid); assert.equal(j.returnees, true);
   assert.equal(S.core.alertMatches({ tab: "returnees" }, j), true); assert.equal(S.core.alertMatches({ tab: "returnees" }, { ...j, returnees: false }), false);
+});
+
+test("diaspora: the shipped .env.example keeps the default destinations (Syria plus the diaspora countries) instead of narrowing texts to Syria", () => {
+  const template = parseEnvFile(new URL("../.env.example", import.meta.url).pathname);
+  const cfg = loadConfig({ skipDotEnv: true, isolated: true, env: { ...template, NODE_ENV: "test" } });
+  for (const p of ["+963", "+49", "+90", "+961", "+1"]) assert.ok(cfg.smsAllowedPrefixes.includes(p), `${p} is allowed with the template settings (got ${cfg.smsAllowedPrefixes.join(",")})`);
 });

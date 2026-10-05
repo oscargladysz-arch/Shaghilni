@@ -34,7 +34,7 @@ Success means confirmed hires: people hired, verified by the Shaghilni team, thr
 
 What a neighbouring product couldn't truthfully copy:
 
-- every employer verified (with sanctions screening) and every listing reviewed by a person before it's published;
+- every employer verified (with sanctions screening) and every listing reviewed by a person before it's published (edits made to a closed or pending listing are not re-reviewed yet: `docs/agent/DEFECTS.md`, D-05 and D-06);
 - the pay shown on every listing, always;
 - confirmed-hire data, and official university partnerships with verified student identities.
 
@@ -42,15 +42,15 @@ What a neighbouring product couldn't truthfully copy:
 
 - Most people use the app in Arabic on a phone. It opens in Arabic, right to left, and switches to English at any time.
 - Sign-in is a six-digit code by text message; there are no passwords.
-- Shaghilni Lite serves the same platform as small server-rendered pages for slow or expensive connections (under 15 KB on the first visit, about 2–3 KB a page after that, no JavaScript beyond a sign-in check).
-- WhatsApp is how many Syrians already apply and talk about jobs; applying by WhatsApp is supported alongside quick apply.
+- Shaghilni Lite serves the same platform as small server-rendered pages for slow or expensive connections (under 15 KB on the first visit, about 1–3 KB a page after that, no JavaScript beyond the sign-in check and an optional one-line *Save as PDF* script on the resume page).
+- WhatsApp is how many Syrians already apply and talk about jobs; applying by WhatsApp (and, where a company chooses, by phone call or email) is supported alongside quick apply.
 - Employers include international companies and NGOs who need records they can show compliance teams and donors.
 - Campus events (careers days, internship fairs) and talent sessions with business councils are part of how employers and students meet.
 - Payments are handled by hand for now: Syrian businesses pay in Syrian pounds (mobile wallet, bank transfer or cash with a receipt), international organisations in US dollars, invoiced with a reference number.
 
 ## Capabilities and Constraints
 
-**Built and working:** bilingual job board with fit scores and filters (including internships and jobs welcoming returnees); job alerts; quick apply with one resume in Arabic or English, or apply by WhatsApp; application tracking with text updates; one resume per person, built from the profile, with "Tailor my resume for this job" focusing the checks on a job without creating a separate version; recruiter search and invitations (only for people who switch on "Let recruiters find me"); students verified by their university email, and university career offices; employer plans (Free, Pro, Enterprise), sponsored listings, placement fees for hires found through search, analytics, reports; company teams with roles (owner, admin, recruiter, hiring manager), invitations, requests to join and a record of who did what (3 people on Free, 10 on Pro, 50 on Enterprise); events with tickets, QR check-in and reports; card payments through a hosted bank page (QNB Syria's adapter still to be completed); account export and deletion; a removable demo with fictional accounts.
+**Built and working:** bilingual job board with fit scores and filters (including internships and jobs welcoming returnees); job alerts; quick apply with one resume in Arabic or English, or apply by WhatsApp, phone call or email where the company allows it; application tracking with text updates; one resume per person, built from the profile, with "Tailor my resume for this job" focusing the checks on a job without creating a separate version; recruiter search and invitations (only for people who switch on "Let recruiters find me"); students verified by their university email, and university career offices; employer plans (Free, Pro, Enterprise), sponsored listings, placement fees for hires found through search, analytics, reports; company teams with roles (owner, admin, recruiter, hiring manager), invitations, requests to join and a record of who did what (3 people on Free, 10 on Pro, 50 on Enterprise); events with tickets, QR check-in and reports; card payments through a hosted bank page (QNB Syria's adapter still to be completed); account export and deletion; a removable demo with fictional accounts.
 
 **Technical constraints:** Node.js 22.13+ with no dependencies, SQLite in one file through `node:sqlite`, a vanilla-JS single-page app plus the server-rendered Lite pages. Data is stored and processed outside Syria, with consent.
 
@@ -80,7 +80,7 @@ What a neighbouring product couldn't truthfully copy:
 ## Evidence on Hand
 
 - **No real users, employers, hires, testimonials, letters of intent or university agreements exist yet.** Future work must not invent any.
-- All demo data is fictional (`server/demo.js`: Omar, Rania, Yasmin Trading, Qasioun Advisory, the Homs University career office). The sample job listings in `server/seed.js` use real organisations' names and must be removed before launch.
+- The demo accounts (`server/demo.js`: Omar, Rania, Yasmin Trading, Qasioun Advisory, the Homs University career office) are fictional, apart from two place and organisation names still to be replaced. The sample job listings in `seed/demo.json` (loaded by `server/seed.js`) use real organisations' names and invented employees; they are never seeded in production and must never reach a public server.
 - Market research gathered so far: competitors (WorkLink, jobs.sy, job.sy, the labour ministry's platform, Job Gate); WorkLink's own H1 2026 report that only 19 of 2,573 vacancies showed pay; the state of payments in Syria (mobile wallets, cards just returning); and the active business councils (US-Syria, Syria Britain and others).
 - Materials: business plan, pitch deck, white paper, infographics in English and Arabic, the launch checklist, and share collages, all built from the working MVP.
 
@@ -95,6 +95,6 @@ What a neighbouring product couldn't truthfully copy:
 ## Accessibility & Inclusion
 
 - Arabic, right to left, by default, with full English; both are first-class.
-- Text at least 12 px, and text contrast meeting WCAG AA in light and dark mode (checked on 40 screens in both modes).
-- Usable with a keyboard and screen readers; testing with TalkBack on real Android phones is still to do.
+- Text at least 12 px everywhere except the scaled resume preview, which is a page thumbnail; text colours come from tokens chosen for WCAG AA in light and dark mode. The contrast check on 40 screens was done by hand and is not recorded in this repository.
+- Built to work with a keyboard and screen readers (skip link, focus rings, ARIA names and live regions); there is no automated accessibility test yet, and testing with TalkBack on real Android phones is still to do.
 - Lite works without JavaScript and in a few kilobytes a page, for slow and expensive connections.
