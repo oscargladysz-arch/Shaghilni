@@ -13,7 +13,9 @@ Status meaning:
 | MISSING | Not built (whether or not a doc claims it) |
 | UNVERIFIED | Could not be checked here (browser e2e not run, Docker not built, no network) |
 
-Defect ids `D-01`…`D-30` refer to `docs/agent/DEFECTS.md`.
+**Stage 2 status (2026-10-05).** Guardrails: every registered route has a policy row (`test/policy/route-policy.js`, completeness test), the generated cross-role, cross-account, revocation and junk-input tests run over every route, nine route-family files pin the rules per area, the i18n parity test and the design ratchets exist (`test/ratchets.json`). Fixed: D-03, D-11, U-016, U-128, U-165 (rows marked *Stage 2*). Confirmed by the tests and left open: U-007, U-017, U-041, U-046, U-048, U-083, U-084, U-129 and the new D-31 to D-37. CI VERIFIED on GitHub (two green runs). 133 tests.
+
+Defect ids `D-01`…`D-37` refer to `docs/agent/DEFECTS.md`.
 
 ## Summary
 
@@ -30,11 +32,11 @@ Defect ids `D-01`…`D-30` refer to `docs/agent/DEFECTS.md`.
 | 9 · Campus and student verification | 16 | 8 | 2 | 0 | 26 |
 | 10 · Events, tickets, check-in | 13 | 14 | 1 | 0 | 28 |
 | 11 · Admin, insights, traffic, system, audit API | 15 | 12 | 2 | 0 | 29 |
-| 12 · Shaghilni Lite | 26 | 18 | 1 | 0 | 45 |
+| 12 · Shaghilni Lite | 27 | 17 | 1 | 0 | 45 |
 | 13 · Security headers, CSRF, rate limits, caps, retention, export, deletion, legal, lockdown | 19 | 15 | 1 | 1 | 36 |
-| 14 · i18n, RTL, design-system conformance, accessibility, theme | 2 | 21 | 1 | 2 | 26 |
-| 15 · Tests, scripts, seeding, demo accounts, Docker, deploy, docs | 7 | 12 | 1 | 1 | 21 |
-| **Total** | **231** | **185** | **13** | **6** | **435** |
+| 14 · i18n, RTL, design-system conformance, accessibility, theme | 3 | 21 | 0 | 2 | 26 |
+| 15 · Tests, scripts, seeding, demo accounts, Docker, deploy, docs | 8 | 12 | 1 | 0 | 21 |
+| **Total** | **234** | **184** | **12** | **5** | **435** |
 
 Brief `<features>` letters → areas: A → 1, 13 · B → 1, 2, 3, 4, 5, 14 · C → 12 · D → 5, 6 · E → 7 · F → 8 · G → 9 · H → 10 · I → 11 · J → 13, 15.
 
@@ -545,7 +547,7 @@ Brief `<features>` letters → areas: A → 1, 13 · B → 1, 2, 3, 4, 5, 14 · 
 | `GET /api/health` | VERIFIED | `public.js:35`; `Dockerfile:14` | security :313 | Counts toward the API rate limit |
 | `GET /api/config` | VERIFIED | `public.js:36` | api :261; demo :65,96,105; payments :71,78; security :79,273 | — |
 | Documentation set (README, SECURITY, PRODUCT with marker, DESIGN front matter, screenshots, docs/agent) | PARTIAL | `PRODUCT.md:3` marker; `DESIGN.md:1`; `docs/screenshots/*` | none (claims) | See `docs/agent/DOC_DRIFT.md` |
-| Continuous integration | UNVERIFIED (Stage 1) | `.github/workflows/ci.yml` (tests and scanner on Node 22.13.0 / 22 / 24; manual e2e job) | none: validated with a YAML parser and the same commands locally; no GitHub run yet (`docs/LAUNCH.md` A7, A8) | P0-2 written in Stage 1 (S1-3); first run is the owner's |
+| Continuous integration | VERIFIED (Stage 2) | `.github/workflows/ci.yml` (tests and scanner on Node 22.13.0 / 22 / 24; manual e2e job) | GitHub runs 37360113885 (PR #2) and 37360175869 (`main`) green on all three versions; the e2e job is manual and has not run (`docs/LAUNCH.md` A7, A8, B2) | P0-2 written in Stage 1 (S1-3); branch protection is the owner's (D5) |
 | Lite demo hint | PARTIAL | `demo.js:193-194`; `lite.js:456-457` | none | See area 12 |
 
 ## Brief corrections
@@ -597,7 +599,7 @@ Items of `<verified_facts>` and `<features>` that the maps contradict or refine.
 | Lite: block a company, plans/billing/analytics, job posting, alert channel choice or edit, withdraw an application, privacy/terms pages | `lite.js:258,265` (yes/no only); no plan/jobs/alerts-edit routes; `:144,450` link to `/#/…` | README.md:11 (block, general); D-12 |
 | Server-rendered legal pages (`/lite/privacy`, `/lite/terms`) | not in `lite.js:601-611` | Backlog P1-2 |
 | QNB Syria payment adapter | `server/payments.js:33-47` `ready = false` | README.md:335; brief E |
-| Continuous integration | `.github/workflows/ci.yml` added in Stage 1 (S1-3); the first GitHub run is UNVERIFIED | closed in Stage 1 |
+| Continuous integration | `.github/workflows/ci.yml` added in Stage 1 (S1-3); two GitHub runs green in Stage 2 | closed in Stage 2 |
 | i18n parity test; CSS ratchets (`test/ratchets.json`) | no such tests | Backlog P1-1 |
 | Production gate for `seedDemo` | `server/config.js:68` now `!prod && …` (Stage 1, S1-1) | closed in Stage 1 |
 | Admin role revocation | `server/auth.js:99` promotes only | D-17 |

@@ -5,7 +5,7 @@ This file maps the 13-item *30-Minute Pre-Launch Security Checklist* onto Shaghi
 Run both commands before every launch and after every change:
 
 ```bash
-npm test                                             # 66 tests in 15 files (API, security, recruiters, import, Lite, payments, plans, universities, teams, events, demo, diaspora, applying, insights, traffic)
+npm test                                             # 133 tests in 30 files (API, security, route policy, recruiters, import, Lite, payments, plans, universities, teams, events, demo, diaspora, applying, insights, traffic, i18n, ratchets)
 npm run security:check -- --url https://your-domain  # the code, your settings and the live site
 ```
 
@@ -189,7 +189,7 @@ present, point to the code, and list any gaps with a fix and a test that would p
 | **A06 Insecure Design** | Threats handled by design: employer verification with a recorded sanctions-screening step, review of every listing (edits made while a listing awaits review or is closed are not re-checked yet), the no-fees rule in the listing checks, SMS-pumping guards, consent and minimisation. | Verification and sanctions screening are manual, so they're only as good as the people doing them |
 | **A07 Authentication Failures** | See item 5 | An admin account is only as safe as the admin's phone number. Ask your carrier for a SIM-swap PIN and keep `ADMIN_PHONES` short. |
 | **A08 Software or Data Integrity Failures** | No scripts from CDNs. Built files are named by content hash. Database migrations are versioned and run in transactions. The audit log records who changed what. | None known |
-| **A09 Security Logging and Alerting Failures** | The audit log records sign-ups, consent, deletions, company and listing changes and decisions, and every application move and hire confirmation. The server log records errors, failed texts and reached caps. | **No automatic alerts yet,** and the admin screens don't show the audit log (it's at `/api/admin/audit`). Watch the log, or add an alert on your host. |
+| **A09 Security Logging and Alerting Failures** | The audit log records sign-ups, consent, deletions, company and listing changes and decisions, and every application move (except a re-application after a withdrawal: `docs/agent/DEFECTS.md`, U-083) and hire confirmation. The server log records errors, failed texts and reached caps. | **No automatic alerts yet,** and the admin screens don't show the audit log (it's at `/api/admin/audit`). Watch the log, or add an alert on your host. |
 | **A10 Mishandling of Exceptional Conditions** | Every request is wrapped, and unexpected errors answer 500 without details. Unhandled rejections are logged, and a fatal error exits so the host restarts a clean process. Fuzz-tested (test 3); a broken database is tested (test 4). | None known |
 
 ## 8. Data leak audit
@@ -380,7 +380,7 @@ The launch checklist, with who owns each item (agent, owner, lawyer or provider)
 ## Plans, teams and billing
 
 - **Nothing here touches job seekers' chances.** Sponsored listings are at most two, lifted to the top and labelled *Sponsored*, only for a signed-in job seeker whose fit score is 60% or more; everyone else sees them in the usual order, unlabelled. No job seeker can pay for anything.
-- **Teammates** are matched by phone number. A number that belongs to a job seeker, an admin or another company can't be added. Only the company owner can request or pay for plans and hand the company over. The owner and admins edit company details and manage the team (only the owner changes, removes or approves admins); removing a teammate ends their access immediately.
+- **Teammates** are matched by phone number. A number that belongs to a job seeker, an admin or another company can't be added. Only the company owner can request or pay for plans and hand the company over. The owner and admins edit company details and manage the team (only the owner changes, removes or approves admins, though an admin can still invite one: `docs/agent/DEFECTS.md`, D-31); removing a teammate ends their access immediately.
 - **Placement fees are computed on the server** at the moment an admin confirms a hire, from the invitation and application records, and only once per hire.
 - **Reports** contain no candidate names or contact details: placements list dates, job title, governorate, type and pay range; the compliance record lists company submission, verification, rejection, suspension and plan changes, listing approvals, rejections and sponsorships, and hire confirmations (its sanctions-screening column is not filled in yet: see `docs/agent/DEFECTS.md`, D-07).
 - **Every plan change, charge update, sponsorship start and team change is in the audit log** (switching a sponsorship off is not yet recorded: see `docs/agent/DEFECTS.md`, D-28).

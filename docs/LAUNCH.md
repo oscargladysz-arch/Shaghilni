@@ -14,14 +14,14 @@ No item marked owner, lawyer or provider is ever ticked by an agent.
 | A4 | Domain, DNS, hosting (Render, Railway or a VPS) and HTTPS in front of the server. | owner, provider | `curl -I https://your-domain` shows `strict-transport-security`; `/api/health` answers 200. | Open |
 | A5 | The Docker image builds and its healthcheck works (`wget` must exist in `node:22-alpine`). | owner | `docker build -t shaghilni .`, run it, then `docker inspect --format '{{.State.Health.Status}}' shaghilni` says `healthy`. | UNVERIFIED (no Docker in the agent environment) |
 | A6 | The `.env` passed with `--env-file` says `NODE_ENV=production` (it overrides the image's own setting). | owner | The scanner against that file prints `0 failed`. | Open |
-| A7 | The first CI run is watched and `main` is protected (owner decision D5). | owner | The *CI* workflow is green on Node 22.13.0, 22 and 24; branch rules require it. | Open |
+| A7 | The first CI run is watched and `main` is protected (owner decision D5). | owner | The *CI* workflow is green on Node 22.13.0, 22 and 24 (checked in Stage 2: runs 37360113885 and 37360175869, the e2e job not run); branch rules require it. | Open (protection) |
 | A8 | CI actions pinned to commit SHAs, if wanted. `actions/checkout@v4`, `actions/setup-node@v4` and `actions/upload-artifact@v4` are pinned by major tag because no SHA could be verified from the official repositories in the agent environment. | owner | Look up each tag's commit on github.com and replace the tag in `.github/workflows/ci.yml`. | Open |
 
 ## B · Security
 
 | # | Item | Owner | How to verify | Status |
 |---|---|---|---|---|
-| B1 | `npm test` green. | agent | 66 of 66 at the Stage 1 gate (`docs/agent/BASELINE.md` has the earlier 60). | Done |
+| B1 | `npm test` green. | agent | 133 of 133 at the Stage 2 gate (66 at Stage 1; `docs/agent/BASELINE.md` has the Stage 0 60). | Done |
 | B2 | The browser flow passes (`npm run test:e2e`, 80 checks, four browsers plus a Lite page without JavaScript). | agent, owner | Run the *Browser end-to-end* job by hand from the CI workflow, or locally after `npm install --no-save puppeteer`. | UNVERIFIED |
 | B3 | `npm run security:check -- --url https://your-domain` shows no FAIL once deployed. | owner | Paste the output into the launch record. | Open |
 | B4 | External scans: MDN HTTP Observatory (aim A+), SSL Labs (aim A), the OWASP ZAP baseline scan, GitHub secret scanning. | owner | Reports saved. | Open |
