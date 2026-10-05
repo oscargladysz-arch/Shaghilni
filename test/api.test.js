@@ -153,6 +153,12 @@ test("admin: verification needs sanctions screening; review publishes listings",
   assert.equal(gendered.status, 200);
   const pending = (await admin.get("/api/admin/jobs?status=pending")).body.jobs.find(x => x.id === employerJobId);
   assert.equal(pending.flags[0].type, "gender");
+  // D-30: a phone number or an email in the free text (place, contact lines, tags, provides) is flagged for the reviewer, not blocked
+  const contact = await employer.put(`/api/employer/jobs/${employerJobId}`, { job: { ...JOB, place: { en: "Mezzeh, call ٠٩٥٥ ١٢٣ ٤٥٦" }, contact: { name: { en: "Rami" }, status: { en: "Write to jobs@example.com" } }, tags: "whatsapp 0944-123-456" }, submit: true });
+  assert.equal(contact.status, 200, contact.text); assert.equal(contact.body.check.fee, null, "contact details are not a fee");
+  const words = contact.body.check.flags.filter(f => f.type === "contact").map(f => f.word);
+  assert.ok(words.length >= 3 && words.some(w => /0955 123 456/.test(w)) && words.some(w => /jobs@example\.com/.test(w)) && words.some(w => /0944-123-456/.test(w)), "D-30: the phone numbers (Arabic-Indic digits included) and the email are flagged: " + JSON.stringify(contact.body.check.flags));
+  assert.deepEqual((await admin.get("/api/admin/jobs?status=pending")).body.jobs.find(x => x.id === employerJobId).flags.filter(f => f.type === "contact").map(f => f.word), words, "and the reviewer's queue carries the flags");
   assert.equal((await admin.post(`/api/admin/jobs/${employerJobId}/reject`, {})).body.error, "note_required");
   await employer.put(`/api/employer/jobs/${employerJobId}`, { job: JOB, submit: true });
   assert.equal((await admin.post(`/api/admin/jobs/${employerJobId}/approve`)).status, 200);
