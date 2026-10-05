@@ -54,6 +54,9 @@ export function registerAdmin(r, deps) {
             verified_at = COALESCE(?, verified_at), verified_by = COALESCE(?, verified_by) WHERE id = ?`,
       status, note, now(), extra.screened_at ?? null, extra.screened_by ?? null, extra.verified_at ?? null, extra.verified_by ?? null, c.id);
     audit(ctx.user.id, `company.${status}`, "company", c.id, { note, ...(extra.screened_at ? { screened: true } : {}) });   // the compliance report reads `screened` (D-07)
+    if (status === "suspended" || status === "rejected") for (const i of db.all("SELECT id FROM invitations WHERE company_id = ? AND status IN ('sent','seen')", c.id)) {   // a company under suspicion keeps no open invitation: nobody hands it a number meanwhile (U-017)
+      db.run("UPDATE invitations SET status = 'withdrawn', updated_at = ? WHERE id = ?", now(), i.id); audit(ctx.user.id, "invitation.withdrawn", "invitation", i.id, { reason: "company_" + status });
+    }
     return { company: companyOut(db.get("SELECT * FROM companies WHERE id = ?", c.id)) };
   };
   r.post("/api/admin/companies/:id/verify", admin, ctx => {

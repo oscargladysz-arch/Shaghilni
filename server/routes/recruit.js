@@ -156,6 +156,9 @@ export function registerRecruit(r, deps) {
     p.recruit = { open };
     db.run("UPDATE profiles SET data = ?, updated_at = ? WHERE user_id = ?", JSON.stringify(p), now(), ctx.user.id);
     audit(ctx.user.id, open ? "recruit.opened" : "recruit.closed", "user", ctx.user.id, {});
+    if (!open) for (const i of db.all("SELECT id FROM invitations WHERE user_id = ? AND status IN ('sent','seen')", ctx.user.id)) {   // opting out ends the open invitations too: nothing more reaches a company through them (D-32)
+      db.run("UPDATE invitations SET status = 'withdrawn', updated_at = ? WHERE id = ?", now(), i.id); audit(ctx.user.id, "invitation.withdrawn", "invitation", i.id, { reason: "opted_out" });
+    }
     return { open };
   });
 
