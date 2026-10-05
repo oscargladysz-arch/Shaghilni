@@ -58,7 +58,9 @@ let seeker, employer, admin, employerJobId, seekerAppId;
 test("public board lists the seeded demo jobs", async () => {
   const c = client(), r = await c.get("/api/jobs");
   assert.equal(r.status, 200);
-  assert.equal(r.body.jobs.length, 19);
+  assert.equal(r.body.jobs.length, 18, "18 of the 19 sample listings pass the posting checks (D-02)");
+  assert.ok(r.body.jobs.every(x => Array.isArray(x.pay) && x.pay[0] > 0), "no sample listing is on the board without pay (D-02)");
+  assert.ok(r.body.jobs.every(x => !x.contact || !(x.contact.name && x.contact.name.en)), "no sample listing names an invented employee of a real organisation (D-15)");
   const j = r.body.jobs.find(x => x.co.en === "Chevron");
   assert.ok(j.title.en && j.title.ar && Array.isArray(j.duties.en) && j.demo === true && j.hasWhatsapp === false);
   assert.equal((await c.get(`/api/jobs/${j.id}`)).body.job.id, j.id);
@@ -155,7 +157,7 @@ test("admin: verification needs sanctions screening; review publishes listings",
   await employer.put(`/api/employer/jobs/${employerJobId}`, { job: JOB, submit: true });
   assert.equal((await admin.post(`/api/admin/jobs/${employerJobId}/approve`)).status, 200);
   const board = (await client().get("/api/jobs")).body.jobs;
-  assert.equal(board.length, 20);
+  assert.equal(board.length, 19, "18 sample listings plus the one just approved");
   const live = board.find(x => x.id === employerJobId);
   assert.equal(live.title.en, "Junior accountant");
   assert.equal(live.hasWhatsapp, true);
@@ -188,19 +190,19 @@ test("pipeline: status moves are checked, seekers are texted, hires need confirm
   assert.deepEqual([ov.counts.hired, ov.counts.confirmedHires, ov.queues.hires], [1, 0, 1]);
   await admin.post(`/api/admin/applications/${seekerAppId}/confirm-hire`, { note: "Called Rami" });
   ov = (await admin.get("/api/admin/overview")).body;
-  assert.deepEqual([ov.counts.confirmedHires, ov.queues.hires, ov.counts.liveJobs, ov.counts.demoJobs], [1, 0, 1, 19]);
+  assert.deepEqual([ov.counts.confirmedHires, ov.queues.hires, ov.counts.liveJobs, ov.counts.demoJobs], [1, 0, 1, 18]);
   assert.equal(ov.weeks.at(-1).confirmedHires, 1);
 });
 
 test("edits send live listings and renamed companies back to review", async () => {
   await employer.put(`/api/employer/jobs/${employerJobId}`, { job: { ...JOB, openings: 3 } });
-  assert.equal((await client().get("/api/jobs")).body.jobs.length, 19, "an edited listing leaves the board until reviewed");
+  assert.equal((await client().get("/api/jobs")).body.jobs.length, 18, "an edited listing leaves the board until reviewed");
   await employer.post(`/api/employer/jobs/${employerJobId}/submit`);
   await admin.post(`/api/admin/jobs/${employerJobId}/approve`);
   await employer.put("/api/employer/company", { company: { name: { en: "Beit Accounting Group", ar: "بيت المحاسبة" }, sector: "finance", gov: "damascus",
     regNo: "DM-12345", contactName: "Rami", whatsapp: "0955 666 777" } });
   assert.equal((await employer.get("/api/employer")).body.company.status, "pending");
-  assert.equal((await client().get("/api/jobs")).body.jobs.length, 19, "a company under re-verification has no live listings");
+  assert.equal((await client().get("/api/jobs")).body.jobs.length, 18, "a company under re-verification has no live listings");
 });
 
 test("resume suggestions: own bullets only, and the fact guard filters Claude's output", async () => {
@@ -259,4 +261,15 @@ test("static client: security headers, fingerprinted gzipped assets, SPA routes"
   assert.equal((await c.get("/api/nope")).status, 404);
   assert.equal((await c.call("PATCH", "/api/jobs")).status, 405);
   assert.equal((await c.get("/api/config")).body.ai, true);
+});
+
+test("seed: a sample listing that fails the posting checks is skipped with one log line, and the invented contact block is never loaded (D-02, D-15)", () => {
+  const fresh = openDb(":memory:"), lines = [];
+  assert.equal(seedDemo(fresh, m => lines.push(m)), true);
+  assert.equal(fresh.get("SELECT COUNT(*) AS n FROM jobs WHERE status = 'published' AND NOT (json_extract(data, '$.pay[0]') > 0)").n, 0, "nothing published without pay");
+  assert.equal(fresh.get("SELECT COUNT(*) AS n FROM jobs WHERE json_extract(data, '$.title.en') = 'Laboratory Internship in Marine Sciences'").n, 0, "the pay-less sample listing is not in the database");
+  assert.equal(lines.filter(l => /\[seed\] skipped .*Marine Sciences/.test(l)).length, 1, "one log line names it: " + lines.join(" / "));
+  assert.equal(fresh.get("SELECT COUNT(*) AS n FROM jobs WHERE json_extract(data, '$.contact') IS NOT NULL").n, 0, "no sample listing carries a contact person (D-15, pending D1)");
+  assert.deepEqual(JSON.parse(fresh.get("SELECT data FROM audit WHERE action = 'demo.seeded'").data), { companies: 17, jobs: 18 }, "the audit row counts what was inserted");
+  assert.ok(lines.some(l => /17 demo companies and 18 demo jobs added/.test(l)), "and so does the log line: " + lines.join(" / "));
 });

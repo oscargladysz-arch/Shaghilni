@@ -116,6 +116,17 @@ test("returnees: employers can say they welcome Syrians coming home, and people 
   const jid = await publish(S, admin, e, { returnees: true });
   const j = (await S.client().get("/api/jobs")).body.jobs.find(x => x.id === jid); assert.equal(j.returnees, true);
   assert.equal(S.core.alertMatches({ tab: "returnees" }, j), true); assert.equal(S.core.alertMatches({ tab: "returnees" }, { ...j, returnees: false }), false);
+  // D-13: the demo marks its own multinational listings as welcoming returnees; a real multinational employer's listing is never rewritten, on any later start
+  const real = await S.login("0955 740 011", "employer");
+  await real.put("/api/employer/company", { company: { name: { en: "Orontes Global" }, cat: "multinational", gov: "damascus", regNo: "REG-OG", contactName: "Contact", whatsapp: "0955 740 011" } });
+  await real.post("/api/employer/company/submit");
+  const co = (await admin.get("/api/admin/companies?status=pending")).body.companies.find(c => c.name.en === "Orontes Global"); await admin.post(`/api/admin/companies/${co.id}/verify`, { screened: true });
+  const realId = await publish(S, admin, real, { returnees: false });
+  assert.equal(seedDemo(S.db, () => {}), false, "a second start seeds nothing");
+  const after = (await S.client().get("/api/jobs")).body.jobs;
+  assert.equal(after.find(x => x.id === realId).returnees, false, "the real employer's listing keeps returnees: false (D-13)");
+  assert.equal(S.db.get("SELECT json_extract(data, '$.returnees') AS r FROM jobs WHERE id = ?", realId).r, 0);
+  assert.ok(after.filter(x => x.demo && x.co.en === "Chevron").every(x => x.returnees === true), "the demo's own multinational listings still say so");
 });
 
 test("diaspora: the shipped .env.example keeps the default destinations (Syria plus the diaspora countries) instead of narrowing texts to Syria", () => {

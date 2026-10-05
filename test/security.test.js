@@ -397,7 +397,7 @@ test("16 · sample listings are never seeded in production, whatever SEED_DEMO s
   const db = openDb(":memory:");
   assert.deepEqual(countDemo(db), { companies: 0, jobs: 0 });
   seedDemo(db, () => {});
-  assert.deepEqual(countDemo(db), { companies: 17, jobs: 19 });
+  assert.deepEqual(countDemo(db), { companies: 17, jobs: 18 });
   db.run("DELETE FROM jobs WHERE is_demo = 1"); db.run("DELETE FROM companies WHERE is_demo = 1");
   assert.deepEqual(countDemo(db), { companies: 0, jobs: 0 }, "nothing left after npm run demo:remove");
 });
