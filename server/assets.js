@@ -6,7 +6,7 @@ import path from "node:path";
 import { ROOT } from "./config.js";
 
 export const CLIENT_FILES = ["lookups.js", "i18n.js", "i18n2.js", "i18n3.js", "i18n4.js", "engine.js", "motion.js",
-  "api.js", "pow.js", "app.js", "app-account.js", "app-seeker.js", "app-resume.js", "cv-import.js", "app-employer.js", "app-plans.js", "app-campus.js", "app-events.js", "app-team.js", "app-insights.js", "app-traffic.js", "app-admin.js", "app-recruit.js", "app-alerts.js", "legal.js", "boot.js"];
+  "api.js", "pow.js", "app.js", "app-account.js", "app-seeker.js", "app-resume.js", "cv-import.js", "app-employer.js", "app-plans.js", "app-campus.js", "app-events.js", "app-team.js", "app-insights.js", "app-traffic.js", "app-admin.js", "app-audit.js", "app-recruit.js", "app-alerts.js", "legal.js", "boot.js"];
 CLIENT_FILES.splice(CLIENT_FILES.includes("boot.js") ? CLIENT_FILES.indexOf("boot.js") : CLIENT_FILES.length, 0, "demo.js");   // demo-accounts (loads before the app starts)
 const pub = (...p) => path.join(ROOT, "public", ...p);
 

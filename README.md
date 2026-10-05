@@ -223,7 +223,7 @@ All endpoints return JSON. Requests that change anything must send the header `x
 | Universities | `POST`/`DELETE /api/me/verify-student`, `POST /api/me/verify-student/confirm`, `GET /api/campus`, `POST /api/campus/domains`, `DELETE /api/campus/domains/:domain`, `POST /api/campus/partners/:companyId`, `GET`/`POST /api/admin/campus`, `DELETE /api/admin/campus/:userId`, `POST /api/admin/campus/domains`, `DELETE /api/admin/campus/domains/:uni/:domain` |
 | Events | `GET /api/events`, `GET /api/events/:id`, `POST`/`DELETE /api/events/:id/rsvp`, `GET /api/me/events`, `GET`/`POST /api/organize/events`, `GET`/`PUT /api/organize/events/:id`, `POST /api/organize/events/:id/companies`, `/checkin`, `GET /api/organize/events/:id/report`, `GET /api/employer/events`, `POST /api/employer/events/:id/attend` |
 | Lite (HTML pages) | `GET /lite`, `/lite/job/:id`, `/lite/applications`, `/lite/recruiters`, `/lite/resume`, `/lite/me`, `/lite/profile?step=1–5`, `/lite/signin`, `/lite/hire` (also at `/hire`), `/lite/hire/company`, `/lite/candidates`, `/lite/candidates/sent`, `/lite/candidates/:id/invite`; forms: `POST /lite/job/:id/apply`, `/lite/job/:id/save`, `/lite/profile`, `/lite/profile/exp`, `/lite/profile/exp/delete`, `/lite/alerts`, `/lite/alerts/:id/delete`, `/lite/invite/:id`, `/lite/recruit`, `/lite/signin`, `/lite/signin/code`, `/lite/signout`, `/lite/hire/company`, `/lite/candidates/:id/invite`, `/lite/invitations/:id/withdraw` |
-| Admin | `GET /api/admin/overview`, `GET /api/admin/companies`, `POST /api/admin/companies/:id/verify`, `/reject`, `/suspend`, `GET /api/admin/jobs`, `POST /api/admin/jobs/:id/approve`, `/reject`, `GET /api/admin/hires`, `POST /api/admin/applications/:id/confirm-hire`, `GET /api/admin/audit`, `GET /api/admin/billing`, `POST /api/admin/companies/:id/plan`, `POST /api/admin/charges/:id/:what`, `POST /api/admin/programmes`, `GET /api/admin/insights`, `GET /api/admin/traffic`, `GET /api/admin/system` |
+| Admin | `GET /api/admin/overview`, `GET /api/admin/companies`, `POST /api/admin/companies/:id/verify`, `/reject`, `/suspend`, `GET /api/admin/jobs`, `POST /api/admin/jobs/:id/approve`, `/reject`, `GET /api/admin/hires`, `POST /api/admin/applications/:id/confirm-hire`, `GET /api/admin/audit` (filters `action`, `entity`, `entityId`, `actor`, `from`, `to`; `before` cursor; `limit` ≤ 200), `GET /api/admin/billing`, `POST /api/admin/companies/:id/plan`, `POST /api/admin/charges/:id/:what`, `POST /api/admin/programmes`, `GET /api/admin/insights`, `GET /api/admin/traffic`, `GET /api/admin/system` |
 | Traffic | `POST /api/t` (a page view), `POST /api/t/error` (a browser error) |
 
 ## Security and privacy
@@ -253,7 +253,7 @@ The scanner checks the code for secrets and risky patterns, your settings as pro
 ## Limits of this MVP
 
 - **The privacy notice and terms are drafts.** They describe what the code does, but a lawyer must review them before launch (SECURITY.md, item 1).
-- **No automatic alerts.** Errors, failed texts and reached caps go to the server log, and the admin screens don't show the audit log yet (it's at `/api/admin/audit`). Watch the log, or add an alert on your host.
+- **No automatic alerts.** Errors, failed texts and reached caps go to the server log (the audit log itself is on the admin's *Audit log* tab). Watch the log, or add an alert on your host.
 - **One server process.** Rate limits live in memory; the daily text and AI caps are in the database. Running several copies would need shared limits (in the database or Redis) and, eventually, Postgres instead of SQLite.
 - **Node's built-in SQLite is marked experimental in Node 22.** It works well here, and the server hides the warning, but keep Node updated.
 - **Search happens in the browser.** The board sends the 500 newest live listings to each visitor (about 320 KB compressed when full) and searches them on the phone. A listing older than the 500 newest is not on the board (except a live sponsored listing, and a signed-in job seeker's own saved listings, which always stay on it); it can still be opened by its link and still matches job alerts. Before the board nears 500 listings, search and paging should move to the server.
@@ -263,7 +263,6 @@ The scanner checks the code for secrets and risky patterns, your settings as pro
   - Admin editing of listings (admins approve or reject; employers edit).
   - Signing in by email (email is used only for alert digests and student verification codes).
   - Lite pages for events, career offices and teams.
-  - An admin screen for the audit log (it's at `/api/admin/audit`).
 
 
 ## Syrians abroad and job alerts

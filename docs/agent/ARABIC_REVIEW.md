@@ -17,3 +17,23 @@ Every Arabic string an agent added or changed, in the order it was added. House 
 | 11 | `err_bad_answer` | `public/js/i18n4.js` (STR.ar, after `err_company_not_verified`) | Answer yes or no. | أجب بنعم أو لا. | Error message under the form that caused it (full app) | Everyday; imperative like the other err_ sentences | |
 | 12 | `err_unknown_bullets` | `public/js/i18n4.js` (STR.ar, after `err_company_not_verified`) | Those lines aren't in your profile. Pick lines from your own experience. | هذه الأسطر ليست في ملفك. اختر أسطراً من خبرتك أنت. | Error message under the form that caused it (full app) | Everyday; imperative like the other err_ sentences | |
 | 13 | `adFlagContact` | `public/js/i18n4.js` (STR.ar, after `adFlagGender`) | Contact details in the text: “{x}” | بيانات تواصل في النص: «{x}» | Admin review card, one pill per phone number or email found in the listing's text | Everyday; matches `adFlagGender` | |
+| 14 | `adAudit` | `public/js/i18n4.js` (STR.ar, after `adHires`) | Audit log | سجل التدقيق | Admin → Audit log tab, filters, table and buttons | Everyday; admin screen | |
+| 15 | `audWhen` | `public/js/i18n4.js` (STR.ar, after `adHires`) | When | متى | Admin → Audit log tab, filters, table and buttons | Everyday; admin screen | |
+| 16 | `audWho` | `public/js/i18n4.js` (STR.ar, after `adHires`) | Who | من | Admin → Audit log tab, filters, table and buttons | Everyday; admin screen | |
+| 17 | `audAction` | `public/js/i18n4.js` (STR.ar, after `adHires`) | Action | الإجراء | Admin → Audit log tab, filters, table and buttons | Everyday; admin screen | |
+| 18 | `audActionPh` | `public/js/i18n4.js` (STR.ar, after `adHires`) | e.g. job.approved, or job. for every listing action | مثلاً job.approved، أو job. لكل إجراءات الإعلانات | Admin → Audit log tab, filters, table and buttons | Everyday; admin screen | |
+| 19 | `audEntity` | `public/js/i18n4.js` (STR.ar, after `adHires`) | Item | العنصر | Admin → Audit log tab, filters, table and buttons | Everyday; admin screen | |
+| 20 | `audEntityAny` | `public/js/i18n4.js` (STR.ar, after `adHires`) | Any item | أي عنصر | Admin → Audit log tab, filters, table and buttons | Everyday; admin screen | |
+| 21 | `audEntityId` | `public/js/i18n4.js` (STR.ar, after `adHires`) | Item number | رقم العنصر | Admin → Audit log tab, filters, table and buttons | Everyday; admin screen | |
+| 22 | `audActor` | `public/js/i18n4.js` (STR.ar, after `adHires`) | Account | الحساب | Admin → Audit log tab, filters, table and buttons | Everyday; admin screen | |
+| 23 | `audActorPh` | `public/js/i18n4.js` (STR.ar, after `adHires`) | account number, e.g. 12 | رقم الحساب، مثلاً 12 | Admin → Audit log tab, filters, table and buttons | Everyday; admin screen | |
+| 24 | `audFrom` | `public/js/i18n4.js` (STR.ar, after `adHires`) | From | من تاريخ | Admin → Audit log tab, filters, table and buttons | Everyday; admin screen | |
+| 25 | `audTo` | `public/js/i18n4.js` (STR.ar, after `adHires`) | To | إلى تاريخ | Admin → Audit log tab, filters, table and buttons | Everyday; admin screen | |
+| 26 | `audApply` | `public/js/i18n4.js` (STR.ar, after `adHires`) | Show | اعرض | Admin → Audit log tab, filters, table and buttons | Everyday; admin screen | |
+| 27 | `audClear` | `public/js/i18n4.js` (STR.ar, after `adHires`) | Clear | امسح | Admin → Audit log tab, filters, table and buttons | Everyday; admin screen | |
+| 28 | `audCsv` | `public/js/i18n4.js` (STR.ar, after `adHires`) | Download spreadsheet | تنزيل جدول بيانات | Admin → Audit log tab, filters, table and buttons | Everyday; admin screen | |
+| 29 | `audOlder` | `public/js/i18n4.js` (STR.ar, after `adHires`) | Older entries | إدخالات أقدم | Admin → Audit log tab, filters, table and buttons | Everyday; admin screen | |
+| 30 | `audEmpty` | `public/js/i18n4.js` (STR.ar, after `adHires`) | No entries match. | لا إدخالات مطابقة. | Admin → Audit log tab, filters, table and buttons | Everyday; admin screen | |
+| 31 | `audDetails` | `public/js/i18n4.js` (STR.ar, after `adHires`) | Details | التفاصيل | Admin → Audit log tab, filters, table and buttons | Everyday; admin screen | |
+| 32 | `audDeleted` | `public/js/i18n4.js` (STR.ar, after `adHires`) | deleted account | حساب محذوف | Admin → Audit log tab, filters, table and buttons | Everyday; admin screen | |
+| 33 | `audOnlyActor` | `public/js/i18n4.js` (STR.ar, after `adHires`) | Only account {id} | الحساب {id} فقط | Admin → Audit log tab, filters, table and buttons | Everyday; admin screen | |

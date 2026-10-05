@@ -2,6 +2,7 @@ import { fail } from "../http.js";
 import { now, J } from "../db.js";
 import { companyOut, employerJobOut, applicantCounts } from "../serialize.js";
 import { checkJob } from "../validate.js";
+import { mask } from "../guard.js";
 
 export function registerAdmin(r, deps) {
   const { db, auth, audit, core } = deps, plans = deps.plans;
@@ -130,9 +131,22 @@ export function registerAdmin(r, deps) {
     return { ok: true, charges: out };
   });
 
+  /* The audit screen's feed: newest first, at most 200 a page, older pages by cursor (before = the last id seen), filtered by action
+     (exact, or a prefix ending in "."), item (entity and entityId), actor (account id) and day range. The actor is shown masked, like the logs. */
   r.get("/api/admin/audit", admin, ctx => {
-    const limit = Math.max(1, Math.min(200, parseInt(ctx.query.get("limit"), 10) || 50));
-    return { entries: db.all("SELECT * FROM audit ORDER BY id DESC LIMIT ?", limit).map(e => ({ ...e, data: J(e.data) })) };
+    const q = k => String(ctx.query.get(k) || "").slice(0, 80), limit = Math.max(1, Math.min(200, parseInt(ctx.query.get("limit"), 10) || 50));
+    const before = parseInt(q("before"), 10), actor = parseInt(q("actor"), 10), entityId = parseInt(q("entityId"), 10), action = q("action"), entity = q("entity");
+    const day = s => (/^\d{4}-\d{2}-\d{2}$/.test(s) ? Date.parse(s + "T00:00:00Z") : NaN), from = day(q("from")), to = day(q("to"));
+    const where = ["1 = 1"], args = [];
+    if (before > 0) { where.push("a.id < ?"); args.push(before); }
+    if (actor > 0) { where.push("a.actor_id = ?"); args.push(actor); }
+    if (entity) { where.push("a.entity = ?"); args.push(entity); }
+    if (entityId > 0) { where.push("a.entity_id = ?"); args.push(entityId); }
+    if (action) { if (action.endsWith(".")) { where.push("a.action LIKE ? ESCAPE '\\'"); args.push(action.replace(/[\\%_]/g, "\\$&") + "%"); } else { where.push("a.action = ?"); args.push(action); } }
+    if (from > 0) { where.push("a.created_at >= ?"); args.push(from); }
+    if (to > 0) { where.push("a.created_at < ?"); args.push(to + 86400e3); }
+    const rows = db.all(/* sql-safe: the fragments are fixed strings chosen by code above; every value is a "?" placeholder */ `SELECT a.*, u.phone AS actor_phone FROM audit a LEFT JOIN users u ON u.id = a.actor_id WHERE ${where.join(" AND ")} ORDER BY a.id DESC LIMIT ?`, ...args, limit);
+    return { entries: rows.map(({ actor_phone, ...e }) => ({ ...e, data: J(e.data), actor: actor_phone ? (actor_phone.startsWith("deleted:") ? "deleted" : mask(actor_phone)) : null })) };
   });
 
   /* ---------- billing: plans, charges and programmes, all handled by hand for now ---------- */

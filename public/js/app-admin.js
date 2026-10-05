@@ -4,7 +4,7 @@ const OFAC_URL = "https://sanctionssearch.ofac.treas.gov/";
 async function renderAdmin() {
   const v = $("#view"), sub = S.sub[0] || "";
   const q = (S.admin && S.admin.overview && S.admin.overview.queues) || { companies: 0, jobs: 0, hires: 0 };
-  const tabs = [["", "adOverview", 0], ["companies", "adCompanies", q.companies], ["jobs", "adJobs", q.jobs], ["hires", "adHires", q.hires], ["campus", "adCampus", 0], ["events", "adEvents", 0], ["billing", "adBilling", 0], ["traffic", "adTraffic", 0], ["system", "adSystem", 0]];
+  const tabs = [["", "adOverview", 0], ["companies", "adCompanies", q.companies], ["jobs", "adJobs", q.jobs], ["hires", "adHires", q.hires], ["campus", "adCampus", 0], ["events", "adEvents", 0], ["billing", "adBilling", 0], ["audit", "adAudit", 0], ["traffic", "adTraffic", 0], ["system", "adSystem", 0]];
   put(v, page(html`<h1 class="lh-title">${t("adTitle")}</h1>
 <nav class="tabs" aria-label="${t("adTitle")}">${tabs.map(([k, key, n]) => html`<button class="tab" type="button" data-act="go" data-to="#/admin${k ? "/" + k : ""}"${sub === k ? raw(' aria-current="page"') : ""}>${t(key)}${n ? html`<span class="nav-n num">${n}</span>` : ""}</button>`)}</nav>
 <div id="admBody">${stateHTML("spin", t("loading"))}</div>`));
@@ -15,6 +15,7 @@ async function renderAdmin() {
     else if (sub === "billing") await drawBilling();
     else if (sub === "campus") await drawCampusAdmin();
     else if (sub === "events") await drawEventsAdmin();
+    else if (sub === "audit") await drawAudit(false);
     else if (sub === "traffic") await drawTraffic();
     else if (sub === "system") await drawSystem();
     else { await loadAdminCounts(); await drawInsights(); }

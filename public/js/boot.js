@@ -82,6 +82,7 @@ document.addEventListener("click", e => {
       if (act.startsWith("onb-")) onbAct(act, el);
       else if (act.startsWith("emp-")) empAct(act, el);
       else if (act.startsWith("adm-")) admAct(act, el);
+      else if (act.startsWith("aud-")) auditAct(act, el);
       else if (act.startsWith("cv-")) cvAct(act, el);
       else if (act.startsWith("rc-")) recruitAct(act, el);
       else if (act.startsWith("al-")) alertAct(act, el);
