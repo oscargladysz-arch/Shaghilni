@@ -205,6 +205,7 @@ Field order in every entry below: ID · Severity (verifier's; reporter's noted i
 
 | Field | Content |
 |---|---|
+| **Status** | **FIXED in Stage 2 (S2-7)**: the organiser guard in `server/routes/events.js` now refuses a `university` user without a `campus_offices` row (`403 no_office`), so a removed office keeps nothing, even after signing in again; the admin removal already ended its sessions. Regression: `test/policy-idor.test.js` "policy revocation". SECURITY.md "Universities" updated. The leftover `university` role itself (D-17 family) is unchanged. |
 | Severity | **P1** (reporter P1) |
 | Lens | authorization after revocation · role escalation · R12 |
 | Rule broken | R12 (every permission checked on the server on every request); SECURITY.md:417 "Career offices can manage only their own university's events" and `:410` "Roles stay apart" are false for a removed office |

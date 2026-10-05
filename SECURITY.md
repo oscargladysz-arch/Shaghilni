@@ -404,7 +404,7 @@ The launch checklist, with who owns each item (agent, owner, lawyer or provider)
 - **Career offices see only their own university** (or faculty): every portal query is scoped to the office, and a partnership request made to another university can't be approved or declined by it (404).
 - **Names only with consent:** for students in general, offices get counts only. Names and activity (faculty, year, how many applications and interviews, confirmed hires) appear only for students who verified themselves with their university email; they are told exactly what the office will see before they ask for the code, and can remove the verification at any time.
 - **Verification is tied to the profile's university**, so it can't be carried to another university; deleting an account deletes its verification records. Every verification, partnership and office change is in the audit log.
-- **Roles stay apart:** career offices can't reach employer, job seeker or admin routes, and the reverse. Accounts are created only by the admin.
+- **Roles stay apart:** career offices can't reach employer, job seeker or admin routes, and the reverse. Accounts are created only by the admin, and when the admin removes an office its sessions end and the number loses every career-office and event-organiser route at once, even after signing in again (tested).
 
 
 ## Events
