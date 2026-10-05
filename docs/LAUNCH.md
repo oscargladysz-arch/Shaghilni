@@ -56,7 +56,7 @@ No item marked owner, lawyer or provider is ever ticked by an agent.
 |---|---|---|---|---|
 | E1 | Daily backups scheduled and copied off the server. With `DB_PATH=/data/shaghilni.db`, run `npm run backup -- /backups` so the System tab finds them. | owner | Admin → System shows the newest backup; a copy exists off the server. | Open |
 | E2 | One restore tested. | owner | Restore a backup on a scratch machine; row counts match the System tab. | Open |
-| E3 | Upgrade check on real data: open a copy of the production database with the new code, confirm `PRAGMA user_version` is 15 and every count is unchanged. | owner, agent | There is no automated upgrade test; this is a manual step before each deploy that adds a migration. | Open |
+| E3 | Upgrade check on real data: open a copy of the production database with the new code, confirm `PRAGMA user_version` is 16 and every count is unchanged. | owner, agent | There is no automated upgrade test; this is a manual step before each deploy that adds a migration. | Open |
 | E4 | Retention matches the privacy notice. | agent | SECURITY.md item 1 lists the periods; the email-code sweep and the "within 24 hours" wording are open (`docs/agent/LEGAL_PROPOSALS.md`, `docs/agent/DEFECTS.md`). | Partial |
 
 ## F · Product content
@@ -66,7 +66,7 @@ No item marked owner, lawyer or provider is ever ticked by an agent.
 | F1 | What happens to the sample data (remove, or replace the real organisations' names; staging), decision D1. | owner | `docs/agent/QUESTIONS.md`. | Blocked on D1 |
 | F2 | The two real names in the demo accounts (a relief society, an event venue) replaced with fictional ones. | agent | `grep -n "Red Crescent\|Four Seasons" server/demo.js` finds nothing. | Open (after D1) |
 | F3 | Which universities issue student email, and their domains. | owner | Admin → Universities → Student email lists them. | Open |
-| F4 | Who screens companies against the OFAC list; every company screened before verification. | owner | The compliance report's sanctions column (filled in once D-07 is fixed in Stage 3) and the audit log. | Open |
+| F4 | Who screens companies against the OFAC list; every company screened before verification. | owner | The compliance report's sanctions column (filled in since Stage 3, D-07) and the audit log. | Open |
 | F5 | The "invoiced by our US company" copy removed from the app and the README (no entity exists). | agent | README done in Stage 1; the app strings follow in Stage 3. | Partial |
 
 ## G · Quality and reach

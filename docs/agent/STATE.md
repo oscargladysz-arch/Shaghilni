@@ -244,7 +244,7 @@ Brief `<features>` letters → areas: A → 1, 13 · B → 1, 2, 3, 4, 5, 14 · 
 | Monthly invitation allowance | VERIFIED | `plans.js:24-25`; `recruit.js:94-95` | plans :73-76 | — |
 | Hiring free on every plan | VERIFIED | `employer.js:85-161` (no plan gates); `plans.js:1-3` | plans :100 | — |
 | Placement fee: Free only, middle of the pay range, accepted invitation before applying, once on admin confirmation | VERIFIED | `admin.js:108,113-119`; `plans.js:8,45` | plans: "plans: a placement fee applies only when a Free employer hires someone it found through search" :98-101 | Any accepted invitation counts, including an event invitation or another job's (probe A5); analytics' `fromSearch` uses the narrower rule (`employer.js:196`) |
-| Donor programmes: create, tag a hire, USD `placement` charge, billing summary | VERIFIED | `admin.js:121-126,141,146,165-170`; `db.js:164-169` | plans :103-112 | D-08: programme charge shown to the employer as its own due fee; `programmes.active` never written (no edit/retire route) |
+| Donor programmes: create, tag a hire, USD `placement` charge, billing summary | VERIFIED | `admin.js:121-126,141,146,165-170`; `db.js:164-169` | plans :103-112 | Stage 3: the programme charge is neither counted as due nor listed on the employer's plan page (D-08 fixed) |
 | Upgrade request (owner, verified; wallet/bank/cash/usd; one open; `SHG-<co>-<id>`) | VERIFIED | `employer.js:173-181`; `plans.js:20,47`; `db.js:185-193` | plans :78-83; team :90; payments :92 | — |
 | Admin billing data (companies with plan, open requests, due charges, programmes) | VERIFIED | `admin.js:137-147` | plans :83,104; insights :74 | — |
 | Admin sets plan and length (0..36 months), optional SYP invoice charge; closes requests | VERIFIED | `admin.js:148-158` | plans :75,77,108,119,135; team :76,130; insights :73 | `months` 0 → paid plan with no end date (probe); undocumented |
@@ -262,7 +262,7 @@ Brief `<features>` letters → areas: A → 1, 13 · B → 1, 2, 3, 4, 5, 14 · 
 | Production lockdown: `PAY_PROVIDER=test` refused; provider needs both monthly prices | VERIFIED | `config.js:76-77` | payments :121-123 | — |
 | Employer analytics (totals, per-job rows; Pro+ adds whatsapp, fromSearch, medianDaysToHire) | VERIFIED | `employer.js:193-204` | plans: "plans: analytics for everyone, full analytics and reports with paid plans" :132-136; demo :77 | — |
 | Placements report (Enterprise, manage): no names | VERIFIED | `employer.js:205-210` | plans :134,137 | Row content not asserted |
-| Compliance report (Enterprise) with sanctions-screened column | PARTIAL | `employer.js:211-217`; `admin.js:54,58-59` | plans :138 | D-07: column always empty (`screened` never stored in the audit data) |
+| Compliance report (Enterprise) with sanctions-screened column | PARTIAL | `employer.js:211-217`; `admin.js:54,58-59` | plans :138 | Stage 3: the verification audit row carries `screened: true`, so the column says yes (D-07 fixed) |
 | CSV download of reports in the browser | PARTIAL | `app-plans.js:74-79,88` | none | — |
 | Employer UI: plan card, Plans page, pay-method flow, reports buttons, charges; Sponsor/Stop buttons; payment-result polling | PARTIAL | `app-plans.js:9-63,21-39`; `app-employer.js:40,53-55` | e2e :349-371 only | Copy `payP_usd` "invoiced by our US company" (`i18n4.js:584/1570`): no entity exists (R6) |
 | Admin Billing tab UI | PARTIAL | `app-plans.js:92-110`; `app-admin.js:15,94` | e2e :242-243 only | — |
@@ -578,7 +578,7 @@ Items of `<verified_facts>` and `<features>` that the maps contradict or refine.
 | D | "edits go back for review" | Only for published and rejected listings; edits while pending or closed are kept without re-check (D-05, D-06) | `server/routes/employer.js` edit: every edit is a draft again since Stage 3 (D-05, D-06 fixed) |
 | D | "registration number unique (otherwise 'ask to join')" | Checked only when the caller has no company yet; an existing company may edit its number to another's | `server/routes/employer.js:40-46` |
 | E | "Placement fee … only for a hire invited through candidate search" | Any accepted invitation from the company counts (event or another job) | `server/routes/admin.js:113-119` |
-| E | "placement and compliance spreadsheet reports Enterprise" | Compliance report's sanctions column is always empty (D-07) | `admin.js:54`; `employer.js:216` |
+| E | "placement and compliance spreadsheet reports Enterprise" | Compliance report's sanctions column is always empty (D-07) | `admin.js` setCompany audit data; D-07 fixed in Stage 3 |
 | F | "every permission enforced on the server" | Admins can invite admins (README says owner only); any employer account, verified or not, can send team invitations by text (D-10) | `server/routes/team.js:14,32-46` |
 | G | "Career-office accounts … removable" | Removal leaves a sign-in-able `university` account (D-11) | `server/routes/campus.js:162-165` |
 | H | "An event has a bilingual title" | At least one language suffices; end time, governorate and link also exist | `server/routes/events.js:36-45` |

@@ -52,7 +52,7 @@ export function registerAdmin(r, deps) {
     db.run(`UPDATE companies SET status = ?, review_note = ?, updated_at = ?, screened_at = COALESCE(?, screened_at), screened_by = COALESCE(?, screened_by),
             verified_at = COALESCE(?, verified_at), verified_by = COALESCE(?, verified_by) WHERE id = ?`,
       status, note, now(), extra.screened_at ?? null, extra.screened_by ?? null, extra.verified_at ?? null, extra.verified_by ?? null, c.id);
-    audit(ctx.user.id, `company.${status}`, "company", c.id, { note });
+    audit(ctx.user.id, `company.${status}`, "company", c.id, { note, ...(extra.screened_at ? { screened: true } : {}) });   // the compliance report reads `screened` (D-07)
     return { company: companyOut(db.get("SELECT * FROM companies WHERE id = ?", c.id)) };
   };
   r.post("/api/admin/companies/:id/verify", admin, ctx => {
@@ -116,7 +116,7 @@ export function registerAdmin(r, deps) {
       // A placement fee only when a Free-plan employer hires someone it found and invited through candidate search.
       const sourced = c && db.get("SELECT 1 AS x FROM invitations WHERE company_id = ? AND user_id = ? AND status = 'accepted' AND created_at <= ?", c.id, a.user_id, a.created_at);
       if (sourced && plans.limits(c).sourcedFee) {
-        const amt = plans.payMid(J(j.data) || {});
+        const amt = a.hire_pay_mid || plans.payMid(J(j.data) || {});   // the pay shown when the hire was recorded; the live pay only for hires older than migration 16 (D-09)
         db.run("INSERT INTO charges (company_id, application_id, kind, amount_syp, note, created_at) VALUES (?, ?, 'hire_fee', ?, ?, ?)", c.id, a.id, amt, "Placement fee: a hire found through candidate search", now());
         out.push({ kind: "hire_fee", amountSyp: amt });
       }

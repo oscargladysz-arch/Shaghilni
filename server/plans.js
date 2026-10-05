@@ -37,7 +37,7 @@ export function makePlans({ db, cfg }) {
     const u = db.get("SELECT phone FROM users WHERE id = ?", userId); if (!u) return null;
     const m = db.get("SELECT name FROM company_members WHERE company_id = ? AND phone = ?", c.id, u.phone); return (m && m.name) || u.phone; };
   const summary = c => {
-    const p = planOf(c), L = PLANS[p], due = db.get("SELECT COUNT(*) AS n, COALESCE(SUM(amount_syp), 0) AS syp FROM charges WHERE company_id = ? AND status = 'due'", c.id);
+    const p = planOf(c), L = PLANS[p], due = db.get("SELECT COUNT(*) AS n, COALESCE(SUM(amount_syp), 0) AS syp FROM charges WHERE company_id = ? AND status = 'due' AND programme_id IS NULL", c.id);   // a programme-billed placement is the programme's charge, not the employer's (D-08)
     return { plan: p, planUntil: p === "free" ? null : c.plan_until || null, limits: L, usage: { invites: invitesUsed(c.id), sponsored: sponsoredUsed(c.id), team: teamUsed(c.id) },
       prices: { pro: cfg.planProPrice || "", enterprise: cfg.planEnterprisePrice || "" }, feesDue: { n: due.n, syp: due.syp } };
   };

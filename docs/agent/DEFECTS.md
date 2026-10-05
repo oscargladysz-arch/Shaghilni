@@ -11,7 +11,7 @@ Reproduction scripts named below live in the Stage 0 scratchpad (`/tmp/claude-0/
 | Verdict | Count | By severity (verifier's) |
 |---|---|---|
 | CONFIRMED | 29 | P0 1 · P1 12 · P2 15 · P3 1 |
-| UNPROVEN | 1 | D-09 (P1 as reported; verifier's tools returned no output) |
+| UNPROVEN | 0 | D-09 was confirmed by test in Stage 3 (1 SYP after a pay edit) and fixed (S3-4) |
 | REFUTED | 0 | — |
 | No verdict (verify file missing) | 0 | all 30 `verify-D-*.json` files present |
 | Not verified (dropped by the cap of 30) | 210 | P2 62 · P3 148 · all UNVERIFIED at Stage 0; Stage 2 tests confirmed 11 of them (3 fixed: U-016, U-128, U-165; 8 open: U-007, U-017, U-041, U-046, U-048, U-083, U-084, U-129), 199 remain UNVERIFIED |
@@ -169,6 +169,7 @@ Field order in every entry below: ID · Severity (verifier's; reporter's noted i
 | Regression test | `test/plans.test.js:138`: `comp.find(x => x.action === 'company.verified').sanctionsScreened === 'yes'`. |
 | Docs (R15) | None: SECURITY.md:387, README.md:157, PRODUCT.md:23/37 and i18n4.js:637 already describe the intended behaviour; the code catches up. |
 | Privacy/legal (R13) | None. The added audit field is a boolean about the company, not personal data; the report exposes no candidate details. |
+| **Status** | **FIXED in Stage 3 (S3-4)**: `setCompany` in `server/routes/admin.js` writes `screened: true` into the `company.verified` audit row, which the compliance report reads. Companies verified before Stage 3 keep rows without it (a backfill from `companies.screened_at` is the owner's call). Test: `test/plans.test.js` reports. |
 | Notes | UNVERIFIED: whether any production rows exist (no DB access in Stage 0). |
 
 ### D-08 · P1 · A donor-programme placement (billed to the programme) is shown to a Pro/Enterprise employer as its own due fee, under a plan that promises "No placement fees"
@@ -186,6 +187,7 @@ Field order in every entry below: ID · Severity (verifier's; reporter's noted i
 | Regression test | `test/plans.test.js` inside the "placement fee" test after `:112`: `assert.equal((await e2.get("/api/employer/plan")).body.feesDue.n, 0)` and `assert.ok(!(...).body.charges.some(x => x.kind === "placement"))`. |
 | Docs (R15) | None required (README.md:287-291 already correct). Optional clause in README.md:291 "the employer is not billed and does not see it on their plan page" (hot). |
 | Privacy/legal (R13) | None. confirm-hire still writes the audit log. |
+| **Status** | **FIXED in Stage 3 (S3-4)**: the due count (`plans.js` summary) and the employer's charge list (`employer.js` plan) exclude rows with a `programme_id`; the admin billing tab still lists them. Test: `test/plans.test.js` placement fee. |
 | Notes | The reporter's `syp: 240000` was not reproduced (the verifier's employer had no hire_fee; placement rows carry amount_syp 0); the defect does not depend on it. No money is wrongly requested (renders 0 SYP / "—"), so not P0. |
 
 ### D-10 · P1 · Any employer account with an unverified draft company can send unlimited Shaghilni-branded texts with its own wording to any allowed-country number (invite → cancel → re-invite), and exhaust the daily SMS cap so nobody can sign in until UTC midnight
@@ -616,7 +618,7 @@ No two of the 30 verified candidates are the same defect, so no IDs were merged.
 
 | ID | Reported sev | Title | Why unproven | What would settle it |
 |---|---|---|---|---|
-| D-09 | P1 (probe:plans 7-1) | Placement fee is computed from the listing's pay as it stands when the admin confirms, so a Free employer can edit the pay down after the hire and cut the fee to 1 SYP | The verifier's session returned empty output for every tool call (Bash, Read, Glob, Grep, Write); it could read no line and run nothing, and declined to confirm or refute under R6. The only evidence on record is the reporter's own probe output (`hire_fee amountSyp 1` after a pay edit to `[1,1]`), which is theirs, not an independent check. | Re-run the verification in a working session: script per the `test/api.test.js:14-45` recipe — Free employer and Syrian seeker; employer POSTs and submits a job; invites the seeker; seeker accepts and applies; employer moves to `hired`; employer PUTs `/api/employer/jobs/:id` with `pay [1,1]` without re-submitting; admin (`+12025550123`) POSTs confirm-hire; assert `charges[0].amountSyp`. Defect is real if it equals 1 instead of payMid of the original pay. Lines the reporter cited to read first: `server/routes/admin.js:113-118`, `server/plans.js:45`, `server/routes/employer.js:97-105`, `server/validate.js:111/130`. Candidate fixes (unconfirmed): snapshot the fee basis when the employer records the hire (append-only column on `applications`, read by confirm-hire with a live fallback for NULL), or refuse pay edits once an application is `hired`/unconfirmed. Note D-05/D-06's fix (any edit of a published job → draft) does not by itself pin the fee basis. |
+| D-09 | P1 (probe:plans 7-1) | Placement fee is computed from the listing's pay as it stands when the admin confirms, so a Free employer can edit the pay down after the hire and cut the fee to 1 SYP | **CONFIRMED and FIXED in Stage 3 (S3-4).** The test in `test/plans.test.js` (placement fee) reproduced it: a Free employer that edited the pay to [1, 1] after recording the hire was charged 1 SYP | Fix: migration 16 adds `applications.hire_pay_mid`; the employer's move to `hired` stores `plans.payMid` of the listing's pay at that moment; confirm-hire charges that amount, falling back to the live pay only for hires recorded before the migration (NULL) |
 
 ## REFUTED
 

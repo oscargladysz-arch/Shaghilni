@@ -150,8 +150,8 @@ export function registerEmployer(r, deps) {
     const status = ctx.body.status || a.status;
     plans.allow(ctx, c, status !== a.status ? "hire" : "view");   // hiring managers can write notes; moving people takes a recruiter
     if (status !== a.status && !(MOVES[a.status] || []).includes(status)) fail(409, "bad_transition", { from: a.status, to: status });
-    db.run("UPDATE applications SET status = ?, employer_note = ?, updated_at = ?, hired_at = CASE WHEN ? = 'hired' THEN ? ELSE hired_at END, moved_by = CASE WHEN ? THEN ? ELSE moved_by END, note_by = CASE WHEN ? THEN ? ELSE note_by END WHERE id = ?",
-      status, note, now(), status, now(), status !== a.status ? 1 : 0, ctx.user.id, note !== a.employer_note ? 1 : 0, ctx.user.id, a.id);
+    db.run("UPDATE applications SET status = ?, employer_note = ?, updated_at = ?, hired_at = CASE WHEN ? = 'hired' THEN ? ELSE hired_at END, hire_pay_mid = CASE WHEN ? = 'hired' THEN ? ELSE hire_pay_mid END, moved_by = CASE WHEN ? THEN ? ELSE moved_by END, note_by = CASE WHEN ? THEN ? ELSE note_by END WHERE id = ?",
+      status, note, now(), status, now(), status, plans.payMid(J(a.j_data) || {}), status !== a.status ? 1 : 0, ctx.user.id, note !== a.employer_note ? 1 : 0, ctx.user.id, a.id);   // the pay at the time of the hire is the fee's basis (D-09)
     if (status !== a.status) {
       audit(ctx.user.id, "application.moved", "application", a.id, { from: a.status, to: status });
       const seekerUser = db.get("SELECT * FROM users WHERE id = ?", a.user_id);
@@ -165,7 +165,7 @@ export function registerEmployer(r, deps) {
   const ownerOnly = (ctx, c) => plans.allow(ctx, c, "billing");
   r.get("/api/employer/plan", employer, ctx => {
     const c = myCompany(ctx); if (!c) fail(409, "company_not_verified");
-    const charges = db.all("SELECT id, kind, amount_syp, status, note, created_at, paid_at FROM charges WHERE company_id = ? ORDER BY created_at DESC LIMIT 100", c.id)
+    const charges = db.all("SELECT id, kind, amount_syp, status, note, created_at, paid_at FROM charges WHERE company_id = ? AND programme_id IS NULL ORDER BY created_at DESC LIMIT 100", c.id)
       .map(x => ({ id: x.id, kind: x.kind, amountSyp: x.amount_syp, status: x.status, note: x.note, createdAt: x.created_at, paidAt: x.paid_at }));
     const pending = db.get("SELECT id, plan, pay_method, created_at FROM plan_requests WHERE company_id = ? AND handled_at IS NULL ORDER BY created_at DESC LIMIT 1", c.id);
     return { ...plans.summary(c), charges, request: pending ? { plan: pending.plan, payMethod: pending.pay_method, ref: plans.ref(c.id, pending.id), createdAt: pending.created_at } : null, isOwner: c.owner_id === ctx.user.id };

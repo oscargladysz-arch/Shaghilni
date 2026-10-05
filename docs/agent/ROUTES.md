@@ -96,7 +96,7 @@ Column meanings:
 | POST | `/api/employer/plan/request` | employer; company verified; billing (owner) | `server/routes/employer.js:173` | plans :78-81; team :90 (403); payments :79 | — | `plan.requested` :179 | — |
 | POST | `/api/employer/jobs/:id/sponsor` | employer; own job; manage; verified; published; plan limit | `server/routes/employer.js:183` | plans :118-127 | — | `job.sponsored` {until} :191 on; **none** when `on:false` (:186) | D-28 |
 | GET | `/api/employer/analytics` | employer; verified; view | `server/routes/employer.js:193` | plans :132,136; demo :77 | — | none | — |
-| GET | `/api/employer/reports/:kind` | employer; verified; manage; plan feature `reports`; kind ∈ placements\|compliance | `server/routes/employer.js:205` | plans :134,137,138 | — | none | D-07 (sanctions column empty) |
+| GET | `/api/employer/reports/:kind` | employer; verified; manage; plan feature `reports`; kind ∈ placements\|compliance | `server/routes/employer.js:205` | plans :134,137,138 | — | none | Stage 3: compliance rows carry `sanctionsScreened: yes` for verifications made since (D-07 fixed) |
 | POST | `/api/employer/plan/checkout` | employer; verified; billing; provider ready and prices set | `server/routes/employer.js:222` | payments :72,80-81,94,97,99 (seeker 403),104,113 | — | `plan.checkout` `server/payments.js:77` | — |
 | GET | `/api/employer/payments/:id` | employer; verified; payment scoped to the company (`payments.js:124`); no team-role check | `server/routes/employer.js:226` | payments :84,88,98,112 | — | none | — |
 
@@ -159,14 +159,14 @@ Column meanings:
 |---|---|---|---|---|---|---|---|
 | GET | `/api/admin/overview` | admin | `server/routes/admin.js:10` | api :142,187,190,232; security :131 (403), :133 (401) | 2 | none | `counts` include demo-listing applications; client uses `queues` only |
 | GET | `/api/admin/companies` | admin | `server/routes/admin.js:40` | api :143; security :63,131 (403), :155 (`?status=%27;drop`); helpers in 12 suites | 2+3 | none | — |
-| POST | `/api/admin/companies/:id/verify` | admin; `screened === true` | `server/routes/admin.js:57` | api :146-147; security :64,155; helpers in 12 suites | 3 | `company.verified` {note} :54 | No state check: a draft or suspended company can be verified (probe); `screened` not stored in the audit data (D-07) |
+| POST | `/api/admin/companies/:id/verify` | admin; `screened === true` | `server/routes/admin.js:57` | api :146-147; security :64,155; helpers in 12 suites | 3 | `company.verified` {note} :54 | Stage 3: audit data `{note, screened: true}` (D-07 fixed) |
 | POST | `/api/admin/companies/:id/reject` | admin; note required | `server/routes/admin.js:61` | security :156 (junk only) | 3 | `company.rejected` {note} :54 | Never asserted |
 | POST | `/api/admin/companies/:id/suspend` | admin; note required | `server/routes/admin.js:62` | **none** | — | `company.suspended` {note} :54 | Sessions not revoked; listings stay `published` in the DB |
 | GET | `/api/admin/jobs` | admin | `server/routes/admin.js:64` | api :152 | — | none | Pending queue, `is_demo = 0` |
 | POST | `/api/admin/jobs/:id/approve` | admin; pending; company verified | `server/routes/admin.js:71` | api :156,199; security :66,156; helpers in 8 suites | 3 | `job.approved` :78 | Stage 3: re-runs `checkJob` → 422 fee_requested (D-05 fixed) |
 | POST | `/api/admin/jobs/:id/reject` | admin; note required | `server/routes/admin.js:81` | api :154 (`note_required` only); security :156 | 3 | `job.rejected` {note} :87 | — |
 | GET | `/api/admin/hires` | admin; `?state=confirmed` | `server/routes/admin.js:92` | api :184; security :157 (`?state=%00`) | 3 | none | LIMIT 200 |
-| POST | `/api/admin/applications/:id/confirm-hire` | admin; application `hired` | `server/routes/admin.js:104` | api :189; insights :72; plans :98-112; campus; events; security :156 | 3 | `hire.confirmed` {note} :110 (also on repeat calls) | Fee/programme charges gated by `first` (:108); charge rows carry no audit of their own (D-08 context) |
+| POST | `/api/admin/applications/:id/confirm-hire` | admin; application `hired` | `server/routes/admin.js:104` | api :189; insights :72; plans :98-112; campus; events; security :156 | 3 | `hire.confirmed` {note} :110 (also on repeat calls) | Stage 3: the placement fee uses `applications.hire_pay_mid`, stored when the employer recorded the hire (D-09 fixed); a repeat is a no-op (U-128) |
 | GET | `/api/admin/audit` | admin; `limit` 1..200 | `server/routes/admin.js:131` | api :239; security :157 (limit=-5, abc), :174-175 | 3 | none | No filters or pagination; no screen |
 | GET | `/api/admin/billing` | admin | `server/routes/admin.js:137` | plans :83,104; insights :74 | — | none | — |
 | POST | `/api/admin/companies/:id/plan` | admin; plan ∈ free\|pro\|enterprise; months 0..36 | `server/routes/admin.js:148` | plans :75,108,119,135; team :76,130; insights :73 | — | `company.plan` {plan, months, amountSyp} :156 | `months` 0 → no expiry |
