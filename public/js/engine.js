@@ -1140,7 +1140,7 @@ function placeOf(p) {
 /* Job alerts: does a saved search match a job? Shared by the server (to send alerts) and the app (to count new ones). */
 function alertMatches(a, j) {
   if (!a || !j) return false;
-  if (a.gov && j.gov !== a.gov) return false;
+  if (a.gov && j.gov !== a.gov && j.gov !== "remote") return false;   // a remote job shows under every governorate on the board, so it matches a governorate alert too (D-26)
   if (a.type && j.type !== a.type) return false;
   if (a.tab && a.tab !== "all" && !inTab(j, a.tab)) return false;
   if (a.q) { const hay = norm([j.title && j.title.en, j.title && j.title.ar, j.co && j.co.en, j.co && j.co.ar].filter(Boolean).join(" ")); if (!norm(a.q).split(" ").filter(Boolean).every(w => hay.includes(w))) return false; }

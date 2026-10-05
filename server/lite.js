@@ -163,7 +163,7 @@ ${nav}${o.pow ? `<script src="/lite/pow.js" defer></script>` : ""}${o.print ? `<
     const lg = ctx.lang, q = String(ctx.query.get("q") || "").slice(0, 60), gov = ctx.query.get("gov") || "", type = ctx.query.get("type") || "", savedOnly = ctx.query.get("saved") === "1", ret = ctx.query.get("returnees") === "1";
     const pg = Math.max(1, Math.min(50, Number(ctx.query.get("page")) || 1)), nq = core.norm(q).trim();
     const M = await me(ctx), prof = M && M.profile, saved = new Set((M && M.saved) || []);
-    const all = listPublished(db).filter(j => (!gov || j.gov === gov) && (!type || j.type === type) && (!savedOnly || saved.has(j.id)) && (!ret || j.returnees)
+    const all = listPublished(db, [...saved]).filter(j => (!gov || j.gov === gov || j.gov === "remote") && (!type || j.type === type) && (!savedOnly || saved.has(j.id)) && (!ret || j.returnees)
       && (!nq || core.norm([bi(j.title, "en"), bi(j.title, "ar"), bi(j.co, "en"), bi(j.co, "ar")].join(" ")).includes(nq)));
     // Sponsored listings are lifted, and labelled, only for signed-in job seekers they fit well.
     const spon = new Set(prof && !savedOnly ? all.filter(j => j.sponsored && ((core.fitFor(prof, j) || {}).score || 0) >= 60).slice(0, 2).map(j => j.id) : []);

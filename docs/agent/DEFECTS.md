@@ -496,6 +496,7 @@ Field order in every entry below: ID · Severity (verifier's; reporter's noted i
 | Regression test | `test/diaspora.test.js` ("job alerts" `:83` or alertMatches assertions `:117`): `alertMatches({gov:'damascus'}, {...j, gov:'remote'}) === true`, `alertMatches({gov:'remote'}, {...j, gov:'damascus'}) === false`, newCount via `/api/me/alerts` after publishing a remote job. `test/lite.test.js`: GET `/lite?gov=damascus` contains the remote listing's title. Engine change: test both sides (CLAUDE.md:32). |
 | Docs (R15) | README.md:263 (Job alerts paragraph): remote jobs count under every governorate, on the board, in Lite and in alerts. PRODUCT.md/SECURITY.md: nothing to correct. |
 | Privacy/legal (R13) | None. |
+| **Status** | **FIXED in Stage 3 (S3-9)**: `engine.js` alertMatches treats a remote listing as matching any governorate alert (an alert for remote work still matches remote only), and Lite's governorate filter keeps remote listings. Tests: `test/diaspora.test.js` (engine via `core`, alert counts, the digest) and `test/lite.test.js`. |
 | Notes | Extra finding: Lite's governorate select omits Remote (`lite.js:149`, G4 false), so a Lite reader reaches remote jobs only via "anywhere" or `?gov=remote` by hand. UNVERIFIED: whether the client comment at `engine.js:1140` is still accurate; app-alerts.js reads newCount from the server (`alerts.js:57`), so the server fix covers the badge. |
 
 ### D-27 · P2 · Board feed is a hard cap of the 500 newest listings: a sponsored listing and a seeker's saved listing older than the 500th vanish from the board and from Saved; the feed is ~350 KB uncompressed per load
@@ -513,6 +514,7 @@ Field order in every entry below: ID · Severity (verifier's; reporter's noted i
 | Regression test | `test/api.test.js`: insert 500+ published rows directly into the in-memory db as the repro does; assert the saved and sponsored ids are still returned. `test/lite.test.js`: `/lite?saved=1` case. |
 | Docs (R15) | README.md:244 "Limits of this MVP": what happens past 500 live listings (newest 500 sent; a signed-in seeker's saved listings and live sponsored listings always included after the fix). BRIEF.md:106 "up to 500 live listings" stays true. |
 | Privacy/legal (R13) | None. Saved ids already travel to the same seeker via `/api/me`; added listings are already public. |
+| **Status** | **FIXED in Stage 3 (S3-9)**: `listPublished(db, extraIds)` appends live sponsored listings and the caller's saved ones past the 500 newest; `GET /api/jobs` passes the signed-in seeker's saved ids and Lite passes the same. Tests: `test/diaspora.test.js` board test (520 newer rows) and `test/lite.test.js` Saved page. |
 | Notes | The 500 cap itself is specified behaviour (BRIEF.md:106, README.md:244, backlog P2-3), not a defect. The gzipped figure is UNVERIFIED: the filler rows were identical (9 KB gzip, unrepresentative); the demo-row ratio gives an upper bound of ~410 KB gzip for 500 varied listings; the reporter's "~320 KB gzipped" is plausible within that bound but not measured. Beyond year-one scale per the brief; demo seed is 19. |
 
 ### D-28 · P2 · Switching a sponsorship off writes no audit entry

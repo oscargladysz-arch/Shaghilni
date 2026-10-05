@@ -256,7 +256,7 @@ The scanner checks the code for secrets and risky patterns, your settings as pro
 - **No automatic alerts.** Errors, failed texts and reached caps go to the server log, and the admin screens don't show the audit log yet (it's at `/api/admin/audit`). Watch the log, or add an alert on your host.
 - **One server process.** Rate limits live in memory; the daily text and AI caps are in the database. Running several copies would need shared limits (in the database or Redis) and, eventually, Postgres instead of SQLite.
 - **Node's built-in SQLite is marked experimental in Node 22.** It works well here, and the server hides the warning, but keep Node updated.
-- **Search happens in the browser.** The board sends the 500 newest live listings to each visitor (about 320 KB compressed when full) and searches them on the phone. A listing older than the 500 newest is not on the board; it can still be opened by its link and still matches job alerts. Before the board nears 500 listings, search and paging should move to the server.
+- **Search happens in the browser.** The board sends the 500 newest live listings to each visitor (about 320 KB compressed when full) and searches them on the phone. A listing older than the 500 newest is not on the board (except a live sponsored listing, and a signed-in job seeker's own saved listings, which always stay on it); it can still be opened by its link and still matches job alerts. Before the board nears 500 listings, search and paging should move to the server.
 - **Not built yet:**
   - Telegram job alerts.
   - Public resume links.
@@ -272,7 +272,7 @@ The scanner checks the code for secrets and risky patterns, your settings as pro
 
 **Jobs that welcome people coming home.** Employers can tick *We welcome Syrians returning from abroad* on a listing. It shows as a badge, and job seekers can filter for it (*For returnees*), in the full app and in Lite.
 
-**Job alerts.** A job seeker saves a search (keyword, governorate, type and filter) from the job board (*Alerts*) or from Lite (*Get alerts for this search*). Up to five alerts each. New matching jobs are counted in the app straight away, and a digest goes out at most about once a day, by email or text:
+**Job alerts.** A job seeker saves a search (keyword, governorate, type and filter) from the job board (*Alerts*) or from Lite (*Get alerts for this search*). Up to five alerts each. New matching jobs are counted in the app straight away, and a digest goes out at most about once a day, by email or text: A remote listing counts under every governorate: on the board, in Lite and in alerts.
 
 | Setting | Default | What it does |
 |---|---|---|
