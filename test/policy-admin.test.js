@@ -137,6 +137,8 @@ test("policy admin: the audit screen's API filters by action, item, actor and da
   const comp = (await get(`?entity=company&entityId=${C.ids.companyA}`)).entries; assert.ok(comp.length >= 2 && comp.every(e => e.entity === "company" && e.entity_id === C.ids.companyA), "item filter");
   const adminId = S.db.get("SELECT id FROM users WHERE phone = ?", ADMIN_PHONE).id;
   const byAdmin = (await get(`?actor=${adminId}`)).entries; assert.ok(byAdmin.length >= 2 && byAdmin.every(e => e.actor_id === adminId), "actor filter");
+  const arabic = s => String(s).replace(/[0-9]/g, d => "٠١٢٣٤٥٦٧٨٩"[d]);
+  assert.equal((await get(`?actor=${arabic(adminId)}&limit=${arabic(200)}`)).entries.length, byAdmin.length, "a filter typed with Arabic-Indic digits filters the same (review)");
   const today = new Date().toISOString().slice(0, 10);
   assert.equal((await get(`?from=${today}&to=${today}`)).entries.length, all.length, "today's rows are all of them");
   assert.equal((await get("?from=2030-01-01")).entries.length, 0); assert.equal((await get("?to=2000-01-01")).entries.length, 0);

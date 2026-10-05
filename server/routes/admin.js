@@ -139,7 +139,7 @@ export function registerAdmin(r, deps) {
   /* The audit screen's feed: newest first, at most 200 a page, older pages by cursor (before = the last id seen), filtered by action
      (exact, or a prefix ending in "."), item (entity and entityId), actor (account id) and day range. The actor is shown masked, like the logs. */
   r.get("/api/admin/audit", admin, ctx => {
-    const q = k => String(ctx.query.get(k) || "").slice(0, 80), limit = Math.max(1, Math.min(200, parseInt(ctx.query.get("limit"), 10) || 50));
+    const q = k => core.latinDigits(String(ctx.query.get(k) || "")).slice(0, 80), limit = Math.max(1, Math.min(200, parseInt(q("limit"), 10) || 50));   // Arabic-Indic digits in a filter count as digits (review)
     const before = parseInt(q("before"), 10), actor = parseInt(q("actor"), 10), entityId = parseInt(q("entityId"), 10), action = q("action"), entity = q("entity");
     const day = s => (/^\d{4}-\d{2}-\d{2}$/.test(s) ? Date.parse(s + "T00:00:00Z") : NaN), from = day(q("from")), to = day(q("to"));
     const where = ["1 = 1"], args = [];
