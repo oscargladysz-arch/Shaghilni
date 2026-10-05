@@ -405,7 +405,7 @@ Brief `<features>` letters → areas: A → 1, 13 · B → 1, 2, 3, 4, 5, 14 · 
 | Feature | Status | Evidence | Tests | Notes or gap |
 |---|---|---|---|---|
 | Page frame (header, role tab bar, footer, flash, language switch) | VERIFIED | `server/lite.js:131-146` | lite: "lite: small pages that work without JavaScript, in Arabic or English" :74 | — |
-| Size budget and caching (first visit < 15 KB; fingerprinted immutable CSS + sprite; gzip) | VERIFIED | `lite.js:619,623-626`; `lite-assets.js:4,6`; `http.js:218-219` | lite :76-82 | Measured: first visit 5,452 B; pages 727–2,650 B. The test ratchet is 6,000 B per page (`lite.test.js:82`), not the documented 2–3 KB |
+| Size budget and caching (first visit < 15 KB; fingerprinted immutable CSS + sprite; gzip) | VERIFIED | `lite.js:619,623-626`; `lite-assets.js:4,6`; `http.js:218-219` | lite :76-82 | Measured: first visit 5,452 B; pages 727–2,650 B (641–2,517 B over 62 loads in Stage 2). The per-page ratchet is 3,072 B since Stage 2 (A-21, `lite.test.js:82`); it was 6,000 B |
 | No JavaScript on content pages; CSP on Lite | VERIFIED | `lite.js:145`; `http.js:197-215` | lite :75,94-95 | Resume page loads a one-line print script (`lite.js:307,315`) |
 | Signed per-browser form token (`lt` cookie, HMAC, timing-safe, Origin/Sec-Fetch-Site refusal) | VERIFIED | `lite.js:104,147,629-630,645-648,654-655` | lite: "lite: a job seeker signs in, builds a profile…" :104-105 | — |
 | In-process handler calls (same guards, validation, limits, audit) | VERIFIED | `lite.js:120-128`; `app.js:59` | lite :116-117,122,131,165 | — |
@@ -571,7 +571,7 @@ Items of `<verified_facts>` and `<features>` that the maps contradict or refine.
 | B | "Claude wording suggestions only for saved bullet points (10 per hour per person)" | A published job must be chosen (404 otherwise); the 10/hour counter is shared with translation; each bullet's `role`/`current` travel unchecked | `server/routes/resume.js:14,46-53` |
 | B | "Job alerts … up to 5 saved searches; counts; a digest at most about once a day" | Confirmed; D-26: a governorate alert never matches remote listings | `server/alerts.js:61`, `engine.js:1143` |
 | C | "no JavaScript beyond the sign-in check" | A one-line print script also loads on the resume page; with the default `OTP_POW_BITS=14` signing in needs the script (no-JS form → `pow_required`) | `server/lite.js:145,307,315,451,462-465` |
-| C | "about 2–3 KB a page after (a test checks)" | Measured max 2,650 B; the test ratchet is 6,000 B | `test/lite.test.js:82`; map 12 sizes |
+| C | "about 2–3 KB a page after (a test checks)" | Measured max 2,650 B; the test ratchet was 6,000 B, now 3,072 B (Stage 2, A-21) | `test/lite.test.js:82`; map 12 sizes |
 | D | "pay and place required" | Pay and governorate (plus title, a language, a summary); free-text `place` is optional | `server/validate.js:126-136` |
 | D | "edits go back for review" | Only for published and rejected listings; edits while pending or closed are kept without re-check (D-05, D-06) | `server/routes/employer.js:100-104,127` |
 | D | "registration number unique (otherwise 'ask to join')" | Checked only when the caller has no company yet; an existing company may edit its number to another's | `server/routes/employer.js:40-46` |

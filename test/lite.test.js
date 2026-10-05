@@ -79,7 +79,7 @@ test("lite: small pages that work without JavaScript, in Arabic or English", asy
   assert.match(c.headers["cache-control"], /immutable/); assert.match(sp.headers["cache-control"], /immutable/, "shared files are cached for good");
   const first = wire.bytes + c.bytes + sp.bytes;
   assert.ok(first < 15000, `the whole first visit is small (${first} bytes over the wire)`);
-  assert.ok(wire.bytes < 6000, `and each page after that is smaller still (${wire.bytes} bytes)`);
+  assert.ok(wire.bytes < 3072, `and each page after that is smaller still (${wire.bytes} bytes)`);
   const id = /href="\/lite\/job\/(\d+)"/.exec(home.text)[1];
   const job = await b.get(`/lite/job/${id}`); assert.equal(job.status, 200); assert.match(job.text, /قدّم الآن/);
   const en = await b.get("/lite?lang=en"); assert.match(en.text, /<html lang="en" dir="ltr">/); assert.match(en.text, /Shaghilni/);
