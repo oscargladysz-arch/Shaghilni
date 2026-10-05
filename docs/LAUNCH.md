@@ -26,7 +26,7 @@ No item marked owner, lawyer or provider is ever ticked by an agent.
 | B3 | `npm run security:check -- --url https://your-domain` shows no FAIL once deployed. | owner | Paste the output into the launch record. | Open |
 | B4 | External scans: MDN HTTP Observatory (aim A+), SSL Labs (aim A), the OWASP ZAP baseline scan, GitHub secret scanning. | owner | Reports saved. | Open |
 | B5 | The four review prompts in SECURITY.md items 6–9 re-run against the current code. | agent | Stage 4 of the launch work updates SECURITY.md with the results and the date. | Open |
-| B6 | Every API route covered by the cross-role and junk-input tests. | agent | Stage 2 adds a generated policy test that fails when a route is missing; today 68 of 109 routes are in neither (`docs/agent/ROUTES.md`). | Open |
+| B6 | Every API route covered by the cross-role and junk-input tests. | agent | `test/policy/route-policy.js` has a row for all 109 routes; `test/policy-completeness.test.js` fails when a route has no row; the generated tests check 574 role × route refusals, 27 cross-account attempts and about 2,000 junk requests (Stage 2). | Done |
 | B7 | Admin phone numbers protected against SIM swap (carrier PIN); `ADMIN_PHONES` kept short. | owner | | Open |
 
 ## C · Legal and people

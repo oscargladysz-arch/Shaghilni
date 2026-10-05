@@ -86,6 +86,7 @@ Security test 2 attacks it:
 - Employer B tries to read employer A's applicants, move them, and edit, submit, close and reopen A's listing. Each attempt answers "not found".
 - A job seeker tries to withdraw another seeker's application, or to see it in their own list or export.
 - Every role tries the other roles' endpoints and is refused (403). Guests trying private endpoints are asked to sign in (401).
+- Generated from the policy table (`test/policy/route-policy.js`): every route × every role the table excludes answers 401, 403 or 404 (`test/policy-access.test.js`, 574 refusals); account B, in the same role as account A, gets nothing of A's through any id-bearing route and A's rows stay unchanged (`test/policy-idor.test.js`); a career office the admin removed loses every organiser route even after signing in again.
 - The public board is searched for private company fields: WhatsApp number, registration number and contact name.
 - Shaghilni Lite (`test/lite.test.js`) runs every action through the same API handlers in-process, so access control, validation and rate limits are identical. Its HTML forms can't send the API's custom header, so each form carries a token signed with the server secret and tied to a per-browser cookie. Posts without it, or sent from another site, are refused. A job seeker's number never becomes a recruiter account, and candidate search in Lite waits for verification.
 - Recruiter search (`test/recruit.test.js`): only job seekers who switched it on are listed, only to verified companies (and only to their owner, admins and recruiters), and never to a company the person blocked. Anyone with a profile can switch it on, and nobody is listed otherwise. Seekers, employers and guests are refused on each other's recruiter endpoints.
@@ -96,7 +97,7 @@ Security test 2 attacks it:
 
 Every endpoint rebuilds its input field by field (`server/validate.js`). It checks types, lengths, allowed values, phone formats and pay ranges, and runs the listing checks for fees and discriminatory wording. The browser's checks exist only for convenience; the server's are the ones that count. Bodies over 256 KB are refused, and so is anything that isn't JSON.
 
-Security test 3 sends more than 1,000 junk requests to 34 of the API's endpoints (the list in `test/security.test.js`; the newer families are not in it yet, see `docs/agent/ROUTES.md`), as a guest, a job seeker, an employer and an admin. The junk includes wrong types, arrays, objects nested 500 levels deep, prototype-pollution payloads, NoSQL-style operators, SQL fragments and bad IDs. The test requires that:
+Security test 3 sends more than 1,000 junk requests to 34 of the API's endpoints (the hand-written list in `test/security.test.js`), and `test/policy-junk.test.js` sends about 2,000 more to every POST, PUT and DELETE route in the policy table (malformed JSON, wrong types, 100 KB strings, bidi and control characters, SQL metacharacters, prototype keys, deep nesting, huge arrays), as a guest, a job seeker, an employer and an admin. The junk includes wrong types, arrays, objects nested 500 levels deep, prototype-pollution payloads, NoSQL-style operators, SQL fragments and bad IDs. The test requires that:
 
 - no request crashes the server;
 - the real profile survives;
@@ -360,7 +361,7 @@ It exits with an error when anything fails, so it can gate a deploy. Security te
 ## Keeping this file true
 
 - When you change what's collected, who receives it or how long it's kept, update `public/js/legal.js`, `server/retention.js`, `TERMS_VERSION` and this file together.
-- Every endpoint must appear in the access-control and junk-input tests (security tests 2 and 3). Today their hard-coded list covers 34 of 109 routes (`docs/agent/ROUTES.md`); Stage 2 (P1-1) replaces it with a generated check that fails when a route is missing.
+- Every endpoint needs a row in `test/policy/route-policy.js` (which roles may call it). `test/policy-completeness.test.js` fails when a registered route has no row, and the rows drive the generated tests: every route × every excluded role (`test/policy-access.test.js`), account B against account A's ids (`test/policy-idor.test.js`) and hostile input on every POST, PUT and DELETE (`test/policy-junk.test.js`). Security tests 2 and 3 keep their hand-written cases; there is no list to extend by hand any more.
 - Re-run the four prompts (items 6–9) after big changes, and update their results here.
 
 ## Before you go live

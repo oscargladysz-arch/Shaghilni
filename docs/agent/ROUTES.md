@@ -10,6 +10,8 @@ Column meanings:
 | Matrix | Membership in the hard-coded security matrix: **3** = in the junk-input list (`test/security.test.js:152-160`, 35 entries, 34 distinct routes); **2** = asserted in the cross-role/IDOR test (`test/security.test.js:114-139`); **—** = neither |
 | Audit | `audit()` calls on the handler's path (`server/app.js:36-37` inserts into `audit`) |
 
+**Stage 2 status.** The "In security matrix (tests 2/3)?" column below is the Stage 0 record. Since Stage 2 every JSON route has a row in `test/policy/route-policy.js` (109 rows; `test/policy-completeness.test.js` fails when a route has no row), and the generated tests derive from those rows: `test/policy-access.test.js` (every route × every excluded role), `test/policy-idor.test.js` (B against A's ids; a removed office), `test/policy-junk.test.js` (hostile input on every POST, PUT and DELETE). Two rows state the product rule where the code was wider and the code was fixed in Stage 2: `GET /api/employer/invitations` and `POST /api/employer/invitations/:id/withdraw` now need the hire level (D-03); the events organiser guard now refuses a university account without an office row (D-11).
+
 ## JSON routes (`/api/*`, 109)
 
 ### Sign-in and public (`server/routes/public.js`, `server/demo.js`) · 9
