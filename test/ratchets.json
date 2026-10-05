@@ -1,0 +1,4 @@
+{
+  "_note": "Ratchets: counts of known violations, measured by the tests that read this file. They may only go down. Lower a number in the same commit that removes the violations; never raise one.",
+  "i18nDuplicateKeys": { "en": 8, "ar": 7 }
+}
