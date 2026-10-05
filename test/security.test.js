@@ -401,3 +401,21 @@ test("16 · sample listings are never seeded in production, whatever SEED_DEMO s
   db.run("DELETE FROM jobs WHERE is_demo = 1"); db.run("DELETE FROM companies WHERE is_demo = 1");
   assert.deepEqual(countDemo(db), { companies: 0, jobs: 0 }, "nothing left after npm run demo:remove");
 });
+
+test("17 · a number taken out of ADMIN_PHONES loses the admin role at its next sign-in, and its open sessions end (D-17)", async () => {
+  const S = await start(), admin = await S.login("+12025550199");
+  assert.equal((await admin.get("/api/admin/overview")).status, 200, "an admin while the number is listed");
+  // the same database served by a second process whose ADMIN_PHONES no longer lists the number (a redeploy with a changed setting)
+  const cfg2 = loadConfig({ skipDotEnv: true, isolated: true, env: { NODE_ENV: "test", ADMIN_PHONES: "" }, values: { powBits: 0, anthropicKey: "" } });
+  const srv2 = http.createServer(createApp({ cfg: cfg2, db: S.db, log: () => {}, sms: async (to, body) => { S.texts.push({ to, body }); } }));
+  await new Promise(r => srv2.listen(0, "127.0.0.1", r)); servers.push(srv2);
+  const base2 = `http://127.0.0.1:${srv2.address().port}`; let jar = "";
+  const call2 = async (method, path, body) => { const res = await realFetch(base2 + path, { method, headers: { "content-type": "application/json", "x-shaghilni": "1", ...(jar ? { cookie: jar } : {}) }, body: body === undefined ? undefined : JSON.stringify(body) }); const sc = res.headers.get("set-cookie"); if (sc) jar = sc.split(";")[0]; return { status: res.status, body: await res.json().catch(() => null) }; };
+  const r = await call2("POST", "/api/auth/code", { phone: "+12025550199" }); assert.equal(r.status, 200);
+  const v = await call2("POST", "/api/auth/verify", { phone: "+12025550199", code: S.lastCode("+12025550199"), role: "seeker", accept: true });
+  assert.equal(v.status, 200); assert.equal(v.body.user.role, "seeker", "D-17: signed in as an ordinary account, not an admin");
+  assert.equal((await call2("GET", "/api/admin/overview")).status, 403, "D-17: the admin routes are closed to the new session");
+  assert.equal(S.db.get("SELECT role FROM users WHERE phone = ?", "+12025550199").role, "seeker", "the role is changed in the database");
+  assert.equal((await admin.get("/api/admin/overview")).status, 401, "D-17: the session opened while the number was an admin has ended");
+  assert.deepEqual(S.db.all("SELECT action, data FROM audit WHERE action = 'user.demoted'").map(x => [x.action, JSON.parse(x.data)]), [["user.demoted", { from: "admin", to: "seeker" }]], "the demotion is in the audit log");
+});

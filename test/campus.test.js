@@ -142,3 +142,14 @@ test("universities: a verification code typed with Arabic-Indic digits is accept
   const ok = await a.post("/api/me/verify-student/confirm", { code: arabic(codeFor("omar@hu.example")) });
   assert.equal(ok.status, 200, ok.text); assert.equal(ok.body.verification.status, "verified", "the right code in Arabic-Indic digits verifies the student");
 });
+
+test("universities: a career office's own export includes its office record, and deleting the account removes it (D-22)", async () => {
+  const S = await start(), admin = await S.login("+12025550199");
+  await admin.post("/api/admin/campus", { phone: "0944 786 001", uni: "homs", name: "Homs Career Office" }); const office = await S.login("0944 786 001");
+  const ex = (await office.get("/api/me/export")).body;
+  assert.equal(ex.account.role, "university"); assert.deepEqual([ex.campusOffice && ex.campusOffice.university, ex.campusOffice && ex.campusOffice.name], ["homs", "Homs Career Office"], "D-22: the export carries the office record");
+  const uid = S.db.get("SELECT id FROM users WHERE phone = ?", "+963944786001").id;
+  assert.equal((await office.del("/api/me")).status, 200);
+  assert.equal(S.db.get("SELECT COUNT(*) AS n FROM campus_offices WHERE user_id = ?", uid).n, 0, "D-22: the office row, with the contact name, goes with the account");
+  assert.ok(!(await admin.get("/api/admin/campus")).body.offices.some(o => o.phone === "+963944786001"), "and the admin's office list no longer shows it");
+});
