@@ -49,7 +49,7 @@ Set these as environment variables or in `.env`.
 | `PORT` / `HOST` | `3000` / `0.0.0.0` | Where the server listens. |
 | `BASE_URL` | none | **Required in production.** Your public address, exactly, starting with `https://`, for example `https://your-domain.example`. Used to reject requests from other sites. |
 | `DB_PATH` | `data/shaghilni.db` | The database file. Put it on a persistent disk. |
-| `ADMIN_PHONES` | none | Comma-separated numbers in international format (`+9639…,+1202…`). These accounts become admins when they sign in. |
+| `ADMIN_PHONES` | none | Comma-separated numbers in international format (`+9639…,+1202…`). These accounts become admins when they sign in. A number taken off the list is demoted to an ordinary account at its next sign-in and its open sessions end. |
 | `OTP_PEPPER` | dev value | **Required in production:** a random secret of at least 32 characters, mixed into stored sign-in codes. The server won't start without it. |
 | `OTP_DEV_ECHO` | `false` | Development only: shows the sign-in code on screen. Ignored in production. |
 | `SESSION_DAYS` | `30` | How long people stay signed in. |

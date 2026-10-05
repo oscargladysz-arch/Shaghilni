@@ -41,7 +41,7 @@ Column meanings:
 | GET | `/api/me/applications` | seeker | `server/routes/me.js:80` | api :114,182; security :128,133,202,206; demo :69,72 | 2 | none | — |
 | POST | `/api/me/applications/:id/withdraw` | seeker; own application; not hired | `server/routes/me.js:91` | api :113,183; security :127,153; recruit | 2+3 | `application.withdrawn` `me.js:96` (every call, even repeated) | Rejected/withdrawn rows can be withdrawn again |
 | GET | `/api/me/export` | `need()` | `server/routes/me.js:101` | security :91-98,129,133; diaspora :110 | 2 | none | Export gaps: see STATE area 13 |
-| DELETE | `/api/me` | `need()`; admin → 409 `admin_cannot_delete` | `server/routes/me.js:136` | api :227; security :105,108; campus :97; events :94; recruit :129 | — | `user.deleted` `me.js:164` | Leaves `campus_offices` (D-22), `applyPhone/applyEmail`, `email_sends` |
+| DELETE | `/api/me` | `need()`; admin → 409 `admin_cannot_delete` | `server/routes/me.js:136` | api :227; security :105,108; campus :97; events :94; recruit :129 | — | `user.deleted` `me.js:164` | Stage 3: also deletes the career office's `campus_offices` row (D-22 fixed) |
 
 ### Resume AI (`server/routes/resume.js`) · 2
 

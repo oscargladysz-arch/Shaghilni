@@ -354,6 +354,7 @@ Field order in every entry below: ID · Severity (verifier's; reporter's noted i
 | Regression test | `test/security.test.js` (`start({ env, values, seed })` helper at `:22`; cross-role checks belong in tests 2/3): two createApp instances over one db as in the probe; verify returns the non-admin role and `/api/admin/overview` is 403. The helper opens its own db, so build the second app by hand or add a `db` option. |
 | Docs (R15) | README.md:52 ADMIN_PHONES row: what removal does (demotes on next sign-in / refuses sign-in / whether live sessions end). SECURITY.md:186: one clause once removal works. |
 | Privacy/legal (R13) | None. The audit entry holds user id and roles, no phone. |
+| **Status** | **FIXED in Stage 3 (S3-10)**: `server/auth.js` verify: a number no longer in `ADMIN_PHONES` is demoted to the role it asked for, its `sessions` rows are deleted and `user.demoted` is audited (A-14). README's `ADMIN_PHONES` row and SECURITY.md A07 say so. Test: `test/security.test.js` 17 (two processes over one database). |
 | Notes | UNVERIFIED: any documented manual SQL demotion workaround (none found by grep). Demo accounts (`server/demo.js:7` userRow takes a role); whether any demo row is `admin` was not checked, so run `test/demo.test.js` after the fix. |
 
 ### D-18 · P2 · `.env.example` narrows texts to +963 while the sign-in picker statically offers 19 diaspora codes; SECURITY.md contradicts itself on the default
@@ -425,6 +426,7 @@ Field order in every entry below: ID · Severity (verifier's; reporter's noted i
 | Regression test | `test/campus.test.js` (admin POST + office login helper at `:72`, `:112`): office GET `/api/me/export` has `campusOffice` with the typed name; office DELETE `/api/me` → 200, then `campus_offices WHERE user_id` is undefined and GET `/api/admin/campus` count unchanged. |
 | Docs (R15) | SECURITY.md:46 (what deletion erases) and `:409` (office records): a career-office account's office record is deleted with the account and included in the export. |
 | Privacy/legal (R13) | Yes (privacy): extends export and deletion coverage. No new user-facing legal wording needed (legal.js already promises export and deletion); if the owner wants the notice to name office records, propose it in `docs/agent/LEGAL_PROPOSALS.md`. No TERMS_VERSION bump; retention.js unchanged (synchronous delete). |
+| **Status** | **FIXED in Stage 3 (S3-10)**: `DELETE /api/me` deletes the `campus_offices` row inside the transaction; `GET /api/me/export` carries `campusOffice` for a university account. SECURITY.md item 1 says so. Test: `test/campus.test.js` D-22. |
 | Notes | `insights.js:70` counts campus_offices without joining users, so the orphan inflates "careerOffices" until removed; the fix resolves that too. The admin-side removal (`campus.js:162-164`) leaves the users row alive (D-11's root). Also reported by probe:campus and probe:platform (A13-05). |
 
 ### D-23 · P2 · Lite's sign-in code field has `pattern="[0-9]{6}"`, so a browser refuses Arabic-Indic or Persian digits that the server accepts

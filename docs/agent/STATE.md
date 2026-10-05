@@ -62,7 +62,7 @@ Brief `<features>` letters → areas: A → 1, 13 · B → 1, 2, 3, 4, 5, 14 · 
 | Logout deletes the session, clears cookie; guests get 200 | VERIFIED | `server/auth.js:128-132`; `app-seeker.js:59-62` | security :204-206; lite :136 | — |
 | Roles at sign-in: seeker/employer chosen; invited number → employer; `ADMIN_PHONES` → admin (also promoted later); role fixed afterwards | VERIFIED | `server/auth.js:82-85,93-94,99`; `server/config.js:24,39` | api :120-123, :138-141; team :79-80 | No `university` self-registration (`auth.js:85`) |
 | Onboarding and profile builder (full app, brief B): role choice student / seeker / employer, bilingual profile (`name`, `nameAr`, `nameEn`) built in steps (`OB_STEPS` = account, about, edu, goals, exp), "Where you live" with "Outside Syria" then "Which country?"; `PUT /api/me/profile` sanitises every field | VERIFIED | `public/js/app-account.js:3,53,67-68,73,82,98-117`; `public/js/engine.js:304`; `public/js/i18n2.js:9,23`; `public/js/i18n4.js:712-713`; `server/routes/me.js:35`; `server/validate.js:23-79` (`:35` names, `:36` abroad + country) | api: "seeker: profile is sanitised; saving and applying work" :96-101; diaspora :72-77 (`gov:"abroad", country:"de"`; unknown country → `other`) | Client step flow untested (browser e2e not run); server side is tested |
-| Admin role revocation when removed from `ADMIN_PHONES` | MISSING | `server/auth.js:99` promotes only | none (probe: role stays admin, `/api/admin/overview` → 200) | D-17 |
+| Admin role revocation when removed from `ADMIN_PHONES` | VERIFIED (Stage 3) | `server/auth.js:99` promotes only | none (probe: role stays admin, `/api/admin/overview` → 200) | Stage 3: demoted to the role it would otherwise have at the next sign-in, sessions deleted, `user.demoted` audited (D-17 fixed, A-14); `test/security.test.js` 17 |
 | `OTP_DEV_ECHO` code echo outside production only | PARTIAL | `server/config.js:41`; `server/auth.js:65`; `server/lite.js:467` | api :74; security :220-222 (negative paths) | Positive path untested |
 | Country-code picker: Syria first then 19 diaspora codes (`DIAL` 20 entries) | PARTIAL | `public/js/lookups.js:136-137`; `app-account.js:60,142-144,262` | none (UI); server side diaspora :65-68 | `+1` labelled United States only though `COUNTRY` has Canada (`lookups.js:133-134,137`) |
 | Phone normalisation: Syrian forms → E.164; other countries `+` + 8-15 digits | VERIFIED | `server/validate.js:15-20`; `engine.js:329-335` | api :72-73; diaspora :65-66; security :219 | — |
@@ -327,7 +327,7 @@ Brief `<features>` letters → areas: A → 1, 13 · B → 1, 2, 3, 4, 5, 14 · 
 | Internship programmes aimed at universities; office sees applicants from its students | VERIFIED | `validate.js:118`; `campus.js:110-114` | campus :123-128 | LIMIT 300 on all published jobs before the filter |
 | Office Events tab | VERIFIED | `app-campus.js:4,7,28`; `events.js:20-23,43` | events: "events: a career office runs events only at its own university" :125-134; demo :81-83 | — |
 | Admin list of offices and office removal | PARTIAL | `campus.js:149-151,162-165` | none | D-11: removed office keeps the `university` role (can still list/publish events); phone can't be reused |
-| Export and deletion cover student verification | PARTIAL | `me.js:126,147-148` | campus :97 | D-22: office self-deletion leaves `campus_offices`; export has no `campusOffice`; `email_sends` rows kept; `email_codes` never swept (probe D1) |
+| Export and deletion cover student verification | PARTIAL | `me.js:126,147-148` | campus :97 | Stage 3: an office's export carries `campusOffice` and deletion removes the `campus_offices` row (D-22 fixed); `email_sends` rows as before |
 | Audit for every campus action | PARTIAL | `campus.js:63,81,87,122,125,134,145,160,164` | none asserts them | — |
 | Demo career office (fictional domain, two verified students, partners) | VERIFIED | `demo.js:14,133-141,179,181` | demo :79-83,95 | — |
 | Insights campus block | PARTIAL | `insights.js:25,55,59,70-73,78` | none | — |
@@ -602,7 +602,7 @@ Items of `<verified_facts>` and `<features>` that the maps contradict or refine.
 | Continuous integration | `.github/workflows/ci.yml` added in Stage 1 (S1-3); two GitHub runs green in Stage 2 | closed in Stage 2 |
 | i18n parity test; CSS ratchets (`test/ratchets.json`) | no such tests | Backlog P1-1 |
 | Production gate for `seedDemo` | `server/config.js:68` now `!prod && …` (Stage 1, S1-1) | closed in Stage 1 |
-| Admin role revocation | `server/auth.js:99` promotes only | D-17 |
+| Admin role revocation | `server/auth.js:99` promotes only | D-17 fixed in Stage 3 (`server/auth.js` demotes at sign-in) |
 | Re-consent prompt for a changed `TERMS_VERSION` while signed in | no client comparison of `termsVersion` | SECURITY.md:42 implies acceptance per version |
 | Manual student-verification approval by the office (`/api/campus/verify`) | no route; `app-campus.js:41` dead action; `campus.test.js:93` asserts `requests === undefined` | README.md:310; SECURITY.md:407-408 still describe it |
 | Text to a student when verified/declined | `notify.js:26-29` templates have no caller | i18n `tCpVerified` promises it |

@@ -97,6 +97,10 @@ export function makeAuth({ db, cfg, core, sms, limit, audit, log, guard }) {
       audit(user.id, "user.created", "user", user.id, { role: user.role, terms: TERMS_VERSION });
     } else {
       if (admin && user.role !== "admin") { db.run("UPDATE users SET role = 'admin' WHERE id = ?", user.id); user.role = "admin"; }
+      else if (!admin && user.role === "admin") {   // taken out of ADMIN_PHONES: an ordinary account from now on, and every session opened as an admin ends (D-17, A-14)
+        db.run("UPDATE users SET role = ? WHERE id = ?", wanted, user.id); db.run("DELETE FROM sessions WHERE user_id = ?", user.id); user.role = wanted;
+        audit(user.id, "user.demoted", "user", user.id, { from: "admin", to: wanted });
+      }
       if (accept && user.terms_version !== TERMS_VERSION) {
         db.run("UPDATE users SET terms_version = ?, terms_accepted_at = ? WHERE id = ?", TERMS_VERSION, now(), user.id);
         user.terms_version = TERMS_VERSION;

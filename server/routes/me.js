@@ -114,6 +114,7 @@ export function registerMe(r, deps) {
         .map(a => ({ id: a.id, job: (J(a.j_data) || {}).title, company: (J(a.c_data) || {}).name, status: a.status, channel: a.channel, resumeLanguage: a.cv_lang || null,
                      sentAt: iso(a.created_at), updatedAt: iso(a.updated_at), profileSentToEmployer: J(a.snapshot) }));
     }
+    if (u.role === "university") out.campusOffice = (o => o ? { university: o.uni, faculty: o.faculty || null, name: o.name, addedAt: iso(o.created_at) } : null)(db.get("SELECT uni, faculty, name, created_at FROM campus_offices WHERE user_id = ?", u.id));   // D-22
     if (u.role === "employer") {
       const c = db.get("SELECT * FROM companies WHERE owner_id = ?", u.id);
       out.company = c ? { ...J(c.data), status: c.status } : null;
@@ -147,6 +148,7 @@ export function registerMe(r, deps) {
       db.run("DELETE FROM student_verifications WHERE user_id = ?", id);
       db.run("DELETE FROM email_codes WHERE user_id = ?", id);
       db.run("DELETE FROM event_rsvps WHERE user_id = ?", id);
+      db.run("DELETE FROM campus_offices WHERE user_id = ?", id);   // a career office's record carries the contact name (D-22)
       db.run("DELETE FROM company_members WHERE phone = ?", phone);
       db.run("DELETE FROM recruiter_blocks WHERE user_id = ?", id);
       db.run("DELETE FROM otps WHERE phone = ?", phone);
