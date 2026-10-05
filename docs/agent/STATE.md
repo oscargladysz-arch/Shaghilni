@@ -442,7 +442,7 @@ Brief `<features>` letters → areas: A → 1, 13 · B → 1, 2, 3, 4, 5, 14 · 
 | 404 page | VERIFIED | `lite.js:638-639` | lite :88 | — |
 | HEAD answered like GET | PARTIAL | `lite.js:638`; `http.js:223` | none | — |
 | Rate limits shared with the API | PARTIAL | `lite.js:637,643` | none | — |
-| Form body limit 64 KB → 413 | PARTIAL | `lite.js:613-618` | none | Socket destroyed before the 413 page arrives (probe) |
+| Form body limit 64 KB → 413 | VERIFIED (Stage 2) | `lite.js` readForm | policy-lite (64 KB test) | Fixed in Stage 2 (U-165): the reader stops buffering and the 413 page is sent with `connection: close`, as the JSON API does |
 | Lite GET pages counted by traffic | VERIFIED | `app.js:111`; `traffic.js:63-73` | traffic :75-78,90 | — |
 | Demo hint on the sign-in page | PARTIAL | `demo.js:193-194`; `lite.js:456` | none | Promises "code is shown on screen" regardless of `OTP_DEV_ECHO`; «جهات التوظيف» |
 | LT string table (189/189, fallback LT → STR → STR.en → key) | PARTIAL | `lite.js:15-82,102` | lite :96 (prefix check on four pages) | 19 keys shadow STR; outside STR parity |
