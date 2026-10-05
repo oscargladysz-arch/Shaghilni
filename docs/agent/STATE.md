@@ -520,7 +520,7 @@ Brief `<features>` letters → areas: A → 1, 13 · B → 1, 2, 3, 4, 5, 14 · 
 | XSS-safe rendering (escaping `html` template, one `innerHTML` sink, scanner rule) | VERIFIED | `engine.js:12-17`; `boot.js:223`; `security-check.js:53` | security test 13 | — |
 | WCAG AA contrast in light and dark (PRODUCT.md "40 screens") | UNVERIFIED | tokens `app.css:111-115,128-132` | none | No report, screenshots or test in the repo |
 | Lite look-alike of the full app | PARTIAL | `lite-assets.js:3` (own palette) vs `app.css:111-131` | lite :74 (tab bar) | Colours close, not the tokens (`#0f6e56` vs `#0E6B46`); favicon `#0D5C3A` |
-| i18n parity test and CSS ratchets | MISSING | no such test; no `test/ratchets.json` | none | Backlog P1-1; baseline numbers: 28 hex after `app.css:150`, 4 sub-12px cqw sizes, physical props at `app.css:462-463,822-823` |
+| i18n parity test and CSS ratchets | VERIFIED (Stage 2) | `test/i18n.test.js`; `test/ratchets.test.js`; `test/ratchets.json` | i18n; ratchets (5 tests) | Counts may only go down: 24 hex, 1 named, 11 rgb(), 4 var() fallbacks outside the token block; 4 cqw sizes under 12 px; 2 physical properties; 5 hex in `public/js/app*.js` (the 10 in `lookups.js` and 2 in `boot.js` are outside the scan); 11 hex in `lite.js`, 16 in `lite-assets.js` outside its `:root` blocks; 3 glyph icons |
 
 ## Area 15 · Tests, scripts, seeding, demo accounts, Docker, deploy, docs (brief J)
 
