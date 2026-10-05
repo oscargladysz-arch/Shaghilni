@@ -135,7 +135,7 @@ docker build -t shaghilni .
 docker run -d --name shaghilni -p 127.0.0.1:3000:3000 -v shaghilni-data:/data --env-file .env shaghilni
 ```
 
-Put Caddy or nginx in front for HTTPS (a two-line Caddyfile is enough: `your-domain { reverse_proxy 127.0.0.1:3000 }`) and set `TRUST_PROXY=true`.
+Put Caddy or nginx in front for HTTPS (a two-line Caddyfile is enough: `your-domain { reverse_proxy 127.0.0.1:3000 }`) and set `TRUST_PROXY=true`. The `.env` you pass with `--env-file` must say `NODE_ENV=production`: it overrides the image's own setting, and the shipped `.env.example` says `development`. Run `npm run security:check` against that file first; it fails until the file says production.
 
 Two settings matter more than they look:
 

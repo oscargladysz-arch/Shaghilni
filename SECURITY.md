@@ -268,8 +268,8 @@ hard-coded or committed.
   - texts can go to any country;
   - `OTP_DEV_ECHO` is set;
   - `.env` is readable by other users on the machine.
-- Development conveniences are switched off in production: codes on screen and the development pepper. The scanner flags the demo listings.
-- `npm run security:check` audits your settings as production would see them. Security test 10 proves the lockdown, and proves that a complete setup passes cleanly.
+- Development conveniences are switched off in production: codes on screen, the development pepper and the sample listings (never seeded when `NODE_ENV=production`; a database that still holds them is reported at start-up and on the Insights screen).
+- `npm run security:check` audits your settings as production would see them, and **fails** when `NODE_ENV` is anything but `production`, because the shipped `.env.example` says `development` and a public host copied from it would echo sign-in codes and use the built-in pepper. Security test 10 proves the lockdown and that a complete setup passes cleanly; tests 14 and 15 prove the scanner stays clean whatever `SEED_DEMO` says and fails development settings.
 - Where you can, set secrets in your host's dashboard ("Environment" on Render or Railway) rather than in a file.
 
 ## 11. Rate limits and cost caps
@@ -282,7 +282,7 @@ hard-coded or committed.
 | Sign-in codes, per address | 30 an hour | fixed |
 | Code checks | 5 attempts per code; 60 checks an hour per address | fixed |
 | Sign-in challenges, per address | 60 per 10 minutes | fixed |
-| **Where texts may go** | Syrian numbers (+963); admin numbers anywhere | `SMS_ALLOWED_PREFIXES` |
+| **Where texts may go** | Syria plus the main diaspora countries; admin numbers anywhere | `SMS_ALLOWED_PREFIXES` |
 | **Texts per day, whole site** | 1,000 | `SMS_DAILY_CAP` |
 | Claude calls (suggestions and translations), per person | 10 an hour, 30 a day | `AI_USER_DAILY_CAP` (daily) |
 | **Claude calls per day, whole site** | 300 | `AI_DAILY_CAP` |
@@ -325,7 +325,7 @@ Security test 12 checks all of this. It also checks the challenge end to end, us
    - inline scripts, and scripts from other sites.
 
    Reviewed exceptions carry a `sql-safe` or `html-safe` marker comment.
-3. Your production settings, from `.env` or `--env file`.
+3. Your production settings, from `.env` or `--env file` (real environment variables take precedence). It fails when `NODE_ENV` is not `production`, when the lockdown would refuse to start, when no admin is set, when texts only go to the log or when the privacy contact is missing.
 4. With `--url`, the live site:
    - the security headers, including HSTS, and no software versions in them;
    - no secrets in `/api/config`;

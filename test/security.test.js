@@ -13,7 +13,7 @@ import { openDb, now } from "../server/db.js";
 import { createApp } from "../server/app.js";
 import { seedDemo } from "../server/seed.js";
 import { leadingZeroBits } from "../server/auth.js";
-import { scanSecrets, scanCode, auditSettings } from "../scripts/security-check.js";
+import { scanSecrets, scanCode, auditSettings, parseEnvFile } from "../scripts/security-check.js";
 
 const realFetch = globalThis.fetch;
 const servers = [];
@@ -368,4 +368,16 @@ test("14 · the scanner stays clean for a correct production setup whether or no
     const rows = auditSettings(seed === undefined ? good : { ...good, SEED_DEMO: seed });
     assert.deepEqual(rows.filter(r => r[0] !== "PASS"), [], `SEED_DEMO=${seed}: ${JSON.stringify(rows)}`);
   }
+});
+
+test("15 · the scanner fails settings that would run a public host in development mode, and catches the shipped .env.example copied as is", () => {
+  const good = { NODE_ENV: "production", OTP_PEPPER: "p".repeat(40), BASE_URL: "https://shaghilni.test", ADMIN_PHONES: "+963944000000", SMS_PROVIDER: "textbee",
+    TEXTBEE_API_KEY: "key", CONTACT_EMAIL: "privacy@example.com", LEGAL_NAME: "Example Org (not a real entity)", TRUST_PROXY: "true" };
+  const failsOn = (rows, re) => rows.some(r => r[0] === "FAIL" && re.test(r[1]));
+  assert.ok(failsOn(auditSettings({ ...good, NODE_ENV: "development" }), /NODE_ENV/), "development mode on a public host echoes codes and uses the built-in pepper: a FAIL, not a warning");
+  assert.ok(failsOn(auditSettings(Object.fromEntries(Object.entries(good).filter(([k]) => k !== "NODE_ENV"))), /NODE_ENV/), "unset counts as development");
+  assert.deepEqual(auditSettings(good).filter(r => r[0] !== "PASS"), [], "a correct production setup still passes cleanly");
+  const template = parseEnvFile(new URL("../.env.example", import.meta.url).pathname);
+  assert.ok(failsOn(auditSettings(template), /NODE_ENV/), "the template copied unchanged to a server is caught");
+  assert.equal(template.OTP_DEV_ECHO, undefined, "the template does not switch on code echo by itself");
 });

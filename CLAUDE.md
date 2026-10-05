@@ -7,7 +7,7 @@ Before changing anything read `docs/agent/BRIEF.md` (the full brief: rules R1–
 ## Stack and commands
 - Node ≥ 22.13, **zero npm dependencies**, built-in `node:sqlite`, server in ESM. Client = plain strict-mode scripts concatenated, fingerprinted and gzipped by `server/assets.js`. Strict CSP, no inline scripts, no third-party origins.
 - `npm test` — the FULL suite (node:test, in-memory databases). Baseline 60 pass / 0 fail. Run the full suite, never a subset, before claiming anything passes.
-- `npm run security:check` — scanner. With no environment it FAILs on `OTP_PEPPER` by design (it audits as production). With the fake production environment in `docs/agent/BASELINE.md` it exits 0 with one WARN.
+- `npm run security:check` — scanner. With no environment it FAILs on `NODE_ENV` and `OTP_PEPPER` by design (it audits as production). With the fake production environment in `docs/agent/BASELINE.md` (use `LEGAL_NAME="Example Org (not a real entity)"`, R6) it exits 0 with one WARN ("live site not checked").
 - Dev run: `OTP_DEV_ECHO=true SMS_PROVIDER=console DEMO_ACCOUNTS=true PORT=3000 DB_PATH=$(mktemp -d)/dev.db npm start`
 - Browser e2e: `npm install --no-save puppeteer` then `npm run test:e2e`. Never commit package changes; delete any stray lockfile.
 - Scripts that delete or rewrite data (`demo:remove`, `demo-accounts:purge`, `backup`, migrations) run only against `DB_PATH=$(mktemp -d)/t.db`.

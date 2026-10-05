@@ -256,6 +256,7 @@ Field order in every entry below: ID · Severity (verifier's; reporter's noted i
 
 | Field | Content |
 |---|---|
+| **Status** | **FIXED in Stage 1 (S1-2)**: `scripts/security-check.js` now FAILs when `NODE_ENV` is not `production` (checked before the lockdown, so it shows even when the pepper is missing) and exports `parseEnvFile`; `.env.example` explains the setting and ships `OTP_DEV_ECHO` commented out; README Option B says the `--env-file` must say production; SECURITY.md items 10 and 13 updated. Test: `test/security.test.js` test 15 (development and unset both FAIL; the template copied as is is caught; a correct setup still passes). No `server/` change. |
 | Severity | **P1** (reporter P1) |
 | Lens | docs versus code · deploy notes · authorization (code echo = account takeover) · scanner |
 | Rule broken | R12/R15: the lockdown described at README.md:48 and SECURITY.md:263 is bypassed by the shipped template; the designated gate (SECURITY.md:363 "shows no FAIL") exits 0 |
@@ -345,6 +346,7 @@ Field order in every entry below: ID · Severity (verifier's; reporter's noted i
 
 | Field | Content |
 |---|---|
+| **Status** | **FIXED in Stage 1 (S1-2)**: `.env.example` no longer sets `SMS_ALLOWED_PREFIXES` (the active `+963` line is now a commented example under a note that the default is Syria plus the diaspora countries); SECURITY.md item 11 says the same. Test: `test/diaspora.test.js` "the shipped .env.example keeps the default destinations". D-16's duplicate-key dedupe stays in Stage 3. |
 | Severity | **P2** (reporter P2) |
 | Lens | configuration · docs versus code R15 · diaspora product promise |
 | Rule broken | R15 (SECURITY.md:285 "Syrian numbers (+963); admin numbers anywhere" vs SECURITY.md:376 and README.md:60 "Syria plus the main diaspora countries"; the code default `config.js:49` is Syria+diaspora, so `:285` is the false line); PRODUCT.md:15 names "Syrians abroad" as an audience while the documented setup refuses them |
