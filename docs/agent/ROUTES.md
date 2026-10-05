@@ -64,7 +64,7 @@ Column meanings:
 
 | Method | Path | Guard | File:line | Tests that hit it | Matrix | Audit | Notes |
 |---|---|---|---|---|---|---|---|
-| GET | `/api/employer/students` | employer + company `verified` + hire role (`recruit.js:38`); `?event=` needs a confirmed attendance | `server/routes/recruit.js:57` | recruit :63-85,126,128; team :91; campus :117-118; events :105-111; security :131 (403), :158; lite :157 | 2+3 | none | ≤60 cards of the 1000 most recent profiles |
+| GET | `/api/employer/students` | employer + company `verified` + hire role (`recruit.js:38`); `?event=` needs a confirmed attendance; `?id=` narrows to one card (Lite's invitation form, U-016) | `server/routes/recruit.js:57` | recruit :63-85,126,128; team :91; campus :117-118; events :105-111; security :131 (403), :158; lite :157 | 2+3 | none | ≤60 cards of the 1000 most recent profiles |
 | POST | `/api/employer/students/:id/invite` | same as search; target findable; caps (3 open, 40/day, monthly plan quota) | `server/routes/recruit.js:85` | recruit :86,96-103,119-120,127; plans :63,73-76,91; events :114; lite :127,160-163; security :158 | 3 | `invitation.sent` `recruit.js:122` | — |
 | GET | `/api/employer/invitations` | employer + company `verified` only (`verified()`, no role check) | `server/routes/recruit.js:127` | recruit :113,121; lite :166; security :158 | 3 | none | D-03: hiring managers read full name + phone after an event yes |
 | POST | `/api/employer/invitations/:id/withdraw` | employer + company `verified`; own company; open only; no role check | `server/routes/recruit.js:141` | recruit :122; security :159 | 3 | `invitation.withdrawn` `recruit.js:147` | D-03 |

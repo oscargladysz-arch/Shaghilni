@@ -565,7 +565,7 @@ ${jobs.length ? `<label for="jb">${esc(tr(lg, "rcJobL"))}</label><select id="jb"
 <label for="msg">${esc(tr(lg, "rcMsgL"))}</label><textarea id="msg" name="message" rows="3" maxlength="600" dir="auto">${esc(vals.message || "")}</textarea><p class="mu">${esc(tr(lg, "rcMsgHint"))}</p>
 <button class="bt" type="submit">${I("send")} ${esc(tr(lg, "rcSend"))}</button></form>`, { error, back: "/lite/candidates", head: tr(lg, "candidates"), tab: "candidates" });
   }
-  async function findCandidate(ctx, id) { return (await call(ctx, "GET", "/api/employer/students")).students.find(x => x.id === id) || null; }
+  async function findCandidate(ctx, id) { return id > 0 && (await call(ctx, "GET", `/api/employer/students?id=${id}`)).students.find(x => x.id === id) || null; }   // by id, not the first 60 (U-016)
   async function invitePage(ctx) {
     const lg = ctx.lang, g = await employerGate(ctx, true); if (g.out != null) return g.out;
     const s = await findCandidate(ctx, Number(ctx.params.id));
