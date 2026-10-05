@@ -565,7 +565,7 @@ ${jobs.length ? `<label for="jb">${esc(tr(lg, "rcJobL"))}</label><select id="jb"
 <label for="msg">${esc(tr(lg, "rcMsgL"))}</label><textarea id="msg" name="message" rows="3" maxlength="600" dir="auto">${esc(vals.message || "")}</textarea><p class="mu">${esc(tr(lg, "rcMsgHint"))}</p>
 <button class="bt" type="submit">${I("send")} ${esc(tr(lg, "rcSend"))}</button></form>`, { error, back: "/lite/candidates", head: tr(lg, "candidates"), tab: "candidates" });
   }
-  async function findCandidate(ctx, id) { return (await call(ctx, "GET", "/api/employer/students")).students.find(x => x.id === id) || null; }
+  async function findCandidate(ctx, id) { return id > 0 && (await call(ctx, "GET", `/api/employer/students?id=${id}`)).students.find(x => x.id === id) || null; }   // by id, not the first 60 (U-016)
   async function invitePage(ctx) {
     const lg = ctx.lang, g = await employerGate(ctx, true); if (g.out != null) return g.out;
     const s = await findCandidate(ctx, Number(ctx.params.id));
@@ -612,8 +612,9 @@ ${jobs.length ? `<label for="jb">${esc(tr(lg, "rcJobL"))}</label><select id="jb"
   const DONE = { alerted: "alerted", applied: "appliedDone", saved: "saved", answered: "answered", submitted: "submitted", invited: "invitedDone", withdrawn: "withdrawn" };
   const readForm = req => new Promise((resolve, reject) => {
     let size = 0; const parts = [];
-    req.on("data", c => { size += c.length; if (size > 64 * 1024) { reject(new HttpError(413, "too_large")); req.destroy(); } else parts.push(c); });
-    req.on("end", () => { const q = new URLSearchParams(Buffer.concat(parts).toString("utf8")), o = {}; for (const k of new Set(q.keys())) { const all = q.getAll(k); o[k] = all.length > 1 ? all : all[0]; } resolve(o); });
+    // Past the limit: stop buffering and answer 413 (the page needs the socket alive; the answer closes it and ends the upload, as server/http.js readJson does)
+    req.on("data", c => { if (size > 64 * 1024) return; size += c.length; if (size > 64 * 1024) { parts.length = 0; reject(new HttpError(413, "too_large")); } else parts.push(c); });
+    req.on("end", () => { if (size > 64 * 1024) return; const q = new URLSearchParams(Buffer.concat(parts).toString("utf8")), o = {}; for (const k of new Set(q.keys())) { const all = q.getAll(k); o[k] = all.length > 1 ? all : all[0]; } resolve(o); });
     req.on("error", reject);
   });
   const FOREVER = "public, max-age=31536000, immutable";
@@ -655,6 +656,7 @@ ${jobs.length ? `<label for="jb">${esc(tr(lg, "rcJobL"))}</label><select id="jb"
       html = page(ctx, tr(ctx.lang, "genericErr"), `<div class="cd"><h1>${esc(err instanceof HttpError && err.code === "csrf" ? tr(ctx.lang, "csrf") : errText(ctx.lang, err))}</h1><a class="b2" href="/lite">${esc(tr(ctx.lang, "jobs"))}</a></div>`);
     }
     const headers = { "content-type": "text/html; charset=utf-8" };
+    if (ctx.status === 413) headers.connection = "close";
     if (ctx.cookiesOut.length) headers["set-cookie"] = ctx.cookiesOut.flat();
     if (ctx.location) { headers.location = ctx.location; return send(req, res, ctx.status === 200 ? 303 : ctx.status, "", headers); }
     return send(req, res, ctx.status, html, headers);

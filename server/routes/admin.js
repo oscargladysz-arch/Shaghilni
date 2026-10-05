@@ -106,10 +106,10 @@ export function registerAdmin(r, deps) {
     if (!a) fail(404, "not_found");
     if (a.status !== "hired") fail(409, "not_hired");
     const first = !a.hire_confirmed_at;
-    db.run("UPDATE applications SET hire_confirmed_at = COALESCE(hire_confirmed_at, ?), hire_confirmed_by = ? WHERE id = ?", now(), ctx.user.id, a.id);
-    audit(ctx.user.id, "hire.confirmed", "application", a.id, { note: String(ctx.body.note || "").slice(0, 500) });
     const out = [];
-    if (first) {
+    if (first) {   // a repeat click is a no-op: the first confirmer, time, audit row and charges stand (U-128)
+      db.run("UPDATE applications SET hire_confirmed_at = ?, hire_confirmed_by = ? WHERE id = ?", now(), ctx.user.id, a.id);
+      audit(ctx.user.id, "hire.confirmed", "application", a.id, { note: String(ctx.body.note || "").slice(0, 500) });
       const j = db.get("SELECT * FROM jobs WHERE id = ?", a.job_id), c = j && db.get("SELECT * FROM companies WHERE id = ?", j.company_id);
       // A placement fee only when a Free-plan employer hires someone it found and invited through candidate search.
       const sourced = c && db.get("SELECT 1 AS x FROM invitations WHERE company_id = ? AND user_id = ? AND status = 'accepted' AND created_at <= ?", c.id, a.user_id, a.created_at);

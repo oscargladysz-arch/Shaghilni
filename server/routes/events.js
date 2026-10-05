@@ -17,8 +17,10 @@ const at = s => (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(String(s || "")) ? Date.
 
 export function registerEvents(r, deps) {
   const { db, core, auth, audit, notify, plans } = deps;
-  const seeker = auth.need("seeker"), organiser = auth.need("admin", "university"), employer = auth.need("employer");
+  const seeker = auth.need("seeker"), employer = auth.need("employer");
   const office = ctx => (ctx.user.role === "university" ? db.get("SELECT * FROM campus_offices WHERE user_id = ?", ctx.user.id) : null);
+  // Organisers: the Shaghilni team, or a career office that still exists. A removed office keeps the university role but no office row, and gets nothing here (D-11).
+  const organiser = ctx => { auth.need("admin", "university")(ctx); if (ctx.user.role === "university" && !office(ctx)) fail(403, "no_office"); };
   const getEv = id => { const e = db.get("SELECT * FROM events WHERE id = ?", Number(id)); if (!e) fail(404, "not_found"); return e; };
   const canManage = (ctx, e) => ctx.user.role === "admin" || (ctx.user.role === "university" && (office(ctx) || {}).uni === e.uni && !!e.uni);
   const manage = (ctx, id) => { const e = getEv(id); if (!canManage(ctx, e)) fail(403, "forbidden"); return e; };

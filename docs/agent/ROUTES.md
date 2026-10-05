@@ -10,6 +10,8 @@ Column meanings:
 | Matrix | Membership in the hard-coded security matrix: **3** = in the junk-input list (`test/security.test.js:152-160`, 35 entries, 34 distinct routes); **2** = asserted in the cross-role/IDOR test (`test/security.test.js:114-139`); **—** = neither |
 | Audit | `audit()` calls on the handler's path (`server/app.js:36-37` inserts into `audit`) |
 
+**Stage 2 status.** The "In security matrix (tests 2/3)?" column below is the Stage 0 record. Since Stage 2 every JSON route has a row in `test/policy/route-policy.js` (109 rows; `test/policy-completeness.test.js` fails when a route has no row), and the generated tests derive from those rows: `test/policy-access.test.js` (every route × every excluded role), `test/policy-idor.test.js` (B against A's ids; a removed office), `test/policy-junk.test.js` (hostile input on every POST, PUT and DELETE). Two rows state the product rule where the code was wider and the code was fixed in Stage 2: `GET /api/employer/invitations` and `POST /api/employer/invitations/:id/withdraw` now need the hire level (D-03); the events organiser guard now refuses a university account without an office row (D-11).
+
 ## JSON routes (`/api/*`, 109)
 
 ### Sign-in and public (`server/routes/public.js`, `server/demo.js`) · 9
@@ -62,7 +64,7 @@ Column meanings:
 
 | Method | Path | Guard | File:line | Tests that hit it | Matrix | Audit | Notes |
 |---|---|---|---|---|---|---|---|
-| GET | `/api/employer/students` | employer + company `verified` + hire role (`recruit.js:38`); `?event=` needs a confirmed attendance | `server/routes/recruit.js:57` | recruit :63-85,126,128; team :91; campus :117-118; events :105-111; security :131 (403), :158; lite :157 | 2+3 | none | ≤60 cards of the 1000 most recent profiles |
+| GET | `/api/employer/students` | employer + company `verified` + hire role (`recruit.js:38`); `?event=` needs a confirmed attendance; `?id=` narrows to one card (Lite's invitation form, U-016) | `server/routes/recruit.js:57` | recruit :63-85,126,128; team :91; campus :117-118; events :105-111; security :131 (403), :158; lite :157 | 2+3 | none | ≤60 cards of the 1000 most recent profiles |
 | POST | `/api/employer/students/:id/invite` | same as search; target findable; caps (3 open, 40/day, monthly plan quota) | `server/routes/recruit.js:85` | recruit :86,96-103,119-120,127; plans :63,73-76,91; events :114; lite :127,160-163; security :158 | 3 | `invitation.sent` `recruit.js:122` | — |
 | GET | `/api/employer/invitations` | employer + company `verified` only (`verified()`, no role check) | `server/routes/recruit.js:127` | recruit :113,121; lite :166; security :158 | 3 | none | D-03: hiring managers read full name + phone after an event yes |
 | POST | `/api/employer/invitations/:id/withdraw` | employer + company `verified`; own company; open only; no role check | `server/routes/recruit.js:141` | recruit :122; security :159 | 3 | `invitation.withdrawn` `recruit.js:147` | D-03 |

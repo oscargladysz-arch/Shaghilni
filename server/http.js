@@ -11,10 +11,11 @@ export function createRouter() {
   const add = method => (pattern, ...handlers) => {
     const keys = [];
     const re = new RegExp("^" + pattern.replace(/[.*+?^${}()|[\]\\]/g, "\\$&").replace(/:(\w+)/g, (_, k) => { keys.push(k); return "([^/]+)"; }) + "/?$");
-    routes.push({ method, re, keys, handlers });
+    routes.push({ method, pattern, re, keys, handlers });
   };
   return {
     get: add("GET"), post: add("POST"), put: add("PUT"), delete: add("DELETE"),
+    routes: () => routes.map(r => ({ method: r.method, pattern: r.pattern })),   // read-only listing, for the route-policy tests
     match(method, pathname) {
       let pathMatched = false;
       for (const r of routes) {

@@ -13,7 +13,9 @@ Status meaning:
 | MISSING | Not built (whether or not a doc claims it) |
 | UNVERIFIED | Could not be checked here (browser e2e not run, Docker not built, no network) |
 
-Defect ids `D-01`…`D-30` refer to `docs/agent/DEFECTS.md`.
+**Stage 2 status (2026-10-05).** Guardrails: every registered route has a policy row (`test/policy/route-policy.js`, completeness test), the generated cross-role, cross-account, revocation and junk-input tests run over every route, nine route-family files pin the rules per area, the i18n parity test and the design ratchets exist (`test/ratchets.json`). Fixed: D-03, D-11, U-016, U-128, U-165 (rows marked *Stage 2*). Confirmed by the tests and left open: U-007, U-017, U-041, U-046, U-048, U-083, U-084, U-129 and the new D-31 to D-37. CI VERIFIED on GitHub (two green runs). 133 tests.
+
+Defect ids `D-01`…`D-37` refer to `docs/agent/DEFECTS.md`.
 
 ## Summary
 
@@ -30,11 +32,11 @@ Defect ids `D-01`…`D-30` refer to `docs/agent/DEFECTS.md`.
 | 9 · Campus and student verification | 16 | 8 | 2 | 0 | 26 |
 | 10 · Events, tickets, check-in | 13 | 14 | 1 | 0 | 28 |
 | 11 · Admin, insights, traffic, system, audit API | 15 | 12 | 2 | 0 | 29 |
-| 12 · Shaghilni Lite | 26 | 18 | 1 | 0 | 45 |
+| 12 · Shaghilni Lite | 27 | 17 | 1 | 0 | 45 |
 | 13 · Security headers, CSRF, rate limits, caps, retention, export, deletion, legal, lockdown | 19 | 15 | 1 | 1 | 36 |
-| 14 · i18n, RTL, design-system conformance, accessibility, theme | 2 | 21 | 1 | 2 | 26 |
-| 15 · Tests, scripts, seeding, demo accounts, Docker, deploy, docs | 7 | 12 | 1 | 1 | 21 |
-| **Total** | **231** | **185** | **13** | **6** | **435** |
+| 14 · i18n, RTL, design-system conformance, accessibility, theme | 3 | 21 | 0 | 2 | 26 |
+| 15 · Tests, scripts, seeding, demo accounts, Docker, deploy, docs | 8 | 12 | 1 | 0 | 21 |
+| **Total** | **234** | **184** | **12** | **5** | **435** |
 
 Brief `<features>` letters → areas: A → 1, 13 · B → 1, 2, 3, 4, 5, 14 · C → 12 · D → 5, 6 · E → 7 · F → 8 · G → 9 · H → 10 · I → 11 · J → 13, 15.
 
@@ -405,7 +407,7 @@ Brief `<features>` letters → areas: A → 1, 13 · B → 1, 2, 3, 4, 5, 14 · 
 | Feature | Status | Evidence | Tests | Notes or gap |
 |---|---|---|---|---|
 | Page frame (header, role tab bar, footer, flash, language switch) | VERIFIED | `server/lite.js:131-146` | lite: "lite: small pages that work without JavaScript, in Arabic or English" :74 | — |
-| Size budget and caching (first visit < 15 KB; fingerprinted immutable CSS + sprite; gzip) | VERIFIED | `lite.js:619,623-626`; `lite-assets.js:4,6`; `http.js:218-219` | lite :76-82 | Measured: first visit 5,452 B; pages 727–2,650 B. The test ratchet is 6,000 B per page (`lite.test.js:82`), not the documented 2–3 KB |
+| Size budget and caching (first visit < 15 KB; fingerprinted immutable CSS + sprite; gzip) | VERIFIED | `lite.js:619,623-626`; `lite-assets.js:4,6`; `http.js:218-219` | lite :76-82 | Measured: first visit 5,452 B; pages 727–2,650 B (641–2,517 B over 62 loads in Stage 2). The per-page ratchet is 3,072 B since Stage 2 (A-21, `lite.test.js:82`); it was 6,000 B |
 | No JavaScript on content pages; CSP on Lite | VERIFIED | `lite.js:145`; `http.js:197-215` | lite :75,94-95 | Resume page loads a one-line print script (`lite.js:307,315`) |
 | Signed per-browser form token (`lt` cookie, HMAC, timing-safe, Origin/Sec-Fetch-Site refusal) | VERIFIED | `lite.js:104,147,629-630,645-648,654-655` | lite: "lite: a job seeker signs in, builds a profile…" :104-105 | — |
 | In-process handler calls (same guards, validation, limits, audit) | VERIFIED | `lite.js:120-128`; `app.js:59` | lite :116-117,122,131,165 | — |
@@ -435,14 +437,14 @@ Brief `<features>` letters → areas: A → 1, 13 · B → 1, 2, 3, 4, 5, 14 · 
 | Employer tab bar; verified employers get candidates/sent/links; plan line | PARTIAL | `lite.js:132,136,162,192,499-501` | lite :151-153 | Plan line untested; career offices get the seeker tab bar |
 | Seeker/admin numbers on `/lite/hire` get a note; roles never changed | VERIFIED | `lite.js:495-496`; `auth.js:85-87` | lite :166-168 | — |
 | Candidate search (verified employers; filters; cards without contact details) | VERIFIED | `lite.js:519-525,538-554` | lite :154,157-158 | D-04 raw `edu_student` |
-| Invite a candidate (job or event; errors; fee refused) | VERIFIED | `lite.js:555-582` | lite :159-165 | Job-kind untested; lookup capped at 60 unfiltered rows |
+| Invite a candidate (job or event; errors; fee refused) | VERIFIED | `lite.js:555-582` | lite :159-165; policy-lite (U-016) | Job-kind untested; the lookup is by id since Stage 2 (U-016), no longer the first 60 unfiltered rows |
 | Invitations sent (phone after event yes; withdraw) | PARTIAL | `lite.js:583-599` | lite :164 | Withdraw and phone reveal untested |
 | Legal links in footer and consent box | PARTIAL | `lite.js:144,450` | none | D-12: point at JavaScript-only `/#/privacy`, `/#/terms`; no `/lite/privacy`/`/lite/terms` |
 | Flash messages after redirects | PARTIAL | `lite.js:612,634,143` | none | Language switch keeps `?done=` so the flash repeats |
 | 404 page | VERIFIED | `lite.js:638-639` | lite :88 | — |
 | HEAD answered like GET | PARTIAL | `lite.js:638`; `http.js:223` | none | — |
 | Rate limits shared with the API | PARTIAL | `lite.js:637,643` | none | — |
-| Form body limit 64 KB → 413 | PARTIAL | `lite.js:613-618` | none | Socket destroyed before the 413 page arrives (probe) |
+| Form body limit 64 KB → 413 | VERIFIED (Stage 2) | `lite.js` readForm | policy-lite (64 KB test) | Fixed in Stage 2 (U-165): the reader stops buffering and the 413 page is sent with `connection: close`, as the JSON API does |
 | Lite GET pages counted by traffic | VERIFIED | `app.js:111`; `traffic.js:63-73` | traffic :75-78,90 | — |
 | Demo hint on the sign-in page | PARTIAL | `demo.js:193-194`; `lite.js:456` | none | Promises "code is shown on screen" regardless of `OTP_DEV_ECHO`; «جهات التوظيف» |
 | LT string table (189/189, fallback LT → STR → STR.en → key) | PARTIAL | `lite.js:15-82,102` | lite :96 (prefix check on four pages) | 19 keys shadow STR; outside STR parity |
@@ -520,7 +522,7 @@ Brief `<features>` letters → areas: A → 1, 13 · B → 1, 2, 3, 4, 5, 14 · 
 | XSS-safe rendering (escaping `html` template, one `innerHTML` sink, scanner rule) | VERIFIED | `engine.js:12-17`; `boot.js:223`; `security-check.js:53` | security test 13 | — |
 | WCAG AA contrast in light and dark (PRODUCT.md "40 screens") | UNVERIFIED | tokens `app.css:111-115,128-132` | none | No report, screenshots or test in the repo |
 | Lite look-alike of the full app | PARTIAL | `lite-assets.js:3` (own palette) vs `app.css:111-131` | lite :74 (tab bar) | Colours close, not the tokens (`#0f6e56` vs `#0E6B46`); favicon `#0D5C3A` |
-| i18n parity test and CSS ratchets | MISSING | no such test; no `test/ratchets.json` | none | Backlog P1-1; baseline numbers: 28 hex after `app.css:150`, 4 sub-12px cqw sizes, physical props at `app.css:462-463,822-823` |
+| i18n parity test and CSS ratchets | VERIFIED (Stage 2) | `test/i18n.test.js`; `test/ratchets.test.js`; `test/ratchets.json` | i18n; ratchets (5 tests) | Counts may only go down: 24 hex, 1 named, 11 rgb(), 4 var() fallbacks outside the token block; 4 cqw sizes under 12 px; 2 physical properties; 5 hex in `public/js/app*.js` (the 10 in `lookups.js` and 2 in `boot.js` are outside the scan); 11 hex in `lite.js`, 16 in `lite-assets.js` outside its `:root` blocks; 3 glyph icons |
 
 ## Area 15 · Tests, scripts, seeding, demo accounts, Docker, deploy, docs (brief J)
 
@@ -545,7 +547,7 @@ Brief `<features>` letters → areas: A → 1, 13 · B → 1, 2, 3, 4, 5, 14 · 
 | `GET /api/health` | VERIFIED | `public.js:35`; `Dockerfile:14` | security :313 | Counts toward the API rate limit |
 | `GET /api/config` | VERIFIED | `public.js:36` | api :261; demo :65,96,105; payments :71,78; security :79,273 | — |
 | Documentation set (README, SECURITY, PRODUCT with marker, DESIGN front matter, screenshots, docs/agent) | PARTIAL | `PRODUCT.md:3` marker; `DESIGN.md:1`; `docs/screenshots/*` | none (claims) | See `docs/agent/DOC_DRIFT.md` |
-| Continuous integration | UNVERIFIED (Stage 1) | `.github/workflows/ci.yml` (tests and scanner on Node 22.13.0 / 22 / 24; manual e2e job) | none: validated with a YAML parser and the same commands locally; no GitHub run yet (`docs/LAUNCH.md` A7, A8) | P0-2 written in Stage 1 (S1-3); first run is the owner's |
+| Continuous integration | VERIFIED (Stage 2) | `.github/workflows/ci.yml` (tests and scanner on Node 22.13.0 / 22 / 24; manual e2e job) | GitHub runs 37360113885 (PR #2) and 37360175869 (`main`) green on all three versions; the e2e job is manual and has not run (`docs/LAUNCH.md` A7, A8, B2) | P0-2 written in Stage 1 (S1-3); branch protection is the owner's (D5) |
 | Lite demo hint | PARTIAL | `demo.js:193-194`; `lite.js:456-457` | none | See area 12 |
 
 ## Brief corrections
@@ -571,7 +573,7 @@ Items of `<verified_facts>` and `<features>` that the maps contradict or refine.
 | B | "Claude wording suggestions only for saved bullet points (10 per hour per person)" | A published job must be chosen (404 otherwise); the 10/hour counter is shared with translation; each bullet's `role`/`current` travel unchecked | `server/routes/resume.js:14,46-53` |
 | B | "Job alerts … up to 5 saved searches; counts; a digest at most about once a day" | Confirmed; D-26: a governorate alert never matches remote listings | `server/alerts.js:61`, `engine.js:1143` |
 | C | "no JavaScript beyond the sign-in check" | A one-line print script also loads on the resume page; with the default `OTP_POW_BITS=14` signing in needs the script (no-JS form → `pow_required`) | `server/lite.js:145,307,315,451,462-465` |
-| C | "about 2–3 KB a page after (a test checks)" | Measured max 2,650 B; the test ratchet is 6,000 B | `test/lite.test.js:82`; map 12 sizes |
+| C | "about 2–3 KB a page after (a test checks)" | Measured max 2,650 B; the test ratchet was 6,000 B, now 3,072 B (Stage 2, A-21) | `test/lite.test.js:82`; map 12 sizes |
 | D | "pay and place required" | Pay and governorate (plus title, a language, a summary); free-text `place` is optional | `server/validate.js:126-136` |
 | D | "edits go back for review" | Only for published and rejected listings; edits while pending or closed are kept without re-check (D-05, D-06) | `server/routes/employer.js:100-104,127` |
 | D | "registration number unique (otherwise 'ask to join')" | Checked only when the caller has no company yet; an existing company may edit its number to another's | `server/routes/employer.js:40-46` |
@@ -597,7 +599,7 @@ Items of `<verified_facts>` and `<features>` that the maps contradict or refine.
 | Lite: block a company, plans/billing/analytics, job posting, alert channel choice or edit, withdraw an application, privacy/terms pages | `lite.js:258,265` (yes/no only); no plan/jobs/alerts-edit routes; `:144,450` link to `/#/…` | README.md:11 (block, general); D-12 |
 | Server-rendered legal pages (`/lite/privacy`, `/lite/terms`) | not in `lite.js:601-611` | Backlog P1-2 |
 | QNB Syria payment adapter | `server/payments.js:33-47` `ready = false` | README.md:335; brief E |
-| Continuous integration | `.github/workflows/ci.yml` added in Stage 1 (S1-3); the first GitHub run is UNVERIFIED | closed in Stage 1 |
+| Continuous integration | `.github/workflows/ci.yml` added in Stage 1 (S1-3); two GitHub runs green in Stage 2 | closed in Stage 2 |
 | i18n parity test; CSS ratchets (`test/ratchets.json`) | no such tests | Backlog P1-1 |
 | Production gate for `seedDemo` | `server/config.js:68` now `!prod && …` (Stage 1, S1-1) | closed in Stage 1 |
 | Admin role revocation | `server/auth.js:99` promotes only | D-17 |

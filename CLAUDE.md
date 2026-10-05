@@ -6,7 +6,7 @@ Before changing anything read `docs/agent/BRIEF.md` (the full brief: rules R1–
 
 ## Stack and commands
 - Node ≥ 22.13, **zero npm dependencies**, built-in `node:sqlite`, server in ESM. Client = plain strict-mode scripts concatenated, fingerprinted and gzipped by `server/assets.js`. Strict CSP, no inline scripts, no third-party origins.
-- `npm test` — the FULL suite (node:test, in-memory databases). Baseline 60 pass / 0 fail. Run the full suite, never a subset, before claiming anything passes.
+- `npm test` — the FULL suite (node:test, in-memory databases). Baseline 133 pass / 0 fail after Stage 2 (60 at Stage 0). Run the full suite, never a subset, before claiming anything passes.
 - `npm run security:check` — scanner. With no environment it FAILs on `NODE_ENV` and `OTP_PEPPER` by design (it audits as production). With the fake production environment in `docs/agent/BASELINE.md` (use `LEGAL_NAME="Example Org (not a real entity)"`, R6) it exits 0 with one WARN ("live site not checked").
 - Dev run: `OTP_DEV_ECHO=true SMS_PROVIDER=console DEMO_ACCOUNTS=true PORT=3000 DB_PATH=$(mktemp -d)/dev.db npm start`
 - Browser e2e: `npm install --no-save puppeteer` then `npm run test:e2e`. Never commit package changes; delete any stray lockfile.
@@ -27,8 +27,8 @@ Before changing anything read `docs/agent/BRIEF.md` (the full brief: rules R1–
 ## Gotchas
 - `CLIENT_FILES` in `server/assets.js` fixes the client script order. A new client file must be inserted there, in the right place (`demo.js` is spliced in just before `boot.js`).
 - `STR` values are not all strings: plural forms are objects. Any parity check must handle that. The Syrian-dialect overrides are the last block of `public/js/i18n4.js`.
-- Security-matrix rule (SECURITY.md, "Keeping this file true"): every new endpoint goes into security tests 2 (cross-role access) and 3 (junk input) in `test/security.test.js`. Today that list is hard-coded (about 35 entries) while 109 routes are registered.
-- `createRouter` in `server/http.js` stores only a compiled regex per route, not the pattern string, and has no `routes()` accessor.
+- Route-policy rule (SECURITY.md, "Keeping this file true"): every new route needs a row in `test/policy/route-policy.js` (method, pattern, allowed roles). `test/policy-completeness.test.js` fails without it, and the row drives the generated cross-role, IDOR and junk-input tests (`test/policy-*.test.js`, harness in `test/policy/harness.js`). A new id-bearing route also needs a `fill()` rule and a `bodyFor()` body in the harness.
+- `createRouter` in `server/http.js` keeps each route's pattern string and exposes `routes()`; `createApp` exposes it as `app.routes()` (read-only listing used by the policy tests).
 - `public/js/engine.js` runs in the browser AND on the server (`server/core.js`, vm sandbox). A change there changes both sides: test both.
 - Migrations (`MIGRATIONS` in `server/db.js`, 15 today) are append-only. A table rebuild copies migration 10 (foreign keys off → rebuild → `foreign_key_check` → on).
 - Privacy is a four-file change: `public/js/legal.js`, `server/retention.js`, `TERMS_VERSION` in `server/config.js`, `SECURITY.md`.

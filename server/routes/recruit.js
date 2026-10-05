@@ -57,7 +57,7 @@ export function registerRecruit(r, deps) {
   r.get("/api/employer/students", ctx => {
     const co = hiring(ctx);
     const f = k => String(ctx.query.get(k) || "").slice(0, 60);
-    const fac = f("fac"), uni = f("uni"), gov = f("gov"), year = Number(f("year")) || 0, stage = f("stage"), level = f("level"), q = core.norm(f("q")).trim();
+    const fac = f("fac"), uni = f("uni"), gov = f("gov"), year = Number(f("year")) || 0, stage = f("stage"), level = f("level"), q = core.norm(f("q")).trim(), only = Number(f("id")) || 0;   // id: one card by user id, for Lite's invitation form (U-016)
     const rows = db.all(`SELECT p.user_id, p.data FROM profiles p JOIN users u ON u.id = p.user_id
       WHERE u.deleted_at IS NULL AND u.role = 'seeker' AND json_extract(p.data, '$.recruit.open') = 1
         AND NOT EXISTS (SELECT 1 FROM recruiter_blocks b WHERE b.user_id = p.user_id AND b.company_id = ?)
@@ -69,6 +69,7 @@ export function registerRecruit(r, deps) {
     }
     const out = [];
     for (const row of rows) {
+      if (only && row.user_id !== only) continue;
       const p = J(row.data); if (!p) continue;
       const e = p.edu || {};
       if ((fac && e.fac !== fac) || (uni && e.uni !== uni) || (gov && p.gov !== gov) || (year && Number(e.year) !== year)) continue;
@@ -125,7 +126,7 @@ export function registerRecruit(r, deps) {
   });
 
   r.get("/api/employer/invitations", ctx => {
-    const co = verified(ctx);
+    const co = hiring(ctx);   // the sent list carries full names and numbers after an event yes: hire level, like search (D-03)
     const rows = db.all(`SELECT i.*, p.data AS p_data, u.phone AS u_phone, j.data AS j_data FROM invitations i
       JOIN users u ON u.id = i.user_id LEFT JOIN profiles p ON p.user_id = i.user_id LEFT JOIN jobs j ON j.id = i.job_id
       WHERE i.company_id = ? ORDER BY i.created_at DESC LIMIT 200`, co.id);
@@ -139,7 +140,7 @@ export function registerRecruit(r, deps) {
   });
 
   r.post("/api/employer/invitations/:id/withdraw", ctx => {
-    const co = verified(ctx);
+    const co = hiring(ctx);   // the sent list carries full names and numbers after an event yes: hire level, like search (D-03)
     const i = db.get("SELECT * FROM invitations WHERE id = ? AND company_id = ?", Number(ctx.params.id), co.id);
     if (!i) fail(404, "not_found");
     if (!OPEN.includes(i.status)) fail(409, "bad_transition");

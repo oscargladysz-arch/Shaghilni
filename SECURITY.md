@@ -5,7 +5,7 @@ This file maps the 13-item *30-Minute Pre-Launch Security Checklist* onto Shaghi
 Run both commands before every launch and after every change:
 
 ```bash
-npm test                                             # 66 tests in 15 files (API, security, recruiters, import, Lite, payments, plans, universities, teams, events, demo, diaspora, applying, insights, traffic)
+npm test                                             # 133 tests in 30 files (API, security, route policy, recruiters, import, Lite, payments, plans, universities, teams, events, demo, diaspora, applying, insights, traffic, i18n, ratchets)
 npm run security:check -- --url https://your-domain  # the code, your settings and the live site
 ```
 
@@ -86,6 +86,7 @@ Security test 2 attacks it:
 - Employer B tries to read employer A's applicants, move them, and edit, submit, close and reopen A's listing. Each attempt answers "not found".
 - A job seeker tries to withdraw another seeker's application, or to see it in their own list or export.
 - Every role tries the other roles' endpoints and is refused (403). Guests trying private endpoints are asked to sign in (401).
+- Generated from the policy table (`test/policy/route-policy.js`): every route × every role the table excludes answers 401, 403 or 404 (`test/policy-access.test.js`, 574 refusals); account B, in the same role as account A, gets nothing of A's through any id-bearing route and A's rows stay unchanged (`test/policy-idor.test.js`); a career office the admin removed loses every organiser route even after signing in again.
 - The public board is searched for private company fields: WhatsApp number, registration number and contact name.
 - Shaghilni Lite (`test/lite.test.js`) runs every action through the same API handlers in-process, so access control, validation and rate limits are identical. Its HTML forms can't send the API's custom header, so each form carries a token signed with the server secret and tied to a per-browser cookie. Posts without it, or sent from another site, are refused. A job seeker's number never becomes a recruiter account, and candidate search in Lite waits for verification.
 - Recruiter search (`test/recruit.test.js`): only job seekers who switched it on are listed, only to verified companies (and only to their owner, admins and recruiters), and never to a company the person blocked. Anyone with a profile can switch it on, and nobody is listed otherwise. Seekers, employers and guests are refused on each other's recruiter endpoints.
@@ -96,7 +97,7 @@ Security test 2 attacks it:
 
 Every endpoint rebuilds its input field by field (`server/validate.js`). It checks types, lengths, allowed values, phone formats and pay ranges, and runs the listing checks for fees and discriminatory wording. The browser's checks exist only for convenience; the server's are the ones that count. Bodies over 256 KB are refused, and so is anything that isn't JSON.
 
-Security test 3 sends more than 1,000 junk requests to 34 of the API's endpoints (the list in `test/security.test.js`; the newer families are not in it yet, see `docs/agent/ROUTES.md`), as a guest, a job seeker, an employer and an admin. The junk includes wrong types, arrays, objects nested 500 levels deep, prototype-pollution payloads, NoSQL-style operators, SQL fragments and bad IDs. The test requires that:
+Security test 3 sends more than 1,000 junk requests to 34 of the API's endpoints (the hand-written list in `test/security.test.js`), and `test/policy-junk.test.js` sends about 2,000 more to every POST, PUT and DELETE route in the policy table (malformed JSON, wrong types, 100 KB strings, bidi and control characters, SQL metacharacters, prototype keys, deep nesting, huge arrays), as a guest, a job seeker, an employer and an admin. The junk includes wrong types, arrays, objects nested 500 levels deep, prototype-pollution payloads, NoSQL-style operators, SQL fragments and bad IDs. The test requires that:
 
 - no request crashes the server;
 - the real profile survives;
@@ -188,7 +189,7 @@ present, point to the code, and list any gaps with a fix and a test that would p
 | **A06 Insecure Design** | Threats handled by design: employer verification with a recorded sanctions-screening step, review of every listing (edits made while a listing awaits review or is closed are not re-checked yet), the no-fees rule in the listing checks, SMS-pumping guards, consent and minimisation. | Verification and sanctions screening are manual, so they're only as good as the people doing them |
 | **A07 Authentication Failures** | See item 5 | An admin account is only as safe as the admin's phone number. Ask your carrier for a SIM-swap PIN and keep `ADMIN_PHONES` short. |
 | **A08 Software or Data Integrity Failures** | No scripts from CDNs. Built files are named by content hash. Database migrations are versioned and run in transactions. The audit log records who changed what. | None known |
-| **A09 Security Logging and Alerting Failures** | The audit log records sign-ups, consent, deletions, company and listing changes and decisions, and every application move and hire confirmation. The server log records errors, failed texts and reached caps. | **No automatic alerts yet,** and the admin screens don't show the audit log (it's at `/api/admin/audit`). Watch the log, or add an alert on your host. |
+| **A09 Security Logging and Alerting Failures** | The audit log records sign-ups, consent, deletions, company and listing changes and decisions, and every application move (except a re-application after a withdrawal: `docs/agent/DEFECTS.md`, U-083) and hire confirmation. The server log records errors, failed texts and reached caps. | **No automatic alerts yet,** and the admin screens don't show the audit log (it's at `/api/admin/audit`). Watch the log, or add an alert on your host. |
 | **A10 Mishandling of Exceptional Conditions** | Every request is wrapped, and unexpected errors answer 500 without details. Unhandled rejections are logged, and a fatal error exits so the host restarts a clean process. Fuzz-tested (test 3); a broken database is tested (test 4). | None known |
 
 ## 8. Data leak audit
@@ -210,7 +211,7 @@ or left behind after deletion.
 | Employer notes on applicants | The company's team (owner, admins, recruiters and hiring managers) | Erased when the applicant deletes their account; not in the audit log |
 | Candidate cards in recruiter search | Verified employers' owners, admins and recruiters (not hiring managers), and only for people who switched on *Let recruiters find me*: first name and last initial, education, experience level, recent job titles, governorate, skills and languages. Never the phone number or email | Nowhere else. Hidden again as soon as the student switches it off or blocks the company |
 | Uploaded resume files | Nobody. The file is read in the browser and never uploaded; the importer makes no network calls (tested) | Only the details the person chooses to add are saved, exactly like typed ones |
-| Invitations and replies | The student, and the company that sent them. That company gets the student's full name and number only after the student says yes to an event | The student gets a text. Deleted with the student's account; withdrawn when the employer deletes theirs |
+| Invitations and replies | The student, and the owner, admins and recruiters of the company that sent them (hiring managers see neither the sent list nor any number). That company gets the student's full name and number only after the student says yes to an event | The student gets a text. Deleted with the student's account; withdrawn when the employer deletes theirs |
 | Event sign-ups (ticket code, check-in time) | The person; the event's organiser sees name, university and faculty to check them in; confirmed companies see only attendees who switched on *Let recruiters find me* | In the export; the code goes by text; reports hold totals only; deleted with the account |
 | University email address | The student (masked); never the career office or employers | The email service, for the code; kept so it verifies one account; deleted with the account |
 | IP addresses | Nobody, through the app | Stored with sign-in codes for 24 hours; kept in memory for rate limits; your host's logs |
@@ -360,7 +361,7 @@ It exits with an error when anything fails, so it can gate a deploy. Security te
 ## Keeping this file true
 
 - When you change what's collected, who receives it or how long it's kept, update `public/js/legal.js`, `server/retention.js`, `TERMS_VERSION` and this file together.
-- Every endpoint must appear in the access-control and junk-input tests (security tests 2 and 3). Today their hard-coded list covers 34 of 109 routes (`docs/agent/ROUTES.md`); Stage 2 (P1-1) replaces it with a generated check that fails when a route is missing.
+- Every endpoint needs a row in `test/policy/route-policy.js` (which roles may call it). `test/policy-completeness.test.js` fails when a registered route has no row, and the rows drive the generated tests: every route × every excluded role (`test/policy-access.test.js`), account B against account A's ids (`test/policy-idor.test.js`) and hostile input on every POST, PUT and DELETE (`test/policy-junk.test.js`). Security tests 2 and 3 keep their hand-written cases; there is no list to extend by hand any more.
 - Re-run the four prompts (items 6–9) after big changes, and update their results here.
 
 ## Before you go live
@@ -379,7 +380,7 @@ The launch checklist, with who owns each item (agent, owner, lawyer or provider)
 ## Plans, teams and billing
 
 - **Nothing here touches job seekers' chances.** Sponsored listings are at most two, lifted to the top and labelled *Sponsored*, only for a signed-in job seeker whose fit score is 60% or more; everyone else sees them in the usual order, unlabelled. No job seeker can pay for anything.
-- **Teammates** are matched by phone number. A number that belongs to a job seeker, an admin or another company can't be added. Only the company owner can request or pay for plans and hand the company over. The owner and admins edit company details and manage the team (only the owner changes, removes or approves admins); removing a teammate ends their access immediately.
+- **Teammates** are matched by phone number. A number that belongs to a job seeker, an admin or another company can't be added. Only the company owner can request or pay for plans and hand the company over. The owner and admins edit company details and manage the team (only the owner changes, removes or approves admins, though an admin can still invite one: `docs/agent/DEFECTS.md`, D-31); removing a teammate ends their access immediately.
 - **Placement fees are computed on the server** at the moment an admin confirms a hire, from the invitation and application records, and only once per hire.
 - **Reports** contain no candidate names or contact details: placements list dates, job title, governorate, type and pay range; the compliance record lists company submission, verification, rejection, suspension and plan changes, listing approvals, rejections and sponsorships, and hire confirmations (its sanctions-screening column is not filled in yet: see `docs/agent/DEFECTS.md`, D-07).
 - **Every plan change, charge update, sponsorship start and team change is in the audit log** (switching a sponsorship off is not yet recorded: see `docs/agent/DEFECTS.md`, D-28).
@@ -396,7 +397,7 @@ The launch checklist, with who owns each item (agent, owner, lawyer or provider)
 - **No card data touches Shaghilni.** Card details are entered on the bank's hosted page; we store only the company, plan, months, amount, currency, dates, status, the provider's name and reference, and which team member started the payment.
 - **Only the bank's signed result switches a plan on.** Results arrive at `/pay/callback/<provider>`, outside `/api` (so without the CSRF header), and each is checked on its own: the signature, that the payment exists, and that the amount and currency match what we asked for. A result is applied once; repeats change nothing. The return page (`/pay/return`) never changes anything.
 - **The test payment page can't reach production:** the server refuses to start with `PAY_PROVIDER=test` when `NODE_ENV=production`, and card payments need both monthly prices to be set.
-- **Every checkout and every card payment is in the audit log.**
+- **Every checkout and every paid card payment is in the audit log.** A failed, cancelled or mismatched result changes the payment's status and writes a log line naming the payment id only, not an audit row (`test/payments.test.js`).
 
 
 ## Universities
@@ -404,7 +405,7 @@ The launch checklist, with who owns each item (agent, owner, lawyer or provider)
 - **Career offices see only their own university** (or faculty): every portal query is scoped to the office, and a partnership request made to another university can't be approved or declined by it (404).
 - **Names only with consent:** for students in general, offices get counts only. Names and activity (faculty, year, how many applications and interviews, confirmed hires) appear only for students who verified themselves with their university email; they are told exactly what the office will see before they ask for the code, and can remove the verification at any time.
 - **Verification is tied to the profile's university**, so it can't be carried to another university; deleting an account deletes its verification records. Every verification, partnership and office change is in the audit log.
-- **Roles stay apart:** career offices can't reach employer, job seeker or admin routes, and the reverse. Accounts are created only by the admin.
+- **Roles stay apart:** career offices can't reach employer, job seeker or admin routes, and the reverse. Accounts are created only by the admin, and when the admin removes an office its sessions end and the number loses every career-office and event-organiser route at once, even after signing in again (tested).
 
 
 ## Events

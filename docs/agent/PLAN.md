@@ -79,6 +79,8 @@ A workflow fits: one agent per route family writes policy rows and fuzz cases in
 
 Hot-file note for Stage 2: family agents write only new files under `test/policy/`; nobody edits `test/security.test.js` in parallel (one owner); S2-7 fixes touch `server/routes/recruit.js`, `server/routes/events.js` (not hot) and ★`SECURITY.md` (integrator only). S2-5 and S2-6 touch no hot file except one README link (integrator).
 
+**Stage 2 closed (2026-10-05).** S2-0 to S2-6 done as planned (13 policy files, 57 tests; i18n 2; ratchets 5; payments 3 + `docs/PAYMENTS_ADAPTER.md`); S2-7 fixed D-03, D-11, U-016 (Lite invite lookup by id), U-128 (repeat hire confirmation) and U-165 (Lite 413 page). Confirmed by the tests and left for Stage 3 or 4: U-017 and D-32 (open invitations stay answerable after suspension / opt-out: privacy, Stage 3 with D-30), U-007 (former teammates by number: privacy, Stage 3), U-041 (cancelled event 404), U-046 and U-048 (admin state check, audit paging: P1-3), U-083/U-084 (re-apply and withdraw records), U-129 (documented in the adapter contract), D-31 (admin invites admin), D-33 to D-37 (P3 records). 133 tests.
+
 ## 3 · Stage 3 · Product gaps · one branch per task
 
 Each task: plan → implement → tests → independent adversarial review (authorization, injection, i18n and RTL, accessibility, Lite budget, design tokens) → integrate (brief). All branches from `main` after Stage 2 is merged. Integration order below is fixed by hot-file contention (section 6). Every new Arabic string → `docs/agent/ARABIC_REVIEW.md` (R9). Every new or changed endpoint → policy table + junk test (`<definition_of_done>` 4).
