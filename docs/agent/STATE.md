@@ -228,7 +228,7 @@ Brief `<features>` letters → areas: A → 1, 13 · B → 1, 2, 3, 4, 5, 14 · 
 | Audit for employer and review actions | PARTIAL | `employer.js:51,57,72,82,92,102,119,128`; `admin.js:54,78,87` | api: "audit log records who did what" (company.verified, job.approved); team :100-101; plans :138 | Many actions never asserted; note-only edits and sponsor-off write nothing (D-28) |
 | Lite recruiter sign-up `/hire` → `/lite/hire` → company form | VERIFIED | `app.js:107`; `lite.js:486-535,608` | lite :144-154; lite :92 | `company_exists` is a dead end in Lite (no ask-to-join page) |
 | Owner deletion closes listings, withdraws invitations, suspends company, strips contact | VERIFIED | `me.js:154-160` | security test 1 :108-111 | `applyPhone`/`applyEmail` are left in `companies.data` (probe) |
-| Undocumented listing fields (openings, level, mode, anyFaculty, noDegree, support, lists, contact, tags) | PARTIAL | `validate.js:112-122`; `app-employer.js:96-144` | api :52-54 (set, not asserted) | D-15 (sample `contact` names real people at real organisations); D-30 |
+| Undocumented listing fields (openings, level, mode, anyFaculty, noDegree, support, lists, contact, tags) | PARTIAL | `validate.js:112-122`; `app-employer.js:96-144` | api :52-54 (set, not asserted) | Stage 3: place, contact lines, provides and tags are scanned for contact details and shown on the review card (D-30 fixed) |
 | Employer "University partner" request + `partners` in `GET /api/employer` | VERIFIED | `campus.js:139`; `employer.js:36`; `app-campus.js:70-76` | campus :119-122 | — |
 | Arabic-Indic digits in `pay` rejected by the server | PARTIAL | `validate.js:6,111`; `engine.js:297` (browser converts first) | none | Direct API callers only (probe) |
 

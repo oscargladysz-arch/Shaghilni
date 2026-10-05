@@ -986,7 +986,7 @@ Object.assign(STR.en, {
   adScreened: "I checked this company and its owners against the US sanctions list (OFAC SDN) and found no match.",
   adSdn: "Open the OFAC sanctions search", adVerify: "Verify company", adReject: "Ask for changes", adSuspend: "Suspend", adNote: "Note to the employer",
   tVerified: "Company verified", tSentBack: "Sent back with your note", tSuspended: "Company suspended",
-  adApprove: "Publish listing", adFlagGender: "Gendered wording: “{x}”", tPublished: "Listing published",
+  adApprove: "Publish listing", adFlagGender: "Gendered wording: “{x}”", adFlagContact: "Contact details in the text: “{x}”", tPublished: "Listing published",
   adCallEmployer: "Call employer", adConfirm: "Confirm hire", adConfirmHint: "Confirm only after the employer tells you on the phone that this person has started work.",
   tConfirmed: "Hire confirmed", adHiredOn: "Marked hired {when}", adSeeker: "Hired", adShowConfirmed: "Show confirmed", adShowPending: "Show unconfirmed",
   demoListing: "Demo listing: applications are recorded but no employer receives them.", waUnavailable: "This employer hasn't added a WhatsApp number yet."
@@ -1978,7 +1978,7 @@ Object.assign(STR.ar, {
   adScreened: "تحققت من الشركة ومالكيها في قائمة العقوبات الأمريكية (OFAC SDN) ولم أجد تطابقاً.",
   adSdn: "افتح بحث العقوبات لدى OFAC", adVerify: "وثّق الشركة", adReject: "اطلب تعديلات", adSuspend: "أوقف الشركة", adNote: "ملاحظة لصاحب العمل",
   tVerified: "وُثّقت الشركة", tSentBack: "أُعيدت مع ملاحظتك", tSuspended: "أُوقفت الشركة",
-  adApprove: "انشر الإعلان", adFlagGender: "صياغة تحدد الجنس: «{x}»", tPublished: "نُشر الإعلان",
+  adApprove: "انشر الإعلان", adFlagGender: "صياغة تحدد الجنس: «{x}»", adFlagContact: "بيانات تواصل في النص: «{x}»", tPublished: "نُشر الإعلان",
   adCallEmployer: "اتصل بصاحب العمل", adConfirm: "أكّد التوظيف", adConfirmHint: "أكّد فقط بعد أن يخبرك صاحب العمل هاتفياً بأن هذا الشخص بدأ العمل.",
   tConfirmed: "تأكّد التوظيف", adHiredOn: "سُجّل التوظيف {when}", adSeeker: "الموظَّف", adShowConfirmed: "اعرض المؤكدة", adShowPending: "اعرض غير المؤكدة",
   demoListing: "إعلان تجريبي: تُسجَّل الطلبات لكن لا يستلمها أي صاحب عمل.", waUnavailable: "لم يضف صاحب العمل رقم واتساب بعد."
