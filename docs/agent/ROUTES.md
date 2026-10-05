@@ -224,7 +224,7 @@ All Lite POSTs require the signed per-browser token (`lt` cookie + `csrf` field,
 | GET | `/lite/recruiters` | seeker; via `GET /api/me/invitations` | `server/lite.js:603` (recruitersPage :254) | lite :128 | — | none (invitations marked seen) | No block action |
 | GET | `/lite/resume` (`?cv=en\|ar`) | seeker | `server/lite.js:603` (resumePage :287) | lite :132-135 | — | none | Loads `/lite/p.<hash>.js` |
 | GET | `/lite/me` | signed in (gate); employer → `/lite/hire`; university/admin get a note | `server/lite.js:604` (mePage :316) | lite :103,118,137,186 | — | none | — |
-| GET | `/lite/profile?step=1-5` | seeker | `server/lite.js:604` (profilePage :403) | lite :112,114,174-175 | — | none | Education dropdown shows raw `edu_student` (D-04) |
+| GET | `/lite/profile?step=1-5` | seeker | `server/lite.js:604` (profilePage :403) | lite :112,114,174-175 | — | none | Stage 3: every education status has a label (D-04 fixed) |
 | POST | `/lite/profile` | seeker; via `PUT /api/me/profile` | `server/lite.js:604` (profilePost :410) | lite :107-108,113,115,176 | — | none | — |
 | POST | `/lite/profile/exp` | seeker; via `PUT /api/me/profile` | `server/lite.js:604` (expPost :424) | lite :109,111 | — | none | Edit path untested |
 | POST | `/lite/profile/exp/delete` | seeker; via `PUT /api/me/profile` | `server/lite.js:604` (expDelete :438) | **none** | — | none | — |

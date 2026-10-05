@@ -107,6 +107,7 @@ test("lite: a job seeker signs in, builds a profile step by step, applies, saves
   assert.equal((await b.post("/lite/profile", { csrf: tok, step: "1", name: "لينا حداد", gov: "damascus", email: "" })).location, "/lite/profile?step=2");
   for (const q of ["", "?lang=en"]) { const s2 = await b.get("/lite/profile?step=2" + q.replace("?", "&")); assert.doesNotMatch(s2.text, /\b(rcSt_|lvl_|edu_|err_|st_)[a-z]/, "every education status has a label, students included (D-04)"); }
   assert.match((await b.get("/lite/profile?step=2&lang=en")).text, /<option value="student">Current student</, "the student option is a sentence, not a key");
+  await b.get("/lite/profile?step=2&lang=ar");   // back to Arabic for the rest of the flow (the language choice sticks)
   assert.equal((await b.post("/lite/profile", { csrf: tok, step: "2", status: "bachelor", uni: "damascus", uniName: "", fac: "business", year: "", grad: "2023", gpa: "" })).location, "/lite/profile?step=3");
   const noOrg = await b.post("/lite/profile/exp", { csrf: tok, i: "", role: "Sales assistant", org: "", place: "", start: "2023-09", end: "", bullets: "" });
   assert.equal(noOrg.status, 200); assert.match(noOrg.text, /aria-invalid="true"/, "a job without a company is sent back with the field marked");

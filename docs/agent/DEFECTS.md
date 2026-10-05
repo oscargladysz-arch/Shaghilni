@@ -116,6 +116,7 @@ Field order in every entry below: ID · Severity (verifier's; reporter's noted i
 | Regression test | `test/lite.test.js`: in the seeker test (~`:103`) GET `/lite/profile?step=2` in both languages, `doesNotMatch /\bedu_[a-z]/`; in the recruiter test (~`:157`) a student candidate with status `student`, assert `/lite/candidates` and `/lite/candidates/<id>/invite` contain no `/\b(rcSt_\|lvl_\|edu_\|err_\|st_)[a-z]/` (same regex as `:96`). |
 | Docs (R15) | No behaviour doc changes. `CLAUDE.md:19` and `docs/agent/BRIEF.md:30` say "1,646 keys each"; after the fix 1,647. R9: log the Arabic string in `docs/agent/ARABIC_REVIEW.md` (does not exist yet). |
 | Privacy/legal (R13) | None. |
+| **Status** | **FIXED in Stage 3 (S3-6)**: `edu_student` added to `public/js/i18n2.js` in both languages (Arabic logged in ARABIC_REVIEW.md). Tests: `test/lite.test.js` profile step 2 and candidate cards carry no raw key. |
 | Notes | Shows even for a seeker who has not chosen a status, since `student` is the first option after "Choose/اختر". Also reported by probe:recruit and map:lite. |
 
 ### D-05 · P1 · Listing text edited while awaiting review is never re-checked: fee wording reaches the board after admin approval
@@ -335,6 +336,7 @@ Field order in every entry below: ID · Severity (verifier's; reporter's noted i
 | Regression test | `test/diaspora.test.js` (loads core via `loadCore()` at `:36`): `core.STR.en.err_phone_region` and `.ar` do not contain `only`/`فقط` (or equal the `:748/:1734` texts); optionally a scan that no key appears twice inside one `Object.assign` block. |
 | Docs (R15) | None (`grep -rn 'err_phone_region\|Syrian mobile numbers only\|numbers in this country yet' docs/ CLAUDE.md` → nothing). |
 | Privacy/legal (R13) | None. A duplicate removal, no new Arabic wording; still log a line in ARABIC_REVIEW.md per R9. |
+| **Status** | **FIXED in Stage 3 (S3-6)**: the later definitions at `i18n4.js` (en and ar) are deleted; the surviving sentence is true for every allowed country; the duplicate-key ratchet moved to en 7 / ar 6. Test: `test/i18n.test.js` error-code test. |
 | Notes | map:auth reported the same defect. Related to D-18 (the duplicate matches only the `+963`-only configuration `.env.example:30` ships). |
 
 ### D-17 · P2 · Admin role never revoked: a number removed from `ADMIN_PHONES` stays admin
@@ -404,6 +406,7 @@ Field order in every entry below: ID · Severity (verifier's; reporter's noted i
 | Regression test | vm-load i18n*.js (pattern `test/import.test.js:12`), grep `server/**/*.js` for `fail(<n>, "<code>")` codes and assert STR.en and STR.ar each have `err_<code>` (handle plural objects per CLAUDE.md:29). |
 | Docs (R15) | None if strings are added (SECURITY.md:109 becomes true). If some codes stay generic, soften SECURITY.md:109. `CLAUDE.md:19` / `BRIEF.md:30` key count drifts by +9. |
 | Privacy/legal (R13) | None. |
+| **Status** | **FIXED in Stage 3 (S3-6)**: nine `err_*` sentences added in both languages (ARABIC_REVIEW.md rows 4–12); `test/i18n.test.js` now fails on any server `fail()` code without a sentence. |
 | Notes | Reachable from the shipped UI: invalid_phone (team invite, campus invite), invalid (event form, admin programme), bad_plan only with a tampered select. Not reachable without tampering: admin_cannot_delete (button hidden `app-seeker.js:23`), method_not_allowed, bad_kind/bad_answer, not_hired; unknown_bullets is a race only. Practical scope 4-5 codes; verdict unchanged. Also reported by probe:teams, probe:events, probe:admin, probe:platform (A13-16). |
 
 ### D-22 · P2 · Career-office (university) account: self-deletion leaves the `campus_offices` row with the contact name; data export omits the office
@@ -472,6 +475,7 @@ Field order in every entry below: ID · Severity (verifier's; reporter's noted i
 | Regression test | `test/diaspora.test.js` ("living outside Syria" suite, abroad profile at `:79`): vm-load lookups/i18n*/engine, assert `t("whyCap", {..., home: L(placeOf(P))})` contains the country in en and ar and never "living in ." / "مقيم في ."; a source assertion that app.js no longer contains `home: L(GOV[P.gov])` pins the line itself. |
 | Docs (R15) | None (README.md:259 becomes true). |
 | Privacy/legal (R13) | None. |
+| **Status** | **FIXED in Stage 3 (S3-6)**: `public/js/app.js` fit caption builds `{home}` with `placeOf(P)` (country, or "Outside Syria") instead of `GOV[P.gov]`. Test: `test/diaspora.test.js` abroad profile (engine fill plus a source pin on app.js). |
 | Notes | UNVERIFIED but not needed: CLIENT_FILES order in `server/assets.js` (public/js/app.js:223 already calling `assess()` is sufficient evidence). |
 
 ### D-26 · P2 · Job alerts with a governorate never match remote listings while the board shows remote listings under every governorate; Lite's governorate filter hides them too

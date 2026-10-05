@@ -1,6 +1,6 @@
 {
   "_note": "Ratchets: counts of known violations, measured by the tests that read this file. They may only go down. Lower a number in the same commit that removes the violations; never raise one.",
-  "i18nDuplicateKeys": { "en": 8, "ar": 7 },
+  "i18nDuplicateKeys": { "en": 7, "ar": 6 },
   "design": {
     "_note": "test/ratchets.test.js: colour literals outside the :root token block of public/css/app.css (hex; named white/black; rgb()/rgba(); var(--x, colour) fallbacks), font-size under 12px (every cqw size counts), physical left/right properties, hex in public/js/app*.js, hex in server/lite.js and in server/lite-assets.js outside its :root blocks, emoji or text-symbol glyphs in string literals of public/js/*.js.",
     "cssHex": 24,
