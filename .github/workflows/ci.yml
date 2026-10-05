@@ -1,0 +1,74 @@
+# Continuous integration for Shaghilni: the full test suite and the pre-launch scanner, on every pull request and on
+# every push to main, across the declared minimum Node (package.json "engines"), the latest Node 22 and Node 24.
+#
+# Every value under "Fake production settings" below is OBVIOUSLY FAKE. They exist only so the scanner can audit a
+# complete production-like configuration: none is a real secret, key, phone number, address, entity or domain
+# (.test is a reserved top-level domain; example.com is a reserved example domain).
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Tests and scanner (Node ${{ matrix.node }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        node: ["22.13.0", "22", "24"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+      - name: Full test suite
+        run: npm test
+      - name: Pre-launch scanner against fake production settings
+        env:
+          NODE_ENV: production
+          OTP_PEPPER: pppppppppppppppppppppppppppppppppppppppp
+          BASE_URL: https://shaghilni.test
+          ADMIN_PHONES: "+963944000000"
+          SMS_PROVIDER: textbee
+          TEXTBEE_API_KEY: key
+          CONTACT_EMAIL: privacy@example.com
+          LEGAL_NAME: "Example Org (not a real entity)"
+          TRUST_PROXY: "true"
+        run: npm run security:check
+      - name: No dependency or lockfile crept in (zero-dependency rule)
+        run: |
+          git diff --exit-code -- package.json
+          for f in package-lock.json npm-shrinkwrap.json yarn.lock pnpm-lock.yaml; do
+            if [ -e "$f" ]; then echo "$f must not exist"; exit 1; fi
+          done
+
+  e2e:
+    # Manual only: three real browsers through the whole loop (needs Puppeteer, installed for the run and never committed).
+    name: Browser end-to-end (manual)
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install the browser driver for this run only
+        run: npm install --no-save puppeteer
+      - name: Browser flow
+        run: npm run test:e2e
+      - name: Keep the screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-screenshots
+          path: test/e2e/shots/
+          if-no-files-found: ignore
