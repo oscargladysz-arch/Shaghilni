@@ -28,7 +28,7 @@ OTP_DEV_ECHO=true ADMIN_PHONES=+963944000000 npm start
 
 Open http://localhost:3000. Put your own number in `ADMIN_PHONES`.
 
-In development, text messages are printed in the terminal instead of being sent, and `OTP_DEV_ECHO=true` also shows the sign-in code on screen. The first run adds 19 demo listings from 17 demo companies so the board isn't empty. Each demo listing says it's a demo, and the Overview dashboard leaves them, and applications to them, out of its numbers. They are never added in production.
+In development, text messages are printed in the terminal instead of being sent, and `OTP_DEV_ECHO=true` also shows the sign-in code on screen. The first run adds 18 demo listings from 17 demo companies so the board isn't empty (the 19th sample listing has no pay and fails the same posting checks a real listing must pass). Each demo listing says it's a demo, and the Overview dashboard leaves them, and applications to them, out of its numbers. They are never added in production.
 
 To keep settings in a file instead, copy `.env.example` to `.env` and edit it. The server reads it on start.
 
@@ -62,7 +62,7 @@ Set these as environment variables or in `.env`.
 | `ANTHROPIC_API_KEY` | none | Turns on Claude in the resume helper: wording suggestions and translation drafts. Without it, people can still write translations themselves. |
 | `CLAUDE_MODEL` | `claude-sonnet-5` | The Claude model used for suggestions and translations. |
 | `AI_DAILY_CAP` / `AI_USER_DAILY_CAP` | `300` / `30` | Most Claude calls (suggestions and translations) per day: for the whole site, and per person. |
-| `SEED_DEMO` | `true` | Development only: add the 19 sample listings on first start (added once; never again after `npm run demo:remove`). Ignored in production, where sample data is never added: the listings carry real organisations' names. |
+| `SEED_DEMO` | `true` | Development only: add the sample listings on first start (added once; never again after `npm run demo:remove`). Ignored in production, where sample data is never added: the listings carry real organisations' names. |
 | `TRUST_PROXY` | `false` | Set to `true` behind a hosting proxy (Render, Railway, Fly, nginx, Caddy). See *Deploying*. |
 | `API_RATE_LIMIT` / `WRITE_RATE_LIMIT` | `600` / `240` | Requests per minute per address: all API calls, and changes. |
 | `LEGAL_NAME` | none | Your registered company name, shown in the privacy notice and terms. |
@@ -126,7 +126,7 @@ LEGAL_NAME=<your registered company>
 CONTACT_EMAIL=<privacy@your-domain>
 ```
 
-Sample data is never added in production: with `NODE_ENV=production` the 19 sample listings are not seeded, whatever `SEED_DEMO` says. If a database that was first used in development still holds them, the server says so at start-up and the Insights screen shows a "Needs attention" note until `npm run demo:remove` has run.
+Sample data is never added in production: with `NODE_ENV=production` the sample listings are not seeded, whatever `SEED_DEMO` says. If a database that was first used in development still holds them, the server says so at start-up and the Insights screen shows a "Needs attention" note until `npm run demo:remove` has run.
 
 **Option B: Docker on a small VPS.**
 

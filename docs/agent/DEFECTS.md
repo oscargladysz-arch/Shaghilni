@@ -98,6 +98,7 @@ Field order in every entry below: ID · Severity (verifier's; reporter's noted i
 | Regression test | `test/demo.test.js` (imports `seedDemo` at `:8`, seeds in-memory at `:16`): after `seedDemo(db, msgs.push)`, `SELECT COUNT(*) FROM jobs WHERE status='published' AND NOT (json_extract(data,'$.pay[0]') > 0)` is 0, the Marine Sciences title is absent, one log line names it. Optionally `every(j => j.pay && j.pay[0] > 0)` on GET /api/jobs in `test/api.test.js:58`. |
 | Docs (R15) | `.env.example:41` ("Add the 19 demo listings") and `server/seed.js:1` ("the 19 sample listings") become 18 published; STATE.md feature matrix if it lists the seed. No ARABIC_REVIEW.md entry (server log line only). |
 | Privacy/legal (R13) | None. The log line names a sample job title, not a phone number. |
+| **Status** | **FIXED in Stage 3 (S3-2)**: `server/seed.js` runs `checkJob(core, sanitizeJob(core, data))` on every sample listing and skips one that fails, with one `[seed] skipped sample listing …` log line (18 of 19 load); the audit row and the log line count what was inserted. Test: `test/api.test.js` "seed: a sample listing that fails the posting checks is skipped". |
 | Notes | The production-seeding half of the reported title is D-01 (P0-1) and is not re-counted here. `server/demo.js:56` (demo accounts) posts through `/api/employer/jobs` with `submit:true`, so that path DOES run the checks; only `seed.js` bypasses them. UNVERIFIED: end-to-end browser rendering of "Unpaid" (no puppeteer); the engine-level vm call in the same setup as `server/core.js:11-12` is the evidence. |
 
 ### D-04 · P1 · Translation key `edu_student` has no text in either language: the raw key is the first option of Lite's education dropdown and the education line on every student candidate card
@@ -253,6 +254,7 @@ Field order in every entry below: ID · Severity (verifier's; reporter's noted i
 | Regression test | `test/diaspora.test.js`: real multinational company posts `returnees:false`; second `seedDemo(db)`; `/api/jobs` still `false` and `$.returnees` 0; demo multinational jobs still `true` after the first seed. |
 | Docs (R15) | None (no doc describes returnees being forced on; `seed.js:33` comment already says it is for the demo). |
 | Privacy/legal (R13) | None. |
+| **Status** | **FIXED in Stage 3 (S3-2)**: the returnees rewrite runs only when the seed has just inserted its rows (`if (r)`) and only over `is_demo = 1` rows of `is_demo = 1` companies. Test: `test/diaspora.test.js` returnees test (a real multinational employer's `returnees: false` survives a second `seedDemo`). |
 | Notes | With SEED_DEMO=false the UPDATE never runs; "even when seeding was skipped" means seedDemoBase returning false under the default config, the realistic restart case. Fixing D-01 masks this in production but not in development/staging. |
 
 ### D-14 · P1 · Copying `.env.example` to `.env` (as README tells operators) yields a server running in development mode on a public host: sign-in codes returned in the API response (admin numbers too), dev pepper in use; the scanner passes it with a WARN
@@ -288,6 +290,7 @@ Field order in every entry below: ID · Severity (verifier's; reporter's noted i
 | Regression test | `test/api.test.js` (seeds demo at `:18`, asserts demo job shape at `:63`): `assert.ok(!j.contact \|\| !(j.contact.name && j.contact.name.en))` for every job in guest GET `/api/jobs`. |
 | Docs (R15) | PRODUCT.md:83 should also say the sample listings attribute named fictional staff and recruiting statements to real organisations. If seed.js drops the contact block, README.md:31 stays true (no edit). |
 | Privacy/legal (R13) | No privacy text involved; the persons are fictional, so no real person's data. The exposure is legal (false attribution to real organisations), not privacy. |
+| **Status** | **FIXED in Stage 3 (S3-2)**: `server/seed.js` drops the `contact` block at insert (code-side default A-15; `seed/demo.json` untouched pending D1). The client already tolerates a missing contact (`engine.js:196`). Test: `test/api.test.js` public board (no `contact.name.en` on any sample listing). |
 | Notes | Corrections to the report: (a) the board CARD does not show the contact — renderers are `public/js/app.js:271` (job sheet), `:359/:368` (WhatsApp panel) and the employer's own editor `app-employer.js:99/141`; (b) the WhatsApp greeting needs a signed-in seeker with a profile, not a guest; (c) Lite never renders the contact (`lite.js:191-213`). The core claim stands. |
 
 ---

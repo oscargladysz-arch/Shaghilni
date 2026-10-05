@@ -80,7 +80,7 @@ What a neighbouring product couldn't truthfully copy:
 ## Evidence on Hand
 
 - **No real users, employers, hires, testimonials, letters of intent or university agreements exist yet.** Future work must not invent any.
-- The demo accounts (`server/demo.js`: Omar, Rania, Yasmin Trading, Qasioun Advisory, the Homs University career office) are fictional, apart from two place and organisation names still to be replaced. The sample job listings in `seed/demo.json` (loaded by `server/seed.js`) use real organisations' names and invented employees; they are never seeded in production and must never reach a public server.
+- The demo accounts (`server/demo.js`: Omar, Rania, Yasmin Trading, Qasioun Advisory, the Homs University career office) are fictional, apart from two place and organisation names still to be replaced. The sample job listings in `seed/demo.json` (loaded by `server/seed.js`, which skips the one without pay and never loads the invented contact person each listing carries in the file) use real organisations' names and invented employees; they are never seeded in production and must never reach a public server.
 - Market research gathered so far: competitors (WorkLink, jobs.sy, job.sy, the labour ministry's platform, Job Gate); WorkLink's own H1 2026 report that only 19 of 2,573 vacancies showed pay; the state of payments in Syria (mobile wallets, cards just returning); and the active business councils (US-Syria, Syria Britain and others).
 - Materials: business plan, pitch deck, white paper, infographics in English and Arabic, the launch checklist, and share collages, all built from the working MVP.
 
