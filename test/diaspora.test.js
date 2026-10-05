@@ -2,6 +2,7 @@
 import { test, after } from "node:test";
 import assert from "node:assert/strict";
 import http from "node:http";
+import { readFileSync } from "node:fs";
 import { loadConfig } from "../server/config.js";
 import { openDb } from "../server/db.js";
 import { createApp } from "../server/app.js";
@@ -74,6 +75,11 @@ test("diaspora: numbers abroad can sign in, within their own daily cap; a profil
   assert.equal((await s.put("/api/me/profile", { profile: p })).status, 200);
   const me = (await s.get("/api/me")).body.profile; assert.deepEqual([me.gov, me.country], ["abroad", "de"]);
   const R = S.core.buildResume(me, "general", "en"); assert.ok(R.contact.some(x => /Germany/.test(x)), "the resume says where they live");
+  // D-25: the fit caption says where they live too, through placeOf, which the app's fit box must use (app.js has no test runtime: the source is pinned)
+  const cap = l => S.core.fill(S.core.STR[l].whyCapAlt, { edu: "x", home: S.core.placeOf(me)[l] });
+  assert.match(cap("en"), /living in Germany/); assert.match(cap("ar"), /مقيم في ألمانيا/); assert.doesNotMatch(cap("en") + cap("ar"), /living in \.|مقيم في \./);
+  const app = readFileSync(new URL("../public/js/app.js", import.meta.url), "utf8");
+  assert.ok(!app.includes("home: L(GOV[P.gov])") && app.includes("home: L(placeOf(P))"), "D-25: the fit box builds {home} with placeOf, so people abroad do not read \"living in .\"");
   assert.equal((await s.put("/api/me/profile", { profile: { ...GRAD, gov: "abroad", country: "atlantis" } })).status, 200);
   assert.equal((await s.get("/api/me")).body.profile.country, "other", "an unknown country is stored as another country");
   const base = (await S.client().get("/api/jobs")).body.jobs[0], remote = { ...base, gov: "remote" }, onsite = { ...base, gov: "damascus", returnees: true };

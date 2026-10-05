@@ -4,7 +4,9 @@
    ratcheted in test/ratchets.json: they may only go down. */
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { readFileSync, readdirSync } from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 import vm from "node:vm";
 
 const JS = f => readFileSync(new URL(`../public/js/${f}`, import.meta.url), "utf8");
@@ -91,4 +93,14 @@ test("i18n: no key is defined twice inside one string table (ratchet: the counts
   assert.ok(dups.en.length <= r.en, `English duplicate keys went up: ${dups.en.join(" ")}`);
   assert.ok(dups.ar.length <= r.ar, `Arabic duplicate keys went up: ${dups.ar.join(" ")}`);
   if (dups.en.length < r.en || dups.ar.length < r.ar) console.log(`i18n duplicates fell: lower test/ratchets.json to en ${dups.en.length}, ar ${dups.ar.length}`);
+});
+
+test("i18n: every error code the server can answer has an err_ sentence in both languages, and the phone-region one does not say Syria only (D-21, D-16)", () => {
+  const STR = loadSTR(FILES), codes = new Set();
+  const walk = d => { for (const f of readdirSync(d, { withFileTypes: true })) { const p = path.join(d, f.name); if (f.isDirectory()) walk(p); else if (f.name.endsWith(".js")) for (const m of readFileSync(p, "utf8").matchAll(/fail\(\d+, "([a-z_]+)"/g)) codes.add(m[1]); } };
+  walk(fileURLToPath(new URL("../server/", import.meta.url)));
+  assert.ok(codes.size > 80, `found ${codes.size} fail() codes`);
+  const missing = [...codes].filter(c => !["en", "ar"].every(l => typeof STR[l]["err_" + c] === "string" && STR[l]["err_" + c].trim())).sort();
+  assert.deepEqual(missing, [], "server error codes with no err_ sentence (the app would show the generic message): " + missing.join(", "));
+  for (const l of ["en", "ar"]) assert.doesNotMatch(STR[l].err_phone_region, /\bonly\b|فقط/, `${l}: the sentence must be true for every allowed country, not Syria only (D-16)`);
 });

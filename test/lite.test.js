@@ -105,6 +105,8 @@ test("lite: a job seeker signs in, builds a profile step by step, applies, saves
   assert.equal((await b.post("/lite/recruit", { csrf: b.csrf(me0.text), open: "1" }, { "sec-fetch-site": "cross-site" })).status, 403, "and so is one sent from another site");
   const tok = b.csrf(me0.text);
   assert.equal((await b.post("/lite/profile", { csrf: tok, step: "1", name: "لينا حداد", gov: "damascus", email: "" })).location, "/lite/profile?step=2");
+  for (const q of ["", "?lang=en"]) { const s2 = await b.get("/lite/profile?step=2" + q.replace("?", "&")); assert.doesNotMatch(s2.text, /\b(rcSt_|lvl_|edu_|err_|st_)[a-z]/, "every education status has a label, students included (D-04)"); }
+  assert.match((await b.get("/lite/profile?step=2&lang=en")).text, /<option value="student">Current student</, "the student option is a sentence, not a key");
   assert.equal((await b.post("/lite/profile", { csrf: tok, step: "2", status: "bachelor", uni: "damascus", uniName: "", fac: "business", year: "", grad: "2023", gpa: "" })).location, "/lite/profile?step=3");
   const noOrg = await b.post("/lite/profile/exp", { csrf: tok, i: "", role: "Sales assistant", org: "", place: "", start: "2023-09", end: "", bullets: "" });
   assert.equal(noOrg.status, 200); assert.match(noOrg.text, /aria-invalid="true"/, "a job without a company is sent back with the field marked");
@@ -140,6 +142,7 @@ test("lite: a job seeker signs in, builds a profile step by step, applies, saves
 test("lite: a recruiter signs up, gets verified, then finds and invites a candidate", async () => {
   const S = await start(), admin = await S.login("+12025550199");
   const seeker = await S.login("0933 730 001"); await seeker.put("/api/me/profile", { profile: GRAD }); await seeker.put("/api/me/recruit", { open: true });
+  const student = await S.login("0933 730 002"); await student.put("/api/me/profile", { profile: { ...GRAD, name: "Omar Nabil", email: "omar@example.com", edu: { status: "student", uni: "damascus", fac: "business", year: 3, grad: 2027 } } }); await student.put("/api/me/recruit", { open: true });
   const r = S.browser();
   assert.match((await r.get("/lite/hire")).text, /أنشئ حساب جهة توظيف/);
   assert.equal((await r.signin("0955 730 001", "employer", "/lite/hire/company")).location, "/lite/hire/company");
@@ -156,6 +159,8 @@ test("lite: a recruiter signs up, gets verified, then finds and invites a candid
   await admin.post(`/api/admin/companies/${co.id}/verify`, { screened: true });
   const list = await r.get("/lite/candidates?stage=grad");
   assert.match(list.text, /لينا ح\./); assert.doesNotMatch(list.text, /933730001|lina@example/, "no phone numbers or emails on candidate cards");
+  const everyone = await r.get("/lite/candidates"); assert.match(everyone.text, /عمر ن\./, "the student is listed too");
+  assert.doesNotMatch(everyone.text, /\b(rcSt_|lvl_|edu_|err_|st_)[a-z]/, "a student's card shows a translated status, not a raw key (D-04)");
   const id = /\/lite\/candidates\/(\d+)\/invite/.exec(list.text)[1], inv = await r.get(`/lite/candidates/${id}/invite`);
   const fee = await r.post(`/lite/candidates/${id}/invite`, { csrf: r.csrf(inv.text), kind: "event", title: "Open day", date: inDays(9), place: "Damascus", link: "", message: "There is an application fee of 5,000 SYP" });
   assert.match(fee.text, /role="alert"/, "a message asking for money is refused");
