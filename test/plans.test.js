@@ -110,6 +110,7 @@ test("plans: a placement fee applies only when a Free employer hires someone it 
   assert.equal((await late.s.post(`/api/jobs/${jid}/apply`, { channel: "web", cvLang: "ar" })).status, 200);
   await hire(e, aOf(late.id));
   assert.equal((await e.put(`/api/employer/jobs/${jid}`, { job: { ...JOB, pay: [1, 1] } })).status, 200, "the employer edits the pay down after recording the hire");
+  assert.equal((await e.put(`/api/employer/applications/${aOf(late.id)}`, { note: "Starts on Monday." })).status, 200, "and writes a note on the hired application afterwards (review: a note must not re-record the fee basis)");
   const c3 = (await admin.post(`/api/admin/applications/${aOf(late.id)}/confirm-hire`, {})).body.charges;
   assert.equal(c3.length, 1); assert.equal(c3[0].amountSyp, Math.round((JOB.pay[0] + JOB.pay[1]) / 2), "D-09: the fee is a month of the pay shown at the time of the hire, not 1 SYP");
   // a donor programme pays per confirmed placement, whatever the employer's plan
