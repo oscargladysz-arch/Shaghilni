@@ -45,13 +45,13 @@ jobs:
         run: npm run security:check
       - name: No dependency or lockfile crept in (zero-dependency rule)
         run: |
-          git diff --exit-code -- package.json
+          node -e 'const p=require("./package.json");for(const k of ["dependencies","devDependencies","optionalDependencies","peerDependencies"])if(p[k]&&Object.keys(p[k]).length){console.error(k+" must be empty: the server has no npm dependencies");process.exit(1)}'
           for f in package-lock.json npm-shrinkwrap.json yarn.lock pnpm-lock.yaml; do
             if [ -e "$f" ]; then echo "$f must not exist"; exit 1; fi
           done
 
   e2e:
-    # Manual only: three real browsers through the whole loop (needs Puppeteer, installed for the run and never committed).
+    # Manual only: four real browsers plus a Lite page without JavaScript through the whole loop (needs Puppeteer, installed for the run and never committed).
     name: Browser end-to-end (manual)
     if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest

@@ -5,7 +5,7 @@ This file maps the 13-item *30-Minute Pre-Launch Security Checklist* onto Shaghi
 Run both commands before every launch and after every change:
 
 ```bash
-npm test                                             # 65 tests in 15 files (API, security, recruiters, import, Lite, payments, plans, universities, teams, events, demo, diaspora, applying, insights, traffic)
+npm test                                             # 66 tests in 15 files (API, security, recruiters, import, Lite, payments, plans, universities, teams, events, demo, diaspora, applying, insights, traffic)
 npm run security:check -- --url https://your-domain  # the code, your settings and the live site
 ```
 
@@ -294,7 +294,7 @@ hard-coded or committed.
 | **Claude calls per day, whole site** | 300 | `AI_DAILY_CAP` |
 | Request size | 256 KB | fixed |
 
-The destination rule matters most. In SMS pumping, bots request codes to premium-rate international numbers, and it's the most common way a small app gets a surprise bill. The daily caps are counted in the database, so they survive restarts. When the text cap is reached, sign-in pauses until midnight UTC and the server log says so. Each AI call is capped at 4,000 output tokens and carries at most about 8,000 characters of input, so 300 calls a day bounds the daily spend. Check that against your model's price.
+The destination rule matters most. In SMS pumping, bots request codes to premium-rate international numbers, and it's the most common way a small app gets a surprise bill. The daily caps are counted in the database, so they survive restarts. When the text cap is reached, sign-in pauses until midnight UTC and the server log says so. Each AI call is capped at 4,000 output tokens; a translation call carries at most about 8,000 characters of input and a suggestion call at most 30 bullet points plus one listing's text, so 300 calls a day bounds the daily spend. Check that against your model's price.
 
 **You must** also set caps at the providers, in case of a bug here:
 

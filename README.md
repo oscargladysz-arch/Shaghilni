@@ -146,7 +146,7 @@ Two settings matter more than they look:
 
 **Backups.** `npm run backup` writes a consistent copy to `backups/shaghilni-YYYY-MM-DD-HH-MM.db` while the site keeps running. Schedule it daily (for example with cron) and copy the files off the server. To restore, stop the app, replace the database file, delete any `-wal` and `-shm` files next to it, and start again.
 
-**Demo listings.** `npm run demo:remove` deletes the demo companies and listings, including any applications made to them. They won't be added again. If the demo accounts are in the database, run `npm run demo-accounts:purge` first (their invitations point at demo listings).
+**Demo listings.** `npm run demo:remove` deletes the demo companies and listings, including any applications made to them. They won't be added again.
 
 **Before you go live:** the launch checklist, with who owns each item and how it is verified, is in [docs/LAUNCH.md](docs/LAUNCH.md).
 
@@ -175,7 +175,6 @@ server/          Node.js, no dependencies
   lite.js        Shaghilni Lite pages (with its own small string table)
   lite-assets.js Lite's stylesheet and icons
   seed.js        the sample listings from seed/demo.json (development only, never in production)
-  demo.js        demo accounts (development only; removable with npm run demo-accounts:uninstall)
   routes/        public, me, resume, recruit, employer, team, campus, events, admin, insights
 seed/            demo.json: the 17 sample companies and 19 sample listings
 public/          the interface: plain JavaScript, bundled and gzipped at start-up
@@ -184,10 +183,9 @@ public/          the interface: plain JavaScript, bundled and gzipped at start-u
   js/i18n*.js    the app's interface strings in English and Arabic (Lite's are in server/lite.js, texts in server/notify.js)
   js/legal.js    the privacy notice and terms of use (drafts: see SECURITY.md)
   js/pow.js      solves the sign-in challenge
-  js/demo.js     the demo chooser (development only)
   js/vendor/     qrcode.js (MIT), loaded only when a ticket is shown
   fonts/         IBM Plex Sans Arabic, self-hosted (SIL Open Font License, OFL.txt)
-scripts/         backup, sample-listing removal, demo-account purge and uninstall, the security scanner
+scripts/         backup, sample-listing removal and the security scanner
 test/            API and security tests, fixtures/ (sample resumes), e2e/ (the browser flow)
 docs/            screenshots, the launch checklist (LAUNCH.md) and the agent records (docs/agent/)
 ```
@@ -213,7 +211,7 @@ All endpoints return JSON. Requests that change anything must send the header `x
 
 | Area | Endpoints |
 |---|---|
-| Sign-in | `GET /api/auth/challenge`, `POST /api/auth/code`, `POST /api/auth/verify`, `POST /api/auth/logout` (and, in development with demo accounts on, `POST /api/auth/demo`) |
+| Sign-in | `GET /api/auth/challenge`, `POST /api/auth/code`, `POST /api/auth/verify`, `POST /api/auth/logout` |
 | Public | `GET /api/jobs`, `GET /api/jobs/:id`, `GET /api/config`, `GET /api/health` |
 | Accounts (any signed-in role) | `GET /api/me` (answers guests too), `PUT /api/me/lang`, `GET /api/me/export`, `DELETE /api/me` |
 | Job seekers | `PUT /api/me/profile`, `POST`/`DELETE /api/me/saved/:jobId`, `POST /api/jobs/:id/apply`, `GET /api/me/applications`, `POST /api/me/applications/:id/withdraw`, `POST /api/resume/suggest`, `POST /api/resume/translate` |
@@ -241,13 +239,13 @@ The scanner checks the code for secrets and risky patterns, your settings as pro
 
 ## Tests
 
-- `npm test` runs 65 tests in 15 files against in-memory databases: 11 API, 14 security, 6 import, 4 Lite, 4 payments, 4 plans, 4 Syrians abroad and job alerts, 3 universities, 3 demo accounts, 3 events, 2 recruiters, 2 teams, 2 insights, 1 applying by other channels and 1 traffic.
+- `npm test` runs every file in `test/` against in-memory databases: 11 API, 15 security, 6 import, 4 Lite, 4 payments, 4 plans, 4 Syrians abroad and job alerts, 3 universities, <!-- demo-accounts:start -->4 demo accounts, <!-- demo-accounts:end -->3 events, 2 recruiters, 2 teams, 2 insights, 1 applying by other channels and 1 traffic (the total is in SECURITY.md).
   - **11 API tests:** sign-in and rate limits, the request-origin checks, profiles, applications, company verification, listing checks, review, the pipeline and its texts, hire confirmation, resume suggestions with a stubbed Claude, account deletion and static file serving.
   - **4 Lite tests** (`test/lite.test.js`): page size and no scripts, both languages; a job seeker's whole flow; a recruiter's whole flow through plain HTML forms, with forged or cross-site forms refused; and people abroad, the *For returnees* filter and saving a search as an alert.
   - **6 import tests** (`test/import.test.js`): names written in the other script, both ways; six real resume files (Word, a LibreOffice PDF and a Chrome PDF, each in English and Arabic) read field by field; files that can't be read; the rule that nothing is replaced; and a check that the importer makes no network calls.
   - **2 recruiter tests** (`test/recruit.test.js`): only job seekers who opted in can be found, and only by verified employers; cards carry no contact details; invitation checks, replies, the number shared after a yes, limits, blocking and deletion.
-  - **14 security tests,** numbered after SECURITY.md: consent and data handling, cross-account access, over 1,000 junk requests to 34 of the API's endpoints (the newer families are not in the list yet: see `docs/agent/ROUTES.md`), error leaks, sign-in failures, what translation sends to Claude, secret exposure, the production lockdown, caps and rate limits, the sign-in challenge and cross-site rules, the scanner itself, and (tests 14 to 16) that the scanner stays clean whatever `SEED_DEMO` says, fails development settings, and that sample listings are never seeded in production.
-  - The other files cover payments, plans, universities, teams, events, demo accounts, Syrians abroad and job alerts, applying by phone call or email, insights and traffic, each named after its subject.
+  - **15 security tests,** numbered after SECURITY.md (two carry the number 1): consent and data handling, cross-account access, over 1,000 junk requests to 34 of the API's endpoints (the newer families are not in the list yet: see `docs/agent/ROUTES.md`), error leaks, sign-in failures, what translation sends to Claude, secret exposure, the production lockdown, caps and rate limits, the sign-in challenge and cross-site rules, the scanner itself, and (tests 14 to 16) that the scanner stays clean whatever `SEED_DEMO` says, fails development settings, and that sample listings are never seeded in production.
+  - The other files cover payments, plans, universities, teams, events, <!-- demo-accounts:start -->demo accounts, <!-- demo-accounts:end -->Syrians abroad and job alerts, applying by phone call or email, insights and traffic, each named after its subject.
 - `npm run test:e2e` drives four real browsers (a job seeker on a phone in Arabic; an employer, an admin and a reader of the legal pages on desktops in English) plus a Lite page with JavaScript switched off through the whole loop, and saves screenshots to `test/e2e/shots/`. Its 80 checks include Lite on a phone with JavaScript switched off (the job list in a few kilobytes, applying, and the recruiter sign-up page at /hire), uploading a PDF resume on a phone and adding it to the profile, the Arabic name arriving already written in English, the posting form asking Arabic questions in Arabic, the recruiter flow (a student opts in, a verified employer invites them to an event, the student says yes), that “Tailor my resume for this job” opens the one resume focused on that job, with no version picker, the consent box, the sign-in challenge solved in a real browser, choosing which resume language to send, writing the English version of an Arabic resume, the legal pages, the self-hosted font, and that no request goes to another site. It needs Puppeteer, installed once with `npm install --no-save puppeteer`; it can also be started by hand from the CI workflow (*Browser end-to-end*).
 
 ## Limits of this MVP
@@ -323,12 +321,12 @@ When you run Shaghilni yourself, the home screen has an **Explore the demo** car
 
 There's also a second fictional company (Qasioun Advisory) and five fictional students, so the lists look real. All of the demo people and companies are fictional; two place and organisation names in the demo (a volunteer role and an event venue) still name real organisations and are to be replaced (see the R6 flags in `docs/agent/DOC_DRIFT.md`). You can also sign in with the numbers: 0933 000 101 (student), 0933 000 102 (job seeker), 0955 000 201 (company, as a recruiter), 0944 000 301 (career office). With `OTP_DEV_ECHO=true` (the Quick start setting) the code is shown on screen; otherwise it goes to the configured text provider.
 
-The demo accounts are made through the app's own actions the first time the server starts. They're on by default when you run it yourself (`DEMO_ACCOUNTS=false` turns them off), off in tests, and never in production.
+The demo accounts are made through the app's own actions the first time the server starts. They're on by default when you run it yourself (`DEMO_ACCOUNTS=false` turns them off), off in tests, and never in production. The chooser signs in through `POST /api/auth/demo`, a route registered only then. The demo code lives in `server/demo.js`, `public/js/demo.js`, `test/demo.test.js` and `scripts/demo-accounts.js`.
 
 **Taking the demo out:**
 - `npm run demo-accounts:purge` removes the demo accounts and everything they made from a database, and keeps them from coming back.
 - `npm run demo-accounts:uninstall` deletes the demo code: `server/demo.js`, `public/js/demo.js`, its test, and the lines marked `// demo-accounts`. The few remaining hooks in the app (on the home screen, the banner, and Lite's sign-in page) do nothing once the demo code is gone.
-- The sample job listings are separate: `npm run demo:remove` takes those out.
+- The sample job listings are separate: `npm run demo:remove` takes those out. Run the purge first while the demo accounts are in the database: their invitations point at the sample listings, and the removal stops with a foreign-key error otherwise.
 
 **What the demo adds elsewhere.** Universities: a fourth account, the Homs University career office (0944 000 301), with a fictional student email domain, Omar and Yazan verified by email, Yasmin Trading approved as a partner and Qasioun Advisory's partnership request waiting. Events: a careers day at Homs University run by its career office, with Yasmin Trading attending and Omar holding a ticket. Teams: Yasmin Trading's team has Lina (admin) and Karim (hiring manager), with Fadi's request to join waiting.
 <!-- demo-accounts:end -->
@@ -403,7 +401,7 @@ Several people can work in one company, each signing in with their own phone num
 
 Admin → **Overview** is the team's dashboard for keeping up with the platform, in totals only (no one's personal details):
 
-- **Period:** the last 7, 30, 90 or 365 days, compared with the period before. Sample listings and demo accounts are left out unless you tick **Include sample data**, so the numbers show real activity.
+- **Period:** the last 7, 30, 90 or 365 days, compared with the period before. Sample listings <!-- demo-accounts:start -->and demo accounts <!-- demo-accounts:end -->are left out unless you tick **Include sample data**, so the numbers show real activity.
 - **Headline:** confirmed hires (all time, and in the period), users and new users, active this week and month, live jobs, applications, verified companies and money received.
 - **Needs attention:** companies to verify, listings to review, hires to confirm, plan requests, unpaid charges, and text messages that failed in the last week, each linking to where it's handled.
 - **The last 12 weeks:** new users, new jobs, applications and confirmed hires, week by week.

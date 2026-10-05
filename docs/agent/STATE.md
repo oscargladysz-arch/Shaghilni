@@ -2,6 +2,8 @@
 
 Synthesised from the 15 area maps (`scratchpad/stage0/map-1.json` … `map-15.json`), `docs/agent/BASELINE.md`, the route grep (109 JSON routes) and the security-matrix list (`test/security.test.js:152-160`). Commit `9683221` on `stage-0/ground-truth` (code identical to `b8425b2`). Docs are claims; evidence is `file:line` or a quoted probe result. Nothing was changed in product code.
 
+**Stage 1 status (2026-10-05).** Rows closed by Stage 1, each with its evidence in `docs/agent/DEFECTS.md` "Status" lines and `docs/agent/PLAN.md` section 1: the `seedDemo` production gate (S1-1, D-01: `server/config.js`, `countDemo` in `server/seed.js`, the start-up warning, the Insights attention fields; security tests 14 and 16, insights test); the scanner's `NODE_ENV` FAIL and the removal of its `SEED_DEMO` WARN (S1-2, D-14; security test 15); `.env.example` no longer narrowing texts to Syria (S1-2, D-18; diaspora test); continuous integration written but never run on GitHub (S1-3, UNVERIFIED until the owner's first run); 118 documentation corrections applied (S1-4, `DOC_DRIFT.md` status line). Counts that moved: `npm test` 60 → 66 (15 files); `STR.en`/`STR.ar` 1,646 → 1,647 keys each (`insSampleRows`), so `BRIEF.md:30` and `:165` now read 1,647 (the brief is the owner's text and is not edited, A-08). Rows below that say MISSING or "no `.github/`" for these items are the Stage 0 record; the two tables carry a "(Stage 1)" note where they were updated.
+
 Status meaning:
 
 | Status | Meaning |
@@ -477,7 +479,7 @@ Brief `<features>` letters → areas: A → 1, 13 · B → 1, 2, 3, 4, 5, 14 · 
 | Production lockdown: `PAY_PROVIDER=test` refused; prices required | VERIFIED | `config.js:76-77`; `payments.js:50` | payments :120-123 | — |
 | Production lockdown: no code echo, no dev pepper, Secure cookies, no demo accounts/route | VERIFIED | `config.js:40-41`; `auth.js:21`; `demo.js:17,189-190` | security :220-224; demo :102-107 | — |
 | Production warnings (empty `ADMIN_PHONES`, console SMS, empty `CONTACT_EMAIL`, `OTP_DEV_ECHO`, empty prefixes, .env mode) | PARTIAL | `config.js:78-83`; `security-check.js:72-94` | security :286-291 (scanner equivalents) | `console.warn` output never asserted |
-| Sample listings (`SEED_DEMO`) gated off in production | MISSING | `config.js:68` (no `prod` check); `index.js:10`; `Dockerfile:3,8` | none (probe G: production + `SEED_DEMO` unset → `seedDemo:true`) | D-01 (P0) |
+| Sample listings (`SEED_DEMO`) gated off in production | VERIFIED (Stage 1) | `config.js:68` `seedDemo: !prod && …`; `seed.js` `countDemo`; `index.js` start-up warning; `routes/insights.js` attention fields | security test 16; insights "sample data left in a production database"; security test 14 | D-01 fixed in Stage 1 (S1-1) |
 | Settings scanner audits the environment as production | VERIFIED | `security-check.js:72-95,98-124` | security test 10, test 13; BASELINE runs | Live check never run |
 | Phone masking in logs | PARTIAL | `guard.js:4`; `auth.js:64`; `notify.js:51`; `campus.js:13,18,20` | none | `app.js:78` logs the raw path on a 500 (team routes carry `%2B963…` in the path, probe); console provider |
 | Errors do not leak internals (500 → `server_error`) | VERIFIED | `app.js:73-79` | security: "4 · errors don't leak internals" :184-195 | — |
@@ -543,7 +545,7 @@ Brief `<features>` letters → areas: A → 1, 13 · B → 1, 2, 3, 4, 5, 14 · 
 | `GET /api/health` | VERIFIED | `public.js:35`; `Dockerfile:14` | security :313 | Counts toward the API rate limit |
 | `GET /api/config` | VERIFIED | `public.js:36` | api :261; demo :65,96,105; payments :71,78; security :79,273 | — |
 | Documentation set (README, SECURITY, PRODUCT with marker, DESIGN front matter, screenshots, docs/agent) | PARTIAL | `PRODUCT.md:3` marker; `DESIGN.md:1`; `docs/screenshots/*` | none (claims) | See `docs/agent/DOC_DRIFT.md` |
-| Continuous integration | MISSING | no `.github/` | none | Backlog P0-2 |
+| Continuous integration | UNVERIFIED (Stage 1) | `.github/workflows/ci.yml` (tests and scanner on Node 22.13.0 / 22 / 24; manual e2e job) | none: validated with a YAML parser and the same commands locally; no GitHub run yet (`docs/LAUNCH.md` A7, A8) | P0-2 written in Stage 1 (S1-3); first run is the owner's |
 | Lite demo hint | PARTIAL | `demo.js:193-194`; `lite.js:456-457` | none | See area 12 |
 
 ## Brief corrections
@@ -595,9 +597,9 @@ Items of `<verified_facts>` and `<features>` that the maps contradict or refine.
 | Lite: block a company, plans/billing/analytics, job posting, alert channel choice or edit, withdraw an application, privacy/terms pages | `lite.js:258,265` (yes/no only); no plan/jobs/alerts-edit routes; `:144,450` link to `/#/…` | README.md:11 (block, general); D-12 |
 | Server-rendered legal pages (`/lite/privacy`, `/lite/terms`) | not in `lite.js:601-611` | Backlog P1-2 |
 | QNB Syria payment adapter | `server/payments.js:33-47` `ready = false` | README.md:335; brief E |
-| Continuous integration | no `.github/` | Backlog P0-2 |
+| Continuous integration | `.github/workflows/ci.yml` added in Stage 1 (S1-3); the first GitHub run is UNVERIFIED | closed in Stage 1 |
 | i18n parity test; CSS ratchets (`test/ratchets.json`) | no such tests | Backlog P1-1 |
-| Production gate for `seedDemo` | `server/config.js:68` | Backlog P0-1; D-01 |
+| Production gate for `seedDemo` | `server/config.js:68` now `!prod && …` (Stage 1, S1-1) | closed in Stage 1 |
 | Admin role revocation | `server/auth.js:99` promotes only | D-17 |
 | Re-consent prompt for a changed `TERMS_VERSION` while signed in | no client comparison of `termsVersion` | SECURITY.md:42 implies acceptance per version |
 | Manual student-verification approval by the office (`/api/campus/verify`) | no route; `app-campus.js:41` dead action; `campus.test.js:93` asserts `requests === undefined` | README.md:310; SECURITY.md:407-408 still describe it |

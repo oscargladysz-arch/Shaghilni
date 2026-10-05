@@ -2,7 +2,7 @@
 
 Agents never edit the wording in `public/js/legal.js`. Each proposal below is for the owner and a lawyer to accept, change or reject. Once accepted, the change is a four-file change (R13): `public/js/legal.js`, `server/retention.js` where a period changes, `TERMS_VERSION` in `server/config.js`, and `SECURITY.md`, in one commit, with the Arabic logged in `docs/agent/ARABIC_REVIEW.md`. The Arabic drafts here are the agent's; they need a native reviewer as well as the lawyer.
 
-Found in Stage 0 (2026-10-05). The notice's structure: `public/js/legal.js:6-100` English, `:101-191` Arabic.
+Found in Stage 0 (2026-10-05). The notice's structure: `public/js/legal.js:7-98` English, `:99-190` Arabic.
 
 ## LP-1 · The cookie sentence is not true for Shaghilni Lite
 
@@ -25,7 +25,7 @@ Found in Stage 0 (2026-10-05). The notice's structure: `public/js/legal.js:6-100
 | Current English (excerpt) | "…our own server counts which page it was (never what you type), the link that brought you, your type of device, browser, language, connection speed and how long the page took to load. We don't use tracking cookies or third-party trackers, and we don't store your IP address…" |
 | Why | Each page view also stores whether the visitor was signed in and as which kind of account (seeker, employer, career office, admin), and the connection's country when the site runs behind a network that sends `CF-IPCountry` (`server/traffic.js:43,59`; `server/db.js:345-346`). Both are reported only as totals (`GET /api/admin/traffic`). |
 | Proposed English (insert after "how long the page took to load") | "…, whether you were signed in and with what kind of account, and the country your connection came from when the site runs behind a content-delivery network, …" |
-| Proposed Arabic (draft, insert after «والمدة التي استغرقها تحميل الصفحة») | «، وما إذا كنت مسجّل الدخول ونوع حسابك، والبلد الذي جاء منه اتصالك عندما يعمل الموقع خلف شبكة توزيع محتوى» |
+| Proposed Arabic (draft, insert after «والوقت الذي استغرقه تحميل الصفحة», the phrase at `public/js/legal.js:112`) | «، وما إذا كنت مسجّل الدخول ونوع حسابك، والبلد الذي جاء منه اتصالك عندما يعمل الموقع خلف شبكة توزيع محتوى» |
 | Alternative | Stop storing the role and the country (`server/traffic.js`), which loses the visit-to-hire funnel by account type and the country breakdown. A product decision for the owner. |
 | Impact | `TERMS_VERSION` bump; SECURITY.md "Traffic counting" unchanged (it already says what is counted in general terms; add the two fields if the lawyer prefers). |
 
@@ -36,7 +36,7 @@ Found in Stage 0 (2026-10-05). The notice's structure: `public/js/legal.js:6-100
 | Where | `public/js/legal.js:52` (English), `:144` (Arabic), "How long we keep it" |
 | Current English | "Sign-in codes and the internet addresses stored with them: deleted within 24 hours." |
 | Current Arabic | «رموز الدخول وعناوين الإنترنت المحفوظة معها: تُحذف خلال 24 ساعة.» |
-| Why | `server/retention.js:5,10` deletes codes older than 24 hours, and the sweep runs at start-up and then every hour (`server/index.js:13`), so a code can live up to about 25 hours. |
+| Why | `server/retention.js:5,10` deletes codes older than 24 hours, and the sweep runs at start-up and then every hour (`server/index.js:13-14`), so a code can live up to about 25 hours. |
 | Recommended fix (code, no wording change) | Set `RETENTION.otpHours` to 23 in `server/retention.js`, so every code is gone within the 24 hours the notice promises. Update SECURITY.md item 1 ("after 24 hours" becomes "after 23 hours, always within the 24 the notice promises"). Codes themselves expire after 10 minutes, so nothing functional changes. No `TERMS_VERSION` bump. Scheduled for Stage 3 if the owner agrees. |
 | Alternative (wording) | "deleted after 24 hours (the deletion runs every hour, so within 25 hours at most)" / «تُحذف بعد 24 ساعة (يجري الحذف كل ساعة، فلا تتجاوز 25 ساعة)» with a `TERMS_VERSION` bump. |
 

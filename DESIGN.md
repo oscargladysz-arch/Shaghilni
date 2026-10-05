@@ -239,7 +239,7 @@ A warm neutral paper-and-ink palette with a single deep green accent and two qui
 
 **The Ink Floor Rule.** No text is lighter than Muted Ink, in either mode. Faint Ink is for disabled controls and decoration only, so every piece of text clears 4.5:1 on every surface it sits on.
 
-**The Same Tokens, Both Lights Rule.** Dark mode is the same tokens with night values, never hand-picked colours. Text on pine always uses On Pine, and nothing hard-codes white or a fallback colour. (Stage 0 counted 28 places in the shipped CSS and scripts that still do, the ticket QR background among them, which must stay white for scanners; the Stage 2 ratchet test records that count and only lets it fall.)
+**The Same Tokens, Both Lights Rule.** Dark mode is the same tokens with night values, never hand-picked colours. Text on pine always uses On Pine, and nothing hard-codes white or a fallback colour. (Stage 0 counted 28 hex colours outside the token block in the shipped CSS, the ticket QR background among them, which must stay white for scanners, plus a handful of fallback colours in the scripts; the Stage 2 ratchet test records those counts and only lets them fall.)
 
 ## Typography
 

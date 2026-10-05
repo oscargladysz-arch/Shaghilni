@@ -21,7 +21,7 @@ No item marked owner, lawyer or provider is ever ticked by an agent.
 
 | # | Item | Owner | How to verify | Status |
 |---|---|---|---|---|
-| B1 | `npm test` green. | agent | 65 of 65 at the Stage 1 gate (`docs/agent/BASELINE.md` has the earlier 60). | Done |
+| B1 | `npm test` green. | agent | 66 of 66 at the Stage 1 gate (`docs/agent/BASELINE.md` has the earlier 60). | Done |
 | B2 | The browser flow passes (`npm run test:e2e`, 80 checks, four browsers plus a Lite page without JavaScript). | agent, owner | Run the *Browser end-to-end* job by hand from the CI workflow, or locally after `npm install --no-save puppeteer`. | UNVERIFIED |
 | B3 | `npm run security:check -- --url https://your-domain` shows no FAIL once deployed. | owner | Paste the output into the launch record. | Open |
 | B4 | External scans: MDN HTTP Observatory (aim A+), SSL Labs (aim A), the OWASP ZAP baseline scan, GitHub secret scanning. | owner | Reports saved. | Open |
