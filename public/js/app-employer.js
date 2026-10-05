@@ -46,7 +46,7 @@ function listingRow(j) {
   const n = (j.counts && j.counts.applicants) || 0;
   return html`<li class="acard"><span class="acard-main"><span class="acard-t">${L(bi(j.title)) || "—"}</span>
 <span class="acard-s">${j.gov && GOV[j.gov] ? L(GOV[j.gov]) : "—"} · ${j.pay && j.pay[0] ? payText(j).main : "—"}</span>
-<span class="acard-meta"><span class="pill ${JS_TONE[j.status]}">${t("js_" + j.status)}</span>${j.flags && j.flags.length ? html`<span>${t("adFlagGender", { x: j.flags[0].word })}</span>` : ""}${j.status === "rejected" && j.reviewNote ? html`<span>${t("jNote", { note: j.reviewNote })}</span>` : ""}${j.postedBy ? html`<span>${t("tmPostedBy", { name: j.postedBy })}</span>` : ""}</span></span>
+<span class="acard-meta"><span class="pill ${JS_TONE[j.status]}">${t("js_" + j.status)}</span>${j.flags && j.flags.length ? html`<span>${t(j.flags[0].type === "contact" ? "adFlagContact" : "adFlagGender", { x: j.flags[0].word })}</span>` : ""}${j.status === "rejected" && j.reviewNote ? html`<span>${t("jNote", { note: j.reviewNote })}</span>` : ""}${j.postedBy ? html`<span>${t("tmPostedBy", { name: j.postedBy })}</span>` : ""}</span></span>
 <span class="acard-act"><button class="btn btn--soft" type="button" data-act="go" data-to="#/company/jobs/${j.id}/applicants">${icon("user", 15)}${tn("jApplicants", n)}</button>
 ${canDo("hire") ? html`<button class="btn btn--ghost" type="button" data-act="go" data-to="#/company/jobs/${j.id}">${icon("edit", 15)}${t("jEdit")}</button>` : ""}
 ${canDo("hire") && (j.status === "draft" || j.status === "rejected") ? html`<button class="btn btn--ghost" type="button" data-act="emp-job-submit" data-job="${j.id}">${t("jSubmit")}</button>` : ""}

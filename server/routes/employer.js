@@ -79,7 +79,7 @@ export function registerEmployer(r, deps) {
     if (check.missing.length) fail(422, "incomplete", check.missing);
     if (check.fee) fail(422, "fee_requested", check.fee);
     db.run("UPDATE jobs SET status = 'pending', flags = ?, submitted_at = ?, updated_at = ? WHERE id = ?", JSON.stringify(check.flags), now(), now(), jobRow.id);
-    audit(ctx.user.id, "job.submitted", "job", jobRow.id, { flags: check.flags });
+    audit(ctx.user.id, "job.submitted", "job", jobRow.id, { flags: check.flags.map(f => (f.type === "contact" ? { type: "contact" } : f)) });   // the log never holds the number or address itself (R12)
   };
 
   r.post("/api/employer/jobs", employer, ctx => {

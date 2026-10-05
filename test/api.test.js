@@ -159,6 +159,11 @@ test("admin: verification needs sanctions screening; review publishes listings",
   const words = contact.body.check.flags.filter(f => f.type === "contact").map(f => f.word);
   assert.ok(words.length >= 3 && words.some(w => /0955 123 456/.test(w)) && words.some(w => /jobs@example\.com/.test(w)) && words.some(w => /0944-123-456/.test(w)), "D-30: the phone numbers (Arabic-Indic digits included) and the email are flagged: " + JSON.stringify(contact.body.check.flags));
   assert.deepEqual((await admin.get("/api/admin/jobs?status=pending")).body.jobs.find(x => x.id === employerJobId).flags.filter(f => f.type === "contact").map(f => f.word), words, "and the reviewer's queue carries the flags");
+  const subs = db.all("SELECT data FROM audit WHERE action = 'job.submitted' AND entity_id = ?", employerJobId).map(x => x.data);
+  assert.ok(subs.length && !/0955 123 456|jobs@example\.com|0944-123-456|\d{7,}/.test(subs.join(" ")), "the audit log records that contact details were flagged, never the number or the address (R12): " + subs.at(-1));
+  assert.ok(JSON.parse(subs.at(-1)).flags.some(f => f.type === "contact" && !("word" in f)), "contact flags in the log carry the type only");
+  const plain = await employer.put(`/api/employer/jobs/${employerJobId}`, { job: { ...JOB, summary: { en: "Summer internship 2025-2026, pay 1500000 SYP, start 12.05.2026, registration 123456." }, place: { en: "Office 2024 - 2026" } }, submit: true });
+  assert.equal(plain.status, 200, plain.text); assert.deepEqual(plain.body.check.flags.filter(f => f.type === "contact"), [], "years, dates, salaries and short numbers are not contact details");
   assert.equal((await admin.post(`/api/admin/jobs/${employerJobId}/reject`, {})).body.error, "note_required");
   await employer.put(`/api/employer/jobs/${employerJobId}`, { job: JOB, submit: true });
   assert.equal((await admin.post(`/api/admin/jobs/${employerJobId}/approve`)).status, 200);
