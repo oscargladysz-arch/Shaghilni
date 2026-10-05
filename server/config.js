@@ -72,7 +72,7 @@ export function loadConfig(overrides = {}) {
   if (prod) {
     // Lockdown: refuse to start with settings that would be unsafe in public.
     if (!cfg.otpPepper || cfg.otpPepper.length < 32) throw new Error("OTP_PEPPER must be set in production to a random secret of at least 32 characters.");
-    if (!/^https:\/\//.test(cfg.baseUrl)) throw new Error("BASE_URL must be set in production to your https:// address, for example https://shaghilni.sy");
+    if (!/^https:\/\//.test(cfg.baseUrl)) throw new Error("BASE_URL must be set in production to your https:// address, for example https://jobs.example");
     if (cfg.payProvider === "test") throw new Error("PAY_PROVIDER=test is a pretend payment page for development. Use your bank's provider in production, or leave PAY_PROVIDER empty.");
     if (cfg.payProvider && !(cfg.planProMonthly > 0 && cfg.planEnterpriseMonthly > 0)) throw new Error("Card payments need PLAN_PRO_MONTHLY and PLAN_ENTERPRISE_MONTHLY, the monthly prices in PAY_CURRENCY.");
     if (!cfg.adminPhones.length) console.warn("[config] ADMIN_PHONES is empty: nobody can verify companies or publish listings.");

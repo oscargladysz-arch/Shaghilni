@@ -594,7 +594,7 @@ Items of `<verified_facts>` and `<features>` that the maps contradict or refine.
 | Admin audit-log screen | `public/js/app-admin.js:7` tab list; no client reference to `admin/audit` | README.md:241 says so; backlog P1-3 |
 | Admin editing of listings | `server/routes/admin.js` mutates listings only at :71 (approve) and :81 (reject) | README.md:252 says so; backlog P2-2 |
 | Telegram alerts | no code (grep `telegram` → none) | README.md:247 says so |
-| Public resume links | no route; `engine.js:177` builds a display string `shaghilni.sy/cv/<slug>` (D-20) | README.md:249 says so |
+| Public resume links | no route; `engine.js:177` builds a display string `shaghilni.sy/cv/<slug>` (D-20) | no route; the dead `shaghilni.sy/cv/<slug>` display string is gone since Stage 3 (D-20 fixed); README.md says not built |
 | Lite pages for events, career offices, teams | `server/lite.js:601-611` route table | Brief C; README.md:13 silent on teams |
 | Lite: block a company, plans/billing/analytics, job posting, alert channel choice or edit, withdraw an application, privacy/terms pages | `lite.js:258,265` (yes/no only); no plan/jobs/alerts-edit routes; `:144,450` link to `/#/…` | README.md:11 (block, general); D-12 |
 | Server-rendered legal pages (`/lite/privacy`, `/lite/terms`) | not in `lite.js:601-611` | Backlog P1-2 |

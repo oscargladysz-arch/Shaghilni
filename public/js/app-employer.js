@@ -78,7 +78,7 @@ ${f("coRegNo", "coRegNo", c.regNo, ' dir="ltr" autocomplete="off"')}</div>
 <div class="ap-way"><label class="tick"><input type="checkbox" id="coViaCall"${c.applyVia && c.applyVia.call ? raw(" checked") : ""}><span>${icon("phone", 15)}${t("coWayCall")}</span></label>
 <input class="inp" id="coApplyPhone" type="tel" inputmode="tel" dir="ltr" placeholder="09•• ••• •••" value="${c.applyPhone || ""}" aria-label="${t("coApplyPhoneL")}"></div>
 <div class="ap-way"><label class="tick"><input type="checkbox" id="coViaEmail"${c.applyVia && c.applyVia.email ? raw(" checked") : ""}><span>${icon("send", 15)}${t("coWayEmail")}</span></label>
-<input class="inp" id="coApplyEmail" type="email" dir="ltr" placeholder="jobs@company.com" value="${c.applyEmail || ""}" aria-label="${t("coApplyEmailL")}"></div></fieldset>
+<input class="inp" id="coApplyEmail" type="email" dir="ltr" placeholder="jobs@example.com" value="${c.applyEmail || ""}" aria-label="${t("coApplyEmailL")}"></div></fieldset>
 <p class="hint">${t("coWhatsappHint")}</p>
 ${f("coWebsite", "coWebsite", c.website, ' type="url" dir="ltr" placeholder="https://"')}
 <div class="field" lang="ar" dir="rtl"><label class="lbl" for="coAboutAr">${tl("ar", "coAboutAr")}</label><textarea class="inp inp--area" id="coAboutAr" dir="rtl" lang="ar">${ab.ar || ""}</textarea></div>

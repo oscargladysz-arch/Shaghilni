@@ -592,6 +592,7 @@ Field order in every entry below: ID · Severity (verifier's; reporter's noted i
 | Regression test | `test/security.test.js` test 10 (`:278-283`, already asserts the BASE_URL throw): `assert.doesNotMatch(err.message, /shaghilni\.sy/)` or a repo-wide grep-style assertion. Optionally `test/import.test.js:10-12` (vm-loads engine.js): `deriveProfile(...)` has no `cv` key. |
 | Docs (R15) | README.md:50 and `.env.example:6` change in the same commit; BASELINE.md:78 already records the drift. |
 | Privacy/legal (R13) | None. |
+| **Status** | **FIXED in Stage 3 (S3-13)** (code halves; the doc halves were S1-4): `server/config.js` names `https://jobs.example`; the dead `cv: shaghilni.sy/cv/…` field is gone from `engine.js` deriveProfile (nothing read it); the apply-email placeholder is `jobs@example.com`; `payP_usd` says "invoiced in US dollars" in both languages (ARABIC_REVIEW.md row 34). Test: `test/security.test.js` 18 scans `server/`, `public/js` and `scripts/` for invented names and pins the BASE_URL error text. |
 | Notes | Lowered to P3: the only runtime occurrence a human sees is the production start-up error, reaching an operator whose BASE_URL is already missing; the engine field is dead (never displayed or transmitted — settles the "area 4" question). Also reported by probe:platform (A13-18) and probe:ops. |
 
 ---
