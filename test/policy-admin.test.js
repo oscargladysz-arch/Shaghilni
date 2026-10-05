@@ -13,7 +13,7 @@ after(closeAll);
 const PHONE_UA = "Mozilla/5.0 (Linux; Android 12; SM-A125F) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Mobile Safari/537.36";
 const audits = (S, entity, id) => S.db.all("SELECT action, data FROM audit WHERE entity = ? AND entity_id = ? ORDER BY id", entity, id).map(x => ({ action: x.action, data: x.data ? JSON.parse(x.data) : null }));
 
-test("policy admin: company review needs screening to verify and a note to reject or suspend; a draft and a suspended company are verified by id today (U-046)", async () => {
+test("policy admin: company review needs screening to verify and a note to reject or suspend; only a submitted company can be verified, and a suspension is lifted by verifying again (U-046)", async () => {
   const S = await start(), admin = await S.login(ADMIN_PHONE), A = await employerWithLiveJob(S, admin, "0955 910 001", "Review Alpha");
   const draft = await S.login("0955 910 002", "employer");
   const put = await draft.put("/api/employer/company", { company: { name: { en: "Review Draft" }, gov: "aleppo", regNo: "REG-Review-Draft", contactName: "Contact Draft", whatsapp: "0955 910 002" } });
@@ -27,22 +27,29 @@ test("policy admin: company review needs screening to verify and a note to rejec
   }
   for (const what of ["verify", "reject", "suspend"]) { const r = await admin.post(`/api/admin/companies/999999/${what}`, { screened: true, note: "x" }); assert.equal(r.status, 404, r.text); assert.equal(r.body.error, "not_found"); }
   assert.equal(S.db.get("SELECT status FROM companies WHERE id = ?", A.companyId).status, "verified", "nothing refused above moved A");
-  // U-046: a company that was never submitted is verified by id (today's behaviour; the product rule wants a state check)
-  const vd = await admin.post(`/api/admin/companies/${dId}/verify`, { screened: true }); assert.equal(vd.status, 200, vd.text); assert.equal(vd.body.company.status, "verified");
-  assert.equal(S.db.get("SELECT submitted_at FROM companies WHERE id = ?", dId).submitted_at, null, "U-046: verified without ever being submitted");
+  // U-046: a company that was never submitted, a sample company, a rejected one and one already verified cannot be verified by id
+  const vd = await admin.post(`/api/admin/companies/${dId}/verify`, { screened: true }); assert.deepEqual([vd.status, vd.body.error], [409, "bad_state"], "U-046: a draft was never submitted");
+  assert.equal(S.db.get("SELECT status FROM companies WHERE id = ?", dId).status, "draft", "and stays a draft");
+  const demoId = S.db.get("SELECT id FROM companies WHERE is_demo = 1 LIMIT 1").id;
+  assert.deepEqual((r => [r.status, r.body.error])(await admin.post(`/api/admin/companies/${demoId}/verify`, { screened: true })), [409, "bad_state"], "U-046: sample data is not a company to verify");
+  assert.deepEqual((r => [r.status, r.body.error])(await admin.post(`/api/admin/companies/${A.companyId}/verify`, { screened: true })), [409, "bad_state"], "U-046: a verified company is not verified twice");
+  const rj = await S.login("0955 910 003", "employer"); const rjId = (await rj.put("/api/employer/company", { company: { name: { en: "Review Rejected" }, gov: "aleppo", regNo: "REG-Review-Rej", contactName: "Contact Rej", whatsapp: "0955 910 003" } })).body.company.id;
+  assert.equal((await rj.post("/api/employer/company/submit")).status, 200); assert.equal((await admin.post(`/api/admin/companies/${rjId}/reject`, { note: "Registration number unclear" })).status, 200);
+  assert.deepEqual((r => [r.status, r.body.error])(await admin.post(`/api/admin/companies/${rjId}/verify`, { screened: true })), [409, "bad_state"], "U-046: a rejected company must resubmit first");
+  assert.equal((await rj.post("/api/employer/company/submit")).body.company.status, "pending"); assert.equal((await admin.post(`/api/admin/companies/${rjId}/verify`, { screened: true })).body.company.status, "verified", "resubmitted, then verified");
   // suspend with a note: the listing leaves the public site, the note is kept and audited
   const sus = await admin.post(`/api/admin/companies/${A.companyId}/suspend`, { note: "Policy test suspension" }); assert.equal(sus.status, 200, sus.text);
   assert.equal(sus.body.company.status, "suspended"); assert.equal(sus.body.company.reviewNote, "Policy test suspension");
   assert.equal((await S.client().get(`/api/jobs/${A.jobId}`)).status, 404, "a suspended company's listings are not public");
   assert.equal((await A.e.post("/api/employer/company/submit")).body.error, "suspended", "the employer cannot resubmit a suspended company");
-  // U-046: a suspended company is verified by id (today's behaviour)
+  // a suspended company cannot resubmit, so the admin lifts the suspension by verifying it again (screened again)
   const vs = await admin.post(`/api/admin/companies/${A.companyId}/verify`, { screened: true }); assert.equal(vs.status, 200, vs.text); assert.equal(vs.body.company.status, "verified");
   assert.equal((await S.client().get(`/api/jobs/${A.jobId}`)).status, 200, "and its listing is public again");
   // reject with a note works on the (re-)verified company too: no state check anywhere in setCompany (admin.js:46-56)
   const rej = await admin.post(`/api/admin/companies/${A.companyId}/reject`, { note: "Policy test rejection" }); assert.equal(rej.status, 200, rej.text); assert.equal(rej.body.company.status, "rejected");
   assert.deepEqual(audits(S, "company", A.companyId).filter(x => /^company\.(verified|suspended|rejected)$/.test(x.action)).map(x => [x.action, x.data.note]),
     [["company.verified", ""], ["company.suspended", "Policy test suspension"], ["company.verified", ""], ["company.rejected", "Policy test rejection"]], "every decision is in the audit log with its note");
-  assert.deepEqual(audits(S, "company", dId).map(x => x.action), ["company.created", "company.verified"], "U-046: the draft went straight from created to verified");
+  assert.deepEqual(audits(S, "company", dId).map(x => x.action), ["company.created"], "U-046: the refused verification of the draft wrote nothing");
 });
 
 test("policy admin: listing review approves only a pending listing of a verified company (409 bad_state, 409 company_not_verified); reject needs a note", async () => {
