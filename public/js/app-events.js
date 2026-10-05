@@ -42,6 +42,7 @@ function evPageHTML(e) {
   if (!S.user) act = html`<p class="card-p">${t("evSignInP")}</p><div class="card-act"><button class="btn btn--primary" type="button" data-act="go" data-to="#/signin">${t("signIn")}</button></div>`;
   else if (!isSk) act = "";
   else if (!PROFILE) act = html`<p class="card-p">${t("evProfileP")}</p><div class="card-act"><button class="btn btn--primary" type="button" data-act="onb-open">${t("obCreate")}</button></div>`;
+  else if (e.status === "cancelled") act = html`<p class="card-p">${t("evCancelledP")}</p>`;   // a ticket holder's view of a cancelled event (U-041)
   else if (mine && mine.status === "going") act = html`<div class="ticket" id="ticket"><p class="ticket-h">${mine.checkedIn ? html`${icon("check", 18, 2.4)}${t("evCheckedIn")}` : t("evTicketH")}</p>
 <img class="ticket-qr" id="evQr" alt="${t("evQrAlt")}" width="220" height="220"><p class="ticket-code num" dir="ltr">${mine.code}</p><p class="ticket-p">${t("evTicketP")}</p></div>
 ${mine.checkedIn ? "" : html`<div class="card-act"><button class="link link--muted" type="button" data-act="ev-cancel" data-id="${e.id}">${t("evCancel")}</button></div>`}`;

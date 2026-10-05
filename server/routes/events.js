@@ -54,9 +54,9 @@ export function registerEvents(r, deps) {
       .map(e => out(e, { companies: companiesOf(e.id).length, mine: mine.get(e.id) || null })) };
   });
   r.get("/api/events/:id", ctx => {
-    const e = getEv(ctx.params.id); if (e.status !== "published" && !(ctx.user && canManage(ctx, e))) fail(404, "not_found");
-    const rs = ctx.user && ctx.user.role === "seeker" ? db.get("SELECT status, code, checked_in_at FROM event_rsvps WHERE event_id = ? AND user_id = ?", e.id, ctx.user.id) : null;
-    return { event: out(e, { companies: companiesOf(e.id), mine: rs ? { status: rs.status, code: rs.code, checkedIn: !!rs.checked_in_at } : null }) };
+    const e = getEv(ctx.params.id), rs = ctx.user && ctx.user.role === "seeker" ? db.get("SELECT status, code, checked_in_at FROM event_rsvps WHERE event_id = ? AND user_id = ?", e.id, ctx.user.id) : null;
+    if (e.status !== "published" && !(ctx.user && canManage(ctx, e)) && !(e.status === "cancelled" && rs)) fail(404, "not_found");   // a ticket holder can still read a cancelled event (U-041)
+    return { event: out(e, { companies: companiesOf(e.id), mine: rs ? { status: e.status === "published" ? rs.status : "cancelled", code: rs.code, checkedIn: !!rs.checked_in_at } : null }) };
   });
 
   /* ---------- job seekers: sign up, get a ticket ---------- */

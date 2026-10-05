@@ -139,7 +139,7 @@ Column meanings:
 | Method | Path | Guard | File:line | Tests that hit it | Matrix | Audit | Notes |
 |---|---|---|---|---|---|---|---|
 | GET | `/api/events` | none (optional session; `mine` for seekers) | `server/routes/events.js:49` | events :81 | — | none | Published, `starts_at > now − 6 h`, LIMIT 100 |
-| GET | `/api/events/:id` | none (404 unless published or manageable) | `server/routes/events.js:54` | events :82,87,92,108,112 | — | none | 404 to ticket holders once cancelled |
+| GET | `/api/events/:id` | none (404 unless published or manageable) | `server/routes/events.js:54` | events :82,87,92,108,112 | — | none | Stage 3: a ticket holder can read a cancelled event, `mine.status` says cancelled (U-041 fixed) |
 | POST | `/api/events/:id/rsvp` | seeker; published; not over (3 h); profile; capacity | `server/routes/events.js:61` | events :73,75,77-80,103 | — | `event.rsvp` :72 | Ticket also by SMS |
 | DELETE | `/api/events/:id/rsvp` | seeker; not after check-in | `server/routes/events.js:77` | events :80 | — | none | — |
 | GET | `/api/me/events` | seeker | `server/routes/events.js:81` | events :83; demo :71 | — | none | No client screen uses it |
