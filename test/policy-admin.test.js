@@ -102,9 +102,9 @@ test("policy admin: the audit log clamps limit to 1..200, takes junk limits, and
   assert.ok(all.length >= 30 && all.length < 200, `${all.length} rows from the cast`);
   for (const action of ["team.invited", "team.joined", "campus.office_added", "invitation.sent", "company.verified", "job.approved", "company.plan", "user.created", "terms.accepted"]) assert.ok(all.some(e => e.action === action), `${action} was logged`);
   assert.deepEqual(all.map(e => e.id), [...all.map(e => e.id)].sort((a, b) => b - a), "newest first");
-  assert.deepEqual(Object.keys(all[0]).sort(), ["action", "actor_id", "created_at", "data", "entity", "entity_id", "id"]);
+  assert.deepEqual(Object.keys(all[0]).sort(), ["action", "actor", "actor_id", "created_at", "data", "entity", "entity_id", "id"], "the row plus the actor shown masked (Stage 3 audit screen)");
   assert.ok(all.every(e => e.data === null || typeof e.data === "object"), "data comes back parsed");
-  const raw = JSON.stringify(all.map(({ created_at, ...e }) => e));   // timestamps are 13 digits: dropped so they cannot look like a number
+  const raw = JSON.stringify(all.map(({ created_at, actor, ...e }) => e));   // timestamps are 13 digits: dropped so they cannot look like a number; the masked actor is checked by the audit-screen test below
   const PHONE = /\+963|\+1202|963(955|944)\d{6}|09(55|44) 9\d\d \d{3}|955900|944900/;
   assert.ok(!PHONE.test(raw), `a phone number in the audit log: ${(raw.match(PHONE) || [])[0]}`);
   assert.ok(PHONE.test(JSON.stringify((await admin.get("/api/admin/companies?status=verified")).body)), "the pattern does catch the owner numbers where they are shown on purpose");
@@ -116,6 +116,31 @@ test("policy admin: the audit log clamps limit to 1..200, takes junk limits, and
   assert.deepEqual([await n("?limit=-5"), await n("?limit=-1"), await n("?limit=0"), await n("?limit=abc"), await n("?limit="), await n("?limit=1e9"), await n("?limit=5.9"), await n("?limit=%00"), await n("?limit=200abc")], [1, 1, 50, 50, 50, 1, 5, 50, 200],
     "a negative limit is 1 (SECURITY.md: -5 once meant everything), zero and junk are the default, 1e9 reads as 1");
   assert.equal((await admin.get("/api/admin/audit?limit=1")).body.entries[0].action, "test.noise", "limit=1 is the newest row");
+});
+
+test("policy admin: the audit screen's API filters by action, item, actor and dates, pages with a cursor to the oldest row, and shows actors masked (P1-3, U-048)", async () => {
+  const S = await start(), C = await cast(S), admin = C.admin;
+  const get = async q => { const r = await admin.get("/api/admin/audit" + q); assert.equal(r.status, 200, q + " " + r.text); return r.body; };
+  const all = (await get("?limit=200")).entries;
+  assert.ok(all.every(e => e.actor === null || e.actor === "deleted" || /^\+\d{4}•••\d{3}$/.test(e.actor)), "actors are masked like the logs: " + JSON.stringify([...new Set(all.map(e => e.actor))]));
+  assert.ok(all.some(e => /^\+\d{4}•••\d{3}$/.test(e.actor)), "and at least the admin's own actions carry one");
+  const approved = (await get("?action=job.approved")).entries; assert.ok(approved.length >= 2 && approved.every(e => e.action === "job.approved"), "exact action");
+  const jobs = (await get("?action=job.")).entries; assert.ok(jobs.length > approved.length && jobs.every(e => e.action.startsWith("job.")), "a trailing dot is a prefix");
+  assert.equal((await get("?action=job%")).entries.length, 0, "no wildcard sneaks in");
+  const comp = (await get(`?entity=company&entityId=${C.ids.companyA}`)).entries; assert.ok(comp.length >= 2 && comp.every(e => e.entity === "company" && e.entity_id === C.ids.companyA), "item filter");
+  const adminId = S.db.get("SELECT id FROM users WHERE phone = ?", ADMIN_PHONE).id;
+  const byAdmin = (await get(`?actor=${adminId}`)).entries; assert.ok(byAdmin.length >= 2 && byAdmin.every(e => e.actor_id === adminId), "actor filter");
+  const today = new Date().toISOString().slice(0, 10);
+  assert.equal((await get(`?from=${today}&to=${today}`)).entries.length, all.length, "today's rows are all of them");
+  assert.equal((await get("?from=2030-01-01")).entries.length, 0); assert.equal((await get("?to=2000-01-01")).entries.length, 0);
+  for (const q of ["?from=abc", "?to=%00", "?actor=abc", "?entityId=-1", "?action=" + "x".repeat(500), "?entity=%27%20OR%201=1%20--", "?before=abc", "?before=-5", "?limit=abc&before=%00"]) assert.equal((await admin.get("/api/admin/audit" + q)).status, 200, "junk filter " + q);
+  for (let i = 0; i < 120; i++) S.db.run("INSERT INTO audit (actor_id, action, entity, entity_id, data, created_at) VALUES (NULL, 'test.noise', 'test', ?, NULL, ?)", i, Date.now());
+  const seen = []; let before = 0, pages = 0;
+  while (pages++ < 50) { const page = (await get(`?limit=50${before ? "&before=" + before : ""}`)).entries; if (!page.length) break; seen.push(...page.map(e => e.id)); before = page[page.length - 1].id; if (page.length < 50) break; }
+  assert.equal(new Set(seen).size, seen.length, "no row twice"); assert.deepEqual(seen, [...seen].sort((a, b) => b - a), "newest first across pages");
+  assert.equal(seen.length, S.db.get("SELECT COUNT(*) AS n FROM audit").n, "the cursor reaches the oldest row (U-048)");
+  const raw = JSON.stringify((await get("?limit=200")).entries.map(({ created_at, actor, ...e }) => e));
+  assert.ok(!/\+963|\+1202|963(955|944)\d{6}|09(55|44) 9\d\d \d{3}|955900|944900/.test(raw), "no phone number anywhere but the masked actor");
 });
 
 const countMap = o => !!o && typeof o === "object" && !Array.isArray(o) && Object.values(o).every(v => typeof v === "number");
