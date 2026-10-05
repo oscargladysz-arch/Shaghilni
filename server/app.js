@@ -118,6 +118,7 @@ export function createApp({ cfg, db, log = console.log, sms: smsOverride, email:
   handler.cleanup = () => cleanup(db);
   handler.traffic = traffic;
   handler.runAlerts = t => deps.alerts.run(t);
+  handler.routes = router.routes;   // read-only listing of the registered JSON routes (test/policy-*.test.js)
   handler.payments = deps.payments;
   registerDemo(router, deps);   // demo-accounts
   handler.demoReady = demoOn(cfg) ? seedDemoAccounts({ ...deps, router }).catch(err => log(`[demo] ${err.stack || err}`)) : Promise.resolve();   // demo-accounts
