@@ -15,7 +15,7 @@ const ym = v => (/^\d{4}-(0[1-9]|1[0-2])$/.test(String(v || "")) ? String(v) : "
 export function e164(core, raw) {
   const sy = core.normPhone(raw || "");
   if (sy) return sy.replace(/\s/g, "");
-  const d = String(raw || "").replace(/[^\d+]/g, "");
+  const d = core.latinDigits(raw || "").replace(/[^\d+]/g, "");   // Arabic-Indic and Persian digits count as digits abroad too (D-19)
   return /^\+[1-9]\d{7,14}$/.test(d) ? d : null;
 }
 

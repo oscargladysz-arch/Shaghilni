@@ -13,5 +13,5 @@ export function loadCore() {
   // Lite asks for a job's fit on the server: set the profile, score, and put it back. It runs synchronously, so requests can't overlap.
   vm.runInContext("function fitFor(me, j) { const prev = PROFILE; PROFILE = deriveProfile(me); try { return assess(j); } finally { PROFILE = prev; } }", ctx);
   return vm.runInContext(`({ normPhone, norm, trSources, translitName, parseResumeText, mergeImported, buildResume, plainResume, fmtRange, fitFor, alertMatches, alertLabel, placeOf, scriptOf, sameNumbers, findGender, findFee, factGuard, factsText, jobPlain, aiPrompt, initialsOf,
-    GOV, GOV_ORDER, COUNTRY, DIAL, UNI, FAC, CAT, SECTOR, TYPE, LEVEL, MODE, LANGS, INTERESTS, STR, fill, LEGAL, MONTHS })`, ctx);
+    GOV, GOV_ORDER, COUNTRY, DIAL, UNI, FAC, CAT, SECTOR, TYPE, LEVEL, MODE, LANGS, INTERESTS, STR, fill, LEGAL, MONTHS, latinDigits })`, ctx);
 }

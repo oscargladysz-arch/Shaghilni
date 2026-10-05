@@ -119,7 +119,7 @@ export function registerEvents(r, deps) {
   r.post("/api/organize/events/:id/checkin", organiser, ctx => {
     const e = manage(ctx, ctx.params.id);
     // Accepts the short code, or what the ticket's QR code holds: "SHG-EV-<event>-<code>".
-    const raw = String(ctx.body.code || "").trim().toUpperCase(), m = /^SHG-EV-(\d+)-([A-Z0-9]{6})$/.exec(raw), code = m ? m[2] : raw.replace(/[^A-Z0-9]/g, "");
+    const raw = core.latinDigits(String(ctx.body.code || "")).trim().toUpperCase(), m = /^SHG-EV-(\d+)-([A-Z0-9]{6})$/.exec(raw), code = m ? m[2] : raw.replace(/[^A-Z0-9]/g, "");   // latinDigits: Arabic-Indic digits are digits (U-045)
     if (m && Number(m[1]) !== e.id) fail(409, "wrong_event");
     const rs = db.get("SELECT r.*, p.data AS p_data FROM event_rsvps r LEFT JOIN profiles p ON p.user_id = r.user_id WHERE r.event_id = ? AND r.code = ?", e.id, code);
     if (!rs) fail(404, "ticket_not_found");
