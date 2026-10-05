@@ -397,7 +397,7 @@ The launch checklist, with who owns each item (agent, owner, lawyer or provider)
 - **No card data touches Shaghilni.** Card details are entered on the bank's hosted page; we store only the company, plan, months, amount, currency, dates, status, the provider's name and reference, and which team member started the payment.
 - **Only the bank's signed result switches a plan on.** Results arrive at `/pay/callback/<provider>`, outside `/api` (so without the CSRF header), and each is checked on its own: the signature, that the payment exists, and that the amount and currency match what we asked for. A result is applied once; repeats change nothing. The return page (`/pay/return`) never changes anything.
 - **The test payment page can't reach production:** the server refuses to start with `PAY_PROVIDER=test` when `NODE_ENV=production`, and card payments need both monthly prices to be set.
-- **Every checkout and every card payment is in the audit log.**
+- **Every checkout and every paid card payment is in the audit log.** A failed, cancelled or mismatched result changes the payment's status and writes a log line naming the payment id only, not an audit row (`test/payments.test.js`).
 
 
 ## Universities

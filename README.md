@@ -187,7 +187,7 @@ public/          the interface: plain JavaScript, bundled and gzipped at start-u
   fonts/         IBM Plex Sans Arabic, self-hosted (SIL Open Font License, OFL.txt)
 scripts/         backup, sample-listing removal and the security scanner
 test/            API and security tests, fixtures/ (sample resumes), e2e/ (the browser flow)
-docs/            screenshots, the launch checklist (LAUNCH.md) and the agent records (docs/agent/)
+docs/            screenshots, the launch checklist (LAUNCH.md), the card-payment adapter contract (PAYMENTS_ADAPTER.md) and the agent records (docs/agent/)
 ```
 
 **One set of rules.** The engine that scores fit, normalises Arabic search, checks listings for fees and gendered wording, and guards resume suggestions against invented facts runs in the browser for instant feedback. The server runs the same file in a sandbox to enforce those rules, so the two can never disagree.
@@ -344,7 +344,7 @@ Employers can pay for Pro or Enterprise by card: they choose the plan and 1, 3 o
 
 **How it works.** `POST /api/employer/plan/checkout` creates a payment and asks the provider for a payment session; the employer is sent to the provider's page. The provider then sends the result to `/pay/callback/<provider>`, server to server. Only that signed result switches a plan on, after the signature, amount and currency are checked, and it's processed once. The employer comes back through `/pay/return`, which only shows the result. Renewing the same plan adds to the time left. Each paid payment is recorded as a paid charge.
 
-**Completing QNB Syria.** Everything is built except the two functions that talk to QNB's gateway, `createSession()` and `verify()` in `server/payments.js`. Fill them in from QNB Syria's developer documents, set `ready = true`, and test against their test environment. Until then, `PAY_PROVIDER=qnb` leaves the card option switched off.
+**Completing QNB Syria.** Everything is built except the two functions that talk to QNB's gateway, `createSession()` and `verify()` in `server/payments.js`. Fill them in from QNB Syria's developer documents, set `ready = true`, and test against their test environment. Until then, `PAY_PROVIDER=qnb` leaves the card option switched off. The contract those two functions must satisfy, line by line from `server/payments.js`, is in [docs/PAYMENTS_ADAPTER.md](docs/PAYMENTS_ADAPTER.md).
 
 **Try it now.** Start with `PAY_PROVIDER=test PLAN_PRO_MONTHLY=4000 PLAN_ENTERPRISE_MONTHLY=20000` to use the pretend payment page (clearly labelled, no real money). The server refuses to start in production with `PAY_PROVIDER=test`.
 
