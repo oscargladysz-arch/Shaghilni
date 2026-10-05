@@ -125,6 +125,21 @@ test("plans: sponsored listings are for paid plans, limited, labelled, and expir
   S.db.run("UPDATE jobs SET sponsored_until = ? WHERE id = ?", Date.now() - 1000, jid);
   assert.equal((await S.client().get("/api/jobs")).body.jobs.find(j => j.id === jid).sponsored, false, "and it ends by itself");
   assert.equal((await e.post(`/api/employer/jobs/${more[1]}/sponsor`, { on: true })).status, 200, "which frees the slot");
+  // D-29: a sponsored listing that leaves the board (closed, edited, rejected) loses its sponsorship and frees the slot at once
+  const until = id => S.db.get("SELECT sponsored_until FROM jobs WHERE id = ?", id).sponsored_until;
+  assert.equal((await e.post(`/api/employer/jobs/${more[0]}/close`)).status, 200); assert.equal(until(more[0]), null, "closing ends the sponsorship");
+  assert.equal((await e.post(`/api/employer/jobs/${jid}/sponsor`, { on: true })).status, 200, "and frees the slot");
+  assert.equal((await e.put(`/api/employer/jobs/${more[1]}`, { job: { ...JOB, title: { en: "Role 1 edited" } } })).body.job.status, "draft"); assert.equal(until(more[1]), null, "editing ends it");
+  assert.equal((await admin.post(`/api/admin/jobs/${jid}/reject`, { note: "Pay range unclear" })).status, 200); assert.equal(until(jid), null, "rejection ends it");
+  assert.equal(S.db.get("SELECT COUNT(*) AS n FROM jobs WHERE company_id = ? AND sponsored_until > ?", cid(S, "Qasioun Advisory"), Date.now()).n, 0, "no slot is held by a listing that is off the board");
+  // D-28: switching a sponsorship off is in the audit log, like switching it on; a click on a listing that is not sponsored writes nothing
+  const rows = () => S.db.all("SELECT entity_id AS id FROM audit WHERE action = 'job.unsponsored'").map(x => x.id);
+  assert.equal((await e.post(`/api/employer/jobs/${more[0]}/reopen`)).body.job.status, "published");
+  assert.equal((await e.post(`/api/employer/jobs/${more[0]}/sponsor`, { on: true })).status, 200);
+  assert.deepEqual((await e.post(`/api/employer/jobs/${more[0]}/sponsor`, { on: false })).body, { ok: true, sponsoredUntil: null }); assert.equal(until(more[0]), null);
+  assert.deepEqual(rows(), [more[0]], "one job.unsponsored row");
+  assert.equal((await e.post(`/api/employer/jobs/${more[0]}/sponsor`, { on: false })).status, 200); assert.deepEqual(rows(), [more[0]], "switching off twice writes one row");
+  assert.ok((await e.get("/api/employer/activity")).body.activity.some(x => x.action === "job.unsponsored"), "and the team activity log lists it");
 });
 
 test("plans: analytics for everyone, full analytics and reports with paid plans", async () => {
