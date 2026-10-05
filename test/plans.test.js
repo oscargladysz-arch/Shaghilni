@@ -104,12 +104,25 @@ test("plans: a placement fee applies only when a Free employer hires someone it 
   const b = (await admin.get("/api/admin/billing")).body; assert.equal(b.charges.length, 1); assert.equal(b.programmes[0].rateUsd, 100);
   assert.equal((await admin.post(`/api/admin/charges/${b.charges[0].id}/paid`)).status, 200);
   assert.equal((await e.get("/api/employer/plan")).body.feesDue.n, 0);
+  // D-09: the fee is based on the pay the listing showed when the employer recorded the hire, not on whatever the pay is edited to afterwards
+  const late = await seekerOpen(S, "0933 761 104"); await inviteJob(e, late.id, jid);
+  await late.s.post(`/api/me/invitations/${(await late.s.get("/api/me/invitations")).body.invitations[0].id}/respond`, { answer: "yes" });
+  assert.equal((await late.s.post(`/api/jobs/${jid}/apply`, { channel: "web", cvLang: "ar" })).status, 200);
+  await hire(e, aOf(late.id));
+  assert.equal((await e.put(`/api/employer/jobs/${jid}`, { job: { ...JOB, pay: [1, 1] } })).status, 200, "the employer edits the pay down after recording the hire");
+  const c3 = (await admin.post(`/api/admin/applications/${aOf(late.id)}/confirm-hire`, {})).body.charges;
+  assert.equal(c3.length, 1); assert.equal(c3[0].amountSyp, Math.round((JOB.pay[0] + JOB.pay[1]) / 2), "D-09: the fee is a month of the pay shown at the time of the hire, not 1 SYP");
   // a donor programme pays per confirmed placement, whatever the employer's plan
   const { e: e2 } = await employer(S, admin, "0955 761 002", "Barada Logistics"); await admin.post(`/api/admin/companies/${cid(S, "Barada Logistics")}/plan`, { plan: "pro", months: 12 });
   const j2 = (await e2.get("/api/employer")).body.jobs[0].id, w = await seekerOpen(S, "0933 761 103");
   await w.s.post(`/api/jobs/${j2}/apply`, { channel: "web", cvLang: "ar" }); const a2 = S.db.get("SELECT id FROM applications WHERE user_id = ?", w.id).id;
   await hire(e2, a2);
   assert.deepEqual((await admin.post(`/api/admin/applications/${a2}/confirm-hire`, { programmeId: pid })).body.charges, [{ kind: "placement", amountUsd: 100, programme: "Livelihoods pilot" }]);
+  // D-08: the programme pays; the Pro employer owes nothing and sees no placement charge on its plan page, while the admin's billing tab still lists it
+  const p2 = (await e2.get("/api/employer/plan")).body;
+  assert.equal(p2.feesDue.n, 0, "D-08: a programme-billed placement is not a fee due from the employer");
+  assert.ok(!p2.charges.some(x => x.kind === "placement"), "D-08: and is not listed on the employer's plan page");
+  assert.ok((await admin.get("/api/admin/billing")).body.charges.some(x => x.kind === "placement" && x.programme === "Livelihoods pilot"), "the admin still bills the programme");
 });
 
 test("plans: sponsored listings are for paid plans, limited, labelled, and expire", async () => {
@@ -151,4 +164,5 @@ test("plans: analytics for everyone, full analytics and reports with paid plans"
   assert.equal((await e.get("/api/employer/analytics")).body.full, true);
   assert.ok(Array.isArray((await e.get("/api/employer/reports/placements")).body.rows));
   const comp = (await e.get("/api/employer/reports/compliance")).body.rows; assert.ok(comp.some(x => x.action === "company.verified"), "the compliance record includes verification");
+  assert.equal(comp.find(x => x.action === "company.verified").sanctionsScreened, "yes", "D-07: the verification row says the company was screened (the admin had to tick it)");
 });
