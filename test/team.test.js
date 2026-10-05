@@ -130,3 +130,26 @@ test("teams: asking to join, duplicate companies, admins, transfer, leaving and 
   await admin.post(`/api/admin/companies/${cid(S, "Halab Freight Co")}/plan`, { plan: "enterprise", months: 1 });
   assert.equal((await fadi.get("/api/employer/team")).body.seats.limit, 50);
 });
+
+test("teams: invitations need a verified company and stop at twenty a day per company, cancelling included (D-10)", async () => {
+  const S = await start(), admin = await S.login("+12025550199");
+  const draft = await S.login("0955 810 001", "employer");
+  await draft.put("/api/employer/company", { company: { name: { en: "Draft Co" }, gov: "homs", regNo: "REG-DRAFT", contactName: "Contact", whatsapp: "0955 810 001" } });
+  const invites = () => S.texts.filter(x => /invited you to join|عزمك/.test(x.body)).length;   // invitation texts only (sign-in codes are texts too)
+  assert.equal((await draft.post("/api/employer/team", { name: "Anyone", phone: "0955 810 002", role: "recruiter" })).body.error, "company_not_verified", "a draft company invites nobody");
+  const { e: pending } = await employer(S, admin, "0955 810 003", "Pending Co", false);
+  assert.equal((await pending.post("/api/employer/team", { name: "Anyone", phone: "0955 810 004", role: "recruiter" })).body.error, "company_not_verified", "nor a company still under review");
+  assert.equal(invites(), 0, "and no invitation text leaves in Shaghilni's name");
+  const { e: owner } = await employer(S, admin, "0955 810 005", "Verified Co");
+  await admin.post(`/api/admin/companies/${cid(S, "Verified Co")}/plan`, { plan: "enterprise", months: 1 });   // fifty seats, so seats never bind here
+  for (let i = 1; i <= 20; i++) {   // invite, then cancel to free the seat: the loop D-10 describes
+    const n = String(i).padStart(3, "0");
+    assert.equal((await owner.post("/api/employer/team", { name: `Person ${i}`, phone: `0955 811 ${n}`, role: "recruiter" })).status, 200, `invitation ${i} of 20`);
+    assert.equal((await owner.del(`/api/employer/team/${encodeURIComponent("+963955811" + n)}`)).status, 200, `cancelling ${i} frees the seat, not the day's count`);
+  }
+  const before = invites(), r21 = await owner.post("/api/employer/team", { name: "Person 21", phone: "0955 811 021", role: "recruiter" });
+  assert.deepEqual([r21.status, r21.body.error], [429, "rate_limited"], "the twenty-first invitation of the day is refused");
+  assert.equal(invites(), before, "and sends no text");
+  const { e: other } = await employer(S, admin, "0955 810 006", "Other Co");
+  assert.equal((await other.post("/api/employer/team", { name: "Theirs", phone: "0955 812 001", role: "recruiter" })).status, 200, "the cap is per company");
+});

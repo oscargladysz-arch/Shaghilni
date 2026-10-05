@@ -200,6 +200,7 @@ Field order in every entry below: ID · Severity (verifier's; reporter's noted i
 | Regression test | `test/team.test.js`: draft company POST team → 409 company_not_verified; verified company 21st invite in a day → 429. |
 | Docs (R15) | README.md:385 (inviting from the Team page) must say the company must be verified. SECURITY.md:28 row 11 and/or `:158`: per-company daily team-invite limit. |
 | Privacy/legal (R13) | None. Texts are recorded and retained as before. |
+| **Status** | **FIXED in Stage 3 (S3-1)**: `POST /api/employer/team` answers `409 company_not_verified` unless the company is verified and `429 rate_limited` after twenty invitations a day per company (counted on the invitation, so cancelling does not reset it). Test: `test/team.test.js` "invitations need a verified company and stop at twenty a day". README Teams and SECURITY.md item 11 say so. |
 | Notes | For P0: one phone with one OTP takes sign-in offline for everyone until 00:00 UTC and sends branded smishing. Against: the attacker needs a real phone (traceable via `otps.ip` and `team.invited` audit rows), cost is bounded by the daily cap, fix is two lines. The fix is identical either way. Existing drift: `test/security.test.js` has no `/api/employer/team` entries (CLAUDE.md:30). |
 
 ### D-11 · P1 · A removed career office keeps the "university" role: it can still list every event (drafts included) and publish events at any university

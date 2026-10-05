@@ -8,7 +8,7 @@ import { e164 } from "../validate.js";
 import { ROLES } from "../plans.js";
 
 export function registerTeam(r, deps) {
-  const { db, core, auth, audit, notify, plans } = deps;
+  const { db, core, auth, audit, notify, plans, limit } = deps;
   const employer = auth.need("employer");
   const coName = c => (J(c.data) || {}).name || {};
   const active = ctx => { const c = plans.companyFor(ctx.user); if (!c) fail(409, "no_company"); return c; };
@@ -31,6 +31,7 @@ export function registerTeam(r, deps) {
   });
   r.post("/api/employer/team", employer, ctx => {
     const c = active(ctx); plans.allow(ctx, c, "manage");
+    if (c.status !== "verified") fail(409, "company_not_verified");   // an unchecked company sends no text in Shaghilni's name (D-10)
     const role = ROLES.includes(ctx.body.role) ? ctx.body.role : null; if (!role) fail(422, "bad_role");
     const name = clean(ctx.body.name, 80); if (!name) fail(422, "name_required");
     const phone = e164(core, ctx.body.phone); if (!phone) fail(422, "invalid_phone");
@@ -39,6 +40,7 @@ export function registerTeam(r, deps) {
     if (u && u.role !== "employer") fail(409, "phone_taken");
     if (u && db.get("SELECT 1 AS x FROM companies WHERE owner_id = ?", u.id)) fail(409, "phone_taken");
     if (db.get("SELECT 1 AS x FROM company_members WHERE phone = ?", phone)) fail(409, "phone_taken");
+    if (!limit(`team-invite:${c.id}`, 20, 86400e3)) fail(429, "rate_limited");   // twenty invitations a day per company; cancelling does not give them back (D-10)
     db.run("INSERT INTO company_members (company_id, phone, added_by, created_at, role, status, name) VALUES (?, ?, ?, ?, ?, 'invited', ?)", c.id, phone, ctx.user.id, now(), role, name);
     audit(ctx.user.id, "team.invited", "company", c.id, { role });
     tell(phone, "team_invite", { co: coName(c), role: roleWord(role), by: { en: plans.memberName(c, ctx.user.id), ar: plans.memberName(c, ctx.user.id) } });
