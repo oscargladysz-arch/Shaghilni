@@ -223,3 +223,16 @@ test("lite: the code field takes Arabic-Indic digits, and looking at the sign-in
   assert.equal((await v.get("/lite/hire")).status, 200);
   assert.equal((await S.client().get("/api/auth/challenge")).status, 200, "D-24: page views do not spend the address's sixty challenges");
 });
+
+test("lite: remote listings show under every governorate, and a saved listing stays past the 500 newest (D-26, D-27)", async () => {
+  const S = await start(), admin = await S.login("+12025550199"), { e } = await employer(S, admin, "0955 795 001", "Remote Co"), b = S.browser();
+  const post = async over => { const j = (await e.post("/api/employer/jobs", { job: { title: { en: "Field trainee" }, gov: "homs", type: "full", level: "entry", pay: [1500000, 2000000], langs: ["ar"], summary: { en: "Work with us." }, ...over }, submit: true })).body.job; await admin.post(`/api/admin/jobs/${j.id}/approve`); return j.id; };
+  await post({ title: { en: "Remote Translator", ar: "مترجم عن بعد" }, gov: "remote" });
+  for (const gov of ["damascus", "aleppo"]) assert.match((await b.get(`/lite?gov=${gov}&lang=en`)).text, /Remote Translator/, `D-26: the remote listing shows under ${gov}`);
+  const keep = await post({ title: { en: "Keep me", ar: "احتفظ بي" }, gov: "homs" });
+  assert.equal((await b.signin("0933 795 001")).location, "/lite/me");
+  const job = await b.get(`/lite/job/${keep}`); assert.equal((await b.post(`/lite/job/${keep}/save`, { csrf: b.csrf(job.text) })).status, 303);
+  const co = S.db.get("SELECT id FROM companies WHERE json_extract(data, '$.name.en') = ?", "Remote Co").id, t0 = Date.now();
+  S.db.tx(() => { for (let i = 1; i <= 520; i++) S.db.run("INSERT INTO jobs (company_id, data, status, published_at, created_at, updated_at) VALUES (?, ?, 'published', ?, ?, ?)", co, JSON.stringify({ title: { en: "Filler " + i }, gov: "homs", type: "full", level: "entry", pay: [1500000, 2000000], langs: ["ar"], summary: { en: "x" } }), t0 + i, t0 + i, t0 + i); });
+  assert.match((await b.get("/lite?saved=1&lang=en")).text, /Keep me/, "D-27: the saved listing is on the Saved page although it is older than the 500 newest");
+});
