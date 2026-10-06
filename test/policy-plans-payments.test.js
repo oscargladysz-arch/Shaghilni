@@ -94,6 +94,25 @@ test("policy plans: the placement fee is charged once, on Free only, only for a 
   assert.deepEqual((await F.e.get("/api/employer/plan")).body.feesDue, { n: 1, syp: MID }); assert.deepEqual((await P.e.get("/api/employer/plan")).body.feesDue, { n: 0, syp: 0 });
 });
 
+test("policy plans: the placement fee follows the plan at the hire, not at the confirmation: a Pro hire stays free after the plan ends, a Free hire keeps its fee after an upgrade (U-029)", async () => {
+  const S = await start(), admin = await S.login("+12025550199");
+  const F = await employerWithLiveJob(S, admin, "0955 921 001", "Free Then Pro Co"), P = await employerWithLiveJob(S, admin, "0955 921 002", "Pro Then Free Co");
+  assert.equal((await admin.post(`/api/admin/companies/${P.companyId}/plan`, { plan: "pro", months: 1 })).status, 200);
+  const a = await seekerOpen(S, "0944 921 001", "Hired Under Free"), b = await seekerOpen(S, "0944 921 002", "Hired Under Pro");
+  const sourcedHire = async (e, jobId, who) => { const inv = await e.post(`/api/employer/students/${who.id}/invite`, { kind: "job", jobId }); assert.equal(inv.status, 200, inv.text);
+    assert.equal((await who.s.post(`/api/me/invitations/${inv.body.invitation.id}/respond`, { answer: "yes" })).status, 200);
+    const ap = await who.s.post(`/api/jobs/${jobId}/apply`, { channel: "web", cvLang: "ar" }); assert.equal(ap.status, 200, ap.text); await hire(e, ap.body.application.id); return ap.body.application.id; };
+  const onFree = await sourcedHire(F.e, F.jobId, a), onPro = await sourcedHire(P.e, P.jobId, b);
+  // between the hire and the admin's confirmation the plans swap: F moves up to Pro, P's Pro ends; a note on each hire comes after
+  assert.equal((await admin.post(`/api/admin/companies/${F.companyId}/plan`, { plan: "pro", months: 1 })).status, 200);
+  assert.equal((await admin.post(`/api/admin/companies/${P.companyId}/plan`, { plan: "free" })).status, 200);
+  assert.equal((await F.e.put(`/api/employer/applications/${onFree}`, { note: "Starts on Sunday." })).status, 200);
+  assert.equal((await P.e.put(`/api/employer/applications/${onPro}`, { note: "Starts on Sunday." })).status, 200);
+  const confirm = async id => { const r = await admin.post(`/api/admin/applications/${id}/confirm-hire`, {}); assert.equal(r.status, 200, r.text); return r.body.charges; };
+  assert.deepEqual(await confirm(onFree), [{ kind: "hire_fee", amountSyp: MID }], "hired on Free: the fee stands although the company is on Pro when the hire is confirmed");
+  assert.deepEqual(await confirm(onPro), [], "hired on Pro: no fee although the plan ended before the confirmation (Pro promises no placement fees)");
+});
+
 test("policy plans: admin billing routes: paid and void repeat without harm (record: no state check), plan with months 0 has no end date (record), a bad plan is 422", async () => {
   const S = await start(), admin = await S.login("+12025550199"), { e, companyId } = await employerWithLiveJob(S, admin, "0955 920 011", "Billing Co");
   const chargeRow = id => plain(S.db.get("SELECT status, paid_at FROM charges WHERE id = ?", id)), audits = () => S.db.get("SELECT COUNT(*) AS n FROM audit WHERE entity = 'charge'").n;
