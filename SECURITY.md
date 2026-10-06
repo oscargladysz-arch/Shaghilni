@@ -332,7 +332,7 @@ Security test 12 checks all of this. It also checks the challenge end to end, us
 
 `npm run security:check` checks four things:
 
-1. The repository, for committed secrets: code, settings and documentation files, and key and certificate files (`.pem`, `.key`, `id_rsa` and the like), which `.gitignore` also keeps out.
+1. The repository, for committed secrets: code, settings and documentation files (this app's secret names in code, JSON, settings lines, a Dockerfile `ENV`, YAML and compose files; a value of one repeated character counts as a placeholder), and key and certificate files (`.pem`, `.key`, `.asc`, `id_rsa` and the like, encrypted keys included; a `.p12` or `.pfx` file is a finding by its name), which `.gitignore` also keeps out. It reads every file in the folder, git-ignored or not, except your `.env*` settings files: keep key files outside the checkout.
 2. The code, for:
    - unreviewed SQL built from text, raw HTML writes, `eval` and shell calls;
    - inline scripts, and scripts from other sites.

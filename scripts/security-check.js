@@ -8,7 +8,7 @@ import { loadConfig } from "../server/config.js";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const SKIP = new Set(["node_modules", ".git", "data", "backups", "shots", "fonts", "screenshots"]);
-const TEXT = /\.(js|mjs|cjs|json|md|html|css|txt|yml|yaml|sh|example|pem|key|crt|cer|p12|pfx|toml|ini|cfg)$|^Dockerfile$|^\.env|^id_(?:rsa|dsa|ecdsa|ed25519)$/;   // key and certificate files too, so the private-key pattern can find them (D-51)
+const TEXT = /\.(js|mjs|cjs|json|md|html|css|txt|yml|yaml|sh|example|pem|key|crt|cer|p12|pfx|asc|toml|ini|cfg)$|^Dockerfile$|^\.env|^id_(?:rsa|dsa|ecdsa|ed25519)$/;   // key and certificate files too, so the private-key pattern can find them (D-51)
 
 function files(root) {
   const out = [];
@@ -29,16 +29,21 @@ const SECRET_PATTERNS = [
   ["OpenAI-style API key", /\bsk-[A-Za-z0-9]{32,}\b/],
   ["AWS access key", /\bAKIA[0-9A-Z]{16}\b/],
   ["Twilio account SID", /\bAC[0-9a-f]{32}\b/],
-  ["Private key", /-----BEGIN (?:RSA |EC |OPENSSH |DSA )?PRIVATE KEY-----/],
-  ["Hard-coded secret", /(?:api[_-]?key|secret|token|password|pepper|key)\b\s*[:=]\s*["'][A-Za-z0-9_\-]{24,}["']/i],   // also prefixed names: textbeeKey, otpPepper, emailApiKey (D-50)
-  ["Hard-coded secret", /^\s*(?:export\s+)?[A-Z0-9_]*(?:API_KEY|SECRET|TOKEN|PASSWORD|PEPPER)\s*=\s*["']?[A-Za-z0-9_\-]{24,}/m]   // a settings line: OTP_PEPPER=..., TEXTBEE_API_KEY=...
+  ["Private key", /-----BEGIN (?:RSA |EC |OPENSSH |DSA |ENCRYPTED |PGP )?PRIVATE KEY(?: BLOCK)?-----/],
+  ["Hard-coded secret", /(?:api[_-]?key|secret|token|password|pepper|textbee[_-]?key|anthropic[_-]?key)\b["']?\s*[:=]\s*(?:[\w.$]+\s*(?:\|\||\?\?)\s*)?["']([A-Za-z0-9_\-]{24,})["']/gi],   // in code or JSON, prefixed names too (textbeeKey, otpPepper, emailApiKey), also as a || fallback (D-50, fix review)
+  ["Hard-coded secret", /(?:^|[\s"'])(?:export\s+|ENV\s+|-\s*)?[A-Z0-9_]*(?:API_KEY|SECRET|TOKEN|PASSWORD|PEPPER)\s*[=:]\s*["']?([A-Za-z0-9_\-]{24,})/gm]   // a settings line: OTP_PEPPER=..., Dockerfile ENV, YAML, a compose list
 ];
+const KEY_FILE = /\.(p12|pfx)$/;   // binary key stores: found by name, since their text holds no header to match
 export function scanSecrets(root = ROOT) {
   const found = [];
   for (const f of files(root)) {
-    if (/^\.env(\..+)?$/.test(path.basename(f)) && path.basename(f) !== ".env.example") continue;   // your local settings files (.env, .env.production, ...): git ignores them and they are supposed to hold secrets; the example must not
+    if (/^\.env/.test(path.basename(f)) && path.basename(f) !== ".env.example") continue;   // your local settings files (.env, .env.production, .envrc, ...): git ignores .env* and they are supposed to hold secrets; the example must not
+    if (KEY_FILE.test(f)) { found.push(`Key file ${path.relative(root, f)}`); continue; }
     const text = readFileSync(f, "utf8");
-    for (const [label, re] of SECRET_PATTERNS) { const m = re.exec(text); if (m) found.push(`${label} in ${path.relative(root, f)} (${m[0].slice(0, 10)}…)`); }
+    for (const [label, re] of SECRET_PATTERNS) for (const m of text.matchAll(re.global ? re : new RegExp(re.source, re.flags + "g"))) {
+      if (m[1] && /^(.)\1*$/.test(m[1])) continue;   // one repeated character is a placeholder (the fake pepper of ci.yml and BASELINE.md)
+      found.push(`${label} in ${path.relative(root, f)} (${m[0].trim().slice(0, 10)}…)`); break;
+    }
   }
   return found;
 }
