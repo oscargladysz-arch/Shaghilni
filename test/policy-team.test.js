@@ -52,6 +52,16 @@ test("policy team: a removed teammate and one who leaves lose every employer rou
   assert.deepEqual(S.db.all("SELECT action FROM audit WHERE entity = 'company' AND entity_id = ? AND action IN ('team.removed', 'team.left') ORDER BY id", I.companyA).map(x => x.action), ["team.removed", "team.left"], "both are audited");
 });
 
+test("policy team: after a transfer each person keeps their own name: the new owner as they were on the team, the old owner as before (U-031)", async () => {
+  const S = await start(), C = await cast(S);
+  const before = (await C.A.e.get("/api/employer/team")).body, oldName = before.owner.name, newName = before.members.find(m => m.phone === PH.cadmin).name;
+  assert.notEqual(oldName, newName, "two different people");
+  assert.equal((await C.A.e.post("/api/employer/team/transfer", { phone: PH.cadmin })).status, 200);
+  const after = (await C.cadmin.get("/api/employer/team")).body;
+  assert.equal(after.owner.name, newName, "the new owner is named as they were on the team, not as the old owner");
+  assert.equal(after.members.find(m => m.phone === PH.owner).name, oldName, "the old owner keeps their name as an admin");
+});
+
 test("policy team: after a transfer the old owner is an admin who cannot bill or transfer; the new owner can", async () => {
   const S = await start(), C = await cast(S), I = C.ids, old = C.A.e, next = C.cadmin;
   assert.equal((await old.get("/api/employer")).body.me.role, "owner");
