@@ -69,9 +69,9 @@ export function registerTeam(r, deps) {
   });
   r.delete("/api/employer/team/:phone", employer, ctx => {
     const c = active(ctx), me = plans.allow(ctx, c, "manage");
-    const m = db.get("SELECT * FROM company_members WHERE company_id = ? AND phone = ?", c.id, String(ctx.params.phone)); if (!m) fail(404, "not_found");
+    const m = db.get("SELECT * FROM company_members WHERE company_id = ? AND phone = ?", c.id, String(ctx.params.phone));
+    if (!m || (m.status === "requested" && c.status !== "verified")) fail(404, "not_found");   // a waiting request is not the unverified holder's to see or remove: it answers like a number that never asked (fix reviews 2 and 3)
     if (me !== "owner" && m.role === "admin") fail(403, "role_forbidden");   // an admin, or an invitation to be one, is the owner's to remove (U-030)
-    if (m.status === "requested" && c.status !== "verified") fail(409, "company_not_verified");   // a waiting request is not the unverified holder's to confirm or remove (fix review 2)
     db.run("DELETE FROM company_members WHERE company_id = ? AND phone = ?", c.id, m.phone);
     audit(ctx.user.id, m.status === "invited" ? "team.invite_cancelled" : "team.removed", "company", c.id, {}); return { ok: true };
   });
