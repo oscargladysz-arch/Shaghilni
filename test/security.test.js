@@ -609,6 +609,15 @@ test("13 · the scanner finds this app's secret names in every settings format i
   assert.deepEqual(scanSecrets(miss), [], "ordinary string keys, a one-character fake and git-ignored local settings files are not findings");
 });
 
+test("13 · the scanner finds a secret given as the fallback of an env variable, leaves upper-case identifiers in code alone, and a settings file named *.env is ignored like .env (fix review 2)", () => {
+  const v = "Q7".repeat(15), hit = mkdtempSync(path.join(os.tmpdir(), "shg-scan2-hit-")), miss = mkdtempSync(path.join(os.tmpdir(), "shg-scan2-miss-"));
+  writeFileSync(path.join(hit, "a.js"), `const key = process.env.TEXTBEE_API_KEY || "${v}";\n`);   // assembled at run time so this file is not itself a finding
+  assert.ok(scanSecrets(hit).some(x => x.includes("a.js")), "a fallback literal behind any variable is found");
+  writeFileSync(path.join(miss, "b.js"), "const API_KEY = readApiKeyFromEnvironment();\nexport const ACTIONS = { RESET_PASSWORD: RESET_PASSWORD_REQUESTED_EVENT };\n");
+  assert.deepEqual(scanSecrets(miss), [], "upper-case identifiers in code are not settings lines");
+  for (const f of [".gitignore", ".dockerignore"]) assert.ok(readFileSync(new URL(`../${f}`, import.meta.url), "utf8").split("\n").includes("*.env"), `${f} keeps production.env and the like out`);
+});
+
 test("13 · a sign followed by a figure and then a formula is text too; only a cell that is wholly a number or a phone number keeps its sign (fix review of D-43)", () => {
   let csv = null; const js = f => readFileSync(new URL(`../public/js/${f}`, import.meta.url), "utf8");
   const ctx = vm.createContext({ console, S: { lang: "en" }, document: { createElement: () => ({ click() {}, remove() {} }), body: { appendChild() {} } },
