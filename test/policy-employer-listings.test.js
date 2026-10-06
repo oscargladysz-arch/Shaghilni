@@ -65,8 +65,9 @@ test("posting checks on the server: stating a trainee's pay, a negated demand an
   const post = async (box, lang, line) => e.post("/api/employer/jobs", { job: { ...JOB, [box]: { [lang]: box === "summary" ? line : [line] } }, submit: true });
   for (const [lang, line] of [["en", "Intern pay: 400,000 SYP per month, plus transport."], ["en", "Paid internship. Intern pay is 400,000 SYP per month."], ["ar", "مكافأة المتدرب تُدفع شهرياً"], ["ar", "راتب المتدرب يُدفع في نهاية كل شهر"], ["ar", "أجور المتدربين تدفع أسبوعياً"],
     ["ar", "التدريب مجاني ولا يدفع المتدرب أي مبلغ"], ["ar", "التقديم مجاني ولا يدفع المتقدم أي شيء"], ["ar", "لا يطلب من المتقدمين دفع أي مبلغ"], ["ar", "ليس على المتقدم دفع أي مبلغ"], ["ar", "لا يتوجب على المتقدم دفع أي مبلغ"], ["ar", "تدريب مجاني بدون أن يدفع المتدرب أي مبلغ"],
-    ["ar", "السكن على حساب الشركة ولا يتحمل المتدرب تكاليف السكن"], ["en", "We cover transport and pay a monthly fee for your gym membership"], ["en", "No candidate pays anything"], ["en", "Trainees pay nothing"]])
+    ["ar", "السكن على حساب الشركة ولا يتحمل المتدرب تكاليف السكن"], ["en", "No candidate pays anything"], ["en", "Trainees pay nothing"]])
     for (const box of ["summary", "provides"]) { const r = await post(box, lang, line); assert.equal(r.status, 200, `never refused (${box}): ${line} → ${r.text}`); }
+  assert.equal((await post("provides", "en", "We cover transport and pay a monthly fee for your gym membership")).status, 200, "a benefit with a fee word, in what the job offers (in the listing's own text any fee word is refused, as before Stage 4)");
   assert.equal((await post("duties", "en", "You will pay 10 daily visits to doctors and pharmacies")).status, 200, "a duty with a number is no sum");
   for (const [lang, line] of [["en", "Students must pay 50 USD before the internship starts."], ["en", "Each student pays 100,000 SYP for the training course."], ["ar", "يجب تسديد ٥٠ ألف ليرة قبل بدء التدريب"], ["ar", "على المتقدم تسديد ٥٠ ألف ليرة قبل المقابلة"]])
     await refused(`${line} (summary)`, post("summary", lang, line), "fee_requested", 422);
