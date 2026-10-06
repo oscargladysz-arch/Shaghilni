@@ -121,7 +121,7 @@ export function sanitizeJob(core, input) {
     tags: clean(j.tags, 300)
   };
 }
-/* Posting checks, the same ones the employer sees while typing: pay and place are required,
+/* Posting checks, the same ones the employer sees while typing: pay and the governorate are required,
    asking candidates for a fee blocks the listing, gendered wording is flagged for review, and so is a fee word in
    the place, contact lines, what the job offers or the tags. */
 export function checkJob(core, j) {
