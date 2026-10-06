@@ -352,7 +352,9 @@ CREATE INDEX shares_day ON shares(day);
 CREATE TABLE client_errors (id INTEGER PRIMARY KEY, at INTEGER NOT NULL, day TEXT NOT NULL, message TEXT NOT NULL, source TEXT NOT NULL DEFAULT '', path TEXT NOT NULL DEFAULT '', variant TEXT NOT NULL DEFAULT '', browser TEXT NOT NULL DEFAULT '');
 CREATE INDEX client_errors_day ON client_errors(day);`,
 // 16 · the middle of the pay range a listing showed when the employer recorded the hire: the placement fee's basis, so a later pay edit cannot cut it (D-09)
-`ALTER TABLE applications ADD COLUMN hire_pay_mid INTEGER;`
+`ALTER TABLE applications ADD COLUMN hire_pay_mid INTEGER;`,
+// 17 · the employer's plan when the hire was recorded: whether a placement fee applies, so a later upgrade or a lapsed plan cannot change it (U-029)
+`ALTER TABLE applications ADD COLUMN hire_plan TEXT;`
 ];
 
 export function openDb(file) {

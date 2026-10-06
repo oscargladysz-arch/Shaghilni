@@ -150,8 +150,8 @@ export function registerEmployer(r, deps) {
     const status = ctx.body.status || a.status;
     plans.allow(ctx, c, status !== a.status ? "hire" : "view");   // hiring managers can write notes; moving people takes a recruiter
     if (status !== a.status && !(MOVES[a.status] || []).includes(status)) fail(409, "bad_transition", { from: a.status, to: status });
-    db.run("UPDATE applications SET status = ?, employer_note = ?, updated_at = ?, hired_at = CASE WHEN ? = 'hired' THEN ? ELSE hired_at END, hire_pay_mid = CASE WHEN ? = 'hired' THEN COALESCE(hire_pay_mid, ?) ELSE hire_pay_mid END, moved_by = CASE WHEN ? THEN ? ELSE moved_by END, note_by = CASE WHEN ? THEN ? ELSE note_by END WHERE id = ?",
-      status, note, now(), status, now(), status, plans.payMid(J(a.j_data) || {}), status !== a.status ? 1 : 0, ctx.user.id, note !== a.employer_note ? 1 : 0, ctx.user.id, a.id);   // the pay at the time of the hire is the fee's basis (D-09)
+    db.run("UPDATE applications SET status = ?, employer_note = ?, updated_at = ?, hired_at = CASE WHEN ? = 'hired' THEN ? ELSE hired_at END, hire_pay_mid = CASE WHEN ? = 'hired' THEN COALESCE(hire_pay_mid, ?) ELSE hire_pay_mid END, hire_plan = CASE WHEN ? = 'hired' THEN COALESCE(hire_plan, ?) ELSE hire_plan END, moved_by = CASE WHEN ? THEN ? ELSE moved_by END, note_by = CASE WHEN ? THEN ? ELSE note_by END WHERE id = ?",
+      status, note, now(), status, now(), status, plans.payMid(J(a.j_data) || {}), status, plans.planOf(c), status !== a.status ? 1 : 0, ctx.user.id, note !== a.employer_note ? 1 : 0, ctx.user.id, a.id);   // the pay and the plan at the time of the hire decide the fee (D-09, U-029)
     if (status !== a.status) {
       audit(ctx.user.id, "application.moved", "application", a.id, { from: a.status, to: status });
       const seekerUser = db.get("SELECT * FROM users WHERE id = ?", a.user_id);

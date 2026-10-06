@@ -3,6 +3,7 @@ import { now, J } from "../db.js";
 import { companyOut, employerJobOut, applicantCounts } from "../serialize.js";
 import { checkJob } from "../validate.js";
 import { mask } from "../guard.js";
+import { PLANS } from "../plans.js";
 
 export function registerAdmin(r, deps) {
   const { db, auth, audit, core } = deps, plans = deps.plans;
@@ -122,7 +123,7 @@ export function registerAdmin(r, deps) {
       const j = db.get("SELECT * FROM jobs WHERE id = ?", a.job_id), c = j && db.get("SELECT * FROM companies WHERE id = ?", j.company_id);
       // A placement fee only when a Free-plan employer hires someone it found and invited through candidate search.
       const sourced = c && db.get("SELECT 1 AS x FROM invitations WHERE company_id = ? AND user_id = ? AND status = 'accepted' AND created_at <= ?", c.id, a.user_id, a.created_at);
-      if (sourced && plans.limits(c).sourcedFee) {
+      if (sourced && (a.hire_plan ? PLANS[a.hire_plan] || PLANS.free : plans.limits(c)).sourcedFee) {   // the plan when the hire was recorded; the live plan only for hires older than migration 17 (U-029)
         const amt = a.hire_pay_mid || plans.payMid(J(j.data) || {});   // the pay shown when the hire was recorded; the live pay only for hires older than migration 16 (D-09)
         db.run("INSERT INTO charges (company_id, application_id, kind, amount_syp, note, created_at) VALUES (?, ?, 'hire_fee', ?, ?, ?)", c.id, a.id, amt, "Placement fee: a hire found through candidate search", now());
         out.push({ kind: "hire_fee", amountSyp: amt });

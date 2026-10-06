@@ -30,7 +30,7 @@ Before changing anything read `docs/agent/BRIEF.md` (the full brief: rules R1–
 - Route-policy rule (SECURITY.md, "Keeping this file true"): every new route needs a row in `test/policy/route-policy.js` (method, pattern, allowed roles). `test/policy-completeness.test.js` fails without it, and the row drives the generated cross-role, IDOR and junk-input tests (`test/policy-*.test.js`, harness in `test/policy/harness.js`). A new id-bearing route also needs a `fill()` rule and a `bodyFor()` body in the harness.
 - `createRouter` in `server/http.js` keeps each route's pattern string and exposes `routes()`; `createApp` exposes it as `app.routes()` (read-only listing used by the policy tests).
 - `public/js/engine.js` runs in the browser AND on the server (`server/core.js`, vm sandbox). A change there changes both sides: test both.
-- Migrations (`MIGRATIONS` in `server/db.js`, 16 today) are append-only. A table rebuild copies migration 10 (foreign keys off → rebuild → `foreign_key_check` → on).
+- Migrations (`MIGRATIONS` in `server/db.js`, 17 today) are append-only. A table rebuild copies migration 10 (foreign keys off → rebuild → `foreign_key_check` → on).
 - Privacy is a four-file change: `public/js/legal.js`, `server/retention.js`, `TERMS_VERSION` in `server/config.js`, `SECURITY.md`.
 - Scanner markers: `/* sql-safe: … */` on template SQL, `html-safe` on a raw HTML write. The scanner skips `test/`.
 - `seedDemo` in `server/config.js` is `!prod && SEED_DEMO !== "false"`: sample listings (under real organisations' names, owner decision D1) are never seeded in production. Leftover rows are counted by `countDemo` in `server/seed.js`, logged at start and shown on the Insights screen (Stage 1, D-01).
