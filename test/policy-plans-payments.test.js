@@ -113,7 +113,7 @@ test("policy plans: the placement fee follows the plan at the hire, not at the c
   assert.deepEqual(await confirm(onPro), [], "hired on Pro: no fee although the plan ended before the confirmation (Pro promises no placement fees)");
 });
 
-test("policy plans: undoing a hire keeps its fee basis: cutting the pay to 1 or moving up to Pro and hiring again still owes the first fee, with one congratulations; a note on a hire older than migration 17 fixes no plan (Stage 4 fix review)", async () => {
+test("policy plans: undoing a hire keeps its fee basis: cutting the pay to 1 or moving up to Pro and hiring again still owes the first fee; a note on a hire older than migration 17 fixes no plan (Stage 4 fix review)", async () => {
   const S = await start(), admin = await S.login("+12025550199");
   const F = await employerWithLiveJob(S, admin, "0955 922 001", "Undo Then Rehire Co"), G = await employerWithLiveJob(S, admin, "0955 922 002", "Pre Seventeen Co");
   const a = await seekerOpen(S, "0944 922 001", "Hired Twice"), b = await seekerOpen(S, "0944 922 002", "Hired Before Seventeen");
@@ -130,7 +130,7 @@ test("policy plans: undoing a hire keeps its fee basis: cutting the pay to 1 or 
   assert.equal((await admin.post(`/api/admin/companies/${F.companyId}/plan`, { plan: "pro", months: 1 })).status, 200, "moved up to Pro");
   assert.equal((await F.e.put(`/api/employer/applications/${onFree}`, { status: "hired" })).status, 200, "hired again");
   assert.deepEqual(basis(onFree), { hire_pay_mid: MID, hire_plan: "free" }, "the basis of the first hire stands");
-  assert.equal(S.texts.length, texts, "the person was congratulated once: the undo and the hire again text nobody");
+  assert.equal(S.texts.length, texts + 1, "the undo texted nobody; hiring again texts the congratulations again (a person who withdrew and re-applied after the undo must get it)");
   assert.deepEqual(await confirm(onFree), [{ kind: "hire_fee", amountSyp: MID }], "the fee is the first hire's, not 1 SYP and not waived by Pro");
   // G's hire predates migration 17 (no plan recorded): a note saved while G is on Pro must not fix Pro as the plan of the hire
   const old = await sourcedHire(G.e, G.jobId, b); S.db.run("UPDATE applications SET hire_plan = NULL WHERE id = ?", old);
