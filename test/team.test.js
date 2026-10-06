@@ -146,6 +146,20 @@ test("teams: one registration number, one company: Arabic-Indic or Persian digit
   assert.equal((await first.put("/api/employer/company", page("Number Holder", "DM-١٢٣٤٥", "0955 815 001"))).status, 200, "and so is the holder typing its own number in Arabic-Indic digits");
 });
 
+test("teams: a registration number held by a company still awaiting verification can be joined (U-023)", async () => {
+  const S = await start(), admin = await S.login("+12025550199");
+  const { e: owner } = await employer(S, admin, "0955 816 001", "Pending Freight", false);   // submitted, not yet verified
+  const second = await S.login("0955 816 002", "employer");
+  const dup = await second.put("/api/employer/company", { company: { name: { en: "Pending Freight Too" }, gov: "homs", regNo: "REG-Pending Freight", contactName: "Second", whatsapp: "0955 816 002" } });
+  assert.deepEqual([dup.status, dup.body.error, dup.body.detail.verified], [409, "company_exists", false], "the number is taken and the answer points to the company");
+  const ask = await second.post(`/api/employer/companies/${dup.body.detail.id}/join`, { name: "Second Person" });
+  assert.equal(ask.status, 200, `the pointer leads to a request, not a dead end: ${ask.text}`);
+  const team = (await owner.get("/api/employer/team")).body;
+  assert.ok(team.requests.some(r => r.name === "Second Person"), "the owner sees the request on the team page");
+  assert.equal((await owner.post(`/api/employer/team/requests/${encodeURIComponent("+963955816002")}`, { decision: "yes", role: "recruiter" })).status, 200, "and approves it");
+  assert.equal(S.db.get("SELECT status FROM company_members WHERE phone = '+963955816002'").status, "active", "the person is on the team");
+});
+
 test("teams: invitations need a verified company and stop at twenty a day per company, cancelling included (D-10)", async () => {
   const S = await start(), admin = await S.login("+12025550199");
   const draft = await S.login("0955 810 001", "employer");
