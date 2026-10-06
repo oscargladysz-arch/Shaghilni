@@ -22,7 +22,7 @@ No item marked owner, lawyer or provider is ever ticked by an agent.
 | # | Item | Owner | How to verify | Status |
 |---|---|---|---|---|
 | B1 | `npm test` green. | agent | 147 of 147 at the Stage 3 gate (133 at Stage 2, 66 at Stage 1; `docs/agent/BASELINE.md` has the Stage 0 60). | Done |
-| B2 | The browser flow passes (`npm run test:e2e`, 80 checks, four browsers plus a Lite page without JavaScript). | agent, owner | Run the *Browser end-to-end* job by hand from the CI workflow, or locally after `npm install --no-save puppeteer`. Run at the Stage 3 gate: 35 checks pass, then the script stops at the job seeker's applications view after the hire (`.acard .pill` never appears); the same stop happens on `main` before Stage 3, so it is a pre-existing gap in the flow or the script (D-38, Stage 4). | Partial |
+| B2 | The browser flow passes (`npm run test:e2e`, 80 checks, four browsers plus a Lite page without JavaScript). | agent, owner | Run the *Browser end-to-end* job by hand from the CI workflow, or locally after `npm install --no-save puppeteer`. Run at the Stage 4 gate in the agent environment's Chromium: 80 of 80 checks pass, no browser errors (the Stage 3 stop was a script gap, D-38, fixed in Stage 4). | Done |
 | B3 | `npm run security:check -- --url https://your-domain` shows no FAIL once deployed. | owner | Paste the output into the launch record. | Open |
 | B4 | External scans: MDN HTTP Observatory (aim A+), SSL Labs (aim A), the OWASP ZAP baseline scan, GitHub secret scanning. | owner | Reports saved. | Open |
 | B5 | The four review prompts in SECURITY.md items 6–9 re-run against the current code. | agent | Stage 4 of the launch work updates SECURITY.md with the results and the date. | Open |

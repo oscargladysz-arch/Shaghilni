@@ -13,7 +13,8 @@ const PORT = 3999, BASE = `http://127.0.0.1:${PORT}`, DB = path.join(os.tmpdir()
 fs.mkdirSync(OUT, { recursive: true });
 for (const f of [DB, DB + "-wal", DB + "-shm"]) { try { fs.unlinkSync(f); } catch {} }
 const srv = spawn("node", ["--disable-warning=ExperimentalWarning", "server/index.js"], { cwd: ROOT,
-  env: { ...process.env, PORT: String(PORT), HOST: "127.0.0.1", DB_PATH: DB, OTP_DEV_ECHO: "true", OTP_POW_BITS: "12", ADMIN_PHONES: "+12025550123", NODE_ENV: "development", BASE_URL: BASE, DEMO_ACCOUNTS: "false", PAY_PROVIDER: "test", PLAN_PRO_MONTHLY: "4000", PLAN_ENTERPRISE_MONTHLY: "20000" } });
+  env: { ...process.env, PORT: String(PORT), HOST: "127.0.0.1", DB_PATH: DB, OTP_DEV_ECHO: "true", OTP_POW_BITS: "12", ADMIN_PHONES: "+12025550123", NODE_ENV: "development", BASE_URL: BASE, DEMO_ACCOUNTS: "false", PAY_PROVIDER: "test", PLAN_PRO_MONTHLY: "4000", PLAN_ENTERPRISE_MONTHLY: "20000",
+    SMS_PROVIDER: "console", TEXTBEE_API_KEY: "", TWILIO_ACCOUNT_SID: "", TWILIO_AUTH_TOKEN: "", TWILIO_FROM: "", ANTHROPIC_API_KEY: "", EMAIL_API_URL: "", EMAIL_API_KEY: "" } });   // whatever the developer's .env says, no text, email or AI call leaves this machine (U-061)
 let slog = ""; srv.stdout.on("data", d => { slog += d; }); srv.stderr.on("data", d => { slog += d; });
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 for (let i = 0; i < 50; i++) { try { if ((await fetch(BASE + "/api/health")).ok) break; } catch {} await sleep(100); }
@@ -30,14 +31,12 @@ async function actor(label, w, h, mobile) {
   await page.setRequestInterception(true);
   page.on("request", req => {
     const u = req.url();
-    const allowed = u.startsWith(BASE) || u.startsWith("data:") || u.startsWith("about:") || u.startsWith("https://fonts.googleapis.com/") || u.startsWith("https://fonts.gstatic.com/");
+    const allowed = u.startsWith(BASE) || u.startsWith("data:") || u.startsWith("about:");
     if (!allowed) return req.abort();   // e.g. the wa.me link: nothing leaves the machine
     req.continue();
   });
   page.on("pageerror", e => errs.push(`[${label}] pageerror: ${e.message}`));
   page.on("console", m => {
-    const where = (m.location && m.location().url) || "";
-    if (/fonts\.(googleapis|gstatic)\.com/.test(where)) return;   // web fonts are optional; offline runs fall back to system fonts
     if (m.type() === "error" && !/net::ERR_FAILED|ERR_BLOCKED|status of 4(09|22|29)/.test(m.text())) errs.push(`[${label}] console: ${m.text()}`);
   });
   page.on("request", r => { const u = r.url(); if (!/^(data:|blob:|about:)/.test(u) && !u.startsWith(BASE)) thirdParty.push(`[${label}] ${u}`); });
@@ -221,7 +220,9 @@ try {
   await m.waitForSelector('[data-act="wa-open"]', { visible: true });
   await shot(m, "a9-whatsapp");
   check("WhatsApp says which resume goes with it", !!(await m.$("#waCvNote")) && (await m.$eval("#waCvNote", x => x.textContent.trim().length)) > 10);
+  await m.evaluate(() => { window.open = () => { const w = { location: {} }; window.__wa = w; return w; }; });   // the chat link opens a new tab, which leaves this page in the background where Puppeteer's visibility waits never fire (D-38); the stub keeps the link on this side
   await click(m, '[data-act="wa-open"]'); await sleep(900);
+  check("the chat opens on wa.me with the message", await m.evaluate(() => !!window.__wa && /^https:\/\/wa\.me\/\d+\?text=./.test(window.__wa.location.href || "")));
   check("WhatsApp application recorded", (await apiGet(m, "/api/me/applications")).applications.some(x => x.jobId === jobId && x.channel === "whatsapp"));
   await e.evaluate(id => location.hash = `#/company/jobs/${id}/applicants`, jobId);
   await e.waitForSelector(".acard--ap", { visible: true, timeout: 8000 });
@@ -296,7 +297,7 @@ try {
   if (await m.$('[data-act="cv-tab"][data-pane="facts"]')) await click(m, '[data-act="cv-tab"][data-pane="facts"]');
   { const done = await m.$('[data-act="cv-tr-close"]'); if (done && await done.isVisible()) await click(m, '[data-act="cv-tr-close"]'); }
   const cvUp = await m.waitForSelector('input[type="file"][data-import="cv"]', { timeout: 8000 });
-  await cvUp.uploadFile((typeof ROOT !== "undefined" ? ROOT : "/home/claude/mvp") + "/test/fixtures/resume-en-chrome.pdf");
+  await cvUp.uploadFile(ROOT + "/test/fixtures/resume-en-chrome.pdf");
   await m.waitForSelector('#panel [data-act="im-apply"]', { visible: true, timeout: 15000 });
   check("an uploaded PDF resume is read on the phone and shown for review", await m.$eval("#panel", p => p.querySelectorAll(".im-row").length >= 5 && p.textContent.includes("Orontes Energy")));
   await shot(m, "a11d-import");
