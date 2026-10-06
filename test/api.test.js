@@ -320,3 +320,23 @@ test("resume suggestions: the Arabic fact guard reads the other number forms, «
   assert.deepEqual(g("بعت البضائع للزبائن", "بعت البضائع لزبائن في الولايات المتحدة").slice(0, 2), [false, "gName"], "a two-word country");
   assert.deepEqual(g("بعت البضائع للزبائن", "بعت البضائع لزبائن في المملكة المتحدة").slice(0, 2), [false, "gName"], "and the other");
 });
+
+test("resume suggestions: the Arabic fact guard reads the duals of million and billion, مئتا and the duals of years, months, days and hours, takes only number words for numbers, and does not count «بإشراف» or «بقيادة» as a bigger role (fix review 3)", async () => {
+  const { loadCore } = await import("../server/core.js"), { factGuard } = loadCore();
+  const g = (orig, sug, facts = orig, job = "") => { const r = factGuard(orig, sug, facts, job); return [r.ok, r.why || "", r.tok || ""]; };
+  for (const [orig, sug] of [["حققت مبيعات شهرية", "حققت مبيعات شهرية تجاوزت مليوني ليرة سورية"], ["حققت مبيعات شهرية", "حققت مبيعات شهرية تجاوزت ملياري ليرة"], ["حققت مبيعات شهرية", "حققت مبيعات شهرية تجاوزت مليارين ليرة"],
+    ["حققت مبيعات شهرية", "حققت مبيعات شهرية بلغت ملياران ليرة"], ["درّبت المتطوعين", "حضر دوراتي مئتا متطوع"], ["درّبت المتطوعين", "حضر دوراتي مائتا متطوع"], ["عملت في التدريس", "عملت سنتين في التدريس"],
+    ["عملت في التدريس", "عملت عامين في التدريس"], ["دربت الموظفين الجدد", "دربت الموظفين الجدد خلال شهرين"], ["بنيت ألفة مع الأطفال", "بنيت ألفة مع ألف طفل"], ["عملت مع مي في الروضة", "رعيت مئة طفل مع مي في الروضة"]])
+    assert.deepEqual(g(orig, sug).slice(0, 2), [false, "gNumber"], sug);
+  for (const [orig, sug] of [["عملت مع الأطفال في الروضة", "بنيت جواً من الألفة مع الأطفال في الروضة"], ["عملت مع الأطفال", "عملت مع مي في رعاية الأطفال"], ["عملت ثماني سنوات في المتجر", "عملت ثمان سنوات في المتجر"],
+    ["خدمت ثلاث مئة زبون يومياً", "خدمت ثلاثمئة زبون يومياً"], ["حققت مبيعات بقيمة مليوني ليرة", "حققت مبيعات بقيمة مليونين من الليرات"], ["خدمت مئتي زبون يومياً", "خدمت مئتين من الزبائن يومياً"],
+    ["ساعدت في جرد المخزون", "بإشراف المدير ساعدت في جرد المخزون"], ["شاركت في تنظيم المعرض", "بقيادة فريق الجامعة شاركت في تنظيم المعرض"], ["ساعدت في جرد المخزون", "بإدارة المتجر ساعدت في جرد المخزون"]])
+    assert.deepEqual(g(orig, sug).slice(0, 1), [true], `an honest rewording: ${sug} → ${g(orig, sug)}`);
+  for (const [orig, sug] of [["ساعدنا في جرد المخزون", "قمنا بإدارة جرد المخزون"], ["قمنا بمساعدة المدير في جرد المخزون", "أدرنا جرد المخزون"], ["دعم إعداد التقارير", "قيادة إعداد التقارير"], ["إسهام في إعداد التقارير", "إدارة إعداد التقارير"]])
+    assert.deepEqual(g(orig, sug).slice(0, 2), [false, "gInflate"], sug);
+  assert.deepEqual(g("ساعدت في جرد المخزون", "قمت بإدارة جرد المخزون")[2], "بإدارة", "the reason names the bigger word, not «قمت»");
+  assert.deepEqual(g("درست إدارة الأعمال في الولايات المتحدة", "درست إدارة الأعمال في المملكة المتحدة").slice(0, 2), [false, "gName"], "the other two-word country, though المتحدة is in the facts");
+  assert.deepEqual(g("بعت البضائع لزبائن", "بعت البضائع لزبائن في الولايات المتحدة", "متطوع لدى مفوضية الأمم المتحدة لشؤون اللاجئين").slice(0, 2), [false, "gName"], "the United Nations in the facts is not the United States");
+  assert.deepEqual(g("بعت البضائع لزبائن", "بعت البضائع لزبائن في أمريكا").slice(0, 2), [false, "gName"], "the everyday one-word name");
+  assert.deepEqual(g("درست في الولايات المتحدة", "درست إدارة الأعمال في الولايات المتحدة").slice(0, 1), [true], "the same country is no new fact");
+});
