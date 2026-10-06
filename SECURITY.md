@@ -47,12 +47,12 @@ The security tests are in `test/security.test.js`, numbered after this list. The
   - An employer deleting their account also closes their listings and removes the contact name, WhatsApp number, application phone number and email from the company page.
 - **Automatic retention.** `server/retention.js` runs at start-up and every hour and deletes:
   - sign-in codes, with the IP addresses stored alongside them, after 24 hours;
+  - university email codes, with the address typed for them, after 24 hours, and the address of a student verification as soon as it is withdrawn;
   - expired sessions;
   - text-message records after 90 days;
   - usage counters after 60 days;
   - visit counts, link-share counts and browser error reports after 180 days.
 
-  Email verification codes (which hold the typed university address) are not swept yet (see `docs/agent/DEFECTS.md`).
 
   These are the periods the privacy notice promises, so keep the two in step.
 - **No tracking.** There's no advertising and no analytics. Fonts are served from your own server, so visitors' addresses no longer go to Google. The full app sets only the session cookie. Shaghilni Lite also sets a form-protection cookie (`lt`, one year, no personal data) and, if you pick a language, a language cookie (`ll`); the notice's own sentence on cookies is to be aligned (see `docs/agent/LEGAL_PROPOSALS.md`).
