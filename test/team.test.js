@@ -158,6 +158,20 @@ test("teams: a registration number written with Arabic words keeps them: Damascu
   const hamza = await put("0955 817 005", "Copy Hamza", "سجل تجارى دمشق ١٢٣٤٥"); assert.deepEqual([hamza.status, hamza.body.error], [409, "company_exists"], "and so is a spelling variant (ى for ي)");
 });
 
+test("teams: the register's own words (the article, سجل تجاري, س.ت, رقم, محافظة, في) do not make a second number: only the digits and the other words do (fix review 2 of U-018)", async () => {
+  const S = await start();
+  const page = (name, regNo, phone) => ({ company: { name: { en: name }, gov: "homs", regNo, contactName: `Contact ${name}`, whatsapp: phone } });
+  const put = async (phone, name, regNo) => (await S.login(phone, "employer")).put("/api/employer/company", page(name, regNo, phone));
+  let n = 0;
+  for (const [first, second] of [["السجل التجاري ١٢٣٤٥", "سجل تجاري 12345"], ["سجل تجاري رقم 22345", "22345"], ["س.ت 32345", "سجل تجاري 32345"], ["سجل تجاري دمشق 42345", "دمشق 42345"], ["سجل تجاري محافظة حلب 52345", "سجل تجاري في حلب 52345"]]) {
+    n += 2;
+    assert.equal((await put(`0955 818 ${String(n).padStart(3, "0")}`, `Holder ${n}`, first)).status, 200, `${first} is saved`);
+    const dup = await put(`0955 818 ${String(n + 1).padStart(3, "0")}`, `Copy ${n}`, second);
+    assert.deepEqual([dup.status, dup.body.error], [409, "company_exists"], `${second} is the same number as ${first}`);
+  }
+  const other = await put("0955 818 100", "Hama Co", "سجل تجاري حماة 42345"); assert.equal(other.status, 200, `another governorate's register with the same digits is still another number: ${other.text}`);
+});
+
 test("teams: a registration number held by a company still awaiting verification can be joined (U-023); the request waits, unseen and untexted, until the admin verifies the holder (fix review)", async () => {
   const S = await start(), admin = await S.login("+12025550199");
   const { e: owner } = await employer(S, admin, "0955 816 001", "Pending Freight", false);   // submitted, not yet verified
