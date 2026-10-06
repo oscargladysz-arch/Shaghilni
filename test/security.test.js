@@ -456,6 +456,23 @@ test("13 · the built-in scanner finds the problems it is meant to find, and the
   assert.deepEqual(scanCode(), [], "no unreviewed risky patterns in the shipped code");
 });
 
+test("13 · the scanner catches this app's own secret names hard-coded anywhere, and every .env variant but the example stays out of git and the image (D-50)", () => {
+  const tmp = mkdtempSync(path.join(os.tmpdir(), "shg-scan-")), v = "Q7".repeat(15);   // a 30-character fake value
+  mkdirSync(path.join(tmp, "server")); mkdirSync(path.join(tmp, "scripts"));
+  writeFileSync(path.join(tmp, "server", "leak.js"), `const textbeeKey = "${v}";\n`);
+  writeFileSync(path.join(tmp, "scripts", "run.sh"), `export OTP_PEPPER=${v}\n`);
+  writeFileSync(path.join(tmp, ".env.example"), `TWILIO_AUTH_TOKEN="${v}"\n`);
+  writeFileSync(path.join(tmp, ".env.production"), `ANTHROPIC_API_KEY=${v}\n`);   // a local settings file is meant to hold secrets: it is never shared, and git ignores it
+  const found = scanSecrets(tmp).join("; ");
+  for (const f of ["leak.js", "run.sh", ".env.example"]) assert.match(found, new RegExp(f.replace(".", "\\.")), `${f}: a hard-coded secret under this app's own names is caught (${found})`);
+  assert.doesNotMatch(found, /\.env\.production/, "a local settings file is not reported");
+  for (const f of [".gitignore", ".dockerignore"]) {
+    const lines = readFileSync(new URL(`../${f}`, import.meta.url), "utf8").split("\n").map(x => x.trim());
+    assert.ok(lines.includes(".env*"), `${f} ignores every .env variant (.env.production, .env.local, ...)`);
+  }
+  assert.ok(readFileSync(new URL("../.gitignore", import.meta.url), "utf8").split("\n").includes("!.env.example"), "but the example stays in the repository");
+});
+
 test("14 · the scanner stays clean for a correct production setup whether or not SEED_DEMO is set: sample listings are never seeded in production", () => {
   const good = { NODE_ENV: "production", OTP_PEPPER: "p".repeat(40), BASE_URL: "https://shaghilni.test", ADMIN_PHONES: "+963944000000", SMS_PROVIDER: "textbee",
     TEXTBEE_API_KEY: "key", CONTACT_EMAIL: "privacy@example.com", LEGAL_NAME: "Example Org (not a real entity)", TRUST_PROXY: "true" };
