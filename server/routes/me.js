@@ -119,6 +119,15 @@ export function registerMe(r, deps) {
       const c = db.get("SELECT * FROM companies WHERE owner_id = ?", u.id);
       out.company = c ? { ...J(c.data), status: c.status } : null;
       out.listings = c ? db.all("SELECT id, data, status, created_at FROM jobs WHERE company_id = ?", c.id).map(j => ({ id: j.id, ...J(j.data), status: j.status, createdAt: iso(j.created_at) })) : [];
+      if (c) {   // the owner handles billing: the company's plan, invoices, payments, plan requests and university partnerships (U-014)
+        out.plan = { plan: c.plan || "free", until: iso(c.plan_until) };
+        out.charges = db.all("SELECT kind, amount_syp, amount_usd, status, note, created_at, paid_at FROM charges WHERE company_id = ? ORDER BY id", c.id).map(x => ({ kind: x.kind, amountSyp: x.amount_syp, amountUsd: x.amount_usd, status: x.status, note: x.note, createdAt: iso(x.created_at), paidAt: iso(x.paid_at) }));
+        out.payments = db.all("SELECT plan, months, amount, currency, provider, status, created_at, paid_at FROM payments WHERE company_id = ? ORDER BY id", c.id).map(x => ({ plan: x.plan, months: x.months, amount: x.amount, currency: x.currency, provider: x.provider, status: x.status, createdAt: iso(x.created_at), paidAt: iso(x.paid_at) }));
+        out.planRequests = db.all("SELECT plan, pay_method, note, created_at, handled_at FROM plan_requests WHERE company_id = ? ORDER BY id", c.id).map(x => ({ plan: x.plan, payMethod: x.pay_method, note: x.note, createdAt: iso(x.created_at), handledAt: iso(x.handled_at) }));
+        out.partnerships = db.all("SELECT uni, status, created_at, decided_at FROM uni_partners WHERE company_id = ?", c.id).map(x => ({ university: x.uni, status: x.status, createdAt: iso(x.created_at), decidedAt: iso(x.decided_at) }));
+      }
+      out.teamMembership = db.all("SELECT m.role, m.status, m.name, m.created_at, c.data FROM company_members m JOIN companies c ON c.id = m.company_id WHERE m.phone = ?", u.phone)
+        .map(m => ({ company: (J(m.data) || {}).name || {}, role: m.role, status: m.status, name: m.name, since: iso(m.created_at) }));   // a teammate's own membership, whoever owns the company
     }
     if (u.role === "seeker") out.invitations = db.all(`SELECT i.kind, i.status, i.data, i.created_at, i.updated_at, c.data AS c_data, j.data AS j_data FROM invitations i
       JOIN companies c ON c.id = i.company_id LEFT JOIN jobs j ON j.id = i.job_id WHERE i.user_id = ? ORDER BY i.created_at`, u.id)
@@ -126,6 +135,7 @@ export function registerMe(r, deps) {
                    event: (J(i.data) || {}).event || null, message: (J(i.data) || {}).message || "", sentAt: iso(i.created_at), updatedAt: iso(i.updated_at) }));
     if (u.role === "seeker") out.studentVerification = db.all("SELECT uni, student_no, email, method, status, created_at, decided_at FROM student_verifications WHERE user_id = ?", u.id).map(v => ({ university: v.uni, universityEmail: v.email || null, method: v.method, studentNumber: v.student_no || null, status: v.status, requestedAt: iso(v.created_at), decidedAt: v.decided_at ? iso(v.decided_at) : null }));
     if (u.role === "seeker") out.eventTickets = db.all("SELECT r.code, r.status, r.created_at, r.checked_in_at, e.data FROM event_rsvps r JOIN events e ON e.id = r.event_id WHERE r.user_id = ?", u.id).map(x => ({ event: ((J(x.data) || {}).title) || {}, code: x.code, status: x.status, signedUpAt: iso(x.created_at), checkedInAt: x.checked_in_at ? iso(x.checked_in_at) : null }));
+    if (u.role === "seeker") out.blockedCompanies = db.all("SELECT b.created_at, c.data FROM recruiter_blocks b JOIN companies c ON c.id = b.company_id WHERE b.user_id = ?", u.id).map(b => ({ company: (J(b.data) || {}).name || {}, blockedAt: iso(b.created_at) }));   // U-014
     if (u.role === "seeker") out.jobAlerts = db.all("SELECT data, channel, created_at FROM alerts WHERE user_id = ?", u.id).map(a => ({ search: J(a.data), channel: a.channel, createdAt: iso(a.created_at) }));
     out.textMessages = db.all("SELECT body, status, created_at FROM notifications WHERE user_id = ? OR phone = ? ORDER BY id", u.id, u.phone)
       .map(n => ({ text: n.body, status: n.status, at: iso(n.created_at) }));
