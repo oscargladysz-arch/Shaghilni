@@ -120,9 +120,9 @@ export function registerMe(r, deps) {
       const c = db.get("SELECT * FROM companies WHERE owner_id = ?", u.id);
       out.company = c ? { ...J(c.data), status: c.status } : null;
       out.listings = c ? db.all("SELECT id, data, status, created_at FROM jobs WHERE company_id = ?", c.id).map(j => ({ id: j.id, ...J(j.data), status: j.status, createdAt: iso(j.created_at) })) : [];
-      if (c) {   // the owner handles billing: the company's plan, invoices, payments, plan requests and university partnerships (U-014)
+      if (c) {   // the owner handles billing: the company's plan, invoices, payments, plan requests and university partnerships (U-014); a placement billed to a programme is the programme's charge (D-08)
         out.plan = { plan: c.plan || "free", until: iso(c.plan_until) };
-        out.charges = db.all("SELECT kind, amount_syp, amount_usd, status, note, created_at, paid_at FROM charges WHERE company_id = ? ORDER BY id", c.id).map(x => ({ kind: x.kind, amountSyp: x.amount_syp, amountUsd: x.amount_usd, status: x.status, note: x.note, createdAt: iso(x.created_at), paidAt: iso(x.paid_at) }));
+        out.charges = db.all("SELECT kind, amount_syp, amount_usd, status, note, created_at, paid_at FROM charges WHERE company_id = ? AND programme_id IS NULL ORDER BY id", c.id).map(x => ({ kind: x.kind, amountSyp: x.amount_syp, amountUsd: x.amount_usd, status: x.status, note: x.note, createdAt: iso(x.created_at), paidAt: iso(x.paid_at) }));
         out.payments = db.all("SELECT plan, months, amount, currency, provider, status, created_at, paid_at FROM payments WHERE company_id = ? ORDER BY id", c.id).map(x => ({ plan: x.plan, months: x.months, amount: x.amount, currency: x.currency, provider: x.provider, status: x.status, createdAt: iso(x.created_at), paidAt: iso(x.paid_at) }));
         out.planRequests = db.all("SELECT plan, pay_method, note, created_at, handled_at FROM plan_requests WHERE company_id = ? ORDER BY id", c.id).map(x => ({ plan: x.plan, payMethod: x.pay_method, note: x.note, createdAt: iso(x.created_at), handledAt: iso(x.handled_at) }));
         out.partnerships = db.all("SELECT uni, status, created_at, decided_at FROM uni_partners WHERE company_id = ?", c.id).map(x => ({ university: x.uni, status: x.status, createdAt: iso(x.created_at), decidedAt: iso(x.decided_at) }));
