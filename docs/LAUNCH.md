@@ -57,7 +57,7 @@ No item marked owner, lawyer or provider is ever ticked by an agent.
 | E1 | Daily backups scheduled and copied off the server. With `DB_PATH=/data/shaghilni.db`, run `npm run backup -- /backups` so the System tab finds them. | owner | Admin → System shows the newest backup; a copy exists off the server. | Open |
 | E2 | One restore tested. | owner | Restore a backup on a scratch machine; row counts match the System tab. | Open |
 | E3 | Upgrade check on real data: open a copy of the production database with the new code, confirm `PRAGMA user_version` is 18 and every count is unchanged. | owner, agent | There is no automated upgrade test; this is a manual step before each deploy that adds a migration. | Open |
-| E4 | Retention matches the privacy notice. | agent | SECURITY.md item 1 lists the periods; the email-code sweep is in the code since Stage 4 (U-035); naming it and the "within 24 hours" wording in the notice is with the lawyer (`docs/agent/LEGAL_PROPOSALS.md` LP-5). | Partial |
+| E4 | Retention matches the privacy notice. | agent | SECURITY.md item 1 lists the periods; the email-code sweep is in the code since Stage 4 (U-035); naming it in the notice is LP-5; the "within 24 hours" promise against an hourly sweep (up to about 25 hours) is LP-3, whose recommended fix is `RETENTION.otpHours` 23 once the owner agrees (`docs/agent/LEGAL_PROPOSALS.md`). | Partial |
 
 ## F · Product content
 
