@@ -567,6 +567,22 @@ test("13 · spreadsheet exports turn a cell that would run as a formula into pla
   assert.deepEqual(cells, ['\'=HYPERLINK("http://evil.example","x")', "'@SUM(A1)", "'-cmd|' /C calc'!A0", "'+HYPERLINK(1)", "'\tlead", "+963944000001", "-5", "-3.5", "plain"]);
 });
 
+test("13 · the scanner finds this app's secret names in every settings format its deploy files use and an encrypted key, and leaves ordinary key strings, one-character fakes and git-ignored .env files alone (fix review of D-50, D-51)", () => {
+  const v = "Q7".repeat(15), pk = name => ["-----BEGIN " + name + " KEY-----", "MIIB" + "A".repeat(60), "-----END " + name + " KEY-----"].join("\n");   // assembled at run time so this file is not itself a finding
+  const hit = mkdtempSync(path.join(os.tmpdir(), "shg-scan-hit-")), miss = mkdtempSync(path.join(os.tmpdir(), "shg-scan-miss-"));
+  const put = (dir, rel, body) => { mkdirSync(path.dirname(path.join(dir, rel)), { recursive: true }); writeFileSync(path.join(dir, rel), body); };
+  const found = { "Dockerfile": `FROM node:22-alpine\nENV NODE_ENV=production OTP_PEPPER=${v}\n`, "deploy/app.yml": `env:\n  OTP_PEPPER: ${v}\n`, "deploy/compose.yml": `services:\n  web:\n    environment:\n      - TEXTBEE_API_KEY=${v}\n`,
+    "deploy/settings.json": `{ "OTP_PEPPER": "${v}" }\n`, "deploy/app.json": `{ "textbeeKey": "${v}" }\n`, "server/local.js": `export const k = { textbeeKey: e.TEXTBEE_API_KEY || "${v}" };\n`,
+    "deploy/server.key": pk("ENCRYPTED " + "PRIVATE"), "deploy/backup.asc": pk("PGP " + "PRIVATE") + " BLOCK", "deploy/cert.p12": "\u0030\u0082\u0009\u00b1binary" };
+  for (const [rel, body] of Object.entries(found)) put(hit, rel, body);
+  const fh = scanSecrets(hit);
+  for (const rel of Object.keys(found)) assert.ok(fh.some(x => x.includes(rel)), `${rel} is a finding: ${JSON.stringify(fh)}`);
+  const clean = { "public/a.js": `out.push({ key: "ckContactMissingForStudentX" }); const cacheKey = "board-feed-cache-entry-v2-all"; const DRAFT_KEY = "shaghilni_profile_draft_v1";\n`,
+    "ci.yml": `env:\n  OTP_PEPPER: ${"p".repeat(40)}\n`, "BASELINE.md": `NODE_ENV=production OTP_PEPPER=${"p".repeat(40)} BASE_URL=https://shaghilni.example\n`, ".envrc": `export OTP_PEPPER=${v}\n`, ".env-local": `OTP_PEPPER=${v}\n` };
+  for (const [rel, body] of Object.entries(clean)) put(miss, rel, body);
+  assert.deepEqual(scanSecrets(miss), [], "ordinary string keys, a one-character fake and git-ignored local settings files are not findings");
+});
+
 test("13 · a sign followed by a figure and then a formula is text too; only a cell that is wholly a number or a phone number keeps its sign (fix review of D-43)", () => {
   let csv = null; const js = f => readFileSync(new URL(`../public/js/${f}`, import.meta.url), "utf8");
   const ctx = vm.createContext({ console, S: { lang: "en" }, document: { createElement: () => ({ click() {}, remove() {} }), body: { appendChild() {} } },
