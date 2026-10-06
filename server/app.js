@@ -7,7 +7,7 @@ import { makeSms } from "./sms.js";
 import { makeAuth } from "./auth.js";
 import { makeNotifier } from "./notify.js";
 import { makeAssets } from "./assets.js";
-import { makeGuard } from "./guard.js";
+import { makeGuard, mask } from "./guard.js";
 import { cleanup } from "./retention.js";
 import { makeTraffic } from "./traffic.js";
 import { readFileSync } from "node:fs";
@@ -75,7 +75,7 @@ export function createApp({ cfg, db, log = console.log, sms: smsOverride, email:
         if (err.status === 413) ctx.headers.connection = "close";
         return send(req, res, err.status, { error: err.code, detail: err.detail ?? null }, ctx.headers);
       }
-      log(`[error] ${req.method} ${url.pathname}: ${err.stack || err}`);
+      log(`[error] ${req.method} ${url.pathname.replace(/(?:%2B|\+)?\d{7,}/gi, m => mask(m.replace(/^%2B/i, "+")))}: ${err.stack || err}`);   // a phone number in the path (the team routes) is masked like every other log line (U-054)
       send(req, res, 500, { error: "server_error" }, ctx.headers);
     }
   }

@@ -113,7 +113,7 @@ The review and this test found two bugs, both fixed:
 - **Expected problems** return a short code, such as `{"error":"wrong_code"}`, which the app turns into a message in the person's language (a code without a translation shows the general "something went wrong" message; `test/i18n.test.js` checks that every code the server answers has one).
 - **Unexpected problems** return only `{"error":"server_error"}`. The details go to the server log. Security test 4 breaks the database on purpose and checks that the answer contains no stack trace, file path or SQL.
 - **Account existence.** Sign-in never reveals whether a number has an account. Someone else's listing or application answers "not found", so its existence isn't confirmed.
-- **Logs.** The server log masks phone numbers (`+9639•••222`), except the development `console` text provider, which prints each message whole (never use it in production; the scanner fails it), and the path of an unexpected error on the team routes, which is to be masked (see `docs/agent/DEFECTS.md`). A text provider's error answer, logged and kept with a failed text, has any number in it masked the same way.
+- **Logs.** The server log masks phone numbers (`+9639•••222`), except the development `console` text provider, which prints each message whole (never use it in production; the scanner fails it). The path of an unexpected error is masked too (the team routes carry a number in the path), and a text provider's error answer, logged and kept with a failed text, has any number in it masked the same way.
 
 ## 5. Auth failure case testing
 
