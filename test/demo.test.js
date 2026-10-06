@@ -138,3 +138,11 @@ test("demo accounts: the uninstall step also takes their passages out of SECURIT
   const cfg = read("server/config.js").split("\n").filter(l => !/\/\/ demo-accounts\b/.test(l)).join("\n");   // the script's dropMarked
   assert.doesNotMatch(cfg, /demo accounts?/i, "server/config.js keeps no comment about the demo accounts once their line is gone");
 });
+
+test("demo accounts: the uninstall step also takes their setting out of .env.example and the demo test out of SECURITY.md's test list (fix review 2)", () => {
+  const read = rel => readFileSync(new URL(`../${rel}`, import.meta.url), "utf8"), script = read("scripts/demo-accounts.js"), env = read(".env.example");
+  assert.ok(script.includes('".env.example"') && /^# demo-accounts:start$/m.test(env), "scripts/demo-accounts.js edits .env.example, whose demo setting sits between markers");
+  assert.deepEqual(env.replace(/^# demo-accounts:start\n[\s\S]*?^# demo-accounts:end\n\n?/m, "").match(/demo accounts?|DEMO_ACCOUNTS/gi) || [], [], "after the uninstall .env.example offers no setting for deleted code");   // the same expression the script uses
+  const list = read("SECURITY.md").replace(/(# \d+ tests in \d+ files \([^)\n]*?)\bdemo, /, "$1").split("\n").find(l => /^npm test\b/.test(l));   // the script's edit of the test list
+  assert.ok(script.includes("demo, /") && list && !/\bdemo\b/.test(list), `after the uninstall SECURITY.md's test list names no demo test: ${list}`);
+});
