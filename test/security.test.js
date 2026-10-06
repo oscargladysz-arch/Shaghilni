@@ -607,7 +607,7 @@ test("13 · the scanner opens key and certificate files, and warns when the emai
   const warn = auditSettings({ ...good, ...mail, EMAIL_API_URL: "http://mail.example/send" }).filter(r => r[0] === "WARN").map(r => r[1]).join(" ");
   assert.match(warn, /EMAIL_API_URL/, "a plain-http email service is reported: the key would travel in clear");
   const ign = readFileSync(new URL("../.gitignore", import.meta.url), "utf8").split("\n");
-  for (const p of ["*.pem", "*.key", "*.p12", "*.pfx"]) assert.ok(ign.includes(p), `.gitignore keeps ${p} out of the repository`);
+  for (const p of ["*.pem", "*.key", "*.p12", "*.pfx", "*.asc", "id_rsa*", "id_dsa*", "id_ecdsa*", "id_ed25519*"]) assert.ok(ign.includes(p), `.gitignore keeps ${p} out of the repository`);   // SSH keys and PGP exports too (fix review)
 });
 
 test("14 · the scanner stays clean for a correct production setup whether or not SEED_DEMO is set: sample listings are never seeded in production", () => {
