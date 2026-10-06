@@ -485,6 +485,17 @@ test("13 · the scanner catches this app's own secret names hard-coded anywhere,
   assert.ok(readFileSync(new URL("../.gitignore", import.meta.url), "utf8").split("\n").includes("!.env.example"), "but the example stays in the repository");
 });
 
+test("13 · spreadsheet exports turn a cell that would run as a formula into plain text, and leave phone numbers and negative amounts alone (D-43)", () => {
+  let csv = null; const js = f => readFileSync(new URL(`../public/js/${f}`, import.meta.url), "utf8");
+  const ctx = vm.createContext({ console, S: { lang: "en" }, document: { createElement: () => ({ click() {}, remove() {} }), body: { appendChild() {} } },
+    URL: { createObjectURL: b => { csv = b.parts.join(""); return "blob:x"; }, revokeObjectURL() {} }, Blob: class { constructor(p) { this.parts = p; } }, setTimeout: () => 0 });
+  for (const f of ["lookups.js", "i18n.js", "i18n2.js", "i18n3.js", "i18n4.js", "engine.js", "app-plans.js"]) vm.runInContext(js(f), ctx, { filename: f });
+  ctx.rows = [{ v: '=HYPERLINK("http://evil.example","x")' }, { v: "@SUM(A1)" }, { v: "-cmd|' /C calc'!A0" }, { v: "+HYPERLINK(1)" }, { v: "\tlead" }, { v: "+963944000001" }, { v: -5 }, { v: "-3.5" }, { v: "plain" }];
+  vm.runInContext('downloadCSV("t.csv", rows)', ctx);
+  const cells = csv.replace(/^\uFEFF/, "").split("\n").slice(1).map(c => c.replace(/^"|"$/g, "").replace(/""/g, '"'));
+  assert.deepEqual(cells, ['\'=HYPERLINK("http://evil.example","x")', "'@SUM(A1)", "'-cmd|' /C calc'!A0", "'+HYPERLINK(1)", "'\tlead", "+963944000001", "-5", "-3.5", "plain"]);
+});
+
 test("14 · the scanner stays clean for a correct production setup whether or not SEED_DEMO is set: sample listings are never seeded in production", () => {
   const good = { NODE_ENV: "production", OTP_PEPPER: "p".repeat(40), BASE_URL: "https://shaghilni.test", ADMIN_PHONES: "+963944000000", SMS_PROVIDER: "textbee",
     TEXTBEE_API_KEY: "key", CONTACT_EMAIL: "privacy@example.com", LEGAL_NAME: "Example Org (not a real entity)", TRUST_PROXY: "true" };
