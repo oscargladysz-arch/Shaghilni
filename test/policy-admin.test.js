@@ -141,8 +141,9 @@ test("policy admin: a hire can be moved back to interview until the Shaghilni te
   const S = await start(), C = await cast(S), { ids, admin } = C, move = (who, status) => who.put(`/api/employer/applications/${ids.appA}`, { status });
   for (const st of ["shortlisted", "interview", "hired"]) assert.equal((await move(C.A.e, st)).status, 200, st);
   const row = () => ({ ...S.db.get("SELECT status, hired_at, hire_pay_mid, hire_plan FROM applications WHERE id = ?", ids.appA) }), texts = S.texts.length;
+  const basis = (({ hire_pay_mid, hire_plan }) => ({ hire_pay_mid, hire_plan }))(row()); assert.ok(basis.hire_pay_mid > 0 && basis.hire_plan, "the hire recorded its fee basis");
   const back = await move(C.recruiter, "interview"); assert.equal(back.status, 200, `a mistaken 'hired' is undone by the recruiter: ${back.text}`);
-  assert.deepEqual(row(), { status: "interview", hired_at: null, hire_pay_mid: null, hire_plan: null }, "the hire, its date and its fee basis go together");
+  assert.deepEqual(row(), { status: "interview", hired_at: null, ...basis }, "the hire and its date go; the fee basis recorded with it stays, so hiring again cannot lower the fee (Stage 4 fix review)");
   assert.equal(S.texts.length, texts, "and the person is not texted 'would like to interview you' after a congratulations");
   assert.ok(!(await admin.get("/api/admin/hires")).body.hires.some(h => h.id === ids.appA), "it leaves the team's confirmation queue");
   assert.equal((await move(C.A.e, "hired")).status, 200, "hired again, for real");
