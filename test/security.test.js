@@ -3,6 +3,7 @@
 import { test, after } from "node:test";
 import assert from "node:assert/strict";
 import http from "node:http";
+import net from "node:net";
 import vm from "node:vm";
 import { readFileSync, readdirSync, mkdtempSync, mkdirSync, writeFileSync } from "node:fs";
 import os from "node:os";
@@ -220,6 +221,35 @@ test("4 · errors don't leak internals", async () => {
   assert.ok(S.logs.some(l => /\[error\]/.test(l)), "the details go to the server log instead");
   const n = await c.get("/api/does-not-exist");
   assert.deepEqual(n.body, { error: "not_found", detail: null });
+});
+
+test("4 · a request line the URL parser rejects answers 400 and the process keeps serving (D-39)", async () => {
+  const S = await start(); let thrown = null;
+  const srv = http.createServer((req, res) => { try { S.app(req, res); } catch (e) { thrown = e; res.statusCode = 599; res.end(); } });   // the guard stands in for the process's fatal handler, which exits
+  await new Promise(r => srv.listen(0, "127.0.0.1", r)); servers.push(srv);
+  const raw = await new Promise((ok, no) => { const sock = net.connect(srv.address().port, "127.0.0.1", () => sock.write("GET //[ HTTP/1.1\r\nHost: localhost\r\nConnection: close\r\n\r\n"));
+    let d = ""; sock.on("data", x => { d += x; }); sock.on("end", () => ok(d)); sock.on("error", no); });
+  assert.equal(thrown, null, `the request handler threw: ${thrown && thrown.message}`);
+  assert.match(raw, /^HTTP\/1\.1 400 /, raw.split("\r\n")[0]);
+});
+
+test("4 · a malformed percent-encoding in a route parameter is a 404, not a server error with a stack in the log (D-40)", async () => {
+  const S = await start(), c = S.client();
+  for (const p of ["/api/jobs/%E0%A4%A", "/api/jobs/%", "/api/events/%ff"]) {
+    const r = await c.get(p); assert.deepEqual([r.status, r.body && r.body.error], [404, "not_found"], `${p}: ${r.text}`);
+  }
+  assert.ok(!S.logs.some(l => /URIError/.test(l)), "and nothing is logged as an unexpected error");
+});
+
+test("4 · an unexpected error on a team route logs the path with the phone number masked (U-054)", async () => {
+  const S = await start(), admin = await S.login("+12025550199"); await employerWithLiveJob(S, admin, "0955 100 061", "Log Mask Co");
+  const e = await S.login("0955 100 061", "employer");
+  S.db.close();   // a real internal failure on a route whose path carries a number
+  for (const [method, p] of [["PUT", "/api/employer/team/%2B963944000777"], ["DELETE", "/api/employer/team/+963944000777"], ["POST", "/api/employer/team/requests/%2B963944000777"]]) {   // the three routes with :phone in the path
+    const r = await e.call(method, p, { role: "recruiter" }); assert.equal(r.status, 500, `${method} ${p}: ${r.text}`);
+  }
+  const lines = S.logs.filter(l => /\[error\]/.test(l)); assert.equal(lines.length, 3, "each failure is logged");
+  assert.ok(lines.every(l => !/963944000777/.test(l) && /\/api\/employer\/team\//.test(l)), `the path is kept, the number masked: ${lines.map(l => l.split(":")[0] + ":" + l.split(":")[1]).join(" | ")}`);
 });
 
 test("5 · sign-in failure cases", async () => {
