@@ -41,7 +41,7 @@ test("posting checks on the server: fee wording is refused (fee_requested), miss
   assert.equal(gAr.body.job.status, "draft"); assert.deepEqual(gAr.body.job.flags, [{ type: "gender", word: "موظفة" }], "Arabic wording is flagged on a draft too (engine.js findGender runs in the server sandbox)");
 });
 
-test("posting checks on the server: an explicit demand for the candidate's money is refused in the listing's own text too, and a benefit the company pays or covers is never refused, whichever box it is in (fix review 3)", async () => {
+test("posting checks on the server: an explicit demand for the candidate's money is refused in the listing's own text too, and a benefit the company pays or covers is never refused in what the job offers (fix review 3)", async () => {
   const S = await start(), admin = await S.login(ADMIN_PHONE), A = await employerWithLiveJob(S, admin, "0955 910 031", "Policy Fee Demands"), e = A.e;
   for (const [where, job] of [["summary", { ...JOB, summary: { en: "Candidates must pay 50,000 SYP for training before starting." } }],
     ["summary (Arabic)", { ...JOB, summary: { ar: "على المتقدم دفع ٥٠ ألف ليرة قبل البدء" } }],
@@ -58,6 +58,22 @@ test("posting checks on the server: an explicit demand for the candidate's money
     const r = await e.post("/api/employer/jobs", { job: { ...JOB, provides }, submit: true });
     assert.equal(r.status, 200, `a benefit is not a demand: ${JSON.stringify(provides)} → ${r.text}`);
   }
+});
+
+test("posting checks on the server: a demand whose payer is the candidate is refused in any box, whatever the subject's number or the verb's form; a benefit or an ordinary duty is never refused; any other payment wording is flagged for the reviewer, never silent (fix review 4, A-51)", async () => {
+  const S = await start(), admin = await S.login(ADMIN_PHONE), A = await employerWithLiveJob(S, admin, "0955 910 041", "Policy Fee Payers"), e = A.e;
+  const demands = { en: ["The trainee pays 100,000 SYP before starting.", "Each candidate pays 50,000 SYP for the course.", "Applicant pays 50,000 SYP for training materials.", "You will need to pay 50 USD for the training course.", "You'll pay 50 USD for the uniform.", "Each applicant is required to pay 50 USD.", "Candidates are expected to pay 50 USD before the interview."],
+    ar: ["على المتقدمين دفع ٥٠ ألف ليرة قبل المقابلة", "يدفع المتقدمون ٥٠ ألف ليرة", "يدفع المتدرب ١٠٠ ألف ليرة قبل بدء التدريب", "على المتدرب دفع ٥٠ ألف ليرة", "يلتزم المتقدم بدفع مبلغ ٥٠ ألف ليرة", "على المتقدمة دفع ٥٠ ألف ليرة",
+      "تطلب الشركة من المتقدم دفع رسم التدريب البالغ ١٠٠ ألف ليرة", "يتحمل المتقدم دفع رسم الامتحان", "يجب دفع ٥٠ ألف ليرة عند التسجيل", "عليك دفع ٥٠ ألف ليرة قبل البدء", "التدريب على حساب المتدرب", "تشترط الشركة دفع رسم الدورة"] };
+  for (const lang of ["en", "ar"]) for (const line of demands[lang]) for (const [box, job] of [["summary", { ...JOB, summary: { [lang]: line } }], ["what they offer", { ...JOB, provides: { [lang]: [line] } }]])
+    await refused(`${line} (${box})`, e.post("/api/employer/jobs", { job, submit: true }), "fee_requested", 422);
+  const flagged = async (job, label) => { const r = await e.post("/api/employer/jobs", { job, submit: true }); assert.equal(r.status, 200, `${label} is not refused: ${r.text}`); return JSON.parse(S.db.get("SELECT flags FROM jobs WHERE id = ?", r.body.job.id).flags).filter(f => f.type === "fee"); };
+  for (const line of ["We'll pay a monthly fee for your gym membership", "We also pay a registration fee for professional exams", "The organization will pay a membership fee for you"])
+    assert.equal((await flagged({ ...JOB, provides: { en: [line] } }, line)).length, 1, `${line}: a benefit, flagged for the reviewer`);
+  for (const line of ["يتم دفع رسوم التسجيل من قبل الشركة", "دفع رسوم النقابة على حساب الشركة", "دفع رسوم الامتحانات المهنية على نفقة الشركة", "دفع رسوم الدورات التدريبية", "دفع مبلغ شهري كبدل مواصلات", "لا يدفع المتقدم أي مبلغ", "تتحمل دفع رسم الدورة التدريبية"])
+    assert.equal((await flagged({ ...JOB, provides: { ar: [line] } }, line)).length, 1, `${line}: not refused, and not silent either`);
+  for (const [box, line] of [["duties", "You will pay close attention to detail"], ["needs", "You will pay suppliers and reconcile accounts"], ["duties", "You will pay regular visits to doctors and pharmacies"], ["needs", "Candidates should pay careful attention to detail."]])
+    await flagged({ ...JOB, [box]: { en: [line] } }, `${line} (${box})`);
 });
 
 test("posting checks on the server: an explicit fee demand is refused in every box; a bare fee word outside the listing's text (a benefit, a place, a job title) goes to the reviewer as a flag (U-020, Stage 4 fix reviews)", async () => {
