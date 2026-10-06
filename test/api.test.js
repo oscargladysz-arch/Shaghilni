@@ -363,3 +363,11 @@ test("resume suggestions: Latin, North or South America is not the United States
     assert.deepEqual(g(orig, sug).slice(0, 1), [true], `the same number: ${sug} → ${g(orig, sug)}`);
   assert.deepEqual(g("Served customers", "Served - five hundred customers")[2], "five", "the reason names the word, not the dash before it");
 });
+
+test("resume suggestions: أمريكا and بريطانيا with و, ب or ل before them still stand for the two-word names (fix review 6)", async () => {
+  const { loadCore } = await import("../server/core.js"), { factGuard } = loadCore();
+  const g = (orig, sug) => factGuard(orig, sug, orig, "").ok;
+  for (const [orig, sug] of [["عملت مع زبائن في سوريا وأمريكا", "عملت مع زبائن في سوريا والولايات المتحدة"], ["عملت بأمريكا لمدة سنتين", "عملت في الولايات المتحدة لمدة سنتين"], ["سافرت لأمريكا للعمل", "سافرت إلى الولايات المتحدة للعمل"], ["عملت ببريطانيا", "عملت في المملكة المتحدة"]])
+    assert.equal(g(orig, sug), true, `the same country: ${sug}`);
+  assert.equal(g("عملت بأمريكا اللاتينية", "عملت في الولايات المتحدة"), false, "Latin America still is not the United States");
+});

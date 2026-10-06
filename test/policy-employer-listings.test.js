@@ -60,6 +60,22 @@ test("posting checks on the server: an explicit demand for the candidate's money
   }
 });
 
+test("posting checks on the server: a negation counts only in its own clause and «عدم» or \"no\" is one; a singular \"pay\" is a statement of pay; any sum of money in the free text is flagged, so a demand with a sum is never silent (fix review 6, A-51)", async () => {
+  const S = await start(), admin = await S.login(ADMIN_PHONE), A = await employerWithLiveJob(S, admin, "0955 910 061", "Policy Fee Clauses"), e = A.e;
+  const post = async (box, lang, line) => e.post("/api/employer/jobs", { job: { ...JOB, [box]: { [lang]: box === "summary" ? line : [line] } }, submit: true });
+  const feeFlags = r => JSON.parse(S.db.get("SELECT flags FROM jobs WHERE id = ?", r.body.job.id).flags).filter(f => f.type === "fee");
+  for (const line of ["لا يشترط خبرة، يتحمل المتدرب تكاليف الدورة التدريبية", "دون خبرة سابقة. يتحمل المتدرب تكاليف التدريب", "بدون خبرة. يتحمل المتقدم ثمن الزي الرسمي", "لا يشترط خبرة\nيتحمل المتدرب تكاليف الدورة"])
+    await refused(`a negation in the clause before does not cancel: ${line}`, post("summary", "ar", line), "fee_requested", 422);
+  for (const [lang, line] of [["ar", "نرجو من المتقدمين عدم دفع أي مبلغ لأي جهة"], ["ar", "على المتقدم عدم تسديد أي مبلغ لأي شخص"], ["en", "No deposit required"], ["en", "No candidate pays a fee"], ["en", "No applicant will pay a deposit"], ["en", "Intern pay 400,000 SYP per month"], ["en", "Student pay 250,000 SYP per month"]]) {
+    const r = await post("provides", lang, line); assert.equal(r.status, 200, `never refused: ${line} → ${r.text}`);
+  }
+  for (const [lang, line] of [["ar", "مدة التدريب ثلاثة أشهر ويتحمل المتدرب تكاليف الدورة التدريبية"], ["ar", "تكاليف الدورة ١٠٠ ألف ليرة"], ["en", "50,000 SYP must be paid on registration."], ["en", "A sum of 50 USD must be paid before the interview."], ["en", "Applicants are charged 50 USD for the training."],
+    ["ar", "سعر الدورة التدريبية ١٠٠ ألف ليرة"], ["ar", "اشتراك الدورة التدريبية ١٠٠ ألف ليرة"], ["ar", "حوّل ٥٠ ألف ليرة إلى الرقم المذكور"], ["en", "Send $50 to secure your place"]]) {
+    const r = await post("summary", lang, line);
+    assert.ok((r.status === 422 && r.body.error === "fee_requested") || (r.status === 200 && feeFlags(r).length), `never silent: ${line} → ${r.status}`);
+  }
+});
+
 test("posting checks on the server: stating a trainee's pay, a negated demand and a company benefit are never refused; a demand with a sum or a modal is refused; every other payment wording with a sum is flagged, never silent (fix review 5, A-51)", async () => {
   const S = await start(), admin = await S.login(ADMIN_PHONE), A = await employerWithLiveJob(S, admin, "0955 910 051", "Policy Fee Recall"), e = A.e;
   const post = async (box, lang, line) => e.post("/api/employer/jobs", { job: { ...JOB, [box]: { [lang]: box === "summary" ? line : [line] } }, submit: true });
