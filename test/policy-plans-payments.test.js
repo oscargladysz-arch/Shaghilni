@@ -141,6 +141,24 @@ test("policy plans: undoing a hire keeps its fee basis: cutting the pay to 1 or 
   assert.deepEqual(await confirm(old), [{ kind: "hire_fee", amountSyp: MID }], "with no plan recorded, the live plan (Free) decides, as documented");
 });
 
+test("policy plans: hiring again after an undo can only raise the fee: a hire recorded on Pro, undone and recorded again on Free owes the fee, and a raise in between counts (fix review 2)", async () => {
+  const S = await start(), admin = await S.login("+12025550199"), P = await employerWithLiveJob(S, admin, "0955 922 021", "Pro Then Free Rehire Co");
+  assert.equal((await admin.post(`/api/admin/companies/${P.companyId}/plan`, { plan: "pro", months: 1 })).status, 200);
+  const a = await seekerOpen(S, "0944 922 021", "Hired On Pro First");
+  const inv = await P.e.post(`/api/employer/students/${a.id}/invite`, { kind: "job", jobId: P.jobId }); assert.equal(inv.status, 200, inv.text);
+  assert.equal((await a.s.post(`/api/me/invitations/${inv.body.invitation.id}/respond`, { answer: "yes" })).status, 200);
+  const id = (await a.s.post(`/api/jobs/${P.jobId}/apply`, {})).body.application.id; await hire(P.e, id);
+  assert.equal(S.db.get("SELECT hire_plan FROM applications WHERE id = ?", id).hire_plan, "pro", "recorded on Pro");
+  assert.equal((await P.e.put(`/api/employer/applications/${id}`, { status: "interview" })).status, 200, "undone");
+  assert.equal((await admin.post(`/api/admin/companies/${P.companyId}/plan`, { plan: "free" })).status, 200, "Pro ends");
+  assert.equal((await P.e.put(`/api/employer/jobs/${P.jobId}`, { job: { ...JOB, pay: [3000000, 3400000] }, submit: true })).status, 200, "a raise");
+  assert.equal((await admin.post(`/api/admin/jobs/${P.jobId}/approve`, {})).status, 200);
+  assert.equal((await P.e.put(`/api/employer/applications/${id}`, { status: "hired" })).status, 200, "hired again, on Free");
+  assert.deepEqual(plain(S.db.get("SELECT hire_plan, hire_pay_mid FROM applications WHERE id = ?", id)), { hire_plan: "free", hire_pay_mid: 3200000 }, "the stricter plan and the higher pay");
+  const r = await admin.post(`/api/admin/applications/${id}/confirm-hire`, {}); assert.equal(r.status, 200, r.text);
+  assert.deepEqual(r.body.charges, [{ kind: "hire_fee", amountSyp: 3200000 }], "the fee is owed, on the raised pay");
+});
+
 test("policy plans: the fee basis is the pay the listing showed when the person applied, or on the day of the hire if higher: cutting the pay just before recording the hire does not lower the fee (fix review)", async () => {
   const S = await start(), admin = await S.login("+12025550199"), F = await employerWithLiveJob(S, admin, "0955 922 011", "Cut Before Hire Co");
   const a = await seekerOpen(S, "0944 922 011", "Applied At Full Pay"), b = await seekerOpen(S, "0944 922 012", "Applied Long Ago");
