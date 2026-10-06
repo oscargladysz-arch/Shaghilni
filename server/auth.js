@@ -78,7 +78,7 @@ export function makeAuth({ db, cfg, core, sms, limit, audit, log, guard }) {
     const good = timingSafeEqual(Buffer.from(row.code_hash, "hex"), Buffer.from(codeHash(phone, code), "hex"));
     if (!good) {   // a guessing attempt leaves a trace: a masked log line each time, an audit row when the code locks (D-42)
       log(`[auth] wrong sign-in code for ${mask(phone)} (${row.attempts + 1} of 5)`);
-      if (row.attempts + 1 >= 5) { const u = db.get("SELECT id FROM users WHERE phone = ?", phone); audit(u ? u.id : null, "auth.locked", "user", u ? u.id : null, null); }
+      if (row.attempts + 1 >= 5) { const u = db.get("SELECT id FROM users WHERE phone = ?", phone); audit(null, "auth.locked", "user", u ? u.id : null, { phone: mask(phone) }); }   // the guesser is anonymous; the masked number says which one was attacked (fix review)
       fail(400, "wrong_code");
     }
 
