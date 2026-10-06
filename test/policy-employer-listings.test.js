@@ -41,6 +41,19 @@ test("posting checks on the server: fee wording is refused (fee_requested), miss
   assert.equal(gAr.body.job.status, "draft"); assert.deepEqual(gAr.body.job.flags, [{ type: "gender", word: "موظفة" }], "Arabic wording is flagged on a draft too (engine.js findGender runs in the server sandbox)");
 });
 
+test("posting checks on the server: fee wording in what the job offers, the place, the contact lines or the tags is refused too (U-020)", async () => {
+  const S = await start(), admin = await S.login(ADMIN_PHONE), A = await employerWithLiveJob(S, admin, "0955 910 021", "Policy Fee Fields"), e = A.e;
+  for (const [where, job, word] of [["what they offer", { ...JOB, provides: { en: ["Training, deposit required before starting"] } }, "deposit"],
+    ["what they offer (Arabic)", { ...JOB, provides: { ar: ["تدريب بعد دفع رسم تسجيل"] } }, "رسم تسجيل"],
+    ["place", { ...JOB, place: { en: "Head office, deposit required at the door" } }, "deposit"],
+    ["contact role", { ...JOB, contact: { role: { en: "Collects the deposit" } } }, "deposit"],
+    ["tags", { ...JOB, tags: "deposit required" }, "deposit"]]) {
+    const r = await refused(`fee in ${where}`, e.post("/api/employer/jobs", { job, submit: true }), "fee_requested", 422);
+    assert.equal(r.body.detail, word, `the word that tripped the check is named (${where})`);
+  }
+  assert.equal((await e.get("/api/employer")).body.jobs.filter(j => j.status === "pending").length, 0, "no listing asking for a fee is awaiting review");
+});
+
 test("verification gates publishing: a draft, pending or rejected company cannot submit a listing; a suspended company cannot submit, reopen or resubmit its page, and its listings leave the board", async () => {
   const S = await start(), admin = await S.login(ADMIN_PHONE), e = await S.login("0955 910 002", "employer");
   const page = { name: { en: "Policy Pending" }, gov: "aleppo", regNo: "REG-Policy Pending", contactName: "Contact Pending", whatsapp: "0955 910 002" };
