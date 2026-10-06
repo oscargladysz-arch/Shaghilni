@@ -46,7 +46,7 @@ export function registerCampus(r, deps) {
     if (!campus.domainsOf(uni).length) fail(409, "uni_no_email");
     const belongs = uniForEmail(email);
     if (belongs !== uni) fail(422, belongs ? "email_other_uni" : "email_wrong_domain", { domains: campus.domainsOf(uni) });
-    if (db.get("SELECT 1 AS x FROM student_verifications WHERE email = ? AND status = 'verified' AND user_id != ?", email, ctx.user.id)) fail(409, "email_taken");
+    // whether the address already verified another account is answered only at the confirmation, by whoever holds the mailbox (U-037)
     if (db.get("SELECT COUNT(*) AS n FROM email_sends WHERE user_id = ? AND sent_at > ?", ctx.user.id, now() - 86400e3).n >= 5) fail(429, "too_many_emails");
     if (!deps.email && !deps.cfg.otpEcho) fail(503, "email_unavailable");
     const code = String(randomInt(0, 1e6)).padStart(6, "0");
