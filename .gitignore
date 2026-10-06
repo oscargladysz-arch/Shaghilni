@@ -1,7 +1,8 @@
 node_modules/
 data/
 backups/
-.env
+.env*
+!.env.example
 test/e2e/shots/
 *.db
 *.db-wal

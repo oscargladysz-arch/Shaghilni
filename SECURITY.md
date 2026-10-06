@@ -249,8 +249,8 @@ hard-coded or committed.
 
 - **The secrets:** `OTP_PEPPER`, `ANTHROPIC_API_KEY`, `TEXTBEE_API_KEY`, and `TWILIO_AUTH_TOKEN` with its account SID. All are read only in `server/config.js`, used only on the server, and never logged. The browser learns only whether AI suggestions are switched on (`/api/config`).
 - **Tested:** security test 9 starts a server with planted secrets. It checks that the page, every script and stylesheet, and the public API responses never contain them.
-- **Scanned:** the scanner checks the repository for key patterns: Anthropic, OpenAI, AWS, Twilio, private keys and hard-coded secrets.
-- **Ignored:** `.env` is listed in both `.gitignore` and `.dockerignore`, so it can't reach GitHub or the Docker image.
+- **Scanned:** the scanner checks the repository for key patterns: Anthropic, OpenAI, AWS, the Twilio account SID, private keys, and hard-coded secrets under any name this app uses, in code (`textbeeKey: "..."`) or as a settings line (`OTP_PEPPER=...`). Your local settings files (`.env`, `.env.production` and the like) are skipped, since they are meant to hold secrets; `.env.example` is checked.
+- **Ignored:** every `.env` variant (`.env`, `.env.production`, `.env.local`...) is listed in both `.gitignore` and `.dockerignore`, so none can reach GitHub or the Docker image; only `.env.example` is kept in the repository. The image is also built from named folders only (`Dockerfile`).
 - **Rotation:**
   - Anthropic keys in the Anthropic Console, under API keys;
   - textbee in its dashboard;

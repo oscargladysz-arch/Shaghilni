@@ -30,12 +30,13 @@ const SECRET_PATTERNS = [
   ["AWS access key", /\bAKIA[0-9A-Z]{16}\b/],
   ["Twilio account SID", /\bAC[0-9a-f]{32}\b/],
   ["Private key", /-----BEGIN (?:RSA |EC |OPENSSH |DSA )?PRIVATE KEY-----/],
-  ["Hard-coded secret", /\b(?:api[_-]?key|secret|token|password|pepper)\b\s*[:=]\s*["'][A-Za-z0-9_\-]{24,}["']/i]
+  ["Hard-coded secret", /(?:api[_-]?key|secret|token|password|pepper|key)\b\s*[:=]\s*["'][A-Za-z0-9_\-]{24,}["']/i],   // also prefixed names: textbeeKey, otpPepper, emailApiKey (D-50)
+  ["Hard-coded secret", /^\s*(?:export\s+)?[A-Z0-9_]*(?:API_KEY|SECRET|TOKEN|PASSWORD|PEPPER)\s*=\s*["']?[A-Za-z0-9_\-]{24,}/m]   // a settings line: OTP_PEPPER=..., TEXTBEE_API_KEY=...
 ];
 export function scanSecrets(root = ROOT) {
   const found = [];
   for (const f of files(root)) {
-    if (path.basename(f) === ".env") continue;   // your local settings file: never share it, but it's supposed to hold secrets
+    if (/^\.env(\..+)?$/.test(path.basename(f)) && path.basename(f) !== ".env.example") continue;   // your local settings files (.env, .env.production, ...): git ignores them and they are supposed to hold secrets; the example must not
     const text = readFileSync(f, "utf8");
     for (const [label, re] of SECRET_PATTERNS) { const m = re.exec(text); if (m) found.push(`${label} in ${path.relative(root, f)} (${m[0].slice(0, 10)}…)`); }
   }
