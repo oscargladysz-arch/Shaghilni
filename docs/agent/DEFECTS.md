@@ -25,7 +25,8 @@ Reproduction scripts named below live in the Stage 0 scratchpad (`/tmp/claude-0/
 | Found by the fourth review of the Stage 4 fixes | 16 | D-130 to D-145: P1 1 · P2 4 · P3 11 (D-133 rated P3 by one of its refuters); 15 fixed, D-135 recorded (section below) |
 | Found by the fifth review of the Stage 4 fixes | 12 | D-146 to D-157: P2 3 · P3 9; 10 fixed, D-151 and D-153 recorded (section below) |
 | Found by the sixth review of the Stage 4 fixes | 6 | D-158 to D-163: P2 4 · P3 2; all fixed (section below) |
-| Fixed by Stage 4 | 152 | round 1: U-003, U-006, U-012 to U-015, U-018, U-020 to U-023, U-028, U-029, U-031, U-032, U-035, U-037, U-050, U-053 to U-055, U-058; browser flow: D-38, U-061; round 2: U-001, U-009, U-010, U-024, U-030 with D-31, U-038, U-040, U-059, U-062; security re-review: D-39 to D-43, D-45, D-46, D-48 to D-54, D-56; fix review: D-57 to D-63, D-65 to D-85; second fix review: D-86 to D-95, D-97 to D-103, D-105 to D-111; third fix review: D-112 to D-116, D-118 to D-129; fourth fix review: D-130 to D-134, D-136 to D-145; fifth fix review: D-146 to D-150, D-152, D-154 to D-157; sixth fix review: D-158 to D-163; accessibility: U-056, U-146, U-184 |
+| Found by the seventh review of the Stage 4 fixes | 7 | D-164 to D-170: P2 3 · P3 4; 6 fixed, D-164 in part (pinned by the fee corpus test); the loop closed with a corpus ratchet test (section below) |
+| Fixed by Stage 4 | 158 | round 1: U-003, U-006, U-012 to U-015, U-018, U-020 to U-023, U-028, U-029, U-031, U-032, U-035, U-037, U-050, U-053 to U-055, U-058; browser flow: D-38, U-061; round 2: U-001, U-009, U-010, U-024, U-030 with D-31, U-038, U-040, U-059, U-062; security re-review: D-39 to D-43, D-45, D-46, D-48 to D-54, D-56; fix review: D-57 to D-63, D-65 to D-85; second fix review: D-86 to D-95, D-97 to D-103, D-105 to D-111; third fix review: D-112 to D-116, D-118 to D-129; fourth fix review: D-130 to D-134, D-136 to D-145; fifth fix review: D-146 to D-150, D-152, D-154 to D-157; sixth fix review: D-158 to D-163; seventh fix review: D-165 to D-170; accessibility: U-056, U-146, U-184 |
 | Fixed by Stage 3 | 33 | D-02, D-04 to D-10, D-12, D-13, D-15 to D-17, D-19 to D-30, D-32; U-007, U-017, U-034, U-041 (page), U-045, U-046, U-048 (Status rows). With Stages 1 and 2, all thirty D-01 to D-30 are closed. The Stage 3 review then fixed six P1/P2 follow-ups inside the same fixes (D-17 live sessions, D-09 on a note, D-30 numbers in the audit log and false positives, audit filters with Arabic-Indic digits, suspend-then-verify) |
 
 Severity changed by the verifier: D-03 P1 → P2; D-20 P2 → P3. All others kept the reporter's tier.
@@ -879,6 +880,20 @@ Two lenses (code, tests and docs truth) read `git diff 1779501 45adb63`, with a 
 | D-161 | P2 | **FIXED** (same) | The anti-scam notice «نرجو من المتقدمين عدم دفع أي مبلغ» and "No deposit required" were refused; «عدم» and "no" now negate; reported twice | code, truth |
 | D-162 | P3 | **FIXED** (`public/js/engine.js`; api "أمريكا and بريطانيا with و, ب or ل") | The D-150 alias missed وأمريكا, بأمريكا, لأمريكا and ببريطانيا (a regression of D-138); reported twice | code, truth |
 | D-163 | P3 | **FIXED** (rows "No candidate pays a fee", "No applicant will pay a deposit") | The "no" lookbehinds added for D-149 were untested | truth |
+
+## Stage 4 · seventh review of the Stage 4 fixes, and how the loop was closed
+
+Two lenses (regressions against 45adb63, tests and docs truth) read `git diff 45adb63 c17cd3b`, with a disprove-first refuter per P2 (6 agents), under a stopping rule set beforehand: a regression, a common legitimate wording refused, or anything outside the fee and guard word lists is fixed; a demand stating no sum that slips both lists is recorded for the owner (A-51, the enforcement model). Everything outside the fee wording held; the three P2s were in it, two of them regressions of the sixth round's own fix. 10 findings: 3 merged, leaving 7. The regression lens left a labelled corpus of realistic lines; with this round's cases it became `test/fee-corpus.test.js` (185 lines), red at c17cd3b (28 lines wrong) and green after the fix (183 right, 2 pinned), so a later fee change cannot undo an earlier round's case without failing the suite. The review loop was closed here rather than run an eighth time: the corpus, written by the reviewers, is the regression guard.
+
+| # | Sev | Status | Title | Lens |
+|---|---|---|---|---|
+| D-164 | P3 | **FIXED in part** (README narrowed); the rest recorded and pinned (fee-corpus "known residual") | README said an anti-scam notice is never refused; in the listing's own text the rule older than Stage 4 refuses any fee word, negated or not ("You never pay to apply", "…deposit them at the bank"). Changing it changes the browser's live check too | regress, truth |
+| D-165 | P2 | **FIXED** (`server/validate.js`; fee-corpus) | «عدم» as a negator silenced the demand after «في حال عدم الالتزام …» or «مع عدم وجود راتب …» (refused at 45adb63, published unflagged at c17cd3b; a regression of D-161); reported twice | regress, truth |
+| D-166 | P2 | **FIXED** (same) | The per-clause split of D-158 also cut at «:» and «،», so «يتحمل المتدرب: تكاليف الدورة …» went from refused to silent; reported twice | regress, truth |
+| D-167 | P2 | **FIXED** (same) | The sum flag needed «ليرة», «ل.س», SYP, USD or $: «تكاليف الدورة ١٠٠ ألف», S.P. and euro sums were silent while the docs said any sum is flagged | truth |
+| D-168 | P3 | **FIXED** (one norm pass; bounded digit runs) | checkJob was 4 to 10 times slower on maximum-size, punctuation-dense listings (about 90 ms; now about 35 ms) and A-51's figure was false | regress, truth |
+| D-169 | P3 | **FIXED** (same) | Allowing و/ف before every Arabic demand refused «وتدفع المتدربين نحو التطور» (push) and «ويجب تسديد المبلغ المستحق للموردين» (a duty) | regress |
+| D-170 | P3 | **FIXED** (HANDOVER.md, STATE.md, validate.js header) | D-163 missing from the doc-or-test corrections list; the validate.js header comment out of date | truth |
 
 ## Merged duplicates
 
