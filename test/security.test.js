@@ -208,6 +208,17 @@ test("1 · a text provider's error answer never carries a full phone number into
   } finally { globalThis.fetch = realFetch; }
 });
 
+test("1 · a provider's error answer that writes the number with spaces or dashes is masked too (fix review of D-53)", async () => {
+  try {
+    for (const shown of ["+963 944 000 001", "+963-944-000-001", "0944 000 001", "(0944) 000-001"]) {
+      globalThis.fetch = async () => new Response(JSON.stringify({ message: `Number ${shown} is not reachable.` }), { status: 400 });
+      const err = await makeSms({ sms: { provider: "twilio", twilioSid: "AC0", twilioToken: "t", twilioFrom: "+15550000000" } })("+963944000001", "hello").then(() => null, e => e);
+      assert.ok(err && !/944[\s().-]*000[\s().-]*001/.test(err.message), `${shown} is masked: ${err && err.message}`);
+      assert.match(err.message, /^twilio 400: /, "the provider and status are kept");
+    }
+  } finally { globalThis.fetch = realFetch; }
+});
+
 test("1 · the email service gets a time limit like the text and AI services, so a hung provider cannot hold a request or the alert run (D-46)", async () => {
   const send = makeEmail({ emailApiUrl: "https://mail.example/send", emailApiKey: "k", emailFrom: "jobs@example.com" }, () => {}), realTimeout = AbortSignal.timeout;
   let gotSignal = false;
@@ -391,6 +402,21 @@ test("5 · wrong sign-in codes are logged with the number masked, and a code loc
   assert.ok(lines.every(l => !l.includes("944100091") && l.includes("•••")), "with the number masked");
   const uid = S.db.get("SELECT id FROM users WHERE phone = ?", phone).id;
   assert.equal(S.db.get("SELECT COUNT(*) AS n FROM audit WHERE action = 'auth.locked' AND entity_id = ?", uid).n, 1, "the lock is audited once, on the account");
+});
+
+test("5 · a locked sign-in code is audited with nobody as the actor and the number masked, for a number with or without an account (fix review of D-42)", async () => {
+  const S = await start(); await S.login("0944 100 093");   // one number has an account, the other none
+  const lock = async raw => { const c = S.client(), phone = (await c.post("/api/auth/code", { phone: raw })).body.phone, wrong = S.lastCode(phone) === "000000" ? "111111" : "000000";
+    for (let i = 0; i < 5; i++) await c.post("/api/auth/verify", { phone, code: wrong }); return phone; };
+  const withAcc = await lock("0944 100 093"), without = await lock("0944 100 094");
+  const rows = S.db.all("SELECT actor_id, entity_id, data FROM audit WHERE action = 'auth.locked' ORDER BY id").map(r => ({ ...r, data: JSON.parse(r.data || "null") }));
+  const uid = S.db.get("SELECT id FROM users WHERE phone = ?", withAcc).id;
+  assert.equal(rows.length, 2, "both locks are audited");
+  assert.deepEqual(rows.map(r => [r.actor_id, r.entity_id]), [[null, uid], [null, null]], "the guesser is anonymous: never the account owner as the actor");
+  for (const [r, phone] of [[rows[0], withAcc], [rows[1], without]]) {
+    assert.ok(r.data && typeof r.data.phone === "string" && r.data.phone.includes("•••"), `the masked number says which one was attacked: ${JSON.stringify(r.data)}`);
+    assert.ok(!r.data.phone.includes(phone.slice(4, 10)), "and never the full number");
+  }
 });
 
 test("8 · translation: Claude never sees the name or phone, and translations that change a number are dropped", async () => {
