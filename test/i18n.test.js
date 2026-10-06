@@ -104,3 +104,13 @@ test("i18n: every error code the server can answer has an err_ sentence in both 
   assert.deepEqual(missing, [], "server error codes with no err_ sentence (the app would show the generic message): " + missing.join(", "));
   for (const l of ["en", "ar"]) assert.doesNotMatch(STR[l].err_phone_region, /\bonly\b|فقط/, `${l}: the sentence must be true for every allowed country, not Syria only (D-16)`);
 });
+
+test("i18n: every complete literal key the client passes to t() exists in both languages, so no screen shows a raw key (U-040)", () => {
+  const STR = loadSTR(["lookups.js", "i18n.js", "i18n2.js", "i18n3.js", "i18n4.js"]), extra = { en: {}, ar: {} };
+  for (const [lang, m] of [["en", /Object\.assign\(STR\.en, (\{[\s\S]*?\})\);/], ["ar", /Object\.assign\(STR\.ar, (\{[\s\S]*?\})\);/]]) { const b = JS("demo.js").match(m); if (b) Object.assign(extra[lang], vm.runInNewContext(`(${b[1]})`)); }   // demo.js adds its own strings (R17)
+  const missing = [];
+  for (const f of readdirSync(new URL("../public/js/", import.meta.url)).filter(f => f.endsWith(".js") && !/^i18n/.test(f))) {
+    for (const [, k] of JS(f).matchAll(/\bt\("([A-Za-z0-9_]+)"\s*[,)]/g)) for (const lang of ["en", "ar"]) if (!(k in STR[lang]) && !(k in extra[lang])) missing.push(`${f}: ${k} (${lang})`);
+  }
+  assert.deepEqual([...new Set(missing)], [], "a missing key is shown to the person as the key itself");
+});
