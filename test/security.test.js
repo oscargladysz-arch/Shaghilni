@@ -113,6 +113,19 @@ test("1 · data handling: export, deletion that erases texts and codes, employer
   assert.deepEqual([co.whatsapp, co.contactName], ["", ""], "contact details are removed from the company page");
 });
 
+test("1 · retention also sweeps university email codes after 24 hours and forgets the address of a withdrawn student verification (U-035)", async () => {
+  const S = await start(); await S.login("0944 100 081"); await S.login("0944 100 082");
+  const id = phone => S.db.get("SELECT id FROM users WHERE phone = ?", phone).id, a = id("+963944100081"), b = id("+963944100082"), t = now();
+  S.db.run("INSERT INTO email_codes (user_id, email, uni, code_hash, created_at, expires_at) VALUES (?, 'old.typed@student.example', 'homs', 'x', ?, ?)", a, t - 25 * 3600e3, t - 25 * 3600e3 + 15 * 60e3);
+  S.db.run("INSERT INTO email_codes (user_id, email, uni, code_hash, created_at, expires_at) VALUES (?, 'fresh.typed@student.example', 'homs', 'x', ?, ?)", b, t, t + 15 * 60e3);
+  S.db.run("INSERT INTO student_verifications (user_id, uni, student_no, email, method, status, created_at, decided_at) VALUES (?, 'homs', '', 'gone@student.example', 'email', 'withdrawn', ?, ?)", a, t - 86400e3, t);
+  S.db.run("INSERT INTO student_verifications (user_id, uni, student_no, email, method, status, created_at, decided_at) VALUES (?, 'homs', '', 'kept@student.example', 'email', 'verified', ?, ?)", b, t - 86400e3, t);
+  S.app.cleanup();
+  assert.deepEqual(S.db.all("SELECT email FROM email_codes ORDER BY user_id").map(r => r.email), ["fresh.typed@student.example"], "a code older than 24 hours goes with the typed address; a live one stays");
+  assert.deepEqual(S.db.all("SELECT status, email FROM student_verifications ORDER BY user_id").map(r => [r.status, r.email]), [["withdrawn", null], ["verified", "kept@student.example"]],
+    "a withdrawn verification keeps its record but not the address; a verified one keeps the address so it verifies only one account");
+});
+
 test("1 · an employer who leaves takes the application phone number and email off the company page as well (U-053)", async () => {
   const S = await start(), admin = await S.login("+12025550199");
   const { e, companyId } = await employerWithLiveJob(S, admin, "0955 100 051", "Leaving Stores");
