@@ -320,6 +320,18 @@ test("5 · sign-in failure cases", async () => {
   assert.match((await pc.get("/")).headers.get("strict-transport-security"), /max-age=31536000/);
 });
 
+test("5 · wrong sign-in codes are logged with the number masked, and a code locked by five of them is in the audit log (D-42)", async () => {
+  const S = await start(), c = S.client(); await S.login("0944 100 091");   // an existing account
+  const phone = (await c.post("/api/auth/code", { phone: "0944 100 091" })).body.phone, wrong = S.lastCode(phone) === "000000" ? "111111" : "000000";
+  for (let i = 1; i <= 5; i++) assert.equal((await c.post("/api/auth/verify", { phone, code: wrong })).body.error, "wrong_code", `try ${i}`);
+  assert.equal((await c.post("/api/auth/verify", { phone, code: wrong })).body.error, "too_many_attempts");
+  const lines = S.logs.filter(l => /wrong sign-in code/.test(l));
+  assert.equal(lines.length, 5, `each wrong code leaves a log line (${S.logs.join(" | ")})`);
+  assert.ok(lines.every(l => !l.includes("944100091") && l.includes("•••")), "with the number masked");
+  const uid = S.db.get("SELECT id FROM users WHERE phone = ?", phone).id;
+  assert.equal(S.db.get("SELECT COUNT(*) AS n FROM audit WHERE action = 'auth.locked' AND entity_id = ?", uid).n, 1, "the lock is audited once, on the account");
+});
+
 test("8 · translation: Claude never sees the name or phone, and translations that change a number are dropped", async () => {
   const S = await start({ values: { anthropicKey: "test-key" } }), s = await S.login("0944 080 001");
   const profile = { v: 1, role: "seeker", name: "لينا حداد", gov: "aleppo", langs: ["ar", "en"], edu: { status: "bachelor", fac: "business" },
