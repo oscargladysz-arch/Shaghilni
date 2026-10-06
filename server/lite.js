@@ -133,13 +133,14 @@ export function makeLite({ db, cfg, core, auth, limit, log }, router) {
   function page(ctx, title, body, o = {}) {
     const lg = ctx.lang, other = lg === "ar" ? "en" : "ar", r = role(ctx);
     const q = new URLSearchParams(ctx.url.search); q.set("lang", other);
+    let lp = ctx.url.pathname; while (ctx.req.method === "POST" && lp !== "/lite" && !ROUTES.some(([m, re]) => m === "GET" && re.test(lp))) lp = lp.replace(/\/[^/]*$/, "") || "/lite";   // a page answered to a form links to the nearest page that exists (U-050)
     const tabs = o.tabs === false ? [] : r === "employer" ? TABS_EMPLOYER : r === "admin" ? [] : TABS_SEEKER;
     const nav = tabs.length ? `<nav class="tb" style="--n:${tabs.length}" aria-label="${esc(tr(lg, "brand"))}">${tabs.map(([href, ic, k, id]) => `<a href="${href}"${o.tab === id ? ' aria-current="page"' : ""}>${I(ic)}${esc(tr(lg, k))}</a>`).join("")}</nav>` : "";
     const lead = o.back ? `<a class="bk" href="${esc(o.back)}" aria-label="${esc(tr(lg, "back"))}">${I("arrow-left", "i flip")}</a><span class="bn">${esc(o.head || title)}</span>`
       : `<a class="lg" href="${r === "employer" ? "/lite/hire" : "/lite"}" aria-label="${esc(tr(lg, "brand"))}">ش</a><span class="bn">${esc(o.head || tr(lg, "brand"))}</span><span class="pill">${esc(o.pill || tr(lg, "lite"))}</span>`;
     return `<!doctype html><html lang="${lg}" dir="${lg === "ar" ? "rtl" : "ltr"}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="color-scheme" content="light dark"><title>${esc(title)} · ${esc(tr(lg, "brand"))} ${esc(tr(lg, "lite"))}</title><link rel="icon" href="/favicon.svg"><link rel="stylesheet" href="${CSS_URL}"></head><body>
-<header>${lead}${o.headEnd || ""}<a class="hl${o.headEnd ? "" : " end"}" href="${esc(ctx.url.pathname + "?" + q)}" lang="${other}">${other === "ar" ? "العربية" : "English"}</a></header>
+<header>${lead}${o.headEnd || ""}<a class="hl${o.headEnd ? "" : " end"}" href="${esc(lp + "?" + q)}" lang="${other}">${other === "ar" ? "العربية" : "English"}</a></header>
 <main>${o.flash ? `<p class="fl" role="status">${esc(o.flash)}</p>` : ""}${o.error ? `<p class="fl er" role="alert">${esc(o.error)}</p>` : ""}${body}</main>
 <footer><p>${esc(tr(lg, "liteNote"))} <a href="/">${esc(tr(lg, "full"))}</a> · <a href="/lite/privacy">${esc(tr(lg, "privacy"))}</a> · <a href="/lite/terms">${esc(tr(lg, "terms"))}</a>${r === "guest" ? ` · <a href="/lite/hire">${esc(tr(lg, "hire"))}</a>` : ""}</p></footer>
 ${nav}${o.pow ? `<script src="/lite/pow.js" defer></script>` : ""}${o.print ? `<script src="${PRINT_URL}" defer></script>` : ""}</body></html>`;
