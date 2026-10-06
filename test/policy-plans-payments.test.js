@@ -153,6 +153,22 @@ test("policy plans: the admin plan route reads months and amount typed with Arab
   assert.deepEqual(a.map(x => [x.months, x.amountSyp]), [[3, 4000], [3, 4000]], "and the audit row says what was set");
 });
 
+test("policy plans: the admin plan route reads grouped amounts ('4,000', '٤٬٠٠٠') and refuses a value that is not a number instead of recording no invoice or no end date (fix review)", async () => {
+  const S = await start(), admin = await S.login("+12025550199"), { companyId } = await employerWithLiveJob(S, admin, "0955 920 032", "Grouped Digits Co");
+  for (const [months, amountSyp, amt] of [["3", "4,000", 4000], ["٣", "٤٬٠٠٠", 4000], [3, "1,250,000", 1250000], ["", "", 0]]) {
+    S.db.run("DELETE FROM charges WHERE company_id = ?", companyId);
+    const r = await admin.post(`/api/admin/companies/${companyId}/plan`, { plan: "pro", months, amountSyp }); assert.equal(r.status, 200, r.text);
+    assert.deepEqual(S.db.all("SELECT amount_syp FROM charges WHERE company_id = ?", companyId).map(x => x.amount_syp), amt ? [amt] : [], `${JSON.stringify(amountSyp)}: the invoice`);
+    assert.equal(!!r.body.planUntil, months !== "", `${JSON.stringify(months)}: an end date when months are given`);
+  }
+  const before = plain(S.db.get("SELECT plan, plan_until FROM companies WHERE id = ?", companyId));
+  for (const [months, amountSyp] of [["٣ أشهر", "4000"], ["3", "4000 SYP"], ["three", ""], ["-1", ""]]) {
+    const r = await admin.post(`/api/admin/companies/${companyId}/plan`, { plan: "enterprise", months, amountSyp });
+    assert.deepEqual([r.status, r.body.error], [422, "bad_number"], `${JSON.stringify([months, amountSyp])} is refused, not read as 0`);
+  }
+  assert.deepEqual(plain(S.db.get("SELECT plan, plan_until FROM companies WHERE id = ?", companyId)), before, "a refused form changes nothing");
+});
+
 test("policy plans: admin billing routes: paid and void repeat without harm (record: no state check), plan with months 0 has no end date (record), a bad plan is 422", async () => {
   const S = await start(), admin = await S.login("+12025550199"), { e, companyId } = await employerWithLiveJob(S, admin, "0955 920 011", "Billing Co");
   const chargeRow = id => plain(S.db.get("SELECT status, paid_at FROM charges WHERE id = ?", id)), audits = () => S.db.get("SELECT COUNT(*) AS n FROM audit WHERE entity = 'charge'").n;
