@@ -165,6 +165,21 @@ test("1 · download my data carries what the notice says is held: plan, invoices
   assert.deepEqual(((await seeker.get("/api/me/export")).body.blockedCompanies || []).map(b => b.company && b.company.en), ["Export Co"], "a job seeker's file has the companies they blocked");
 });
 
+test("1 · a placement billed to a programme is the programme's charge: the employer's data download does not list it as due, nor the programme's rate (fix review of U-014, D-08)", async () => {
+  const S = await start(), admin = await S.login("+12025550199");
+  const { e: owner, jobId } = await employerWithLiveJob(S, admin, "0955 100 081", "Programme Hire Co");
+  const seeker = await S.login("0944 100 081"); await seeker.put("/api/me/profile", { profile: PROFILE });
+  const app = (await seeker.post(`/api/jobs/${jobId}/apply`, {})).body.application;
+  for (const st of ["shortlisted", "interview", "hired"]) assert.equal((await owner.put(`/api/employer/applications/${app.id}`, { status: st })).status, 200, st);
+  const pid = (await admin.post("/api/admin/programmes", { name: "Example Donor Internship Programme", rateUsd: 450 })).body.id;
+  const conf = await admin.post(`/api/admin/applications/${app.id}/confirm-hire`, { programmeId: pid }); assert.equal(conf.status, 200, conf.text);
+  assert.deepEqual(conf.body.charges, [{ kind: "placement", amountUsd: 450, programme: "Example Donor Internship Programme" }], "control: the programme is charged");
+  assert.deepEqual((await owner.get("/api/employer/plan")).body.charges, [], "control: the plan page lists nothing (D-08)");
+  const mine = await owner.get("/api/me/export");
+  assert.deepEqual(mine.body.charges, [], "the download lists no charge the employer does not owe");
+  assert.ok(!/Example Donor Internship Programme|"amountUsd":450/.test(mine.text), "nor the programme's name or rate");
+});
+
 test("1 · a text provider's error answer never carries a full phone number into the server log or the texts table (leaks review)", async () => {
   const cfgOf = provider => ({ sms: { provider, textbeeKey: "k", twilioSid: "AC0", twilioToken: "t", twilioFrom: "+15550000000" } });
   try {
