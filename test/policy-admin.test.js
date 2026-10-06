@@ -54,6 +54,24 @@ test("policy admin: company review needs screening to verify and a note to rejec
   assert.deepEqual(audits(S, "company", dId).map(x => x.action), ["company.created"], "U-046: the refused verification of the draft wrote nothing");
 });
 
+test("policy admin: a suspended company's team reads no applicant and moves nobody until the admin verifies it again (U-022)", async () => {
+  const S = await start(), C = await cast(S), { admin, ids } = C;
+  const list = who => who.get(`/api/employer/jobs/${ids.jobA}/applications`);
+  for (const [name, who] of [["owner", C.A.e], ["recruiter", C.recruiter], ["hiring manager", C.hiring]]) assert.equal((await list(who)).status, 200, `${name} reads the applicants while the company is verified`);
+  assert.equal((await admin.post(`/api/admin/companies/${ids.companyA}/suspend`, { note: "Complaint under review" })).status, 200);
+  const texts = S.texts.length;
+  for (const [name, who] of [["owner", C.A.e], ["recruiter", C.recruiter], ["hiring manager", C.hiring]]) {
+    const r = await list(who); assert.deepEqual([r.status, r.body && r.body.error], [409, "suspended"], `${name}: a suspended company reads no applicant`);
+    assert.ok(!/Seeker Alpha|944900001/.test(r.text), `${name}: neither the applicant's name nor number in the answer`);
+  }
+  const mv = await C.A.e.put(`/api/employer/applications/${ids.appA}`, { status: "shortlisted" });
+  assert.deepEqual([mv.status, mv.body && mv.body.error], [409, "suspended"], "nor moves an applicant");
+  assert.equal(S.db.get("SELECT status FROM applications WHERE id = ?", ids.appA).status, "new", "the application is untouched");
+  assert.equal(S.texts.length, texts, "and no text goes to the applicant under the suspended company's name");
+  assert.equal((await admin.post(`/api/admin/companies/${ids.companyA}/verify`, { screened: true })).status, 200, "the admin lifts the suspension");
+  assert.equal((await list(C.A.e)).status, 200, "and the team reads its applicants again");
+});
+
 test("policy admin: listing review approves only a pending listing of a verified company (409 bad_state, 409 company_not_verified); reject needs a note", async () => {
   const S = await start(), admin = await S.login(ADMIN_PHONE), A = await employerWithLiveJob(S, admin, "0955 910 003", "Review Beta");
   const submit = async () => { const r = await A.e.post("/api/employer/jobs", { job: JOB, submit: true }); assert.equal(r.status, 200, r.text); return r.body.job.id; };
