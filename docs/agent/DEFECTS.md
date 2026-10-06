@@ -24,7 +24,8 @@ Reproduction scripts named below live in the Stage 0 scratchpad (`/tmp/claude-0/
 | Found by the third review of the Stage 4 fixes | 18 | D-112 to D-129: P2 3 · P3 15 (D-125 rated P2 by its reviewer, P3 by its refuter); 17 fixed (D-115 and D-118 in part), D-117 recorded (section below) |
 | Found by the fourth review of the Stage 4 fixes | 16 | D-130 to D-145: P1 1 · P2 4 · P3 11 (D-133 rated P3 by one of its refuters); 15 fixed, D-135 recorded (section below) |
 | Found by the fifth review of the Stage 4 fixes | 12 | D-146 to D-157: P2 3 · P3 9; 10 fixed, D-151 and D-153 recorded (section below) |
-| Fixed by Stage 4 | 146 | round 1: U-003, U-006, U-012 to U-015, U-018, U-020 to U-023, U-028, U-029, U-031, U-032, U-035, U-037, U-050, U-053 to U-055, U-058; browser flow: D-38, U-061; round 2: U-001, U-009, U-010, U-024, U-030 with D-31, U-038, U-040, U-059, U-062; security re-review: D-39 to D-43, D-45, D-46, D-48 to D-54, D-56; fix review: D-57 to D-63, D-65 to D-85; second fix review: D-86 to D-95, D-97 to D-103, D-105 to D-111; third fix review: D-112 to D-116, D-118 to D-129; fourth fix review: D-130 to D-134, D-136 to D-145; fifth fix review: D-146 to D-150, D-152, D-154 to D-157; accessibility: U-056, U-146, U-184 |
+| Found by the sixth review of the Stage 4 fixes | 6 | D-158 to D-163: P2 4 · P3 2; all fixed (section below) |
+| Fixed by Stage 4 | 152 | round 1: U-003, U-006, U-012 to U-015, U-018, U-020 to U-023, U-028, U-029, U-031, U-032, U-035, U-037, U-050, U-053 to U-055, U-058; browser flow: D-38, U-061; round 2: U-001, U-009, U-010, U-024, U-030 with D-31, U-038, U-040, U-059, U-062; security re-review: D-39 to D-43, D-45, D-46, D-48 to D-54, D-56; fix review: D-57 to D-63, D-65 to D-85; second fix review: D-86 to D-95, D-97 to D-103, D-105 to D-111; third fix review: D-112 to D-116, D-118 to D-129; fourth fix review: D-130 to D-134, D-136 to D-145; fifth fix review: D-146 to D-150, D-152, D-154 to D-157; sixth fix review: D-158 to D-163; accessibility: U-056, U-146, U-184 |
 | Fixed by Stage 3 | 33 | D-02, D-04 to D-10, D-12, D-13, D-15 to D-17, D-19 to D-30, D-32; U-007, U-017, U-034, U-041 (page), U-045, U-046, U-048 (Status rows). With Stages 1 and 2, all thirty D-01 to D-30 are closed. The Stage 3 review then fixed six P1/P2 follow-ups inside the same fixes (D-17 live sessions, D-09 on a note, D-30 numbers in the audit log and false positives, audit filters with Arabic-Indic digits, suspend-then-verify) |
 
 Severity changed by the verifier: D-03 P1 → P2; D-20 P2 → P3. All others kept the reporter's tier.
@@ -865,6 +866,19 @@ Three lenses read `git diff 0e14a35 1779501` (the fourth review's fixes), with a
 | D-155 | P3 | **FIXED** (STATE.md) | STATE's approve row said every payment wording is only a flag, though a fee word in the listing's own text is refused | truth |
 | D-156 | P3 | **FIXED** (test name narrowed) | The fix-review-4 policy test's name said "any box"; it checks the summary and what the job offers | truth |
 | D-157 | P3 | **FIXED** (HANDOVER.md) | HANDOVER said every fix review used five lenses; the third to fifth used three | truth |
+
+## Stage 4 · sixth review of the Stage 4 fixes
+
+Two lenses (code, tests and docs truth) read `git diff 1779501 45adb63`, with a disprove-first refuter per P2 (9 agents). Everything outside the fee wording held; the four P2s were all in it, one of them a regression of the fifth round's own fix. 10 findings: 4 merged (each P2 but one, and the alias, were found by both lenses), leaving 6. The fix adds a recall backstop instead of more words: any sum of money written in a listing's free text is flagged (pay has its own field).
+
+| # | Sev | Status | Title | Lens |
+|---|---|---|---|---|
+| D-158 | P2 | **FIXED** (`server/validate.js`, per-clause check; policy-employer-listings "a negation counts only in its own clause") | The D-147 three-word negation window crossed into the previous sentence, so «لا يشترط خبرة، يتحمل المتدرب تكاليف الدورة» went from refused to neither refused nor flagged (a regression of the fifth round) | code |
+| D-159 | P2 | **FIXED** (same; the sum backstop, و/ف before a clause's first word) | Demands still silent: «ويتحمل المتدرب تكاليف …», «تكاليف الدورة ١٠٠ ألف ليرة», «حوّل ٥٠ ألف ليرة», "50,000 SYP must be paid", "Applicants are charged 50 USD"; reported twice | code, truth |
+| D-160 | P2 | **FIXED** (same) | A trainee's pay without a colon ("Intern pay 400,000 SYP per month") and "Student pay …" were refused; a singular "pay" is now the noun; reported twice | code, truth |
+| D-161 | P2 | **FIXED** (same) | The anti-scam notice «نرجو من المتقدمين عدم دفع أي مبلغ» and "No deposit required" were refused; «عدم» and "no" now negate; reported twice | code, truth |
+| D-162 | P3 | **FIXED** (`public/js/engine.js`; api "أمريكا and بريطانيا with و, ب or ل") | The D-150 alias missed وأمريكا, بأمريكا, لأمريكا and ببريطانيا (a regression of D-138); reported twice | code, truth |
+| D-163 | P3 | **FIXED** (rows "No candidate pays a fee", "No applicant will pay a deposit") | The "no" lookbehinds added for D-149 were untested | truth |
 
 ## Merged duplicates
 
