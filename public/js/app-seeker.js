@@ -54,7 +54,7 @@ async function holdDone(what) {
 }
 function resetSession() {
   S.user = null; S.me = null; S.emp = null; S.admin = null; S.saved = new Set(); S.applied = new Set(); S.apps = new Map();
-  setProfile(null, true);
+  setProfile(null, true); store.set("meDraft", null);   // the next person on this phone starts with an empty profile form (D-54)
 }
 async function signOut() {
   try { await api.post("/api/auth/logout"); } catch (e) { /* signed out locally anyway */ }
