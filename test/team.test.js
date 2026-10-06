@@ -206,7 +206,7 @@ test("teams: invitations need a verified company and stop at twenty a day per co
     assert.equal((await owner.del(`/api/employer/team/${encodeURIComponent("+963955811" + n)}`)).status, 200, `cancelling ${i} frees the seat, not the day's count`);
   }
   const before = invites(), r21 = await owner.post("/api/employer/team", { name: "Person 21", phone: "0955 811 021", role: "recruiter" });
-  assert.deepEqual([r21.status, r21.body.error], [429, "rate_limited"], "the twenty-first invitation of the day is refused");
+  assert.deepEqual([r21.status, r21.body.error], [429, "daily_limit"], "the twenty-first invitation of the day is refused");
   assert.equal(invites(), before, "and sends no text");
   const { e: other } = await employer(S, admin, "0955 810 006", "Other Co");
   assert.equal((await other.post("/api/employer/team", { name: "Theirs", phone: "0955 812 001", role: "recruiter" })).status, 200, "the cap is per company");
@@ -232,7 +232,7 @@ test("teams: an invitation to a number that already has an account spends the da
   await S.login("0944 817 001");   // a job seeker's number
   for (let i = 1; i <= 20; i++) { const r = await owner.post("/api/employer/team", { name: "Probe", phone: "0944 817 001", role: "recruiter" }); assert.equal(r.body.error, "phone_taken", `try ${i}`); }
   const r21 = await owner.post("/api/employer/team", { name: "Probe", phone: "0944 817 001", role: "recruiter" });
-  assert.deepEqual([r21.status, r21.body.error], [429, "rate_limited"], "the twenty-first try of the day is refused before anything is looked up");
+  assert.deepEqual([r21.status, r21.body.error], [429, "daily_limit"], "the twenty-first try of the day is refused before anything is looked up");
 });
 
 test("teams: asking to join texts the company's managers at most five times a day per account, withdrawing included (U-032)", async () => {
@@ -245,7 +245,7 @@ test("teams: asking to join texts the company's managers at most five times a da
     assert.equal((await asker.post("/api/employer/membership/cancel")).status, 200, `withdrawing ${i} does not give the request back`);
   }
   const before = requests(), r6 = await asker.post(`/api/employer/companies/${target}/join`, { name: "Visit our site 6" });
-  assert.deepEqual([r6.status, r6.body.error], [429, "rate_limited"], "the sixth request of the day is refused");
+  assert.deepEqual([r6.status, r6.body.error], [429, "daily_limit"], "the sixth request of the day is refused");
   assert.equal(requests(), before, "and texts nobody");
   assert.equal(before, 5, "five requests, five texts to the owner");
   const other = await S.login("0955 813 003", "employer");
