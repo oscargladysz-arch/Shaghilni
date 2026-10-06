@@ -5,7 +5,7 @@
    development echo (OTP_DEV_ECHO) instead of a mail stub: it goes through the same send, lock and confirm code paths. */
 import { test, after } from "node:test";
 import assert from "node:assert/strict";
-import { start, cast, closeAll, PROFILE } from "./policy/harness.js";
+import { start, cast, closeAll, PROFILE, EV } from "./policy/harness.js";
 
 after(closeAll);
 
@@ -140,4 +140,49 @@ test("policy campus: an office account is a career office and nothing else: /api
   const n = S.db.get("SELECT COUNT(*) AS n FROM profiles p JOIN users u ON u.id = p.user_id WHERE u.deleted_at IS NULL AND json_extract(p.data, '$.edu.uni') = 'homs' AND json_extract(p.data, '$.edu.fac') = 'business'").n;
   assert.equal(page.stats.students, n, "the faculty office's total is its faculty's students only");
   assert.ok(n < S.db.get("SELECT COUNT(*) AS n FROM profiles p WHERE json_extract(p.data, '$.edu.uni') = 'homs'").n, "which is fewer than the university's");
+});
+
+test("policy campus: university, faculty and governorate ids are the tables' own string keys; a list or a prototype name is refused, and nothing answers 500 (U-038)", async () => {
+  const S = await start(ECHO), C = await cast(S), I = C.ids;
+  // (1) a seeker types a list for the university and faculty: stored as none, and the screens that read it keep answering
+  assert.equal((await C.seekerB.put("/api/me/profile", { profile: at(["damascus"], "Seeker Beta", ["business"]) })).status, 200);
+  const edu = JSON.parse(S.db.get("SELECT data FROM profiles WHERE user_id = ?", I.userB).data).edu;
+  assert.deepEqual([typeof edu.uni, typeof edu.fac], ["string", "string"], "a list is never stored as a university or faculty");
+  assert.equal((await C.seekerB.post(`/api/jobs/${I.jobA}/apply`, {})).status, 200, "seeker B applies to A's job");
+  for (const [who, path] of [[C.seekerB, "/api/me"], [C.A.e, "/api/employer/students"], [C.A.e, `/api/employer/jobs/${I.jobA}/applications`], [C.recruiter, "/api/employer/students"]]) {
+    const r = await who.get(path); assert.equal(r.status, 200, `${path}: ${r.text}`);
+  }
+  // a snapshot stored before this fix (a list frozen at apply time) no longer breaks the applicant list or the search
+  const bad = JSON.stringify({ ...at("damascus", "Seeker Beta"), edu: { status: "bachelor", uni: ["damascus"], fac: "business" } });
+  S.db.run("UPDATE applications SET snapshot = ? WHERE job_id = ? AND user_id = ?", bad, I.jobA, I.userB); S.db.run("UPDATE profiles SET data = ? WHERE user_id = ?", bad, I.userB);
+  for (const [who, path] of [[C.A.e, `/api/employer/jobs/${I.jobA}/applications`], [C.A.e, "/api/employer/students"], [C.seekerB, "/api/me"]]) {
+    const r = await who.get(path); assert.equal(r.status, 200, `stored list, ${path}: ${r.text}`);
+  }
+  // (2) an employer asking for a partnership: a prototype name or a list is no university
+  const before = S.db.all("SELECT uni FROM uni_partners WHERE company_id = ? ORDER BY uni", I.companyA);
+  for (const uni of ["constructor", "__proto__", ["homs"], ["damascus"]]) {
+    const r = await C.A.e.post("/api/employer/partners", { uni }); assert.deepEqual([r.status, r.body.error], [422, "uni_required"], `partners uni ${JSON.stringify(uni)}`);
+  }
+  assert.deepEqual(S.db.all("SELECT uni FROM uni_partners WHERE company_id = ? ORDER BY uni", I.companyA), before, "no partnership row added");
+  // (3) the admin adding a career office: refused before any account is made; a junk faculty is stored as none
+  for (const [n, uni] of [["391", "toString"], ["392", ["damascus"]]]) {
+    const r = await C.admin.post("/api/admin/campus", { phone: `0944 900 ${n}`, uni, name: "U-038 office" });
+    assert.deepEqual([r.status, r.body.error], [422, "uni_required"], `office uni ${JSON.stringify(uni)}`);
+    assert.equal(S.db.get("SELECT COUNT(*) AS n FROM users WHERE phone = ?", `+963944900${n}`).n, 0, "no account left behind");
+  }
+  for (const [n, faculty] of [["393", "valueOf"], ["394", ["informatics"]]]) {
+    const r = await C.admin.post("/api/admin/campus", { phone: `0944 900 ${n}`, uni: "damascus", faculty, name: "U-038 office" }); assert.equal(r.status, 200, r.text);
+    assert.equal(S.db.get("SELECT o.faculty FROM campus_offices o JOIN users u ON u.id = o.user_id WHERE u.phone = ?", `+963944900${n}`).faculty, "", `faculty ${JSON.stringify(faculty)} stored as none`);
+  }
+  // (4) the admin adding an email domain for a university
+  for (const uni of ["constructor", ["homs"]]) {
+    const r = await C.admin.post("/api/admin/campus/domains", { uni, domain: "u038.example" }); assert.deepEqual([r.status, r.body.error], [422, "uni_required"], `domain uni ${JSON.stringify(uni)}`);
+  }
+  assert.equal(S.db.get("SELECT COUNT(*) AS n FROM uni_domains WHERE domain = 'u038.example'").n, 0);
+  // (5) an event: the university and governorate are none, never a prototype name or a list
+  for (const over of [{ uni: "hasOwnProperty", gov: "constructor" }, { uni: ["damascus"], gov: ["aleppo"] }]) {
+    const r = await C.admin.post("/api/organize/events", { event: EV(over) }); assert.equal(r.status, 200, r.text);
+    const row = S.db.get("SELECT uni, data FROM events WHERE id = ?", r.body.event.id);
+    assert.deepEqual([row.uni, JSON.parse(row.data).gov], ["", ""], `event ${JSON.stringify(over)}`);
+  }
 });
