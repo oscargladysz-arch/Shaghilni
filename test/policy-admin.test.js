@@ -137,6 +137,20 @@ test("policy admin: the hire date is written once: a note or a repeated 'hired' 
   assert.ok(first < S.db.get("SELECT hire_confirmed_at FROM applications WHERE id = ?", ids.appA).hire_confirmed_at, "so the hire date stays before its confirmation");
 });
 
+test("policy admin: a hire can be moved back to interview until the Shaghilni team confirms it; a confirmed hire is final (U-003)", async () => {
+  const S = await start(), C = await cast(S), { ids, admin } = C, move = (who, status) => who.put(`/api/employer/applications/${ids.appA}`, { status });
+  for (const st of ["shortlisted", "interview", "hired"]) assert.equal((await move(C.A.e, st)).status, 200, st);
+  const row = () => ({ ...S.db.get("SELECT status, hired_at, hire_pay_mid, hire_plan FROM applications WHERE id = ?", ids.appA) }), texts = S.texts.length;
+  const back = await move(C.recruiter, "interview"); assert.equal(back.status, 200, `a mistaken 'hired' is undone by the recruiter: ${back.text}`);
+  assert.deepEqual(row(), { status: "interview", hired_at: null, hire_pay_mid: null, hire_plan: null }, "the hire, its date and its fee basis go together");
+  assert.equal(S.texts.length, texts, "and the person is not texted 'would like to interview you' after a congratulations");
+  assert.ok(!(await admin.get("/api/admin/hires")).body.hires.some(h => h.id === ids.appA), "it leaves the team's confirmation queue");
+  assert.equal((await move(C.A.e, "hired")).status, 200, "hired again, for real");
+  assert.equal((await admin.post(`/api/admin/applications/${ids.appA}/confirm-hire`, {})).status, 200);
+  const late = await move(C.A.e, "interview"); assert.deepEqual([late.status, late.body.error], [409, "hire_confirmed"], "a confirmed hire is final");
+  assert.equal(row().status, "hired", "and stays hired");
+});
+
 test("policy admin: the audit log clamps limit to 1..200, takes junk limits, and holds no phone number (team invitations and offices are added by phone)", async () => {
   const S = await start(), C = await cast(S), admin = C.admin;
   const all = (await admin.get("/api/admin/audit?limit=200")).body.entries;
