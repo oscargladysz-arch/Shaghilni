@@ -123,6 +123,20 @@ test("policy admin: confirm-hire needs a hired application (409 not_hired) and c
   assert.equal(audits(S, "application", appB.id).filter(x => x.action === "hire.confirmed").length, 1, "one confirmation, one hire.confirmed row");
 });
 
+test("policy admin: the hire date is written once: a note or a repeated 'hired' afterwards leaves it as recorded (U-006)", async () => {
+  const S = await start(), C = await cast(S), { ids } = C, wait = () => new Promise(r => setTimeout(r, 15));
+  for (const st of ["shortlisted", "interview", "hired"]) assert.equal((await C.A.e.put(`/api/employer/applications/${ids.appA}`, { status: st })).status, 200, st);
+  const at = () => S.db.get("SELECT hired_at FROM applications WHERE id = ?", ids.appA).hired_at, first = at(); assert.ok(first, "the hire is recorded");
+  await wait(); assert.equal((await C.hiring.put(`/api/employer/applications/${ids.appA}`, { note: "Starts on Sunday." })).status, 200);
+  assert.equal(at(), first, "a hiring manager's note does not move the hire date");
+  await wait(); assert.equal((await C.A.e.put(`/api/employer/applications/${ids.appA}`, { status: "hired" })).status, 200);
+  assert.equal(at(), first, "nor does saving 'hired' again");
+  assert.equal((await C.admin.post(`/api/admin/applications/${ids.appA}/confirm-hire`, {})).status, 200);
+  await wait(); assert.equal((await C.recruiter.put(`/api/employer/applications/${ids.appA}`, { note: "Confirmed by Shaghilni." })).status, 200);
+  assert.equal(at(), first, "nor a note after the Shaghilni team confirmed the hire");
+  assert.ok(first < S.db.get("SELECT hire_confirmed_at FROM applications WHERE id = ?", ids.appA).hire_confirmed_at, "so the hire date stays before its confirmation");
+});
+
 test("policy admin: the audit log clamps limit to 1..200, takes junk limits, and holds no phone number (team invitations and offices are added by phone)", async () => {
   const S = await start(), C = await cast(S), admin = C.admin;
   const all = (await admin.get("/api/admin/audit?limit=200")).body.entries;
