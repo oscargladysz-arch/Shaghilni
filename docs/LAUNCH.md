@@ -21,7 +21,7 @@ No item marked owner, lawyer or provider is ever ticked by an agent.
 
 | # | Item | Owner | How to verify | Status |
 |---|---|---|---|---|
-| B1 | `npm test` green. | agent | 202 of 202 at the Stage 4 gate (147 at Stage 3, 133 at Stage 2, 66 at Stage 1; `docs/agent/BASELINE.md` has the Stage 0 60). | Done |
+| B1 | `npm test` green. | agent | 223 of 223 at the Stage 4 gate (147 at Stage 3, 133 at Stage 2, 66 at Stage 1; `docs/agent/BASELINE.md` has the Stage 0 60). | Done |
 | B2 | The browser flow passes (`npm run test:e2e`, 80 checks, four browsers plus a Lite page without JavaScript). | agent, owner | Run the *Browser end-to-end* job by hand from the CI workflow, or locally after `npm install --no-save puppeteer`. Run at the Stage 4 gate on commit 9b4f053 in the agent environment's Chromium: 80 of 80 checks pass, no browser errors (the Stage 3 stop was a script gap, D-38, fixed in Stage 4). | Done |
 | B3 | `npm run security:check -- --url https://your-domain` shows no FAIL once deployed. | owner | Paste the output into the launch record. | Open |
 | B4 | External scans: MDN HTTP Observatory (aim A+), SSL Labs (aim A), the OWASP ZAP baseline scan, GitHub secret scanning. | owner | Reports saved. | Open |
@@ -37,7 +37,7 @@ No item marked owner, lawyer or provider is ever ticked by an agent.
 | C2 | `LEGAL_NAME` and `CONTACT_EMAIL` set to the real operating entity and a monitored mailbox. | owner | The scanner's `Legal name:` and `Privacy contact:` lines. | Blocked on D4 and D6 |
 | C3 | A named person responsible for personal data, and a breach plan. | owner | Written down and named in the privacy notice if the lawyer asks for it. | Open |
 | C4 | The employment-office licence application is under way. | owner | | Open |
-| C5 | Native Arabic review of every new or changed string. | owner, reviewer | Every row of `docs/agent/ARABIC_REVIEW.md` ticked. | Open (46 rows so far) |
+| C5 | Native Arabic review of every new or changed string. | owner, reviewer | Every row of `docs/agent/ARABIC_REVIEW.md` ticked. | Open (47 rows so far) |
 | C6 | Lite users can read the terms they consent to without JavaScript. | agent | `/lite/privacy` and `/lite/terms` (Stage 3, P1-2); `test/lite.test.js` checks both languages, the filled-in details and the links. | Done |
 
 ## D · Providers and money
