@@ -58,6 +58,7 @@ export function registerRecruit(r, deps) {
     const co = hiring(ctx);
     const f = k => String(ctx.query.get(k) || "").slice(0, 60);
     const fac = f("fac"), uni = f("uni"), gov = f("gov"), year = Number(f("year")) || 0, stage = f("stage"), level = f("level"), q = core.norm(f("q")).trim(), only = Number(f("id")) || 0;   // id: one card by user id, for Lite's invitation form (U-016)
+    const vOnly = ctx.query.get("verified") === "1", evId = ctx.query.get("event"), who = evId ? attendeesFor(db, evId, co.id) : null; if (evId && !who) fail(403, "not_attending");   // both filters before the 60-card cap (U-015)
     const rows = db.all(`SELECT p.user_id, p.data FROM profiles p JOIN users u ON u.id = p.user_id
       WHERE u.deleted_at IS NULL AND u.role = 'seeker' AND json_extract(p.data, '$.recruit.open') = 1
         AND NOT EXISTS (SELECT 1 FROM recruiter_blocks b WHERE b.user_id = p.user_id AND b.company_id = ?)
@@ -69,18 +70,17 @@ export function registerRecruit(r, deps) {
     }
     const out = [];
     for (const row of rows) {
-      if (only && row.user_id !== only) continue;
+      if ((only && row.user_id !== only) || (who && !who.has(row.user_id))) continue;
       const p = J(row.data); if (!p) continue;
       const e = p.edu || {};
       if ((fac && e.fac !== fac) || (uni && e.uni !== uni) || (gov && p.gov !== gov) || (year && Number(e.year) !== year)) continue;
       if ((stage === "student" && e.status !== "student") || (stage === "grad" && e.status === "student") || (level && (p.prefs || {}).level !== level)) continue;
       if (q && !core.norm([...(p.skills || []), ...(p.exp || []).map(x => x.role), ...(p.acts || []).map(x => x.role), e.course || ""].join(" ")).includes(q)) continue;
-      out.push(card(row.user_id, p, mine.get(row.user_id) || []));
+      const c = card(row.user_id, p, mine.get(row.user_id) || []); if (vOnly && !c.verifiedUni) continue;
+      out.push(c);
       if (out.length >= 60) break;
     }
-    let list = ctx.query.get("verified") === "1" ? out.filter(x => x.verifiedUni) : out;
-    if (ctx.query.get("event")) { const who = attendeesFor(db, ctx.query.get("event"), co.id); if (!who) fail(403, "not_attending"); list = list.filter(x => who.has(x.id)); }
-    return { students: list };
+    return { students: out };
   });
 
   r.post("/api/employer/students/:id/invite", ctx => {
