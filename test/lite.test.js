@@ -174,6 +174,20 @@ test("lite: a recruiter signs up, gets verified, then finds and invites a candid
   assert.equal((await s2.get("/lite/candidates")).location, "/lite/hire");
 });
 
+test("lite: saving the company page keeps the ways to apply chosen in the full app (U-021)", async () => {
+  const S = await start(), e = await S.login("0955 731 001", "employer");
+  const company = { name: { ar: "شركة البحر", en: "Sea Co" }, sector: "trade", cat: "domestic", gov: "damascus", regNo: "DM-77777", contactName: "Rania Saleh", whatsapp: "0955 731 001",
+    applyVia: { whatsapp: false, call: true, email: true }, applyPhone: "0955 731 002", applyEmail: "jobs@example.com" };
+  assert.equal((await e.put("/api/employer/company", { company })).status, 200);
+  const r = S.browser(); assert.equal((await r.signin("0955 731 001", "employer", "/lite/hire/company")).location, "/lite/hire/company");
+  const form = await r.get("/lite/hire/company");
+  const saved = await r.post("/lite/hire/company", { csrf: r.csrf(form.text), nameAr: "شركة البحر", nameEn: "Sea Co", sector: "trade", cat: "domestic", gov: "damascus", regNo: "DM-77777",
+    contactName: "Rania Saleh", whatsapp: "0955 731 001", website: "", aboutAr: "", aboutEn: "About us", submit: "0" });
+  assert.equal(saved.location, "/lite/hire?done=saved", saved.text.slice(0, 300));
+  const d = JSON.parse(S.db.get("SELECT data FROM companies WHERE json_extract(data, '$.regNo') = 'DM-77777'").data);
+  assert.deepEqual([d.applyVia, d.applyPhone, d.applyEmail, d.about.en], [{ whatsapp: false, call: true, email: true }, "+963955731002", "jobs@example.com", "About us"], "the Lite form changes what it shows and keeps the rest");
+});
+
 test("lite: people abroad can say where they live, filter for returnees, and save a search as an alert", async () => {
   const S = await start(), b = S.browser();
   await b.signin("0933 750 001");
