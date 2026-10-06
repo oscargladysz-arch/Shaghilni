@@ -146,6 +146,17 @@ test("teams: one registration number, one company: Arabic-Indic or Persian digit
   assert.equal((await first.put("/api/employer/company", page("Number Holder", "DM-١٢٣٤٥", "0955 815 001"))).status, 200, "and so is the holder typing its own number in Arabic-Indic digits");
 });
 
+test("teams: a registration number written with Arabic words keeps them: Damascus and Aleppo registrations that share their digits are two companies, as the same pair in Latin letters is (fix review of U-018)", async () => {
+  const S = await start();
+  const page = (name, regNo, phone) => ({ company: { name: { en: name }, gov: "homs", regNo, contactName: `Contact ${name}`, whatsapp: phone } });
+  const put = async (phone, name, regNo) => (await S.login(phone, "employer")).put("/api/employer/company", page(name, regNo, phone));
+  assert.equal((await put("0955 817 001", "Damascus Holder", "سجل تجاري دمشق ١٢٣٤٥")).status, 200);
+  const aleppo = await put("0955 817 002", "Aleppo Co", "سجل تجاري حلب ١٢٣٤٥"); assert.equal(aleppo.status, 200, `another governorate's register is another number: ${aleppo.text}`);
+  assert.equal((await put("0955 817 003", "Latin Damascus", "Damascus CR 12345")).status, 200, "control: the Latin pair was already two companies");
+  const same = await put("0955 817 004", "Copy Damascus", "سجل تجاري  دمشق 12345"); assert.deepEqual([same.status, same.body.error], [409, "company_exists"], "the same register and number, spaced or in Latin digits, is still one company");
+  const hamza = await put("0955 817 005", "Copy Hamza", "سجل تجارى دمشق ١٢٣٤٥"); assert.deepEqual([hamza.status, hamza.body.error], [409, "company_exists"], "and so is a spelling variant (ى for ي)");
+});
+
 test("teams: a registration number held by a company still awaiting verification can be joined (U-023)", async () => {
   const S = await start(), admin = await S.login("+12025550199");
   const { e: owner } = await employer(S, admin, "0955 816 001", "Pending Freight", false);   // submitted, not yet verified
