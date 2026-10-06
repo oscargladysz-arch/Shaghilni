@@ -527,6 +527,7 @@ ${f("website", tr(lg, "coWebL"), c.website, ' type="url" dir="ltr"')}
   async function companyPost(ctx) {
     const lg = ctx.lang, g = await employerGate(ctx, false); if (g.out != null) return g.out;
     const b = ctx.body, company = { name: { ar: b.nameAr || "", en: b.nameEn || "" }, sector: b.sector, cat: b.cat, gov: b.gov, regNo: b.regNo, contactName: b.contactName, whatsapp: b.whatsapp, website: b.website, about: { ar: b.aboutAr || "", en: b.aboutEn || "" } };
+    const old = g.emp.company || {}; if (old.applyVia) Object.assign(company, { applyVia: old.applyVia, applyPhone: old.applyPhone, applyEmail: old.applyEmail });   // the form does not show the ways to apply, so it keeps them (U-021)
     try {
       await call(ctx, "PUT", "/api/employer/company", { company });
       if (b.submit === "1") { await call(ctx, "POST", "/api/employer/company/submit"); return redirect(ctx, "/lite/hire?done=submitted"); }
