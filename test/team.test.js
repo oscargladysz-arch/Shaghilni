@@ -153,3 +153,20 @@ test("teams: invitations need a verified company and stop at twenty a day per co
   const { e: other } = await employer(S, admin, "0955 810 006", "Other Co");
   assert.equal((await other.post("/api/employer/team", { name: "Theirs", phone: "0955 812 001", role: "recruiter" })).status, 200, "the cap is per company");
 });
+
+test("teams: asking to join texts the company's managers at most five times a day per account, withdrawing included (U-032)", async () => {
+  const S = await start(), admin = await S.login("+12025550199");
+  await employer(S, admin, "0955 813 001", "Join Target Co");
+  const asker = await S.login("0955 813 002", "employer"), target = cid(S, "Join Target Co");
+  const requests = () => S.texts.filter(x => /asked to join|ينضم/.test(x.body) && x.to === "+963955813001").length;   // the owner's join-request texts only
+  for (let i = 1; i <= 5; i++) {   // ask, then withdraw: the loop that sent unlimited texts with the asker's own wording
+    assert.equal((await asker.post(`/api/employer/companies/${target}/join`, { name: `Visit our site ${i}` })).status, 200, `request ${i} of 5`);
+    assert.equal((await asker.post("/api/employer/membership/cancel")).status, 200, `withdrawing ${i} does not give the request back`);
+  }
+  const before = requests(), r6 = await asker.post(`/api/employer/companies/${target}/join`, { name: "Visit our site 6" });
+  assert.deepEqual([r6.status, r6.body.error], [429, "rate_limited"], "the sixth request of the day is refused");
+  assert.equal(requests(), before, "and texts nobody");
+  assert.equal(before, 5, "five requests, five texts to the owner");
+  const other = await S.login("0955 813 003", "employer");
+  assert.equal((await other.post(`/api/employer/companies/${target}/join`, { name: "Someone else" })).status, 200, "the limit is per account");
+});
