@@ -131,6 +131,7 @@ export function registerEmployer(r, deps) {
 
   r.get("/api/employer/jobs/:id/applications", employer, ctx => {
     const { c: co, j } = myJob(ctx, ctx.params.id); plans.allow(ctx, co, "view");
+    if (co.status === "suspended") fail(409, "suspended");   // a suspended company reads no applicant until the admin verifies it again (U-022)
     const rows = db.all(`SELECT a.*, u.phone AS u_phone FROM applications a JOIN users u ON u.id = a.user_id
       WHERE a.job_id = ? AND a.status != 'withdrawn' ORDER BY a.created_at DESC`, j.id);
     return { applications: rows.map(a => ({
@@ -146,6 +147,7 @@ export function registerEmployer(r, deps) {
     const c = myCompany(ctx);
     const a = c && db.get("SELECT a.*, j.data AS j_data FROM applications a JOIN jobs j ON j.id = a.job_id WHERE a.id = ? AND j.company_id = ?", Number(ctx.params.id), c.id);
     if (!a) fail(404, "not_found");
+    if (c.status === "suspended") fail(409, "suspended");   // nor moves or texts anyone (U-022)
     const note = ctx.body.note != null ? String(ctx.body.note).slice(0, 1000) : a.employer_note;
     const status = ctx.body.status || a.status;
     plans.allow(ctx, c, status !== a.status ? "hire" : "view");   // hiring managers can write notes; moving people takes a recruiter
