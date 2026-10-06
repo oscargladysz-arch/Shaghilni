@@ -1,5 +1,7 @@
 /* SMS providers. "console" logs messages (development); "textbee" sends from an Android phone with a local SIM;
    "twilio" uses Twilio's API. All take E.164 numbers such as +963944123456. */
+import { mask } from "./guard.js";
+const said = async r => (await r.text()).slice(0, 200).replace(/\+?\d{7,}/g, mask);   // the provider's answer can quote the number: it reaches the log and the texts table masked
 export function makeSms(cfg, log = console.log) {
   const s = cfg.sms;
   if (s.provider === "textbee") {
@@ -9,7 +11,7 @@ export function makeSms(cfg, log = console.log) {
         method: "POST", headers: { "x-api-key": s.textbeeKey, "content-type": "application/json" },
         body: JSON.stringify({ recipients: [to], message: body }), signal: AbortSignal.timeout(15000)
       });
-      if (!r.ok) throw new Error(`textbee ${r.status}: ${(await r.text()).slice(0, 200)}`);
+      if (!r.ok) throw new Error(`textbee ${r.status}: ${await said(r)}`);
     };
   }
   if (s.provider === "twilio") {
@@ -20,7 +22,7 @@ export function makeSms(cfg, log = console.log) {
         headers: { authorization: "Basic " + Buffer.from(`${s.twilioSid}:${s.twilioToken}`).toString("base64"), "content-type": "application/x-www-form-urlencoded" },
         body: new URLSearchParams({ To: to, From: s.twilioFrom, Body: body }), signal: AbortSignal.timeout(15000)
       });
-      if (!r.ok) throw new Error(`twilio ${r.status}: ${(await r.text()).slice(0, 200)}`);
+      if (!r.ok) throw new Error(`twilio ${r.status}: ${await said(r)}`);
     };
   }
   return async (to, body) => { log(`[sms] to ${to}: ${body}`); };
