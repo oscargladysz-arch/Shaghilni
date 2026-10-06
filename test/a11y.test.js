@@ -59,7 +59,7 @@ test("a11y: the loading ring (.spin) stops under prefers-reduced-motion, like th
 
 test("a11y: the event links on the invitation card and the event page use the link token colour and wrap, never the browser's default colours (fix review)", () => {
   const css = stripComments(read("public/css/app.css"));
-  for (const [file, re] of [["public/js/app-recruit.js", /<a href="\$\{ev\.link\}"[^>]*>/], ["public/js/app-events.js", /<a href="\$\{e\.link\}"[^>]*>/]]) {
+  for (const [file, re] of [["public/js/app-recruit.js", /<a [^>]*href="\$\{ev\.link\}"[^>]*>/], ["public/js/app-events.js", /<a [^>]*href="\$\{e\.link\}"[^>]*>/]]) {
     const a = read(file).match(re); assert.ok(a, `${file}: the event link exists`);
     assert.match(a[0], /class="link"/, `${file}: the event link has no class, so it gets the browser's link colours (1.9:1 in one theme pairing)`);
   }
