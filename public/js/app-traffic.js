@@ -59,7 +59,7 @@ ${Object.keys(D.speed.byConn).length ? html`<h3 class="ck-h">${t("trSpeedByConn"
 <section class="card"><h2 class="card-h">${t("trWhoH")}</h2>${trList(D.variants, k => t("trv_" + k))}<h3 class="ck-h">${t("trLangH")}</h3>${trList(D.languages, k => (k === "ar" ? "العربية" : k === "en" ? "English" : "?"))}<h3 class="ck-h">${t("trRolesH")}</h3>${trList(D.roles, k => t("trr_" + k))}
 ${D.countries.length ? html`<h3 class="ck-h">${t("trCountriesH")}</h3>${trList(D.countries, k => k)}` : ""}</section>
 <section class="card"><h2 class="card-h">${t("trErrorsH")}</h2>${D.errors.length ? html`<ul class="tr-list">${D.errors.map(e => html`<li><span class="tr-k" dir="ltr">${e.key}</span><span class="tr-n num">${fmt(e.n)}</span></li>`)}</ul>` : html`<p class="empty-p">${t("trNoErrors")}</p>`}</section>
-</div><p class="note">${t("trPrivacy")}</p></div>`;
+</div><p class="note">${t("trNote")}</p></div>`;
 }
 /* ---------- the team's System tab ---------- */
 async function drawSystem() { const b = $("#admBody"); TR.sys = await api.get("/api/admin/system"); put(b, systemHTML()); }
