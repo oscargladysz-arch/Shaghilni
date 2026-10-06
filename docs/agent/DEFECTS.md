@@ -19,8 +19,8 @@ Reproduction scripts named below live in the Stage 0 scratchpad (`/tmp/claude-0/
 | Found at the Stage 3 gate | 1 | D-38 (P2): the browser flow stopped at the applications view after a hire; a gap in the script, fixed in Stage 4 (S4-3) |
 | Found by the Stage 4 security re-review | 18 | D-39 to D-56: P2 3 (D-39, D-50, D-53) · P3 15; 15 fixed, D-44 and D-47 recorded, D-55 proposed (LP-4) (section below) |
 | Verified in Stage 4 (S4-2) | 28 + 23 | Round 1: 28 confirmed (P1 2 · P2 20 · P3 6): 22 fixed, 6 recorded. Round 2: 23 verified, none refuted: 5 confirmed P2 (U-010, U-024, U-030, U-038, U-059), all fixed; 9 confirmed P3, 4 fixed (U-001, U-009, U-040, U-062), 5 recorded or proposed; 9 already fixed by Stages 1 and 2. No unverified P2 candidate is left |
-| Found by the review of the Stage 4 fixes | 29 | D-57 to D-85: P2 9 · P3 20 (D-57 rated P1 by two reviewers, P3 by its refuter); 26 fixed (D-85 by narrowing two rows), D-64 recorded, D-82 and D-83 at the gate (section below) |
-| Fixed by Stage 4 | 78 | D-38; round 1: U-003, U-006, U-012 to U-015, U-018, U-020 to U-023, U-028, U-029, U-031, U-032, U-035, U-037, U-050, U-053 to U-056, U-058, U-061; round 2: U-001, U-009, U-010, U-024, U-030 with D-31, U-038, U-040, U-059, U-062; security re-review: D-39 to D-43, D-45, D-46, D-48 to D-54, D-56; fix review: D-57 to D-63, D-65 to D-81, D-84, D-85; accessibility: U-146, U-184 |
+| Found by the review of the Stage 4 fixes | 29 | D-57 to D-85: P2 9 · P3 20 (D-57 rated P1 by two reviewers, P3 by its refuter); 28 fixed (D-85 by narrowing two rows), D-64 recorded (section below) |
+| Fixed by Stage 4 | 80 | D-38; round 1: U-003, U-006, U-012 to U-015, U-018, U-020 to U-023, U-028, U-029, U-031, U-032, U-035, U-037, U-050, U-053 to U-056, U-058, U-061; round 2: U-001, U-009, U-010, U-024, U-030 with D-31, U-038, U-040, U-059, U-062; security re-review: D-39 to D-43, D-45, D-46, D-48 to D-54, D-56; fix review: D-57 to D-63, D-65 to D-85; accessibility: U-146, U-184 |
 | Fixed by Stage 3 | 33 | D-02, D-04 to D-10, D-12, D-13, D-15 to D-17, D-19 to D-30, D-32; U-007, U-017, U-034, U-041 (page), U-045, U-046, U-048 (Status rows). With Stages 1 and 2, all thirty D-01 to D-30 are closed. The Stage 3 review then fixed six P1/P2 follow-ups inside the same fixes (D-17 live sessions, D-09 on a note, D-30 numbers in the audit log and false positives, audit filters with Arabic-Indic digits, suspend-then-verify) |
 
 Severity changed by the verifier: D-03 P1 → P2; D-20 P2 → P3. All others kept the reporter's tier.
@@ -757,8 +757,8 @@ Five read-only reviewers (money, authorization, client, security, tests) read `g
 | D-79 | P3 | **FIXED** with D-73 | The key pattern missed encrypted PKCS#8 and PGP keys; .p12 and .pfx are binary, now found by name | security |
 | D-80 | P3 | **FIXED** (this file) | DEFECTS.md had no rows for D-39 to D-56 and stale counts | tests |
 | D-81 | P3 | **FIXED** (SECURITY.md) | Stale SECURITY.md sentences: test counts, "four leaks", the withdrawn-address retention wording | tests |
-| D-82 | P3 | Open until the gate's docs commit | LAUNCH.md B1, B2, B5, C5, E4 and CLAUDE.md's test count are stale | tests |
-| D-83 | P3 | Open until the gate's docs commit | STATE.md rows made false by Stage 4 fixes (fonts allowance, R17 count, suspend tested, transfer naming) | tests |
+| D-82 | P3 | **FIXED** (LAUNCH.md, CLAUDE.md, at the gate) | LAUNCH.md B1, B2, B5, C5, E4 and CLAUDE.md's test count are stale | tests |
+| D-83 | P3 | **FIXED** (STATE.md, at the gate; the summary recounted) | STATE.md rows made false by Stage 4 fixes (fonts allowance, R17 count, suspend tested, transfer naming) | tests |
 | D-84 | P3 | **FIXED** (ROUTES.md, ASSUMPTIONS.md A-46 to A-49) | ROUTES.md rows out of date and A-46 to A-49 missing their Evidence and Reverses-if cells | tests |
 | D-85 | P3 | **FIXED** (wording narrowed) | U-015's row said every attendee (the search shows up to 60 from the 1,000 newest opted-in profiles); U-054's said any number in the path (an E.164 number or seven digits in a row) | tests |
 

@@ -1,6 +1,6 @@
 # Launch checklist
 
-One list for everything that has to be true before Shaghilni takes real users, merged from the README's and SECURITY.md's "Before you go live" lists, the human-only items in the launch brief, and what the Stage 0 ground-truth review found. Owner means who must act: **agent** (done in the repository, with a test), **owner** (the Shaghilni team), **lawyer**, **provider** (a hosting, SMS, email, payment or bank service). Status as of the Stage 1 gate: **Done** (verified in the repository), **Open** (not yet done), **UNVERIFIED** (cannot be checked from this repository), **Blocked on Dn** (waits on an owner decision in `docs/agent/QUESTIONS.md`).
+One list for everything that has to be true before Shaghilni takes real users, merged from the README's and SECURITY.md's "Before you go live" lists, the human-only items in the launch brief, and what the Stage 0 ground-truth review found. Owner means who must act: **agent** (done in the repository, with a test), **owner** (the Shaghilni team), **lawyer**, **provider** (a hosting, SMS, email, payment or bank service). Status as of the Stage 4 gate: **Done** (verified in the repository), **Open** (not yet done), **UNVERIFIED** (cannot be checked from this repository), **Blocked on Dn** (waits on an owner decision in `docs/agent/QUESTIONS.md`).
 
 No item marked owner, lawyer or provider is ever ticked by an agent.
 
@@ -21,11 +21,11 @@ No item marked owner, lawyer or provider is ever ticked by an agent.
 
 | # | Item | Owner | How to verify | Status |
 |---|---|---|---|---|
-| B1 | `npm test` green. | agent | 147 of 147 at the Stage 3 gate (133 at Stage 2, 66 at Stage 1; `docs/agent/BASELINE.md` has the Stage 0 60). | Done |
-| B2 | The browser flow passes (`npm run test:e2e`, 80 checks, four browsers plus a Lite page without JavaScript). | agent, owner | Run the *Browser end-to-end* job by hand from the CI workflow, or locally after `npm install --no-save puppeteer`. Run at the Stage 4 gate in the agent environment's Chromium: 80 of 80 checks pass, no browser errors (the Stage 3 stop was a script gap, D-38, fixed in Stage 4). | Done |
+| B1 | `npm test` green. | agent | 202 of 202 at the Stage 4 gate (147 at Stage 3, 133 at Stage 2, 66 at Stage 1; `docs/agent/BASELINE.md` has the Stage 0 60). | Done |
+| B2 | The browser flow passes (`npm run test:e2e`, 80 checks, four browsers plus a Lite page without JavaScript). | agent, owner | Run the *Browser end-to-end* job by hand from the CI workflow, or locally after `npm install --no-save puppeteer`. Run at the Stage 4 gate on commit 9b4f053 in the agent environment's Chromium: 80 of 80 checks pass, no browser errors (the Stage 3 stop was a script gap, D-38, fixed in Stage 4). | Done |
 | B3 | `npm run security:check -- --url https://your-domain` shows no FAIL once deployed. | owner | Paste the output into the launch record. | Open |
 | B4 | External scans: MDN HTTP Observatory (aim A+), SSL Labs (aim A), the OWASP ZAP baseline scan, GitHub secret scanning. | owner | Reports saved. | Open |
-| B5 | The four review prompts in SECURITY.md items 6–9 re-run against the current code. | agent | Stage 4 of the launch work updates SECURITY.md with the results and the date. | Open |
+| B5 | The four review prompts in SECURITY.md items 6–9 re-run against the current code. | agent | Re-run on 6 October 2026 (Stage 4) by four independent reviewers, each finding adjudicated by a separate agent; SECURITY.md items 6–9 carry the results, `docs/agent/DEFECTS.md` D-39 to D-56 the findings. Re-run after any large change. | Done |
 | B6 | Every API route covered by the cross-role and junk-input tests. | agent | `test/policy/route-policy.js` has a row for all 109 routes; `test/policy-completeness.test.js` fails when a route has no row; the generated tests check 574 role × route refusals, 27 cross-account attempts and about 2,000 junk requests (Stage 2). | Done |
 | B7 | Admin phone numbers protected against SIM swap (carrier PIN); `ADMIN_PHONES` kept short. | owner | | Open |
 
@@ -37,7 +37,7 @@ No item marked owner, lawyer or provider is ever ticked by an agent.
 | C2 | `LEGAL_NAME` and `CONTACT_EMAIL` set to the real operating entity and a monitored mailbox. | owner | The scanner's `Legal name:` and `Privacy contact:` lines. | Blocked on D4 and D6 |
 | C3 | A named person responsible for personal data, and a breach plan. | owner | Written down and named in the privacy notice if the lawyer asks for it. | Open |
 | C4 | The employment-office licence application is under way. | owner | | Open |
-| C5 | Native Arabic review of every new or changed string. | owner, reviewer | Every row of `docs/agent/ARABIC_REVIEW.md` ticked. | Open (37 rows so far) |
+| C5 | Native Arabic review of every new or changed string. | owner, reviewer | Every row of `docs/agent/ARABIC_REVIEW.md` ticked. | Open (46 rows so far) |
 | C6 | Lite users can read the terms they consent to without JavaScript. | agent | `/lite/privacy` and `/lite/terms` (Stage 3, P1-2); `test/lite.test.js` checks both languages, the filled-in details and the links. | Done |
 
 ## D · Providers and money
@@ -57,7 +57,7 @@ No item marked owner, lawyer or provider is ever ticked by an agent.
 | E1 | Daily backups scheduled and copied off the server. With `DB_PATH=/data/shaghilni.db`, run `npm run backup -- /backups` so the System tab finds them. | owner | Admin → System shows the newest backup; a copy exists off the server. | Open |
 | E2 | One restore tested. | owner | Restore a backup on a scratch machine; row counts match the System tab. | Open |
 | E3 | Upgrade check on real data: open a copy of the production database with the new code, confirm `PRAGMA user_version` is 18 and every count is unchanged. | owner, agent | There is no automated upgrade test; this is a manual step before each deploy that adds a migration. | Open |
-| E4 | Retention matches the privacy notice. | agent | SECURITY.md item 1 lists the periods; the email-code sweep and the "within 24 hours" wording are open (`docs/agent/LEGAL_PROPOSALS.md`, `docs/agent/DEFECTS.md`). | Partial |
+| E4 | Retention matches the privacy notice. | agent | SECURITY.md item 1 lists the periods; the email-code sweep is in the code since Stage 4 (U-035); naming it and the "within 24 hours" wording in the notice is with the lawyer (`docs/agent/LEGAL_PROPOSALS.md` LP-5). | Partial |
 
 ## F · Product content
 

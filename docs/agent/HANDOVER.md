@@ -1,0 +1,53 @@
+# HANDOVER · the launch work on Shaghilni · Stages 0 to 4
+
+What was done, how it was verified, what remains and who owns it. Written at the Stage 4 gate (6 October 2026). Read it with `docs/LAUNCH.md` (the one checklist), `docs/agent/DEFECTS.md` (every defect and its status), `docs/agent/STATE.md` (the feature matrix), `docs/agent/QUESTIONS.md` (the owner decisions) and `docs/agent/ASSUMPTIONS.md` (every call an agent made alone). The brief that governed the work is `docs/agent/BRIEF.md`; nothing in it was edited.
+
+## 1 · What was done
+
+| Stage | Branch · merge | Delivered | Tests after |
+|---|---|---|---|
+| 0 · Ground truth | `stage-0/ground-truth` · PR #1 | Fifteen area maps of the code read line by line, synthesised into `STATE.md` (435 rows), `BASELINE.md` (measured, not copied), `DEFECTS.md` (30 verified defects: 29 confirmed, D-09 then unproven; 210 candidates dropped by the cap of 30 and listed as UNVERIFIED), `DOC_DRIFT.md` (120 false or stale doc claims with corrected text), `ROUTES.md`, `PLAN.md`, `QUESTIONS.md` (D1 to D7) | 60 |
+| 1 · Launch integrity | `stage-1/launch-integrity` · PR #2 | Sample listings can never be seeded into a production database (D-01); the scanner fails development settings and the `SEED_DEMO` warning is gone (D-14); texts no longer narrowed to Syria by the example settings (D-18); the CI workflow; the 118 documentation corrections of `DOC_DRIFT.md` applied; `ARABIC_REVIEW.md` started | 66 |
+| 2 · Guardrails | `stage-2/guardrails` · PR #3 | A policy row for every one of the 109 API routes and generated cross-role, cross-account, revocation and junk-input tests over all of them; nine route-family test files pinning the rules per area; the i18n parity test (both languages, same placeholders, duplicate-key ratchet) and the design ratchets; the card-payment adapter contract (`docs/PAYMENTS_ADAPTER.md`); D-03, D-11, U-016, U-128, U-165 fixed; CI green on GitHub on Node 22.13.0, 22 and 24 | 133 |
+| 3 · Product gaps | `stage-3/integration` · PR #4 | Every one of the thirty Stage 0 defects closed (D-01 to D-30, with D-09 re-verified and fixed by migration 16); the Lite privacy notice and terms (`/lite/privacy`, `/lite/terms`); the admin Audit log tab with filters, paging, masking and export; eight Stage 2 confirmations fixed (D-32, U-007, U-017, U-034, U-041, U-045, U-046, U-048); a seven-lens adversarial review of the diff with its six P1/P2 findings fixed | 147 |
+| 4 · Verification and handover | `stage-4/verification` (not yet merged) | SECURITY.md items 6 to 9 re-run by four independent reviewers, each finding adjudicated (D-39 to D-56); two verification rounds over every unverified P2 candidate (51 verified: 27 P1/P2 confirmed and all fixed, 15 P3 confirmed, 9 already fixed, none refuted); a five-lens review of the Stage 4 fixes with a refuter per P1/P2 (D-57 to D-85), which also found an older fee hole (D-58, migration 18, A-50); the static accessibility pass (U-146, U-184 and the rest recorded); the browser flow to the end (80 of 80, D-38 was the script); the R17 rehearsal; the final docs. 80 defects fixed in the stage, each behind a red test or a corrected test in its own commit | 202 |
+
+## 2 · How it was verified
+
+- **The suite.** `npm test`: 202 tests in 31 files, every one against an in-memory database; run in full before every claim (R3). The count only went up: 60 → 66 → 133 → 147 → 202.
+- **The scanner.** `npm run security:check` with no environment fails on `NODE_ENV` and `OTP_PEPPER` by design; with the fake production environment of `BASELINE.md` it exits 0 with the one WARN "live site not checked".
+- **The browser flow.** `npm run test:e2e` (Puppeteer, four browsers plus a Lite page without JavaScript): 80 of 80 checks pass in the agent environment's Chromium, last run at the Stage 4 gate (commit 9b4f053); the Stage 3 stop was a gap in the script (D-38).
+- **Independent review.** Authors never verified their own work (brief, "Verification"): Stage 0's defects each had a separate verifier told to disprove them; Stage 3's diff went through seven read-only reviewers and two refuters per P1/P2 finding; Stage 4 re-ran the four SECURITY.md prompts with four independent reviewers and one disprove-first adjudicator each, gave each of 51 unverified candidates a verifier and, where confirmed at P2 or above, a refuter, and put its own fixes through five independent review lenses with refuters. Fixes were made on a side branch while those reviewers read the stage branch, then fast-forwarded in.
+- **The demo code is removable (R17).** `npm run demo-accounts:uninstall` rehearsed on a scratch copy in Stage 4: no marker left in code or docs (README, SECURITY.md and PRODUCT.md blocks included), and the full suite in the copy passes, 196 of 196 (the six demo tests go with the code). The rehearsal caught one test that read `demo.js` unconditionally; it was fixed.
+- **Docs.** Every behaviour change carried its doc change in the same commit (R15); `DOC_DRIFT.md`'s method was re-run on each stage's diff.
+
+**Not verified here, by anyone:** the Docker image build and its healthcheck (no Docker in the agent environment, LAUNCH.md A5); the scanner against a live site (B3); any real text, email or payment provider (D1 to D5 of LAUNCH.md); an upgrade of a real production database (E3); TalkBack on a real phone (G1); native Arabic review of the 46 rows in `ARABIC_REVIEW.md` (C5).
+
+## 3 · What remains
+
+- **Owner decisions** (`docs/agent/QUESTIONS.md`): D1 to D7 and Q8 are all still open. None blocks the code; D1 (sample data, and with it LAUNCH.md F1 and F2), D2 (prices), D3 (SMS provider), D4 (entity and QNB) and D6 (lawyer and data person) block launch.
+- **Open defects, all P3:** D-33 to D-37 (Stage 2, pinned by tests that flip when fixed; D-34: hiring managers see teammates' numbers), D-44 (`company_exists` names the holder, A-49), D-47 (job-alert emails go to an unconfirmed address), D-55 (LP-4), D-64 (after a transfer the WhatsApp number is still the old owner's), U-083, U-084, U-129 (Stage 2), and the verified-P3 records U-002, U-005, U-008, U-011, U-025, U-043, U-044, U-049, U-051, U-052, U-057, U-060. Each has a Status row in `docs/agent/DEFECTS.md`.
+- **Unverified candidates:** 141 of the 210 Stage 0 candidates were never independently checked, all P3 (no P2 is left); the method to continue is in `PLAN.md` (Stage 4 outcome).
+- **Legal wording** (`docs/agent/LEGAL_PROPOSALS.md`): LP-1 (Lite's cookies), LP-2 (the visit-count fields), LP-3 ("within 24 hours" against an hourly sweep), LP-4 (the email address employers receive) and LP-5 (university email codes), for the lawyer; the wording in `public/js/legal.js` is never edited by an agent (R9).
+- **Optional work** (`PLAN.md` section 5, each only on an explicit `GO P2-n`): admin step-up, admin listing edits, design notes, the QNB adapter.
+
+## 4 · Who owns what
+
+| Item | Owner | Where |
+|---|---|---|
+| Production settings, hosting, HTTPS, backups and a tested restore, the first CI run, branch protection | the Shaghilni team | LAUNCH.md A1 to A8, E1 to E3 |
+| The privacy notice and terms under Law No. 12 of 2024, a named person for personal data, the employment-office licence | lawyer, the team | LAUNCH.md C1 to C4; `LEGAL_PROPOSALS.md` |
+| SMS provider on Syrian networks, spend caps, plan prices, the entity that invoices, QNB documents | the team, providers | LAUNCH.md D1 to D5; QUESTIONS.md D2 to D4 |
+| Native Arabic review of every new string | the team's reviewer | `ARABIC_REVIEW.md` (46 rows) |
+| Sample data (remove or rename), the two real names in the demo accounts | the team (D1) | LAUNCH.md F1, F2 |
+| TalkBack on real phones, the external scans | the team | LAUNCH.md G1, B4 |
+| Everything marked *agent* that is still Open in LAUNCH.md, the optional P2 work, the next verification round | the next agent, on a `GO` | `PLAN.md` |
+
+## 5 · Working on this repository next
+
+- Read `CLAUDE.md`, then `docs/agent/BRIEF.md` (rules R1 to R20) and `docs/agent/STATE.md`. Work on a stage branch, never on `main`; never push or open a pull request unless told.
+- `npm test` is the contract: the count only goes up; a wrong test is fixed in its own `test:` commit with the reason. Run the full suite, never a subset, before claiming anything.
+- Every new route needs a row in `test/policy/route-policy.js` (the completeness test fails without it) and, if it carries an id, a `fill()` rule and a `bodyFor()` body in `test/policy/harness.js`.
+- Every user-visible string goes in both `STR.en` and `STR.ar` with the same placeholders, and every new or changed Arabic string gets a row in `ARABIC_REVIEW.md`.
+- Privacy is a four-file change (`public/js/legal.js` wording by proposal only, `server/retention.js`, `TERMS_VERSION`, `SECURITY.md`); migrations are append-only; the hot files in `CLAUDE.md` are edited serially.
+- Scripts that delete or rewrite data run only against `DB_PATH=$(mktemp -d)/t.db`; never read, print or commit `.env`.
