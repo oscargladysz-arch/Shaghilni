@@ -5,7 +5,7 @@ This file maps the 13-item *30-Minute Pre-Launch Security Checklist* onto Shaghi
 Run both commands before every launch and after every change:
 
 ```bash
-npm test                                             # 202 tests in 31 files (API, security, route policy, recruiters, import, Lite, payments, plans, universities, teams, events, demo, diaspora, applying, insights, traffic, i18n, ratchets, accessibility)
+npm test                                             # the full suite (API, security, route policy, recruiters, import, Lite, payments, plans, universities, teams, events, demo, diaspora, applying, insights, traffic, i18n, ratchets, accessibility)
 npm run security:check -- --url https://your-domain  # the code, your settings and the live site
 ```
 
