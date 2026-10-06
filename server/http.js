@@ -103,9 +103,10 @@ export function makeLimiter() {
   const hits = new Map();
   return function limit(key, max, windowMs) {
     const t = Date.now(), arr = (hits.get(key) || []).filter(x => t - x < windowMs);
+    arr.w = windowMs;   // each key is pruned by its own window, so a flood of one-minute keys never wipes a daily count (fix review)
     if (arr.length >= max) { hits.set(key, arr); return false; }
     arr.push(t); hits.set(key, arr);
-    if (hits.size > 50000) for (const [k, v] of hits) if (!v.length || t - v[v.length - 1] > windowMs) hits.delete(k);
+    if (hits.size > 50000) for (const [k, v] of hits) if (!v.length || t - v[v.length - 1] > v.w) hits.delete(k);
     return true;
   };
 }
