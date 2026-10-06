@@ -36,11 +36,11 @@ export function registerTeam(r, deps) {
     const name = clean(ctx.body.name, 80); if (!name) fail(422, "name_required");
     const phone = e164(core, ctx.body.phone); if (!phone) fail(422, "invalid_phone");
     if (seatsLeft(c) <= 0) fail(409, "team_full", { limit: plans.limits(c).team });
+    if (!limit(`team-invite:${c.id}`, 20, 86400e3)) fail(429, "rate_limited");   // twenty invitations a day per company; cancelling does not give them back (D-10), and a refused number spends one too, so the form is no free account check (D-41)
     const u = db.get("SELECT id, role FROM users WHERE phone = ? AND deleted_at IS NULL", phone);
     if (u && u.role !== "employer") fail(409, "phone_taken");
     if (u && db.get("SELECT 1 AS x FROM companies WHERE owner_id = ?", u.id)) fail(409, "phone_taken");
     if (db.get("SELECT 1 AS x FROM company_members WHERE phone = ?", phone)) fail(409, "phone_taken");
-    if (!limit(`team-invite:${c.id}`, 20, 86400e3)) fail(429, "rate_limited");   // twenty invitations a day per company; cancelling does not give them back (D-10)
     db.run("INSERT INTO company_members (company_id, phone, added_by, created_at, role, status, name) VALUES (?, ?, ?, ?, ?, 'invited', ?)", c.id, phone, ctx.user.id, now(), role, name);
     audit(ctx.user.id, "team.invited", "company", c.id, { role });
     tell(phone, "team_invite", { co: coName(c), role: roleWord(role), by: { en: plans.memberName(c, ctx.user.id), ar: plans.memberName(c, ctx.user.id) } });
