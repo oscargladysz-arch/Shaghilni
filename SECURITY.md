@@ -1,11 +1,11 @@
 # Security and privacy checklist
 
-This file maps the 13-item *30-Minute Pre-Launch Security Checklist* onto Shaghilni. For each item it covers three things: what the code does, which test proves it, and what you still have to do yourselves. It was last reviewed on 28 September 2026. On 5 October 2026 (Stage 0 of the launch work) every claim below was re-checked against the code at terms version 2026-10-04 and the ones that had drifted were corrected; the four review prompts (items 6–9) are re-run in Stage 4, which updates this line.
+This file maps the 13-item *30-Minute Pre-Launch Security Checklist* onto Shaghilni. For each item it covers three things: what the code does, which test proves it, and what you still have to do yourselves. It was last reviewed on 28 September 2026. On 5 October 2026 (Stage 0 of the launch work) every claim below was re-checked against the code at terms version 2026-10-04 and the ones that had drifted were corrected; on 6 October 2026 (Stage 4) the four review prompts (items 6–9) were re-run by four independent reviewers at the commit that closed Stage 3, every finding went to a separate adjudicator told to disprove it, and the results below describe the code after the Stage 4 fixes (`docs/agent/DEFECTS.md`, "Stage 4 · security re-review").
 
 Run both commands before every launch and after every change:
 
 ```bash
-npm test                                             # 147 tests in 30 files (API, security, route policy, recruiters, import, Lite, payments, plans, universities, teams, events, demo, diaspora, applying, insights, traffic, i18n, ratchets)
+npm test                                             # 202 tests in 31 files (API, security, route policy, recruiters, import, Lite, payments, plans, universities, teams, events, demo, diaspora, applying, insights, traffic, i18n, ratchets, accessibility)
 npm run security:check -- --url https://your-domain  # the code, your settings and the live site
 ```
 
@@ -20,10 +20,10 @@ npm run security:check -- --url https://your-domain  # the code, your settings a
 | 3 | Server-side validation on every form | Built | Security test 3 (over 1,000 junk requests) |
 | 4 | Error handling that does not leak data | Built | Security test 4 |
 | 5 | Auth failure case testing | Built | Security test 5 and the API tests |
-| 6 | Baseline security posture prompt | Review done for this version; prompt below | This file |
-| 7 | OWASP standards prompt | Review done against the OWASP Top 10:2025; prompt below | This file |
-| 8 | Data leak audit prompt | Review done; four leaks found and fixed; prompt below | Security tests 1, 2, 8 and 9, and the recruiter tests |
-| 9 | API key exposure prompt | Review done; prompt below | Security test 9 and the scanner |
+| 6 | Baseline security posture prompt | Re-run on 6 October 2026 (Stage 4); prompt below | This file |
+| 7 | OWASP standards prompt | Re-run against the OWASP Top 10:2025 on 6 October 2026; prompt below | This file |
+| 8 | Data leak audit prompt | Re-run on 6 October 2026; every leak found is fixed (list in item 8); prompt below | Security tests 1, 2, 8 and 9, and the recruiter and team tests |
+| 9 | API key exposure prompt | Re-run on 6 October 2026; prompt below | Security tests 9 (two) and 13, and the scanner |
 | 10 | Environment variable lockdown | Built | Security test 10 |
 | 11 | Rate limits and cost caps | Built. **Set the providers' own caps too** | Security test 11 |
 | 12 | CAPTCHA and CORS restrictions | Built, with an invisible proof-of-work challenge instead of a picture CAPTCHA | Security test 12; browser flow |
@@ -47,7 +47,7 @@ The security tests are in `test/security.test.js`, numbered after this list. The
   - An employer deleting their account also closes their listings and removes the contact name, WhatsApp number, application phone number and email from the company page.
 - **Automatic retention.** `server/retention.js` runs at start-up and every hour and deletes:
   - sign-in codes, with the IP addresses stored alongside them, after 24 hours;
-  - university email codes, with the address typed for them, after 24 hours, and the address of a student verification as soon as it is withdrawn;
+  - university email codes, with the address typed for them, after 24 hours, and the address of a withdrawn student verification at the next sweep;
   - expired sessions;
   - text-message records after 90 days;
   - usage counters after 60 days;
@@ -148,28 +148,28 @@ say what is done well, what is weak, and the smallest fix. List findings by seve
 with file and line. Don't suggest rewriting working code unless there is a concrete risk.
 ```
 
-**Result for this version**
+**Result for this version** (re-run on 6 October 2026)
 
 - **Strong:**
-  - no third-party packages at runtime, so there's nothing in the supply chain to hijack;
-  - phone sign-in with hashed, peppered, expiring codes;
-  - random session tokens stored only as hashes, in HttpOnly SameSite cookies;
-  - access checks on the server for every route;
-  - a strict Content-Security-Policy: no inline scripts and nothing loaded from other sites (inline styles are still allowed);
-  - an audit log of account, company, listing, application and hire actions.
-- **Fixed in this pass:**
-  - consent recording, data export and retention jobs;
-  - gaps in deletion;
-  - Google Fonts;
-  - text and AI cost caps, and limits on where texts can go;
-  - the sign-in challenge and the production lockdown;
-  - the audit-limit and upload-size bugs;
-  - phone masking in logs and extra isolation headers.
+  - no npm packages at runtime (CI refuses a dependency or a lockfile); the one third-party script, `public/js/vendor/qrcode.js` (MIT), is served from this server and loaded only for event tickets;
+  - phone sign-in with peppered SHA-256 codes that expire in 10 minutes, five tries, one use, compared in constant time, behind an HMAC-signed proof-of-work challenge and per-number, per-address and per-day limits;
+  - random 256-bit session tokens stored only as hashes, in HttpOnly SameSite cookies (`Secure` in production), ended on sign-out, account deletion, admin demotion and office removal;
+  - access checks on the server for every route, with a policy row per route and generated cross-role, cross-account and junk-input tests;
+  - every body rebuilt field by field, 256 KB cap, JSON only; SQL through `?` placeholders, with 57 reviewed `sql-safe` markers where SQL text is built from fixed parts; one HTML sink in the app and `esc()` throughout Lite;
+  - CSRF defence (the app header plus an Origin check on every `/api` write; signed per-browser tokens on Lite forms), no CORS grant, and a strict Content-Security-Policy with no inline scripts and nothing from other sites (inline styles are still allowed);
+  - secrets read only in `server/config.js`, never sent to the browser (two tests plant all seven), never committed (the scanner and `.gitignore`), and a production lockdown that refuses a weak pepper or a non-https address;
+  - errors answer a code only; phone numbers are masked in every log line (the development `console` text provider aside);
+  - an hourly retention sweep, a complete data download and a deletion that erases or anonymises everything about the person;
+  - an audit log of account, company, listing, application, hire, plan, charge, payment, team, invitation, campus, event and programme actions, read in the admin's *Audit log* tab.
+- **Fixed in this pass (Stage 4):** a request line the URL parser rejects stopped the process (D-39); a malformed percent-encoding answered 500 (D-40); the team invitation and the student email code told whether an account exists (D-41, U-037); wrong sign-in codes left no trace (D-42); a text provider's error and an unexpected error's path could log a full number (D-53, U-054); the scanner missed this app's own secret names and key files, and `.env.production` was not ignored (D-50, D-51); the email call had no timeout (D-46); spreadsheet cells could run as formulas (D-43); a suspended company kept reading applicants (U-022); the data download, deletion and retention fell short of the notice (U-014, U-053, U-055, U-035); and two money holes in the placement fee and the join requests (U-029, U-032). The second verification round and an adversarial review of these fixes then found and fixed: a university or faculty sent as a list that broke employers' applicant lists (U-038); a backup that silently copied an empty database (U-059); a company admin inviting admins (U-030); a rejected company still reading applicants; a draft that held someone else's registration number seeing and texting the people asking to join it; a placement fee lowered by cutting the pay just before the hire or by undoing it; the owner's download listing a programme's charges; formula cells starting with a sign and a figure; a flood of addresses resetting the daily limits; the scanner missing this app's secret names in Dockerfile, YAML, compose and JSON files and encrypted keys; and a sign-in lock audited with the victim as the actor.
+- **Fixed in the earlier passes (Stages 1–3, and 28 September):** sample data never seeded in production; the scanner fails development settings; the admin role follows `ADMIN_PHONES`; team invitations need a verified company; edits re-enter review; the fee basis is fixed at the hire; consent recording, export and retention; Google Fonts; text and AI caps; the sign-in challenge and the production lockdown; phone masking and isolation headers.
+- **Weak, recorded:** job-alert emails go to the profile's address, which nothing confirms (D-47; email alerts are off until an email service is set); after an ownership transfer the company's WhatsApp number is still the old owner's, so the hire-confirmation call can go to the wrong person until the new owner changes it; hiring managers read the company's charges and payment status (U-121, reported in Stage 0 and not yet verified); the scanner's SQL check sees only templates passed straight to `db.*` (U-060, P3, confirmed in Stage 4 and recorded); `company_exists` names the holder of a registration number (D-44, A-49).
 - **Remaining, by design for an MVP:**
-  - One server process. Rate limits live in memory and reset on restart; the daily caps are in the database and survive.
-  - SQLite rather than Postgres.
+  - One server process. Rate limits and the used-challenge list live in memory and reset on restart; the daily caps are in the database and survive.
+  - SQLite rather than Postgres, and the database file is not encrypted (use an encrypted disk).
   - Admin accounts have no second factor beyond their phone.
   - There are no automatic alerts (see A09 below).
+  - `style-src 'unsafe-inline'` stays in the CSP.
 
 ## 7. OWASP Top 10:2025
 
@@ -179,20 +179,20 @@ Control to A10 Mishandling of Exceptional Conditions. For each category, name th
 present, point to the code, and list any gaps with a fix and a test that would prove it.
 ```
 
-**Result for this version** (categories from [owasp.org/Top10/2025](https://owasp.org/Top10/2025/)):
+**Result for this version** (re-run on 6 October 2026; categories from [owasp.org/Top10/2025](https://owasp.org/Top10/2025/)):
 
 | Category | What protects Shaghilni | Gaps to know about |
 |---|---|---|
-| **A01 Broken Access Control** (now includes SSRF) | Every account query is limited to its owner, and every route checks roles. Cross-account attacks are tested (test 2). The server only ever calls fixed addresses (Anthropic, textbee, Twilio) and never fetches a URL a user supplied, so there's no SSRF surface. | None known |
-| **A02 Security Misconfiguration** | Production refuses to start with a weak secret or a non-https address. Strict security headers (CSP, HSTS, nosniff, no framing, isolation headers); no software versions in headers. The scanner audits your settings and the live headers. | Your host's own settings are yours to check: firewall, backups, and who can reach the dashboard |
-| **A03 Software Supply Chain Failures** | No runtime dependencies at all. Fonts and code are served from your own server. The Docker image uses the official `node:22-alpine` and runs as the unprivileged `node` user. | Rebuild the image monthly to pick up Node and Alpine security patches. Puppeteer is a test-only install. |
-| **A04 Cryptographic Failures** | HTTPS enforced with HSTS. Codes stored as SHA-256 with a secret pepper. Session tokens come from `crypto.randomBytes` and are stored only as hashes. Constant-time comparisons; HMAC-signed challenges. | The app doesn't encrypt the database file. Use an encrypted disk (most hosts encrypt by default) and keep backups private. |
-| **A05 Injection** | Bound SQL parameters everywhere. The four places that build SQL text are reviewed, marked and contain no user input, and the scanner fails on any new one. All HTML goes through one escaping template; strict CSP; no `eval` and no shell. Every spreadsheet export goes through one function that keeps a cell that would run as a formula (`=`, `@`, `+` or `-` before a letter) as text. | None known |
-| **A06 Insecure Design** | Threats handled by design: employer verification with a recorded sanctions-screening step (only a submitted company can be verified; a suspension is lifted by verifying it again, and while it lasts the company's team reads no applicant and moves nobody), review of every listing (an edit in any state makes it a draft that is checked and reviewed again), the no-fees rule in the listing checks, SMS-pumping guards, consent and minimisation. | Verification and sanctions screening are manual, so they're only as good as the people doing them |
-| **A07 Authentication Failures** | See item 5 | An admin account is only as safe as the admin's phone number. Ask your carrier for a SIM-swap PIN and keep `ADMIN_PHONES` short. A number taken off the list is demoted at its next sign-in and its sessions end. |
-| **A08 Software or Data Integrity Failures** | No scripts from CDNs. Built files are named by content hash. Database migrations are versioned and run in transactions. The audit log records who changed what. | None known |
-| **A09 Security Logging and Alerting Failures** | The audit log records sign-ups, consent, deletions, company and listing changes and decisions, and every application move (except a re-application after a withdrawal: `docs/agent/DEFECTS.md`, U-083) and hire confirmation. The server log records errors, failed texts, reached caps and wrong sign-in codes (number masked), and a code locked after five wrong tries is in the audit log. | **No automatic alerts yet,** but the admin's *Audit log* tab shows the log with filters, older pages and a spreadsheet export (actors masked like the logs). Watch the log, or add an alert on your host. |
-| **A10 Mishandling of Exceptional Conditions** | Every request is wrapped, the request line itself included (a line the URL parser rejects answers 400 instead of stopping the process, test 4), and unexpected errors answer 500 without details. Unhandled rejections are logged, and a fatal error exits so the host restarts a clean process. Fuzz-tested (test 3); a broken database is tested (test 4). | None known |
+| **A01 Broken Access Control** (now includes SSRF) | Every account query is limited to its owner, and every route checks roles and the team level; the route-policy table drives the cross-role, cross-account and junk-input tests for every route. The server calls only addresses the operator sets (Anthropic, textbee, Twilio, the email service at `EMAIL_API_URL`) and never fetches a URL a user supplied, so there's no SSRF surface. Since Stage 4 a suspended or rejected company's team reads no applicant, a request to join an unverified company waits unseen, and only the owner makes admins. | `company_exists` names the company that holds a registration number (D-44, accepted in A-49). Hiring managers read teammates' numbers (D-34) and the company's charges (U-121, unverified). |
+| **A02 Security Misconfiguration** | Production refuses to start with a weak secret or a non-https address. Strict security headers (CSP, HSTS, nosniff, no framing, isolation headers); no software versions in headers. The scanner audits your settings (and warns on a plain-http email service) and the live headers. | Your host's own settings are yours to check: firewall, backups, and who can reach the dashboard. |
+| **A03 Software Supply Chain Failures** | No runtime dependencies at all; CI refuses a dependency or a lockfile. Fonts, code and the one vendored library (`qrcode.js`, MIT) are served from your own server. The Docker image uses the official `node:22-alpine` and runs as the unprivileged `node` user. | Rebuild the image monthly to pick up Node and Alpine security patches; the image tag and the CI actions are pinned by version, not by digest. Puppeteer is a test-only install. |
+| **A04 Cryptographic Failures** | HTTPS enforced with HSTS in production. Sign-in codes stored as SHA-256 with a secret pepper, student email codes as an HMAC under it. Session tokens come from `crypto.randomBytes` and are stored only as hashes. Every code, challenge and form token is compared in constant time. | The app doesn't encrypt the database file. Use an encrypted disk (most hosts encrypt by default) and keep backups private. |
+| **A05 Injection** | Bound SQL parameters everywhere. The 57 places that build SQL text carry a `sql-safe` marker saying why it's safe (fixed fragments, lists of `?`, the database's own stored definitions, the operator's backup folder); none takes text from a user. All HTML goes through one escaping template (the app) or `esc()` (Lite); strict CSP; no `eval` and no shell. Every spreadsheet export keeps a cell that would run as a formula as text. | The scanner's SQL check sees only templates passed straight to `db.*` (U-060, recorded). |
+| **A06 Insecure Design** | Threats handled by design: employer verification with a recorded sanctions-screening step (only a submitted company can be verified; a suspension is lifted by verifying it again, and while a company is suspended or rejected its team reads no applicant and moves nobody), review of every listing (an edit in any state makes it a draft that is checked and reviewed again), the no-fees rule over every field of a listing, the placement fee fixed by the plan at the hire and the pay the listing showed when the person applied, SMS-pumping guards (invitations and requests to join capped per company and per account, and a request to an unverified company waits unseen and untexted), consent and minimisation. | Verification and sanctions screening are manual, so they're only as good as the people doing them |
+| **A07 Authentication Failures** | See item 5. Sign-in never reveals whether a number has an account. | An admin account is only as safe as the admin's phone number. Ask your carrier for a SIM-swap PIN and keep `ADMIN_PHONES` short. A number taken off the list loses its sessions at its next request and the admin role at its next sign-in. |
+| **A08 Software or Data Integrity Failures** | No scripts from CDNs. Built files are named by content hash. Database migrations are versioned and run in transactions. Card payment results are applied once, after the signature, amount and currency are checked. The audit log records who changed what. | None known |
+| **A09 Security Logging and Alerting Failures** | The audit log records sign-ups, consent, deletions, company and listing changes and decisions, every application move (except a re-application after a withdrawal: `docs/agent/DEFECTS.md`, U-083), hire confirmations and a sign-in code locked after five wrong tries. The server log records errors, failed texts, reached caps and wrong sign-in codes, numbers masked. | **No automatic alerts yet,** but the admin's *Audit log* tab shows the log with filters, older pages and a spreadsheet export (actors masked like the logs). Watch the log, or add an alert on your host. |
+| **A10 Mishandling of Exceptional Conditions** | Every request is wrapped, the request line itself included (a line the URL parser rejects answers 400 instead of stopping the process), a malformed percent-encoding is a 404, and unexpected errors answer 500 without details. Unhandled rejections are logged, and a fatal error exits so the host restarts a clean process. Fuzz-tested (test 3 and the policy junk tests); a broken database is tested (test 4). | None known |
 
 ## 8. Data leak audit
 
@@ -204,21 +204,25 @@ browser. Flag anything sent to someone who doesn't need it, kept longer than nee
 or left behind after deletion.
 ```
 
-**Result for this version**
+**Result for this version** (re-run on 6 October 2026)
 
 | Data | Who can see it | Where else it goes |
 |---|---|---|
-| Job seeker's profile and phone | The seeker; employers they apply to (as a snapshot; not while the admin has the company suspended); admins | The text provider gets the phone number. Anthropic gets only the text the person asks it to work on: for suggestions, the bullet points with their job titles and the job text; for a translation, the resume's text. The server never adds the name or phone number (tested for translation; the suggestion prompt is not yet covered by a test). |
-| Company registration number, contact name, WhatsApp number, application phone number and email | The company's team and admins. The WhatsApp number, application phone number and email are released only to a signed-in applicant, and only for the ways the company switched on. | Never on the public board (tested) |
+| Job seeker's profile, phone and email address | The seeker; the team of a company they apply to, at every level (the profile as it was sent, email address included; not while the company is suspended or rejected); admins | The text provider gets the phone number. The email service gets the profile's email address with the titles of matching jobs, only for alerts the person sets to email (the address isn't confirmed: D-47). Anthropic gets only the text the person asks it to work on: for suggestions, the bullet points with their job titles and the job text; for a translation, the resume's text. The server never adds the name or phone number (tested for translation; the suggestion prompt is not yet covered by a test). |
+| Company registration number, contact name, WhatsApp number, application phone number and email | The company's team and admins. The WhatsApp number, application phone number and email are released only to a signed-in applicant, and only for the ways the company switched on. A company that types a number another company holds is told which company holds it (D-44, A-49) | Never on the public board (tested). Removed from the company page when the owner deletes their account |
+| Team members (name, phone number, last active) | The company's team at every level, hiring managers included (D-34); the owner and admins also see requests to join, once the company is verified. Former members are named, never shown by number | Invitation texts go through the text provider; deleted with the member's account |
 | Employer notes on applicants | The company's team (owner, admins, recruiters and hiring managers) | Erased when the applicant deletes their account; not in the audit log |
-| Candidate cards in recruiter search | Verified employers' owners, admins and recruiters (not hiring managers), and only for people who switched on *Let recruiters find me*: first name and last initial, education, experience level, recent job titles, governorate, skills and languages. Never the phone number or email | Nowhere else. Hidden again as soon as the student switches it off or blocks the company |
+| Candidate cards in recruiter search | Verified employers' owners, admins and recruiters (not hiring managers), and only for people who switched on *Let recruiters find me*: first name and last initial, education, experience level, recent job titles, governorate, skills and languages. Never the phone number or email | Gone from search as soon as the student switches it off or blocks the company. A company's own sent list keeps the invitations it sent, with the same short name, faculty, university and year, marked withdrawn (tested, D-32) |
 | Uploaded resume files | Nobody. The file is read in the browser and never uploaded; the importer makes no network calls (tested) | Only the details the person chooses to add are saved, exactly like typed ones |
 | Invitations and replies | The student, and the owner, admins and recruiters of the company that sent them (hiring managers see neither the sent list nor any number). That company gets the student's full name and number only after the student says yes to an event | The student gets a text. Deleted with the student's account; withdrawn when the employer deletes theirs, when the admin suspends or rejects the company, and when the student switches recruiter search off |
 | Event sign-ups (ticket code, check-in time) | The person; the event's organiser sees name, university and faculty to check them in; confirmed companies see only attendees who switched on *Let recruiters find me* | In the export; the code goes by text; reports hold totals only; deleted with the account |
-| University email address | The student (masked); never the career office or employers | The email service, for the code; kept so it verifies one account; deleted with the account |
+| University email address | The student (masked); never the career office or employers | The email service, for the code. The codes, with the address typed, are deleted after 24 hours; a verified address is kept so it verifies one account, cleared when the verification is withdrawn, and deleted with the account |
 | IP addresses | Nobody, through the app | Stored with sign-in codes for 24 hours; kept in memory for rate limits; your host's logs |
 | Sessions | Nobody | Stored only as a hash, with the browser type; deleted at sign-out or when they expire |
 | Text messages | The recipient, in their export (texts sent to the number before the account existed included) | The text provider; kept for 90 days, or until the account is deleted |
+| Server log | Whoever runs the server | Errors (any number in the path masked), failed texts and wrong sign-in codes (numbers masked), reached caps. With `SMS_PROVIDER=console` every text, its number and its sign-in code is written to the log: production warns at start and the scanner fails it |
+| The browser | The person on that phone | The language, the theme and, until the profile is saved or the person signs out, the profile form being filled in (without the phone number). The session cookie can't be read by scripts |
+| Backups | Whoever holds the backup files | `npm run backup` copies the whole database, personal data included, to `backups/` (never committed: `.gitignore`). Deleting an account doesn't reach copies made before; keep them private, copy them off the server and delete old ones on the schedule you choose (item 1) |
 
 **Found and fixed**
 
@@ -226,6 +230,7 @@ or left behind after deletion.
 2. Deleting an account left its text-message history and sign-in codes (with phone number and IP address) behind. Both are now erased.
 3. Server logs printed full phone numbers when a text failed. They're now masked.
 4. An employer who deleted their account left their listings live and their contact details on the company page. The listings now close and the details are removed.
+5. Stage 4: a text provider's error answer reached the log and the texts table with the number unmasked (D-53); an unexpected error on a team route logged the number in its path (U-054); the profile form stayed in the browser after sign-out, for the next person on a shared phone (D-54); deleting an owner's account left the application phone number and email on the company page (U-053); texts sent to a number before it had an account stayed after the account was deleted, and were missing from its export (U-055); the export missed the company's billing (for its owner), team memberships and blocked companies (U-014), then listed a programme's charges as the owner's (fix review); university email codes and withdrawn addresses were never swept (U-035); a rejected company kept reading its applicants, and a draft holding someone else's registration number saw and could text the people asking to join it (fix review). Each has a test.
 
 **Reviewed when translation was added.** Translation sends more resume text to Anthropic, so it went through the same audit. Security test 8 checks four things:
 
@@ -251,8 +256,8 @@ hard-coded or committed.
 
 - **The secrets:** seven. `OTP_PEPPER` (hashes sign-in codes and student email codes; signs the sign-in challenge, Lite's form tokens and the development test-payment page; salts the daily visitor code), `ANTHROPIC_API_KEY`, `TEXTBEE_API_KEY`, `TWILIO_AUTH_TOKEN` with its account SID, `EMAIL_API_KEY` (sent only to the address in `EMAIL_API_URL`), and `QNB_API_SECRET` and `QNB_WEBHOOK_SECRET` (read, but unused until the bank's adapter is written). All are read only in `server/config.js`, used only on the server, and never logged. The browser learns only whether AI suggestions are switched on (`/api/config`).
 - **Tested:** two security tests (both numbered 9) start a server with all seven secrets planted. They check that the page, every script and stylesheet, Lite and the public API responses never contain them.
-- **Scanned:** the scanner checks the repository for key patterns: Anthropic, OpenAI, AWS, the Twilio account SID, private keys, and hard-coded secrets under any name this app uses, in code (`textbeeKey: "..."`) or as a settings line (`OTP_PEPPER=...`). Your local settings files (`.env`, `.env.production` and the like) are skipped, since they are meant to hold secrets; `.env.example` is checked.
-- **Ignored:** every `.env` variant (`.env`, `.env.production`, `.env.local`...) is listed in both `.gitignore` and `.dockerignore`, so none can reach GitHub or the Docker image; only `.env.example` is kept in the repository. The image is also built from named folders only (`Dockerfile`).
+- **Scanned:** the scanner checks the repository for key patterns: Anthropic, OpenAI, AWS, the Twilio account SID, private keys, and hard-coded secrets under any name this app uses, in code (`textbeeKey: "..."`, a `||` fallback included), JSON, a settings line (`OTP_PEPPER=...`), a Dockerfile `ENV`, YAML or a compose file (a value of one repeated character is a placeholder). It reads code, settings and key or certificate files (`.pem`, `.key`, `.asc`, `id_rsa` and the like, encrypted keys included; a `.p12` or `.pfx` file is a finding by its name). Your local settings files (`.env`, `.env.production`, `.envrc` and the like) are skipped, since they are meant to hold secrets; `.env.example` is checked.
+- **Ignored:** every `.env` variant (`.env`, `.env.production`, `.env.local`...) is listed in both `.gitignore` and `.dockerignore`, so none can reach GitHub or the Docker image; only `.env.example` is kept in the repository. Key files (`*.pem`, `*.key`, `*.p12`, `*.pfx`, `*.asc`, `id_rsa*` and the other SSH key names) are git-ignored too. The image is also built from named folders only (`Dockerfile`).
 - **Rotation:**
   - Anthropic keys in the Anthropic Console, under API keys;
   - textbee in its dashboard;
