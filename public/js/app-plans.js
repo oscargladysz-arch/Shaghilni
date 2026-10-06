@@ -102,7 +102,7 @@ async function drawBilling() {
 async function billingAct(act, el) {
   const id = el.dataset.id2;
   try {
-    if (act === "adm-plan-set") { await api.post(`/api/admin/companies/${id}/plan`, { plan: $("#bp-" + id).value, months: $("#bm-" + id).value, amountSyp: $("#ba-" + id).value });   // as typed: the server reads Arabic-Indic digits and grouped figures, and refuses anything else (fix review) toast({ title: t("tPlanSet"), ic: "check" }); }
+    if (act === "adm-plan-set") { await api.post(`/api/admin/companies/${id}/plan`, { plan: $("#bp-" + id).value, months: $("#bm-" + id).value, amountSyp: $("#ba-" + id).value /* as typed: the server reads Arabic-Indic digits and grouped figures, and refuses anything else */ }); toast({ title: t("tPlanSet"), ic: "check" }); }
     else if (act === "adm-charge") { await api.post(`/api/admin/charges/${id}/${el.dataset.to2}`); toast({ title: t("tChargeDone"), ic: "check" }); }
     else if (act === "adm-prog-add") { await api.post("/api/admin/programmes", { name: $("#pgName").value, rateUsd: Number($("#pgRate").value) || 0 }); toast({ title: t("tProgAdded"), ic: "check" }); }
     await drawBilling();
