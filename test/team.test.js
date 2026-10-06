@@ -190,6 +190,19 @@ test("teams: a registration number held by a company still awaiting verification
   assert.equal((await squat.post(`/api/employer/team/requests/${encodeURIComponent("+963955816004")}`, { decision: "yes" })).status, 409, "and cannot approve or text the requester");
 });
 
+test("teams: an unverified holder can neither delete a waiting join request nor see it in its activity log (fix review 2)", async () => {
+  const S = await start();
+  const squat = await S.login("0955 816 101", "employer");
+  assert.equal((await squat.put("/api/employer/company", { company: { name: { en: "Squatter Two" }, gov: "homs", regNo: "REG-REAL-2", contactName: "Squatter", whatsapp: "0955 816 101" } })).status, 200);
+  const real = await S.login("0955 816 102", "employer");
+  const d = await real.put("/api/employer/company", { company: { name: { en: "Real Two" }, gov: "homs", regNo: "REG-REAL-2", contactName: "Real", whatsapp: "0955 816 102" } });
+  assert.equal((await real.post(`/api/employer/companies/${d.body.detail.id}/join`, { name: "Victim Two" })).status, 200);
+  const del = await squat.del(`/api/employer/team/${encodeURIComponent("+963955816102")}`);
+  assert.deepEqual([del.status, del.body.error], [409, "company_not_verified"], "the waiting request cannot be confirmed by deleting it");
+  assert.equal(S.db.get("SELECT status FROM company_members WHERE phone = '+963955816102'").status, "requested", "it still waits");
+  assert.ok(!(await squat.get("/api/employer/activity")).body.activity.some(x => x.action === "team.requested"), "and the activity log does not show that a request arrived");
+});
+
 test("teams: invitations need a verified company and stop at twenty a day per company, cancelling included (D-10)", async () => {
   const S = await start(), admin = await S.login("+12025550199");
   const draft = await S.login("0955 810 001", "employer");

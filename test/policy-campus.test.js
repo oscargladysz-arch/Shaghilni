@@ -179,6 +179,12 @@ test("policy campus: university, faculty and governorate ids are the tables' own
     const r = await C.admin.post("/api/admin/campus/domains", { uni, domain: "u038.example" }); assert.deepEqual([r.status, r.body.error], [422, "uni_required"], `domain uni ${JSON.stringify(uni)}`);
   }
   assert.equal(S.db.get("SELECT COUNT(*) AS n FROM uni_domains WHERE domain = 'u038.example'").n, 0);
+  // (4b) languages, job types and fields keep only the tables' own keys too (fix review 2)
+  assert.equal((await C.seekerA.put("/api/me/profile", { profile: { ...PROFILE, langs: ["ar", "constructor", ["en"], "__proto__"], prefs: { types: ["full", "toString", ["intern"]], fields: ["constructor"] } } })).status, 200);
+  const pr = JSON.parse(S.db.get("SELECT data FROM profiles WHERE user_id = ?", I.userA).data);
+  assert.deepEqual([pr.langs, pr.prefs.types, pr.prefs.fields], [["ar"], ["full"], []], "profile lookups");
+  const jr = await C.A.e.post("/api/employer/jobs", { job: { title: { en: "Lookup clerk" }, gov: "aleppo", type: "full", level: "entry", pay: [1, 2], langs: ["ar", "constructor", ["en"]], summary: { en: "Keep records." } } });
+  assert.deepEqual(JSON.parse(S.db.get("SELECT data FROM jobs WHERE id = ?", jr.body.job.id).data).langs, ["ar"], "listing languages");
   // (5) an event: the university and governorate are none, never a prototype name or a list
   for (const over of [{ uni: "hasOwnProperty", gov: "constructor" }, { uni: ["damascus"], gov: ["aleppo"] }]) {
     const r = await C.admin.post("/api/organize/events", { event: EV(over) }); assert.equal(r.status, 200, r.text);
