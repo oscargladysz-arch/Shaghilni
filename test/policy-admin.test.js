@@ -137,6 +137,22 @@ test("policy admin: the hire date is written once: a note or a repeated 'hired' 
   assert.ok(first < S.db.get("SELECT hire_confirmed_at FROM applications WHERE id = ?", ids.appA).hire_confirmed_at, "so the hire date stays before its confirmation");
 });
 
+test("policy admin: a rejected company's team reads no applicant and moves nobody either, like a suspended one (fix review of U-022)", async () => {
+  const S = await start(), C = await cast(S), { admin, ids } = C;
+  const list = who => who.get(`/api/employer/jobs/${ids.jobA}/applications`);
+  assert.equal((await list(C.A.e)).status, 200, "control: verified, the owner reads the applicants");
+  assert.equal((await admin.post(`/api/admin/companies/${ids.companyA}/reject`, { note: "Registration number belongs to another company" })).status, 200);
+  const texts = S.texts.length;
+  for (const [name, who] of [["owner", C.A.e], ["recruiter", C.recruiter], ["hiring manager", C.hiring]]) {
+    const r = await list(who); assert.deepEqual([r.status, r.body && r.body.error], [409, "company_not_verified"], `${name}: a rejected company reads no applicant`);
+    assert.ok(!/Seeker Alpha|944900001/.test(r.text), `${name}: neither the applicant's name nor number in the answer`);
+  }
+  const mv = await C.A.e.put(`/api/employer/applications/${ids.appA}`, { status: "shortlisted" });
+  assert.deepEqual([mv.status, mv.body && mv.body.error], [409, "company_not_verified"], "nor moves an applicant");
+  assert.equal(S.db.get("SELECT status FROM applications WHERE id = ?", ids.appA).status, "new", "the application is untouched");
+  assert.equal(S.texts.length, texts, "and no text goes to the applicant under the rejected company's name");
+});
+
 test("policy admin: a hire can be moved back to interview until the Shaghilni team confirms it; a confirmed hire is final (U-003)", async () => {
   const S = await start(), C = await cast(S), { ids, admin } = C, move = (who, status) => who.put(`/api/employer/applications/${ids.appA}`, { status });
   for (const st of ["shortlisted", "interview", "hired"]) assert.equal((await move(C.A.e, st)).status, 200, st);
