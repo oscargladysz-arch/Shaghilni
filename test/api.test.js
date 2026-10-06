@@ -353,3 +353,13 @@ test("resume suggestions: the Arabic fact guard reads the accusative and اثن�
     assert.deepEqual(g(orig, sug, facts).slice(0, 1), [true], `the same fact in another form: ${sug} → ${g(orig, sug, facts)}`);
   for (const sug of ["كنا ندير جرد المخزون", "أشرفنا على جرد المخزون"]) assert.deepEqual(g("كنا نساعد في جرد المخزون", sug).slice(0, 2), [false, "gInflate"], sug);
 });
+
+test("resume suggestions: Latin, North or South America is not the United States, a hundred after و or ب is still one number, and the reason names the number without a stray space (fix review 5)", async () => {
+  const { loadCore } = await import("../server/core.js"), { factGuard } = loadCore();
+  const g = (orig, sug, facts = orig, job = "") => { const r = factGuard(orig, sug, facts, job); return [r.ok, r.why || "", r.tok || ""]; };
+  for (const region of ["أمريكا اللاتينية", "أمريكا الشمالية", "أمريكا الجنوبية"])
+    assert.deepEqual(g(`بعت لزبائن في ${region}`, "بعت المنتجات لزبائن في الولايات المتحدة").slice(0, 2), [false, "gName"], `${region} is not the United States`);
+  for (const [orig, sug] of [["جمعت ألفاً وخمس مئة توقيع", "جمعت ألفاً وخمسمئة توقيع"], ["بعت بخمس مئة ألف ليرة", "بعت بخمسمئة ألف ليرة"]])
+    assert.deepEqual(g(orig, sug).slice(0, 1), [true], `the same number: ${sug} → ${g(orig, sug)}`);
+  assert.deepEqual(g("Served customers", "Served - five hundred customers")[2], "five", "the reason names the word, not the dash before it");
+});
