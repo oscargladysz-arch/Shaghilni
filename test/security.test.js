@@ -538,7 +538,7 @@ test("13 · spreadsheet exports turn a cell that would run as a formula into pla
 });
 
 test("13 · the scanner opens key and certificate files, and warns when the email key would go to a plain-http address (D-51, D-52)", () => {
-  const tmp = mkdtempSync(path.join(os.tmpdir(), "shg-scan-")), pem = ["-----BEGIN RSA PRIVATE KEY-----", "MIIB" + "A".repeat(60), "-----END RSA PRIVATE KEY-----"].join("\n");
+  const tmp = mkdtempSync(path.join(os.tmpdir(), "shg-scan-")), pem = ["-----BEGIN RSA " + "PRIVATE KEY-----", "MIIB" + "A".repeat(60), "-----END RSA " + "PRIVATE KEY-----"].join("\n");   // assembled at run time so this file is not itself a finding
   for (const f of ["server.pem", "deploy.key", "id_rsa"]) writeFileSync(path.join(tmp, f), pem + "\n");
   const found = scanSecrets(tmp).join("; ");
   for (const f of ["server.pem", "deploy.key", "id_rsa"]) assert.match(found, new RegExp(`Private key in ${f.replace(".", "\\.")}`), `${f} is opened and its key found (${found})`);
