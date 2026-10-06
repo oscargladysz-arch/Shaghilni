@@ -41,13 +41,18 @@ test("posting checks on the server: fee wording is refused (fee_requested), miss
   assert.equal(gAr.body.job.status, "draft"); assert.deepEqual(gAr.body.job.flags, [{ type: "gender", word: "موظفة" }], "Arabic wording is flagged on a draft too (engine.js findGender runs in the server sandbox)");
 });
 
-test("posting checks on the server: fee wording in what the job offers, the place, the contact lines or the tags goes to the reviewer as a flag, so a benefit such as 'tuition fees covered' can be posted; in the listing's own text it is refused (U-020, Stage 4 fix review)", async () => {
+test("posting checks on the server: an explicit fee demand is refused in every box; a bare fee word outside the listing's text (a benefit, a place, a job title) goes to the reviewer as a flag (U-020, Stage 4 fix reviews)", async () => {
   const S = await start(), admin = await S.login(ADMIN_PHONE), A = await employerWithLiveJob(S, admin, "0955 910 021", "Policy Fee Fields"), e = A.e;
-  for (const [where, job, word] of [["what they offer", { ...JOB, provides: { en: ["Training, deposit required before starting"] } }, "deposit"],
-    ["what they offer (Arabic)", { ...JOB, provides: { ar: ["تدريب بعد دفع رسم تسجيل"] } }, "رسم تسجيل"],
-    ["place", { ...JOB, place: { en: "Head office, deposit required at the door" } }, "deposit"],
-    ["contact role", { ...JOB, contact: { role: { en: "Collects the deposit" } } }, "deposit"],
-    ["tags", { ...JOB, tags: "deposit required" }, "deposit"],
+  for (const [where, job, word] of [["what they offer", { ...JOB, provides: { en: ["Training, deposit required before starting"] } }, "deposit required"],
+    ["what they offer (Arabic)", { ...JOB, provides: { ar: ["تدريب بعد دفع رسم تسجيل"] } }, "دفع رسم"],
+    ["place", { ...JOB, place: { en: "Head office, deposit required at the door" } }, "deposit required"],
+    ["place, with an amount", { ...JOB, place: { en: "Head office, pay a 50,000 SYP registration fee at the door" } }, "pay a 50,000 SYP registration fee"],
+    ["tags", { ...JOB, tags: "deposit required" }, "deposit required"]]) {
+    const r = await refused(`fee demand in ${where}`, e.post("/api/employer/jobs", { job, submit: true }), "fee_requested", 422);
+    assert.equal(r.body.detail, word, `the phrase that tripped the check is named (${where})`);
+  }
+  assert.equal(S.db.get("SELECT COUNT(*) AS n FROM jobs WHERE company_id = ? AND status = 'pending'", A.companyId).n, 0, "no listing asking for a fee is awaiting review");
+  for (const [where, job, word] of [["contact role", { ...JOB, contact: { role: { en: "Collects the deposit" } } }, "deposit"],
     ["a benefit", { ...JOB, provides: { en: ["University tuition fees covered"] } }, "fees"],
     ["a place (Arabic)", { ...JOB, place: { ar: "مديرية الرسوم والضرائب" } }, "الرسوم"]]) {
     const r = await e.post("/api/employer/jobs", { job, submit: true }); assert.equal(r.status, 200, `fee word in ${where} goes to review: ${r.text}`);
@@ -55,10 +60,10 @@ test("posting checks on the server: fee wording in what the job offers, the plac
     assert.equal(row.status, "pending", `${where}: awaiting review`);
     assert.deepEqual(JSON.parse(row.flags).filter(f => f.type === "fee"), [{ type: "fee", word }], `the reviewer is shown the word (${where})`);
   }
-  // in the listing's own text (title, summary, duties, needs) a fee is still refused
+  // in the listing's own text (title, summary, duties, needs) any fee word is refused
   const own = await refused("fee in the summary", e.post("/api/employer/jobs", { job: { ...JOB, summary: { en: "Pay a deposit before starting." } }, submit: true }), "fee_requested", 422);
   assert.equal(own.body.detail, "deposit", "the word that tripped the check is named");
-  // the reviewer decides on a flagged listing
+  // the reviewer decides on a flagged one
   const flagged = S.db.get("SELECT id FROM jobs WHERE company_id = ? AND status = 'pending' ORDER BY id LIMIT 1", A.companyId).id;
   assert.equal((await admin.post(`/api/admin/jobs/${flagged}/approve`, {})).status, 200, "the admin publishes a flagged listing after reading it");
 });
