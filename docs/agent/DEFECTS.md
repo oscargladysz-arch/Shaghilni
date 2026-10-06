@@ -23,7 +23,8 @@ Reproduction scripts named below live in the Stage 0 scratchpad (`/tmp/claude-0/
 | Found by the second review of the Stage 4 fixes | 26 | D-86 to D-111: P2 3 · P3 23 (D-86, D-90 and D-91 rated P2 by their reviewers, P3 by their refuters); 24 fixed (D-99 in part, the rest in the third review), D-96 and D-104 recorded (section below) |
 | Found by the third review of the Stage 4 fixes | 18 | D-112 to D-129: P2 3 · P3 15 (D-125 rated P2 by its reviewer, P3 by its refuter); 17 fixed (D-115 and D-118 in part), D-117 recorded (section below) |
 | Found by the fourth review of the Stage 4 fixes | 16 | D-130 to D-145: P1 1 · P2 4 · P3 11 (D-133 rated P3 by one of its refuters); 15 fixed, D-135 recorded (section below) |
-| Fixed by Stage 4 | 136 | round 1: U-003, U-006, U-012 to U-015, U-018, U-020 to U-023, U-028, U-029, U-031, U-032, U-035, U-037, U-050, U-053 to U-055, U-058; browser flow: D-38, U-061; round 2: U-001, U-009, U-010, U-024, U-030 with D-31, U-038, U-040, U-059, U-062; security re-review: D-39 to D-43, D-45, D-46, D-48 to D-54, D-56; fix review: D-57 to D-63, D-65 to D-85; second fix review: D-86 to D-95, D-97 to D-103, D-105 to D-111; third fix review: D-112 to D-116, D-118 to D-129; fourth fix review: D-130 to D-134, D-136 to D-145; accessibility: U-056, U-146, U-184 |
+| Found by the fifth review of the Stage 4 fixes | 12 | D-146 to D-157: P2 3 · P3 9; 10 fixed, D-151 and D-153 recorded (section below) |
+| Fixed by Stage 4 | 146 | round 1: U-003, U-006, U-012 to U-015, U-018, U-020 to U-023, U-028, U-029, U-031, U-032, U-035, U-037, U-050, U-053 to U-055, U-058; browser flow: D-38, U-061; round 2: U-001, U-009, U-010, U-024, U-030 with D-31, U-038, U-040, U-059, U-062; security re-review: D-39 to D-43, D-45, D-46, D-48 to D-54, D-56; fix review: D-57 to D-63, D-65 to D-85; second fix review: D-86 to D-95, D-97 to D-103, D-105 to D-111; third fix review: D-112 to D-116, D-118 to D-129; fourth fix review: D-130 to D-134, D-136 to D-145; fifth fix review: D-146 to D-150, D-152, D-154 to D-157; accessibility: U-056, U-146, U-184 |
 | Fixed by Stage 3 | 33 | D-02, D-04 to D-10, D-12, D-13, D-15 to D-17, D-19 to D-30, D-32; U-007, U-017, U-034, U-041 (page), U-045, U-046, U-048 (Status rows). With Stages 1 and 2, all thirty D-01 to D-30 are closed. The Stage 3 review then fixed six P1/P2 follow-ups inside the same fixes (D-17 live sessions, D-09 on a note, D-30 numbers in the audit log and false positives, audit filters with Arabic-Indic digits, suspend-then-verify) |
 
 Severity changed by the verifier: D-03 P1 → P2; D-20 P2 → P3. All others kept the reporter's tier.
@@ -845,6 +846,25 @@ The same three lenses read `git diff b390158 0e14a35` (the third review's fixes)
 | D-143 | P3 | **FIXED** (the fix-review-4 api test asserts them) | The fix-review-3 api test's name promised the day, hour and week duals, which nothing asserted | truth |
 | D-144 | P3 | **FIXED** (test name narrowed) | The fix-review-3 policy test's name said "whichever box"; it checked what the job offers only | truth |
 | D-145 | P3 | **FIXED** (HANDOVER.md, STATE.md) | The list of fixes without a red test left out D-118's copy change | truth |
+
+## Stage 4 · fifth review of the Stage 4 fixes
+
+Three lenses read `git diff 0e14a35 1779501` (the fourth review's fixes), with a disprove-first refuter per P2 (8 agents). The server's cost and the fact guard came back with P3s only; the three P2s were again in the fee wording, all on the refusal side being wider than its evidence. 15 findings: 3 merged (the stipend refusals, the unflagged demands and the أمريكا alias were each reported by two lenses), leaving 12.
+
+| # | Sev | Status | Title | Lens |
+|---|---|---|---|---|
+| D-146 | P2 | **FIXED** (`server/validate.js`; policy-employer-listings "stating a trainee's pay, a negated demand and a company benefit are never refused"; A-51) | A trainee's pay stated plainly was refused as a demand: "Intern pay: 400,000 SYP" (the noun read as the verb) and «مكافأة المتدرب تُدفع شهرياً» (the passive); reported twice | server, truth |
+| D-147 | P2 | **FIXED** (same) | The negation check saw one word back only, so «ولا يدفع المتدرب أي مبلغ», «ليس على المتقدم دفع», «لا يطلب من المتقدمين دفع» were refused | server |
+| D-148 | P2 | **FIXED** (same) | Demands neither refused nor flagged: "Students must pay 50 USD", «على المتقدم تسديد ٥٠ ألف», «قسط الدورة ١٠٠ ألف ليرة», "a one-time payment of 50 USD is required"; the docs claimed none could pass unflagged; reported twice | server, truth |
+| D-149 | P3 | **FIXED** (same) | Benefit and duty wordings still refused: "…and pay a monthly fee for your gym", "You will pay 10 daily visits", "No candidate pays anything" | server |
+| D-150 | P3 | **FIXED** (`public/js/engine.js`; api "Latin, North or South America is not the United States") | The fix-review-4 alias took any أمريكا in the facts for the United States, so «أمريكا اللاتينية» let «الولايات المتحدة» through; reported twice | client, truth |
+| D-151 | P3 | Recorded | A suspended company is told it "must be verified first" on the routes that answer `company_not_verified` for any unverified status (recruit, events, team), though `err_suspended` exists; the applicant routes already answer `suspended` | client |
+| D-152 | P3 | **FIXED** (same commit and test) | A hundred in two words after و or ب («ألف وخمس مئة») was not joined | client |
+| D-153 | P3 | Recorded | Eleven (أحد عشر, إحدى عشرة) is no number to the guard; أحد and إحدى are everyday words ("one of", "someone", Sunday), so adding them would hold back honest rewordings | client |
+| D-154 | P3 | **FIXED** (same) | The reason named the number with a leading space when a lone dash came before it | client |
+| D-155 | P3 | **FIXED** (STATE.md) | STATE's approve row said every payment wording is only a flag, though a fee word in the listing's own text is refused | truth |
+| D-156 | P3 | **FIXED** (test name narrowed) | The fix-review-4 policy test's name said "any box"; it checks the summary and what the job offers | truth |
+| D-157 | P3 | **FIXED** (HANDOVER.md) | HANDOVER said every fix review used five lenses; the third to fifth used three | truth |
 
 ## Merged duplicates
 
