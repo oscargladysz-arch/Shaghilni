@@ -60,7 +60,26 @@ test("posting checks on the server: an explicit demand for the candidate's money
   }
 });
 
-test("posting checks on the server: a demand whose payer is the candidate is refused in any box, whatever the subject's number or the verb's form; a benefit or an ordinary duty is never refused; any other payment wording is flagged for the reviewer, never silent (fix review 4, A-51)", async () => {
+test("posting checks on the server: stating a trainee's pay, a negated demand and a company benefit are never refused; a demand with a sum or a modal is refused; every other payment wording with a sum is flagged, never silent (fix review 5, A-51)", async () => {
+  const S = await start(), admin = await S.login(ADMIN_PHONE), A = await employerWithLiveJob(S, admin, "0955 910 051", "Policy Fee Recall"), e = A.e;
+  const post = async (box, lang, line) => e.post("/api/employer/jobs", { job: { ...JOB, [box]: { [lang]: box === "summary" ? line : [line] } }, submit: true });
+  for (const [lang, line] of [["en", "Intern pay: 400,000 SYP per month, plus transport."], ["en", "Paid internship. Intern pay is 400,000 SYP per month."], ["ar", "مكافأة المتدرب تُدفع شهرياً"], ["ar", "راتب المتدرب يُدفع في نهاية كل شهر"], ["ar", "أجور المتدربين تدفع أسبوعياً"],
+    ["ar", "التدريب مجاني ولا يدفع المتدرب أي مبلغ"], ["ar", "التقديم مجاني ولا يدفع المتقدم أي شيء"], ["ar", "لا يطلب من المتقدمين دفع أي مبلغ"], ["ar", "ليس على المتقدم دفع أي مبلغ"], ["ar", "لا يتوجب على المتقدم دفع أي مبلغ"], ["ar", "تدريب مجاني بدون أن يدفع المتدرب أي مبلغ"],
+    ["ar", "السكن على حساب الشركة ولا يتحمل المتدرب تكاليف السكن"], ["en", "We cover transport and pay a monthly fee for your gym membership"], ["en", "No candidate pays anything"], ["en", "Trainees pay nothing"]])
+    for (const box of ["summary", "provides"]) { const r = await post(box, lang, line); assert.equal(r.status, 200, `never refused (${box}): ${line} → ${r.text}`); }
+  assert.equal((await post("duties", "en", "You will pay 10 daily visits to doctors and pharmacies")).status, 200, "a duty with a number is no sum");
+  for (const [lang, line] of [["en", "Students must pay 50 USD before the internship starts."], ["en", "Each student pays 100,000 SYP for the training course."], ["ar", "يجب تسديد ٥٠ ألف ليرة قبل بدء التدريب"], ["ar", "على المتقدم تسديد ٥٠ ألف ليرة قبل المقابلة"]])
+    await refused(`${line} (summary)`, post("summary", lang, line), "fee_requested", 422);
+  for (const [lang, line] of [["en", "Pay 50,000 SYP to secure your seat in the training."], ["en", "A one-time payment of 50 USD is required before the interview."], ["en", "The training course costs 100,000 SYP, payable on registration."],
+    ["ar", "رسم الدورة التدريبية ٥٠ ألف ليرة سورية"], ["ar", "سداد ٥٠ ألف ليرة عند التسجيل"], ["ar", "قسط الدورة ١٠٠ ألف ليرة"], ["ar", "تكلفة التدريب ١٠٠ ألف ليرة سورية"], ["ar", "ادفع ٥٠ ألف ليرة واحجز مكانك"]])
+    for (const box of ["summary", "provides"]) {
+      const r = await post(box, lang, line);
+      const silent = r.status === 200 && !JSON.parse(S.db.get("SELECT flags FROM jobs WHERE id = ?", r.body.job.id).flags).some(f => f.type === "fee");
+      assert.ok((r.status === 422 && r.body.error === "fee_requested") || (r.status === 200 && !silent), `never silent (${box}): ${line} → ${r.status}`);
+    }
+});
+
+test("posting checks on the server: a demand whose payer is the candidate is refused in the listing's text and in what the job offers, whatever the subject's number or the verb's form; a benefit or an ordinary duty is never refused; any other payment wording is flagged for the reviewer, never silent (fix review 4, A-51)", async () => {
   const S = await start(), admin = await S.login(ADMIN_PHONE), A = await employerWithLiveJob(S, admin, "0955 910 041", "Policy Fee Payers"), e = A.e;
   const demands = { en: ["The trainee pays 100,000 SYP before starting.", "Each candidate pays 50,000 SYP for the course.", "Applicant pays 50,000 SYP for training materials.", "You will need to pay 50 USD for the training course.", "You'll pay 50 USD for the uniform.", "Each applicant is required to pay 50 USD.", "Candidates are expected to pay 50 USD before the interview."],
     ar: ["على المتقدمين دفع ٥٠ ألف ليرة قبل المقابلة", "يدفع المتقدمون ٥٠ ألف ليرة", "يدفع المتدرب ١٠٠ ألف ليرة قبل بدء التدريب", "على المتدرب دفع ٥٠ ألف ليرة", "يلتزم المتقدم بدفع مبلغ ٥٠ ألف ليرة", "على المتقدمة دفع ٥٠ ألف ليرة",
