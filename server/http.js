@@ -24,7 +24,7 @@ export function createRouter() {
         pathMatched = true;
         if (r.method !== method) continue;
         const params = {};
-        r.keys.forEach((k, i) => { params[k] = decodeURIComponent(m[i + 1]); });
+        try { r.keys.forEach((k, i) => { params[k] = decodeURIComponent(m[i + 1]); }); } catch { return null; }   // a malformed percent-encoding is an unknown address, not a server error (D-40)
         return { handlers: r.handlers, params };
       }
       return pathMatched ? { methodNotAllowed: true } : null;
