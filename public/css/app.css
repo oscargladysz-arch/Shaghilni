@@ -730,6 +730,7 @@ a.btn{text-decoration:none}
 .legal-links{text-align:center}
 .tick--consent span{line-height:1.55}
 .tick--consent .link,.legal-links .link{display:inline}
+.acard-s .link,.kv-row .link{display:inline;overflow-wrap:anywhere}
 .trbar{margin-bottom:12px}
 .trbar-h{display:flex;align-items:flex-start;gap:8px;font-weight:600}
 .trbar-busy{display:inline-flex;align-items:center;gap:8px}

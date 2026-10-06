@@ -64,7 +64,7 @@ function invCard(i) {
 <span class="acard-t" dir="auto">${title}</span>
 <span class="acard-s">${co}${i.company.verified ? html`<span class="rc-ver" role="img" aria-label="${t("rcVerified")}">${iconF("verified", 13)}</span>` : ""}${where ? sep() + where : ""}</span>
 ${i.message ? html`<span class="rc-msg" dir="auto">${i.message}</span>` : ""}
-${!job && ev.link ? html`<span class="acard-s">${t("evLinkL")}: <a href="${ev.link}" target="_blank" rel="noopener nofollow ugc" dir="ltr">${ev.link}</a></span>` : ""}
+${!job && ev.link ? html`<span class="acard-s">${t("evLinkL")}: <a class="link" href="${ev.link}" target="_blank" rel="noopener nofollow ugc" dir="ltr">${ev.link}</a></span>` : ""}
 ${!job && i.status === "accepted" ? html`<span class="acard-s">${t("rcAttendNote", { co })}</span>` : ""}
 <span class="acard-meta">${said}<span>${t("rcSentOn", { when: dayLabel(i.createdAt) })}</span></span></span>
 <span class="acard-act">${act}</span></li>`;

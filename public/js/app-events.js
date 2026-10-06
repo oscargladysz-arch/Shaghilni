@@ -52,7 +52,7 @@ ${mine.checkedIn ? "" : html`<div class="card-act"><button class="link link--mut
   return html`<div class="ev-wrap"><button class="link" type="button" data-act="go" data-to="#/events">${icon("back", 15)}${t("evAll")}</button>
 <div class="ev-head">${evDate(e)}<div><h1 class="lh-title">${L(bi(e.title))}</h1><p class="ev-meta-line">${t("evK_" + e.kind)}${e.host ? " · " + t("evWith", { host: e.host }) : ""}</p></div></div>
 <dl class="kv"><div class="kv-row"><dt>${t("evWhenL")}</dt><dd>${w.full}</dd></div>${L(bi(e.place)) ? html`<div class="kv-row"><dt>${t("evWhereL")}</dt><dd>${L(bi(e.place))}${e.gov && GOV[e.gov] ? ", " + L(GOV[e.gov]) : ""}</dd></div>` : ""}
-${e.uni ? html`<div class="kv-row"><dt>${t("obUni")}</dt><dd>${evUni(e.uni)}</dd></div>` : ""}${e.link ? html`<div class="kv-row"><dt>${t("evLinkL")}</dt><dd><a href="${e.link}" target="_blank" rel="noopener">${e.link}</a></dd></div>` : ""}</dl>
+${e.uni ? html`<div class="kv-row"><dt>${t("obUni")}</dt><dd>${evUni(e.uni)}</dd></div>` : ""}${e.link ? html`<div class="kv-row"><dt>${t("evLinkL")}</dt><dd><a class="link" href="${e.link}" target="_blank" rel="noopener" dir="ltr">${e.link}</a></dd></div>` : ""}</dl>
 ${L(bi(e.about)) ? html`<p class="ev-about">${L(bi(e.about))}</p>` : ""}
 <section class="card">${act || ""}</section>
 <h2 class="sec-h">${t("evCompaniesH")}</h2>${(e.companies || []).length ? html`<ul class="ev-cos">${e.companies.map(c => html`<li><span class="ev-tile" aria-hidden="true">${c.abbr || String(L(bi(c.name)) || "?").trim().slice(0, 1).toUpperCase()}</span><span>${L(bi(c.name))}</span></li>`)}</ul>` : html`<p class="empty-p">${t("evCompaniesSoon")}</p>`}</div>`;
