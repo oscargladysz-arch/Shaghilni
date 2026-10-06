@@ -4,15 +4,15 @@
 import { createHmac, randomInt, timingSafeEqual } from "node:crypto";
 import { fail } from "../http.js";
 import { J, now } from "../db.js";
-import { e164 } from "../validate.js";
+import { e164, keyOf } from "../validate.js";
 
 export function makeCampus({ db }) {
   // A student counts as verified only for the university in their profile now.
-  const verifiedUni = (userId, uni) => (uni && db.get("SELECT 1 AS x FROM student_verifications WHERE user_id = ? AND uni = ? AND status = 'verified'", userId, uni) ? uni : "");
+  const verifiedUni = (userId, uni) => (uni && typeof uni === "string" && db.get("SELECT 1 AS x FROM student_verifications WHERE user_id = ? AND uni = ? AND status = 'verified'", userId, uni) ? uni : "");
   const domainsOf = uni => db.all("SELECT domain FROM uni_domains WHERE uni = ? ORDER BY domain", uni).map(x => x.domain);
   const mask = email => { const [u, d] = String(email || "").split("@"); return u && d ? `${u.slice(0, 2)}${"•".repeat(Math.max(1, Math.min(6, u.length - 2)))}@${d}` : ""; };
   const forUser = (userId, profile) => {
-    const uni = profile && profile.edu && profile.edu.uni; if (!uni) return null;
+    const uni = profile && profile.edu && profile.edu.uni; if (!uni || typeof uni !== "string") return null;   // a list stored before U-038 reads as no university
     const domains = domainsOf(uni);
     const v = db.get("SELECT status, uni, email, created_at, decided_at FROM student_verifications WHERE user_id = ? AND uni = ? AND status = 'verified' ORDER BY id DESC LIMIT 1", userId, uni);
     if (v) return { status: "verified", uni, email: mask(v.email), at: v.decided_at || v.created_at, domains };
@@ -39,7 +39,7 @@ export function registerCampus(r, deps) {
   const codeHash = (userId, code) => createHmac("sha256", deps.cfg.otpPepper || "dev-pepper").update(`student-email:${userId}:${code}`).digest("hex");
   r.post("/api/me/verify-student", seeker, async ctx => {
     const p = profileOf(ctx.user.id); if (!p) fail(409, "profile_required");
-    const uni = p.edu && p.edu.uni; if (!uni || !core.UNI[uni]) fail(422, "uni_required");
+    const uni = p.edu && p.edu.uni; if (!keyOf(core.UNI, uni)) fail(422, "uni_required");
     if (campus.forUser(ctx.user.id, p).status === "verified") fail(409, "already_verified");
     const email = String(ctx.body.email || "").trim().toLowerCase();
     if (!/^[^\s@]{1,64}@[^\s@]{3,190}$/.test(email)) fail(422, "bad_email");
@@ -127,7 +127,7 @@ export function registerCampus(r, deps) {
     audit(ctx.user.id, "campus.domain_removed", "user", ctx.user.id, { uni, domain: d }); return { ok: true, domains: campus.domainsOf(uni) }; };
   r.post("/api/campus/domains", uniOnly, ctx => addDomain(ctx, office(ctx).uni, ctx.body.domain));
   r.delete("/api/campus/domains/:domain", uniOnly, ctx => dropDomain(ctx, office(ctx).uni, ctx.params.domain));
-  r.post("/api/admin/campus/domains", admin, ctx => { if (!core.UNI[ctx.body.uni]) fail(422, "uni_required"); return addDomain(ctx, ctx.body.uni, ctx.body.domain); });
+  r.post("/api/admin/campus/domains", admin, ctx => { if (!keyOf(core.UNI, ctx.body.uni)) fail(422, "uni_required"); return addDomain(ctx, ctx.body.uni, ctx.body.domain); });
   r.delete("/api/admin/campus/domains/:uni/:domain", admin, ctx => dropDomain(ctx, ctx.params.uni, ctx.params.domain));
   r.post("/api/campus/partners/:companyId", uniOnly, ctx => {
     const o = office(ctx), yes = ctx.body.decision === "yes";
@@ -140,7 +140,7 @@ export function registerCampus(r, deps) {
   /* ---------- employers: ask a university to partner ---------- */
   r.post("/api/employer/partners", employer, ctx => {
     const c = deps.plans.companyFor(ctx.user); if (!c || c.status !== "verified") fail(409, "company_not_verified"); deps.plans.allow(ctx, c, "manage");
-    const uni = core.UNI[ctx.body.uni] ? ctx.body.uni : null; if (!uni) fail(422, "uni_required");
+    const uni = keyOf(core.UNI, ctx.body.uni) || null; if (!uni) fail(422, "uni_required");
     const cur = db.get("SELECT status FROM uni_partners WHERE company_id = ? AND uni = ?", c.id, uni);
     if (cur && cur.status !== "declined") return { ok: true, status: cur.status };
     db.run("INSERT INTO uni_partners (company_id, uni, status, created_at) VALUES (?, ?, 'requested', ?) ON CONFLICT(company_id, uni) DO UPDATE SET status = 'requested', created_at = excluded.created_at, decided_at = NULL, decided_by = NULL", c.id, uni, now());
@@ -153,8 +153,8 @@ export function registerCampus(r, deps) {
       verified: db.get("SELECT COUNT(*) AS n FROM student_verifications WHERE uni = ? AND status = 'verified'", o.uni).n })) }));
   r.post("/api/admin/campus", admin, ctx => {
     const phone = e164(core, ctx.body.phone); if (!phone) fail(422, "invalid_phone");
-    const uni = core.UNI[ctx.body.uni] ? ctx.body.uni : null; if (!uni) fail(422, "uni_required");
-    const fac = ctx.body.faculty && core.FAC[ctx.body.faculty] ? ctx.body.faculty : "";
+    const uni = keyOf(core.UNI, ctx.body.uni) || null; if (!uni) fail(422, "uni_required");
+    const fac = keyOf(core.FAC, ctx.body.faculty);
     const name = String(ctx.body.name || "").trim().slice(0, 120);
     if (db.get("SELECT 1 AS x FROM users WHERE phone = ? AND deleted_at IS NULL", phone)) fail(409, "phone_taken");
     const uid = Number(db.run("INSERT INTO users (phone, role, lang, created_at) VALUES (?, 'university', 'ar', ?)", phone, now()).lastInsertRowid);

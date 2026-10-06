@@ -6,6 +6,7 @@
 import { randomInt } from "node:crypto";
 import { fail } from "../http.js";
 import { J, now } from "../db.js";
+import { keyOf } from "../validate.js";
 
 export const EVENT_KINDS = ["careers_day", "internship_fair", "talent_session", "diaspora"];
 const CODE_CHARS = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";   // no 0/O or 1/I, so codes are easy to read out
@@ -41,9 +42,9 @@ export function registerEvents(r, deps) {
     if (isNew && starts < now() - 3600e3) fail(422, "invalid", { startsLocal: "past" });
     const ends = m.endsLocal && Number.isFinite(at(m.endsLocal)) && at(m.endsLocal) > starts ? m.endsLocal : "";
     const link = /^https?:\/\/[^\s]+$/.test(String(m.link || "")) ? clean(m.link, 300) : "";
-    let uni = core.UNI[m.uni] ? m.uni : "";
+    let uni = keyOf(core.UNI, m.uni);
     const o = office(ctx); if (o) uni = o.uni;   // a career office's events are always at its own university
-    return { data: { title, kind, startsLocal: m.startsLocal, endsLocal: ends, place: bi(m.place, 160), gov: core.GOV[m.gov] ? m.gov : "", host: clean(m.host, 120), about: bi(m.about, 1500), link },
+    return { data: { title, kind, startsLocal: m.startsLocal, endsLocal: ends, place: bi(m.place, 160), gov: keyOf(core.GOV, m.gov), host: clean(m.host, 120), about: bi(m.about, 1500), link },
       starts, uni, capacity: Math.max(0, Math.min(5000, Math.round(Number(m.capacity) || 0))) };
   }
 

@@ -108,6 +108,8 @@ The review and this test found two bugs, both fixed:
 - an audit-log `limit` of `-5` meant "no limit";
 - oversized uploads lost their "too large" (413) answer, because the connection was cut before the answer was sent.
 
+Stage 4 found a third that the junk could not reach, because its values never formed a real key: a university, faculty or governorate sent as a list (`["damascus"]`) or as a prototype name (`constructor`) passed the lookup check, and one job seeker's list made the employer's applicant list and recruiter search answer 500. Every lookup id must now be one of the table's own keys, as a string, and a list stored before the fix reads as no university (`test/policy-campus.test.js`, U-038).
+
 ## 4. Error handling that does not leak data
 
 - **Expected problems** return a short code, such as `{"error":"wrong_code"}`, which the app turns into a message in the person's language (a code without a translation shows the general "something went wrong" message; `test/i18n.test.js` checks that every code the server answers has one).

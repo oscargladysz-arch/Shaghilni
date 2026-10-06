@@ -9,7 +9,7 @@ const biList = (o, items, max) => ({
   en: (Array.isArray(o && o.en) ? o.en : []).map(x => clean(x, max)).filter(Boolean).slice(0, items),
   ar: (Array.isArray(o && o.ar) ? o.ar : []).map(x => clean(x, max)).filter(Boolean).slice(0, items)
 });
-const keyOf = (table, v) => (Object.prototype.hasOwnProperty.call(table, v) ? v : "");
+export const keyOf = (table, v) => (typeof v === "string" && Object.prototype.hasOwnProperty.call(table, v) ? v : "");   // a string and the table's own key: never a list (["damascus"] is coerced to a key) or a prototype name (U-038)
 const ym = v => (/^\d{4}-(0[1-9]|1[0-2])$/.test(String(v || "")) ? String(v) : "");
 
 export function e164(core, raw) {
@@ -114,7 +114,7 @@ export function sanitizeJob(core, input) {
     type: keyOf(core.TYPE, j.type) || "full", level: keyOf(core.LEVEL, j.level) || "entry", mode: keyOf(core.MODE, j.mode) || "onsite",
     pay: [lo, Math.max(lo, hi)],
     langs: [...new Set((Array.isArray(j.langs) ? j.langs : []).filter(l => core.LANGS[l]))].slice(0, 7),
-    recruits: (Array.isArray(j.recruits) ? j.recruits : []).filter(r => Array.isArray(r) && core.UNI[r[0]] && core.FAC[r[1]]).slice(0, 10).map(r => [r[0], r[1]]),
+    recruits: (Array.isArray(j.recruits) ? j.recruits : []).filter(r => Array.isArray(r) && keyOf(core.UNI, r[0]) && keyOf(core.FAC, r[1])).slice(0, 10).map(r => [r[0], r[1]]),
     anyFaculty: bool(j.anyFaculty), noDegree: bool(j.noDegree), support: bool(j.support), returnees: bool(j.returnees), unis: (Array.isArray(j.unis) ? j.unis : []).map(k => keyOf(core.UNI, k)).filter(Boolean).filter((k, i, a) => a.indexOf(k) === i).slice(0, 8), progStart: /^\d{4}-(0[1-9]|1[0-2])$/.test(String(j.progStart || "")) ? j.progStart : "", progEnd: /^\d{4}-(0[1-9]|1[0-2])$/.test(String(j.progEnd || "")) ? j.progEnd : "", openings: intIn(j.openings || 1, 1, 500),
     summary: bi(j.summary, 1500), duties: biList(j.duties, 12, 200), needs: biList(j.needs, 12, 200), provides: biList(j.provides, 12, 200),
     contact: { name: bi(j.contact && j.contact.name, 80), role: bi(j.contact && j.contact.role, 100), status: bi(j.contact && j.contact.status, 120) },
