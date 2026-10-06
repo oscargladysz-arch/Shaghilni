@@ -219,6 +219,17 @@ test("1 · a provider's error answer that writes the number with spaces or dashe
   } finally { globalThis.fetch = realFetch; }
 });
 
+test("1 · a number the provider writes without the country code keeps only its last three digits, since the usual mask would show all but two of a local number (fix review 2)", async () => {
+  try {
+    for (const shown of ["0944000001", "0944 000 001", "(0944) 000-001", "963944000001"]) {
+      globalThis.fetch = async () => new Response(JSON.stringify({ message: `Number ${shown} is not reachable.` }), { status: 400 });
+      const err = await makeSms({ sms: { provider: "twilio", twilioSid: "AC0", twilioToken: "t", twilioFrom: "+15550000000" } })("+963944000001", "hello").then(() => null, e => e);
+      const body = err ? err.message.replace(/^twilio 400: /, "") : "";
+      assert.ok(err && (body.match(/\d/g) || []).length <= 3 && body.includes("•••001"), `${shown} keeps only its last three digits: ${err && err.message}`);
+    }
+  } finally { globalThis.fetch = realFetch; }
+});
+
 test("1 · the email service gets a time limit like the text and AI services, so a hung provider cannot hold a request or the alert run (D-46)", async () => {
   const send = makeEmail({ emailApiUrl: "https://mail.example/send", emailApiKey: "k", emailFrom: "jobs@example.com" }, () => {}), realTimeout = AbortSignal.timeout;
   let gotSignal = false;
