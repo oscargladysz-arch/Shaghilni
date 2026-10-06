@@ -96,5 +96,5 @@ What a neighbouring product couldn't truthfully copy:
 
 - Arabic, right to left, by default, with full English; both are first-class.
 - Text at least 12 px everywhere except the scaled resume preview, which is a page thumbnail; text colours come from tokens chosen for WCAG AA in light and dark mode. The contrast check on 40 screens was done by hand and is not recorded in this repository.
-- Built to work with a keyboard and screen readers (skip link, focus rings, ARIA names and live regions); there is no automated accessibility test yet, and testing with TalkBack on real Android phones is still to do.
+- Built to work with a keyboard and screen readers (skip link, focus rings, ARIA names and live regions); `test/a11y.test.js` checks a few of these statically (dialog names, the filter-count contrast, the event date for screen readers, the spinner under reduced motion); there is no browser-based accessibility test, and testing with TalkBack on real Android phones is still to do.
 - Lite works without JavaScript and in a few kilobytes a page, for slow and expensive connections.

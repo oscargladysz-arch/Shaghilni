@@ -8,7 +8,7 @@ function evWhen(e) {
   return { day: d.toLocaleDateString(loc, { day: "numeric", ...tz }), mon: d.toLocaleDateString(loc, { month: "short", ...tz }),
     full: d.toLocaleString(loc, { weekday: "long", day: "numeric", month: "long", hour: "2-digit", minute: "2-digit", ...tz }) };
 }
-const evDate = e => { const w = evWhen(e); return html`<span class="ev-date" aria-hidden="true"><b>${w.day}</b><span>${w.mon}</span></span>`; };
+const evDate = e => { const w = evWhen(e); return html`<span class="ev-date" role="img" aria-label="${w.full}"><b>${w.day}</b><span>${w.mon}</span></span>`; };
 const evUni = k => (UNI[k] ? L(UNI[k]) : "");
 /* ---------- job seekers ---------- */
 function evTeaserHTML() {

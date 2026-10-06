@@ -74,7 +74,7 @@ No item marked owner, lawyer or provider is ever ticked by an agent.
 | # | Item | Owner | How to verify | Status |
 |---|---|---|---|---|
 | G1 | TalkBack testing on real Android phones. | owner | Notes per screen. | Open |
-| G2 | Accessibility pass against WCAG AA, the 12 px floor and keyboard use. | agent | Stage 4 static pass; findings fixed or recorded. | Open |
+| G2 | Accessibility pass against WCAG AA, the 12 px floor and keyboard use. | agent | Stage 4 static pass (S4-4): three Stage 0 observations and the spinner fixed, pinned by `test/a11y.test.js`; the rest recorded in `docs/agent/DEFECTS.md` ("Stage 4 · static accessibility pass"). TalkBack on devices is G1. | Done (static) |
 | G3 | Telegram alerts, public resume links and Lite event pages: wanted or not, decision D7. | owner | | Blocked on D7 |
 
 ## Owner decisions

@@ -508,11 +508,11 @@ Brief `<features>` letters → areas: A → 1, 13 · B → 1, 2, 3, 4, 5, 14 · 
 | Lite language handling and LT parity (189/189) | VERIFIED | `lite.js:15-82,102,140,142,631-633` | lite :74,85-86,147 | — |
 | Theme system/light/dark (data-theme + prefers-color-scheme, theme-color meta, View Transitions, OS tracking) | PARTIAL | `engine.js:25`; `boot.js:3-21,69-70,216-218`; `app.css:127-148`; `index.html:6-8` | none | Lite has OS preference only |
 | Design tokens: `:root` light, night values for dark, match DESIGN.md | PARTIAL | `app.css:107-148` = DESIGN.md front matter | none | 28 hex colours outside the token block; `--on-accent` hard-coded white on tiles (`app.css:284`) |
-| 12 px floor and Ink Floor | PARTIAL | `app.css` (smallest px 12px; no text in `--ink-4`) | none | Resume preview scales with `cqw` to ≈10 px (`app.css:523-529`) |
+| 12 px floor and Ink Floor | PARTIAL | `app.css` (smallest px 12px; no text in `--ink-4`) | none | Resume preview scales with `cqw` to ≈10 px (`app.css:523-529`): the documented thumbnail exception (PRODUCT.md:98), recorded in Stage 4 |
 | Single 24 px stroke icon set, `aria-hidden`, all names resolve | PARTIAL | `engine.js:61-105`; `app.js:21-44` | none | Emoji in the job header (`app.js:255`, `lookups.js:78-80`); `ICON.home` defined twice |
 | No card inside a card / no side stripes | UNVERIFIED | `app.css:895-899` flattens nested boxes; no `border-left` | none | Needs a browser pass |
 | Type scale (22/20/17/15/12) | PARTIAL | `app.css:157,191,251,309,335,371,432,462-467,609,665` | none | DESIGN.md:41 Display 28px vs `.h-display` 32px (`app.css:465`); many half-pixel sizes |
-| Accessibility: skip link, focus ring, sr-only, labelled nav/dialogs, inert background, focus restore, live regions, aria states | PARTIAL | `index.html:18,33,37-40`; `app.css:167-173`; `motion.js:37,55-57,132`; `app.js:99-107,161,192,322` | lite :110,179 (Lite aria) | No automated accessibility test; no `forced-colors`; event list date only in an `aria-hidden` span (`app-events.js:11`) |
+| Accessibility: skip link, focus ring, sr-only, labelled nav/dialogs, inert background, focus restore, live regions, aria states | PARTIAL | `index.html:18,33,37-40`; `app.css:167-173`; `motion.js:37,55-57,132`; `app.js:99-107,161,192,322` | lite :110,179 (Lite aria) | Static test `test/a11y.test.js` since Stage 4 (dialog names, `.seg-n` contrast, event date tile, `.spin` under reduced motion); no `forced-colors`; no browser-based test |
 | Keyboard: Escape, `/`, arrows and j/k, Space/Enter hold, Enter advances | PARTIAL | `boot.js:118-144`; `motion.js:8-9,35,60,113,122`; `app.js:214-219` | none | — |
 | Motion respects `prefers-reduced-motion`; hover on fine pointers only | PARTIAL | `motion.js:13,60,122,171,229`; `app.css:570,629-637,774,806` | none | — |
 | Self-hosted IBM Plex Sans Arabic (4 weights, 3 subsets), preloaded, no third-party origin | PARTIAL | `app.css:1-98`; `index.html:13`; `app.js:88-90`; `public/fonts/` (12 woff2 + OFL.txt) | e2e :437-438 only (not run) | e2e still whitelists Google Fonts origins (`browser-flow.mjs:33,40`) |
@@ -613,5 +613,5 @@ Items of `<verified_facts>` and `<features>` that the maps contradict or refine.
 | Any route that reverts a hire | `admin.js` has only confirm-hire; `MOVES.hired = []` | — |
 | "My tickets" screen | `GET /api/me/events` exists; no client file calls it | — |
 | Admin overview 8-week chart | `drawOverview` never called | README.md:17 describes it |
-| `forced-colors` / high-contrast handling; automated accessibility test | grep `prefers-contrast|forced-colors` → none; no a11y test | PRODUCT.md:99 (TalkBack still to do) |
+| `forced-colors` / high-contrast handling; automated accessibility test | grep `prefers-contrast|forced-colors` → none; static a11y test since Stage 4 (`test/a11y.test.js`), none in a browser | PRODUCT.md:99 (TalkBack still to do) |
 | Browser e2e run, Docker build, live-site scanner | not possible here (no network, no Docker) | UNVERIFIED, not absent |

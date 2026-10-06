@@ -274,7 +274,7 @@ svg{display:inline-block;flex:none;vertical-align:middle}
 .seg-copy .seg-btn{background:var(--surface);color:var(--ink-1);box-shadow:var(--shadow-sm)}
 .seg[data-instant="true"] .seg-copy{transition:none}
 .seg-btn{height:30px;padding:0 12px;border-radius:8px;font-size:13px;font-weight:600;color:var(--ink-3);white-space:nowrap;scroll-snap-align:start}
-.seg-n{margin-inline-start:6px;font-size:12px;font-weight:600;opacity:.7}
+.seg-n{margin-inline-start:6px;font-size:12px;font-weight:600}
 
 .rows{padding:4px 8px 12px}
 .row{position:relative;display:grid;grid-template-columns:40px minmax(0,1fr) auto;align-items:center;gap:12px;padding:12px 10px;border-radius:var(--r-m)}
@@ -803,7 +803,7 @@ a.btn{text-decoration:none}
 .im-card .err,.im-card .im-note{flex-basis:100%;margin:0}
 .im-spin{width:14px;height:14px;border-radius:50%;border:2px solid currentColor;border-inline-end-color:transparent;animation:im-spin .8s linear infinite}
 @keyframes im-spin{to{transform:rotate(360deg)}}
-@media (prefers-reduced-motion:reduce){.im-spin{animation:none}}
+@media (prefers-reduced-motion:reduce){.spin,.im-spin{animation:none}}
 .im-list{list-style:none;margin:0 0 12px;padding:0;display:flex;flex-direction:column;gap:10px}
 .im-row{display:flex;gap:10px;align-items:flex-start}
 .im-ic{flex:none;display:grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--accent-soft);color:var(--accent-ink)}
