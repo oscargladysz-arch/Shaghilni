@@ -36,7 +36,7 @@ export function registerTeam(r, deps) {
     const name = clean(ctx.body.name, 80); if (!name) fail(422, "name_required");
     const phone = e164(core, ctx.body.phone); if (!phone) fail(422, "invalid_phone");
     if (seatsLeft(c) <= 0) fail(409, "team_full", { limit: plans.limits(c).team });
-    if (!limit(`team-invite:${c.id}`, 20, 86400e3)) fail(429, "rate_limited");   // twenty invitations a day per company; cancelling does not give them back (D-10), and a refused number spends one too, so the form is no free account check (D-41)
+    if (!limit(`team-invite:${c.id}`, 20, 86400e3)) fail(429, "daily_limit");   // twenty invitations a day per company; cancelling does not give them back (D-10), and a refused number spends one too, so the form is no free account check (D-41)
     const u = db.get("SELECT id, role FROM users WHERE phone = ? AND deleted_at IS NULL", phone);
     if (u && u.role !== "employer") fail(409, "phone_taken");
     if (u && db.get("SELECT 1 AS x FROM companies WHERE owner_id = ?", u.id)) fail(409, "phone_taken");
@@ -115,7 +115,7 @@ export function registerTeam(r, deps) {
     if (pending(ctx.user.phone)) fail(409, "request_pending");
     const c = db.get("SELECT * FROM companies WHERE id = ? AND status IN ('draft', 'pending', 'verified')", Number(ctx.params.id)); if (!c) fail(404, "not_found");   // the company a registration number points to, even while it awaits verification (U-023); never a rejected or suspended one
     const name = clean(ctx.body.name, 80); if (!name) fail(422, "name_required");
-    if (!limit(`team-join:${ctx.user.id}`, 5, 86400e3)) fail(429, "rate_limited");   // five requests a day per account, each texting the managers; withdrawing does not give one back (U-032, as D-10)
+    if (!limit(`team-join:${ctx.user.id}`, 5, 86400e3)) fail(429, "daily_limit");   // five requests a day per account, each texting the managers; withdrawing does not give one back (U-032, as D-10)
     db.run("INSERT INTO company_members (company_id, phone, added_by, created_at, role, status, name, user_id) VALUES (?, ?, ?, ?, 'recruiter', 'requested', ?, ?)", c.id, ctx.user.phone, ctx.user.id, now(), name, ctx.user.id);
     audit(ctx.user.id, "team.requested", "company", c.id, {});
     if (c.status === "verified") for (const p of managers(c)) tell(p, "team_request", { co: coName(c), name: { en: name, ar: name } });   // an unverified holder is told nothing: the request waits for the admin's check

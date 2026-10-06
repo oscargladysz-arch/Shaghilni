@@ -499,7 +499,7 @@ Brief `<features>` letters → areas: A → 1, 13 · B → 1, 2, 3, 4, 5, 14 · 
 
 | Feature | Status | Evidence | Tests | Notes or gap |
 |---|---|---|---|---|
-| `STR.en`/`STR.ar` parity (1,683 keys each after Stage 4, same placeholders, no empty Arabic) | VERIFIED (Stage 2) | `i18n.js:6-7`; `i18n3.js:2,15`; `demo.js:3,10` (+23 keys at runtime); probe: 0 one-sided keys, 0 placeholder mismatches, 0 empty, 8 Arabic values without Arabic letters | none (import.test.js:12 only loads the files) | `test/i18n.test.js` holds parity and placeholders; 1,680 keys after Stage 3; 8 Latin-only Arabic values allow-listed; the duplicate-key ratchet is at en 7 / ar 6 |
+| `STR.en`/`STR.ar` parity (1,684 keys each after Stage 4, same placeholders, no empty Arabic) | VERIFIED (Stage 2) | `i18n.js:6-7`; `i18n3.js:2,15`; `demo.js:3,10` (+23 keys at runtime); probe: 0 one-sided keys, 0 placeholder mismatches, 0 empty, 8 Arabic values without Arabic letters | none (import.test.js:12 only loads the files) | `test/i18n.test.js` holds parity and placeholders; 1,680 keys after Stage 3; 8 Latin-only Arabic values allow-listed; the duplicate-key ratchet is at en 7 / ar 6 |
 | Plural forms as CLDR objects rendered by `tn()` | PARTIAL | `engine.js:27-38,40`; `i18n3.js:5,18` | none | Numbers always `en-US` (`engine.js:19`) |
 | `t()` lookup with English fallback then the key itself | PARTIAL | `engine.js:18,39,318` | none | Raw key shown on a miss (`coGovL`, `edu_student`) |
 | Language switch (header, settings, localStorage + `PUT /api/me/lang`, re-render) | PARTIAL | `index.html:29`; `app.js:108-109`; `boot.js:22-32,67-68,250`; `me.js:28-33`; `db.js:11` | security test 3 (junk) | Happy path untested; device language overrides the account on every load |
