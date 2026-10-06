@@ -124,6 +124,20 @@ test("events: companies attend, meet signed-up candidates, and the report shows 
   assert.equal(JSON.stringify(R).includes(GRAD.name), false, "the report has no names");
 });
 
+test("events: a confirmed company sees every attendee open to recruiters, however many newer profiles fill the first page (U-015)", async () => {
+  const S = await start(), admin = await S.login("+12025550199"), { e } = await employer(S, admin, "0955 792 001", "Qasioun Advisory");
+  const ev = (await admin.post("/api/organize/events", { event: EV({ capacity: 0, startsLocal: local(0.02) }), publish: true })).body.event;
+  const st = await S.login("0933 792 101"); await st.put("/api/me/profile", { profile: profileAt("homs") }); await st.put("/api/me/recruit", { open: true }); await st.post(`/api/events/${ev.id}/rsvp`);
+  await e.post(`/api/employer/events/${ev.id}/attend`);
+  await admin.post(`/api/organize/events/${ev.id}/companies`, { companyId: S.db.get("SELECT company_id FROM event_companies").company_id, status: "confirmed" });
+  const me = (await st.get("/api/me")).body.user.id, t0 = Date.now();
+  S.db.tx(() => { for (let i = 1; i <= 60; i++) {   // sixty opted-in profiles, all newer than the attendee's, none of them signed up
+    const uid = Number(S.db.run("INSERT INTO users (phone, role, lang, created_at) VALUES (?, 'seeker', 'ar', ?)", `+963933793${String(i).padStart(3, "0")}`, t0).lastInsertRowid);
+    S.db.run("INSERT INTO profiles (user_id, data, updated_at) VALUES (?, ?, ?)", uid, JSON.stringify({ ...profileAt("homs"), name: `Filler ${i}`, recruit: { open: true } }), t0 + 1000 + i);
+  } });
+  assert.deepEqual((await e.get(`/api/employer/students?event=${ev.id}`)).body.students.map(x => x.id), [me], "the attendee is listed, and only the attendee");
+});
+
 test("events: a career office runs events only at its own university", async () => {
   const S = await start(), admin = await S.login("+12025550199");
   await admin.post("/api/admin/campus", { phone: "0944 792 001", uni: "homs" }); const office = await S.login("0944 792 001");
