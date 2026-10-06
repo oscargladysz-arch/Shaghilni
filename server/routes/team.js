@@ -30,9 +30,10 @@ export function registerTeam(r, deps) {
       requests: c.status === "verified" && plans.can(c, ctx.user, "manage") ? rows.filter(m => m.status === "requested").map(m => out(c, m)) : [] };   // a request waits unseen until the company is verified (fix review of U-023)
   });
   r.post("/api/employer/team", employer, ctx => {
-    const c = active(ctx); plans.allow(ctx, c, "manage");
+    const c = active(ctx), me = plans.allow(ctx, c, "manage");
     if (c.status !== "verified") fail(409, "company_not_verified");   // an unchecked company sends no text in Shaghilni's name (D-10)
     const role = ROLES.includes(ctx.body.role) ? ctx.body.role : null; if (!role) fail(422, "bad_role");
+    if (role === "admin" && me !== "owner") fail(403, "role_forbidden");   // only the owner makes admins, as at approval and role change (D-31, U-030)
     const name = clean(ctx.body.name, 80); if (!name) fail(422, "name_required");
     const phone = e164(core, ctx.body.phone); if (!phone) fail(422, "invalid_phone");
     if (seatsLeft(c) <= 0) fail(409, "team_full", { limit: plans.limits(c).team });
@@ -69,7 +70,7 @@ export function registerTeam(r, deps) {
   r.delete("/api/employer/team/:phone", employer, ctx => {
     const c = active(ctx), me = plans.allow(ctx, c, "manage");
     const m = db.get("SELECT * FROM company_members WHERE company_id = ? AND phone = ?", c.id, String(ctx.params.phone)); if (!m) fail(404, "not_found");
-    if (me !== "owner" && m.role === "admin" && m.status === "active") fail(403, "role_forbidden");
+    if (me !== "owner" && m.role === "admin") fail(403, "role_forbidden");   // an admin, or an invitation to be one, is the owner's to remove (U-030)
     db.run("DELETE FROM company_members WHERE company_id = ? AND phone = ?", c.id, m.phone);
     audit(ctx.user.id, m.status === "invited" ? "team.invite_cancelled" : "team.removed", "company", c.id, {}); return { ok: true };
   });

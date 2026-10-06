@@ -388,7 +388,7 @@ Several people can work in one company, each signing in with their own phone num
 | Role | Can do |
 |---|---|
 | **Owner** (one) | Everything, including billing and plans; hands the company over to someone else |
-| **Admin** | Runs the team and the company page, plus everything a recruiter does; admins can invite admins, but only the owner changes an admin's role, removes an admin or approves a join request as admin |
+| **Admin** | Runs the team and the company page, plus everything a recruiter does; only the owner invites an admin, changes an admin's role, removes an admin or cancels their invitation, or approves a join request as admin |
 | **Recruiter** | Posts and edits jobs, moves applicants through the stages, searches for candidates, sends invitations |
 | **Hiring manager** | Sees jobs and applicants, reads resumes, writes notes |
 
