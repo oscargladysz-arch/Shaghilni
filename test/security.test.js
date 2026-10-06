@@ -197,6 +197,17 @@ test("1 · the student email code is compared in constant time, like every other
   assert.doesNotMatch(src, /codeHash\([^)]*\) !== row\.code_hash/, "and no plain string comparison of the code hash");
 });
 
+test("1 · signing out or deleting the account clears the profile draft kept on the phone, so the next person's form starts empty (D-54)", () => {
+  const js = f => readFileSync(new URL(`../public/js/${f}`, import.meta.url), "utf8"), mem = new Map();
+  const ctx = vm.createContext({ console, S: { lang: "en" }, localStorage: { getItem: k => (mem.has(k) ? mem.get(k) : null), setItem: (k, v) => mem.set(k, String(v)), removeItem: k => mem.delete(k) } });
+  for (const f of ["lookups.js", "i18n.js", "i18n2.js", "i18n3.js", "i18n4.js", "engine.js"]) vm.runInContext(js(f), ctx, { filename: f });
+  vm.runInContext("function setProfile() {}", ctx);   // app.js's, not needed here
+  vm.runInContext(js("app-seeker.js"), ctx, { filename: "app-seeker.js" });
+  vm.runInContext('store.set("meDraft", { name: "Lina Haddad", email: "lina@example.com", exp: [{ role: "Accountant" }] })', ctx);
+  vm.runInContext("resetSession()", ctx);   // used by sign-out and by account deletion
+  assert.equal(vm.runInContext('store.get("meDraft", null)', ctx), null, "the draft with the name, email and work history is gone");
+});
+
 test("2 · access control (the equivalent of row-level security): no account can reach another's data", async () => {
   const S = await start(), admin = await S.login("+12025550199");
   const a = await employerWithLiveJob(S, admin, "0955 200 001", "Alpha Co");
