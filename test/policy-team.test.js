@@ -246,7 +246,7 @@ test("policy team: A's activity log never carries B's actions and names people, 
   assert.equal((await A.del(`/api/employer/team/${enc(PH.recruiter)}`)).status, 200);
   const gone = (await log()).find(x => x.action === "job.created" && x.job && x.job.en === "Alpha clerk");
   assert.match(gone.who, /^(former teammate|زميل سابق)$/, "U-007: a removed teammate is a former teammate, not a number: " + gone.who);
-  assert.ok(!/963|\d{3} \d{3}|deleted:/.test(JSON.stringify(await log())), "no number or deletion marker anywhere in the log after the removal");
+  assert.ok(!/963|\d{3} \d{3}|deleted:/.test(JSON.stringify((await log()).map(({ at, ...x }) => x))), "no number or deletion marker anywhere in the log after the removal");   // timestamps are 13 digits and contain "963" about once in 200: dropped, as in the audit-log test
   const posted = (await A.get("/api/employer")).body.jobs.find(j => j.id === job.id); assert.match(posted.postedBy, /^(former teammate|زميل سابق)$/, "U-007: the listing's Posted by says the same");
 });
 
