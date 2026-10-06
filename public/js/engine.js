@@ -460,10 +460,14 @@ const HELP_START = /^(helped|help|assisted|assist|supported|support|contributed|
 const NUM_WORDS = new Set("one two three four five six seven eight nine ten eleven twelve fifteen twenty thirty forty fifty hundred hundreds thousand thousands million dozen dozens percent".split(" "));
 // The same three checks in Arabic (U-010): number words, "helped" grown into "led", and places; the lists go through norm() like the text.
 const arSet = words => new Set(words.split(" ").map(norm));
-const AR_NUM = arSet("واحد واحدة اثنان اثنين اثنتين ثلاث ثلاثة أربع أربعة خمس خمسة ستة سبع سبعة ثماني ثمانية تسع تسعة عشر عشرة عشرات عشرين عشرون ثلاثين ثلاثون أربعين أربعون خمسين خمسون ستين ستون سبعين سبعون ثمانين ثمانون تسعين تسعون مئة مائة مئتين مئتان مئات ألف ألفين ألفان آلاف ألوف مليون ملايين");
-const AR_HELP = arSet("ساعدت ساعد أساعد ساعدنا شاركت شارك أشارك شاركنا ساهمت ساهم أساهم ساهمنا دعمت عاونت تعاونت");
-const AR_LEAD = arSet("قدت قاد أقود قدنا أدرت أدار أدير أدرنا أشرفت أشرف أشرفنا ترأست ترأس تولّيت أسست أسس");
+const AR_NUM = arSet("ست ثمان ثلاثمئة ثلاثمائة أربعمئة أربعمائة خمسمئة خمسمائة ستمئة ستمائة سبعمئة سبعمائة ثمانمئة ثمانمائة تسعمئة تسعمائة ألفي مئتي مليار مليارات مليونين مليونان واحد واحدة اثنان اثنين اثنتين ثلاث ثلاثة أربع أربعة خمس خمسة ستة سبع سبعة ثماني ثمانية تسع تسعة عشر عشرة عشرات عشرين عشرون ثلاثين ثلاثون أربعين أربعون خمسين خمسون ستين ستون سبعين سبعون ثمانين ثمانون تسعين تسعون مئة مائة مئتين مئتان مئات ألف ألفين ألفان آلاف ألوف مليون ملايين");
+const AR_HELP = arSet("أسهمت أسهم أسهمنا مساعدة مشاركة مساهمة ساعدت ساعد أساعد ساعدنا شاركت شارك أشارك شاركنا ساهمت ساهم أساهم ساهمنا دعمت عاونت تعاونت");
+const AR_LEAD = arSet("قيادة إدارة إشراف ترؤس قدت قاد أقود قدنا أدرت أدار أدير أدرنا أشرفت أشرف أشرفنا ترأست ترأس تولّيت أسست أسس");
 let AR_PLACES = null;   // the Arabic names of the governorates and countries, filled on first use
+// A number word in another form is the same number: مئة/مائة, the feminine ة, the accusative alif, ون/ان for ين (fix review 2).
+const numCanon = w => { let c = w.replace(/ماي/g, "مي"); if (c.length > 3 && /ا$/.test(c)) c = c.slice(0, -1); if (c.length > 2 && /ه$/.test(c)) c = c.slice(0, -1); if (c.length >= 4 && /ون$/.test(c)) c = c.slice(0, -2) + "ين"; else if (c.length > 4 && /ان$/.test(c)) c = c.slice(0, -2) + "ين"; return c; };
+let AR_NUM_C = null;
+const leadWords = x => { const ws = norm(x).split(" "); return /^(قمت|كنت)$/.test(ws[0]) && ws[1] ? [ws[0], ws[1]] : [ws[0] || ""]; };   // «قمت بمساعدة …» opens with its second word
 const arVariants = w => { const v = new Set(prefixVariants(w)); for (const x of [...v]) if (/^[بلك]/.test(x) && x.length > 3) v.add(x.slice(1)); return [...v]; };   // و ف ال لل بال كال, and ب ل ك before a name
 const EXTRA_VERBS = "achieved advised arranged audited catalogued chaired classified communicated compiled completed composed computed contributed convinced coordinated counselled demonstrated designed determined directed distributed drafted earned edited educated enabled established estimated evaluated examined executed expanded facilitated forecasted formulated founded gathered generated guided identified implemented improved increased initiated instructed interpreted interviewed introduced investigated launched maximized mediated minimized modernized motivated navigated observed obtained oversaw participated performed persuaded piloted prioritized produced programmed promoted proposed provided published purchased raised reconciled redesigned reduced resolved responded restored revised scheduled screened secured simplified solved sorted spearheaded streamlined strengthened structured summarized surveyed synthesized trained transformed upgraded utilized verified volunteered worked";
 const VERB_STEMS = new Set();  // filled in cvInit(), once stem() and norm() exist
@@ -499,7 +503,7 @@ const SKILL_LEX = [
 ];
 const UNI_CITY = { damascus: "damascus", aleppo: "aleppo", homs: "homs", latakia: "latakia", furat: "deirezzor", hama: "hama", hiast: "damascus", hiba: "damascus", svu: "remote", aleppoti: "aleppo" };
 const STOP = new Set(("a an the and or of for to in on at by with from as is are be this that your you our we will can per each all any into over under their them his her its "
-  + "في من على الى عن مع او ثم هذا هذه ذلك التي الذي كل بعد قبل عند لدى حتى غير و").split(" "));
+  + "في من على الى عن مع او ثم هذا هذه ذلك التي الذي كل بعد قبل عند لدى حتى غير و").split(" ").map(norm));   // through norm(), which writes ى as ي (fix review 2)
 function stem(w) {
   if (/^[a-z]/.test(w)) {
     if (w.length > 5 && w.endsWith("ies")) return w.slice(0, -3) + "y";
@@ -560,14 +564,16 @@ function factGuard(orig, sug, facts, jobText) {
   const have = new Set(nums(orig));
   const n1 = nums(s).find(n => !have.has(n));
   if (n1) return { ok: false, why: "gNumber", tok: n1 };
-  const ow = new Set(norm(orig).split(" ").flatMap(arVariants));
-  const n2 = norm(s).split(" ").find(w => arVariants(w).some(c => (NUM_WORDS.has(c) || AR_NUM.has(c)) && !ow.has(c)));
-  if (n2) return { ok: false, why: "gNumber", tok: n2 };
-  const first = norm(s).split(" ")[0], helpAr = arVariants(norm(orig).split(" ")[0] || "").some(w => AR_HELP.has(w));
-  if ((HELP_START.test(orig.trim()) && LEAD_VERBS.has(first)) || (helpAr && arVariants(first).some(w => AR_LEAD.has(w)))) return { ok: false, why: "gInflate", tok: s.split(/\s+/)[0] };
+  if (!AR_NUM_C) AR_NUM_C = new Set([...AR_NUM].map(numCanon));
+  const ow = new Set(norm(orig).split(" ").flatMap(arVariants).map(numCanon)), isNum = c => NUM_WORDS.has(c) || AR_NUM_C.has(numCanon(c));
+  const n2 = norm(s).split(" ").find(w => arVariants(w).some(c => isNum(c) && !ow.has(numCanon(c))));
+  if (n2) return { ok: false, why: "gNumber", tok: (s.split(/\s+/).find(r => norm(r).split(" ").includes(n2)) || n2).replace(/[^\p{L}\p{N}]/gu, "") };   // the word as written (fix review 2)
+  const first = norm(s).split(" ")[0], helpAr = leadWords(orig).some(w => arVariants(w).some(v => AR_HELP.has(v)));
+  if ((HELP_START.test(orig.trim()) && LEAD_VERBS.has(first)) || (helpAr && leadWords(s).some(w => arVariants(w).some(v => AR_LEAD.has(v))))) return { ok: false, why: "gInflate", tok: s.split(/\s+/)[0] };
   if (!AR_PLACES) AR_PLACES = new Set([...Object.values(GOV), ...Object.values(COUNTRY)].flatMap(x => norm(x.ar).split(" ")).flatMap(w => [w, w.replace(/^ال/, "")])
     .filter(w => w.length > 2 && !["ريف", "دير", "بلد", "اخر", "بعد", "المملكه", "مملكه", "المتحده", "متحده", "الولايات", "ولايات", "رقه", "امارات"].includes(w)));   // each name with and without ال; the words of "ريف دمشق" or "عن بعد" that are not names, and رقة/أمارات, which are also common words, left out
-  const known = new Set(norm(`${orig} ${facts}`).split(" ").flatMap(arVariants));
+  const known = new Set(norm(`${orig} ${facts}`).split(" ").flatMap(arVariants)), rw = s.split(/\s+/);
+  for (let i = 0; i < rw.length - 1; i++) if (arVariants(norm(rw[i])).some(v => v === "ولايات" || v === "مملكه") && norm(rw[i + 1]) === "المتحده" && !known.has("المتحده")) return { ok: false, why: "gName", tok: `${rw[i]} ${rw[i + 1]}`.replace(/[^\p{L}\p{N} ]/gu, "") };   // the two-word countries (fix review 2)
   for (const raw0 of s.split(/\s+/)) { const w = norm(raw0); if (arVariants(w).some(c => AR_PLACES.has(c)) && !arVariants(w).some(c => known.has(c))) return { ok: false, why: "gName", tok: raw0.replace(/[^\p{L}\p{N}]/gu, "") }; }
   const factSet = new Set(toks(facts)), jobSet = new Set(toks(jobText));
   const words = s.split(/\s+/);
