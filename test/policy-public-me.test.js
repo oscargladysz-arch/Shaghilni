@@ -151,7 +151,7 @@ test("export and deletion: seeker A's file holds A's data only, and deleting A e
   assert.equal((await A.post(`/api/me/saved/${I.jobA}`)).status, 200);
   assert.equal((await A.post(`/api/me/invitations/${I.invA}/block`)).status, 200, "A blocks the recruiter: a recruiter_blocks row");
   const ex = await A.get("/api/me/export"); assert.equal(ex.status, 200); assert.match(ex.headers.get("content-disposition") || "", /attachment/);
-  assert.deepEqual(Object.keys(ex.body).sort(), ["account", "applications", "eventTickets", "exportedAt", "invitations", "jobAlerts", "profile", "savedJobs", "studentVerification", "textMessages"], "every section is on the allow-list");
+  assert.deepEqual(Object.keys(ex.body).sort(), ["account", "applications", "blockedCompanies", "eventTickets", "exportedAt", "invitations", "jobAlerts", "profile", "savedJobs", "studentVerification", "textMessages"], "every section is on the allow-list (blockedCompanies since U-014: the notice says the companies a person blocked are held)");
   assert.equal(ex.body.account.phone, "+963944900001"); assert.equal(ex.body.profile.name, "Seeker Alpha");
   assert.deepEqual([ex.body.applications.length, ex.body.applications[0].company.en, ex.body.applications[0].profileSentToEmployer.name], [1, "Policy Alpha", "Seeker Alpha"]);
   assert.deepEqual([ex.body.invitations.length, ex.body.invitations[0].from.en, ex.body.eventTickets.length, ex.body.eventTickets[0].code, ex.body.jobAlerts.length, ex.body.jobAlerts[0].search.q, ex.body.savedJobs[0].jobId], [1, "Policy Alpha", 1, I.ticketA, 1, "store", I.jobA]);
