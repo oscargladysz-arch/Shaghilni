@@ -227,7 +227,9 @@ test("teams: an unverified holder can neither delete a waiting join request nor 
   const d = await real.put("/api/employer/company", { company: { name: { en: "Real Two" }, gov: "homs", regNo: "REG-REAL-2", contactName: "Real", whatsapp: "0955 816 102" } });
   assert.equal((await real.post(`/api/employer/companies/${d.body.detail.id}/join`, { name: "Victim Two" })).status, 200);
   const del = await squat.del(`/api/employer/team/${encodeURIComponent("+963955816102")}`);
-  assert.deepEqual([del.status, del.body.error], [409, "company_not_verified"], "the waiting request cannot be confirmed by deleting it");
+  const none = await squat.del(`/api/employer/team/${encodeURIComponent("+963955816199")}`);
+  assert.deepEqual([del.status, del.body.error], [none.status, none.body.error], "the waiting request cannot be confirmed by deleting it: the answer is the one for a number that never asked (fix review 3)");
+  assert.deepEqual([del.status, del.body.error], [404, "not_found"]);
   assert.equal(S.db.get("SELECT status FROM company_members WHERE phone = '+963955816102'").status, "requested", "it still waits");
   assert.ok(!(await squat.get("/api/employer/activity")).body.activity.some(x => x.action === "team.requested"), "and the activity log does not show that a request arrived");
 });
