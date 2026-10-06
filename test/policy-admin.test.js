@@ -151,6 +151,15 @@ test("policy admin: a rejected company's team reads no applicant and moves nobod
   assert.deepEqual([mv.status, mv.body && mv.body.error], [409, "company_not_verified"], "nor moves an applicant");
   assert.equal(S.db.get("SELECT status FROM applications WHERE id = ?", ids.appA).status, "new", "the application is untouched");
   assert.equal(S.texts.length, texts, "and no text goes to the applicant under the rejected company's name");
+  // resubmitting the unchanged page makes it pending, not verified: still nothing until the admin verifies it again (fix review 2)
+  assert.equal((await C.A.e.post("/api/employer/company/submit", {})).status, 200, "the rejected company resubmits");
+  assert.equal(S.db.get("SELECT status FROM companies WHERE id = ?", ids.companyA).status, "pending");
+  for (const who of [C.A.e, C.hiring]) { const r = await list(who); assert.deepEqual([r.status, r.body && r.body.error], [409, "company_not_verified"], "a resubmitted company reads no applicant"); }
+  const mv2 = await C.recruiter.put(`/api/employer/applications/${ids.appA}`, { status: "shortlisted" });
+  assert.deepEqual([mv2.status, mv2.body && mv2.body.error], [409, "company_not_verified"], "nor moves one");
+  assert.equal(S.texts.length, texts, "nor texts anyone");
+  assert.equal((await admin.post(`/api/admin/companies/${ids.companyA}/verify`, { screened: true })).status, 200, "the admin verifies it again");
+  assert.equal((await list(C.A.e)).status, 200, "and the team reads its applicants again");
 });
 
 test("policy admin: a hire can be moved back to interview until the Shaghilni team confirms it; a confirmed hire is final (U-003)", async () => {
