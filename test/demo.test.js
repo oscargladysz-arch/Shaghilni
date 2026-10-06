@@ -2,7 +2,11 @@
 import { test, after } from "node:test";
 import assert from "node:assert/strict";
 import http from "node:http";
-import { readFileSync } from "node:fs";
+import { readFileSync, mkdtempSync, mkdirSync, copyFileSync, rmSync } from "node:fs";
+import { execFileSync } from "node:child_process";
+import { tmpdir } from "node:os";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 import { loadConfig } from "../server/config.js";
 import { openDb } from "../server/db.js";
 import { createApp } from "../server/app.js";
@@ -139,10 +143,14 @@ test("demo accounts: the uninstall step also takes their passages out of SECURIT
   assert.doesNotMatch(cfg, /demo accounts?/i, "server/config.js keeps no comment about the demo accounts once their line is gone");
 });
 
-test("demo accounts: the uninstall step also takes their setting out of .env.example and the demo test out of SECURITY.md's test list (fix review 2)", () => {
-  const read = rel => readFileSync(new URL(`../${rel}`, import.meta.url), "utf8"), script = read("scripts/demo-accounts.js"), env = read(".env.example");
-  assert.ok(script.includes('".env.example"') && /^# demo-accounts:start$/m.test(env), "scripts/demo-accounts.js edits .env.example, whose demo setting sits between markers");
-  assert.deepEqual(env.replace(/^# demo-accounts:start\n[\s\S]*?^# demo-accounts:end\n\n?/m, "").match(/demo accounts?|DEMO_ACCOUNTS/gi) || [], [], "after the uninstall .env.example offers no setting for deleted code");   // the same expression the script uses
-  const list = read("SECURITY.md").replace(/(# \d+ tests in \d+ files \([^)\n]*?)\bdemo, /, "$1").split("\n").find(l => /^npm test\b/.test(l));   // the script's edit of the test list
-  assert.ok(script.includes("demo, /") && list && !/\bdemo\b/.test(list), `after the uninstall SECURITY.md's test list names no demo test: ${list}`);
+test("demo accounts: the uninstall step, run for real on a copy, takes their setting out of .env.example, the demo test out of SECURITY.md's test list and every passage about them out of README.md, SECURITY.md and PRODUCT.md (fix reviews 2 and 3)", () => {
+  const dir = mkdtempSync(path.join(tmpdir(), "uninstall-")), from = rel => fileURLToPath(new URL(`../${rel}`, import.meta.url));
+  try {
+    for (const rel of ["scripts/demo-accounts.js", ".env.example", "README.md", "SECURITY.md", "PRODUCT.md", "package.json"]) { mkdirSync(path.dirname(path.join(dir, rel)), { recursive: true }); copyFileSync(from(rel), path.join(dir, rel)); }
+    execFileSync(process.execPath, [path.join(dir, "scripts/demo-accounts.js"), "uninstall"], { cwd: dir, stdio: "pipe" });   // the script finds its files from its own place, so it edits the copy only
+    const read = rel => readFileSync(path.join(dir, rel), "utf8"), list = read("SECURITY.md").split("\n").find(l => /^npm test\b/.test(l));
+    assert.deepEqual(read(".env.example").match(/demo accounts?|DEMO_ACCOUNTS/gi) || [], [], "after the uninstall .env.example offers no setting for deleted code");
+    assert.ok(list && !/\bdemo\b/.test(list), `after the uninstall SECURITY.md's test list names no demo test: ${list}`);
+    for (const rel of ["README.md", "SECURITY.md", "PRODUCT.md"]) assert.deepEqual(read(rel).match(/demo accounts?|demo-accounts|demo\.js\b|auth\/demo|DEMO_ACCOUNTS|removable demo/gi) || [], [], `after the uninstall ${rel} no longer describes deleted code`);
+  } finally { rmSync(dir, { recursive: true, force: true }); }
 });
