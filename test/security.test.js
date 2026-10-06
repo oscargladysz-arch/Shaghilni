@@ -13,6 +13,7 @@ import { openDb, now } from "../server/db.js";
 import { createApp } from "../server/app.js";
 import { seedDemo, countDemo } from "../server/seed.js";
 import { leadingZeroBits } from "../server/auth.js";
+import { makeSms } from "../server/sms.js";
 import { scanSecrets, scanCode, auditSettings, parseEnvFile } from "../scripts/security-check.js";
 
 const realFetch = globalThis.fetch;
@@ -123,6 +124,19 @@ test("1 · an employer who leaves takes the application phone number and email o
   const co = JSON.parse(S.db.get("SELECT data FROM companies WHERE id = ?", companyId).data);
   assert.deepEqual([co.contactName, co.whatsapp, co.applyPhone, co.applyEmail], ["", "", "", ""], "every contact detail of the person who left is removed, the application phone and email included");
   assert.ok(!S.db.get("SELECT data FROM companies WHERE id = ?", companyId).data.includes("955100052"), "the number is nowhere in the record");
+});
+
+test("1 · a text provider's error answer never carries a full phone number into the server log or the texts table (leaks review)", async () => {
+  const cfgOf = provider => ({ sms: { provider, textbeeKey: "k", twilioSid: "AC0", twilioToken: "t", twilioFrom: "+15550000000" } });
+  try {
+    for (const provider of ["textbee", "twilio"]) {
+      globalThis.fetch = async () => new Response(JSON.stringify({ code: 21211, message: "The 'To' number +963944000001 is not a valid phone number." }), { status: 400 });
+      const err = await makeSms(cfgOf(provider))("+963944000001", "hello").then(() => null, e => e);
+      assert.ok(err, `${provider}: a refused text is an error`);
+      assert.match(err.message, new RegExp(`^${provider} 400: `), `${provider}: the error still says which provider and status`);
+      assert.ok(!/963944000001/.test(err.message), `${provider}: the provider's echo of the number is masked: ${err.message}`);
+    }
+  } finally { globalThis.fetch = realFetch; }
 });
 
 test("2 · access control (the equivalent of row-level security): no account can reach another's data", async () => {
