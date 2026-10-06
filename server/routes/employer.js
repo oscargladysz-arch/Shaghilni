@@ -39,14 +39,15 @@ export function registerEmployer(r, deps) {
   });
 
   r.put("/api/employer/company", employer, ctx => {
+    const data = sanitizeCompany(core, ctx.body.company);
     { const own = myCompany(ctx); if (own) plans.allow(ctx, own, "manage");
       // one company, one page: if this registration number is already on Shaghilni, ask to join instead; Arabic-Indic digits are digits, Arabic words count like Latin ones (the governorate of the register), in any order beside the digits, except the register's own words and the article; registers are per governorate, so two companies' governorates must also match (a page without one matches any); an existing page changing its number is checked too (U-018, fix reviews 1 to 3)
-      const key = (s, gov) => { const t = (core.norm(s).toUpperCase().match(/[A-Z]+|[0-9]+|[\u0621-\u064A]+/g) || []).reduce((a, t) => (/^\d/.test(t) && /^\d/.test(a[a.length - 1] || "") ? a.slice(0, -1).concat(a[a.length - 1] + t) : a.concat(t)), []).map(w => w.replace(/^ال(?=[\u0621-\u064A]{2})/, "")).filter((w, i, a) => !REG_WORDS.has(w) && !(w === "س" && a[i + 1] === "ت") && !(w === "ت" && a[i - 1] === "س")); return { w: (t.some(x => /^\d/.test(x)) ? t.sort() : t).join(" "), gov: typeof gov === "string" ? gov : "" }; };
-      const same = (a, b) => !!a.w && a.w === b.w && (!a.gov || !b.gov || a.gov === b.gov), of = x => { const d = J(x.data) || {}; return key(d.regNo, d.gov); }, body = ctx.body.company || {}, reg = key(body.regNo, body.gov || (own && of(own).gov));
+      const key = (s, gov) => { const t = []; for (const w of core.norm(String(s ?? "").slice(0, 60)).toUpperCase().match(/[A-Z]+|[0-9]+|[\u0621-\u064A]+/g) || []) if (/^\d/.test(w) && /^\d/.test(t[t.length - 1] || "")) t[t.length - 1] += w; else t.push(w);   // at most 60 characters, the stored cap, so a huge body costs nothing (fix review 4)
+        const k = t.map(w => w.replace(/^ال(?=[\u0621-\u064A]{2})/, "")).filter((w, i, a) => !REG_WORDS.has(w) && !(w === "س" && a[i + 1] === "ت") && !(w === "ت" && a[i - 1] === "س")); return { w: (k.some(x => /^\d/.test(x)) ? k.sort() : k).join(" "), gov: typeof gov === "string" ? gov : "" }; };
+      const same = (a, b) => !!a.w && a.w === b.w && (!a.gov || !b.gov || a.gov === b.gov), of = x => { const d = J(x.data) || {}; return key(d.regNo, d.gov); }, reg = key(data.regNo, data.gov || (own && of(own).gov));   // the sanitised page: its number capped, its governorate one the server keeps
       const dup = reg.w && (!own || !same(of(own), reg)) && db.all("SELECT id, data, status FROM companies").find(x => (!own || x.id !== own.id) && same(of(x), reg));
       if (dup) fail(409, "company_exists", { id: dup.id, name: (J(dup.data) || {}).name || {}, verified: dup.status === "verified" });
       if (!own && db.get("SELECT 1 AS x FROM company_members WHERE phone = ? AND status IN ('invited', 'requested')", ctx.user.phone)) fail(409, "membership_pending"); }
-    const data = sanitizeCompany(core, ctx.body.company);
     const c = myCompany(ctx);
     if (!c) {
       const id = Number(db.run("INSERT INTO companies (owner_id, data, created_at, updated_at) VALUES (?, ?, ?, ?)", ctx.user.id, JSON.stringify(data), now(), now()).lastInsertRowid);
