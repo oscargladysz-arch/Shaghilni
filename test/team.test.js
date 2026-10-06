@@ -172,6 +172,21 @@ test("teams: the register's own words (the article, سجل تجاري, س.ت, ر
   const other = await put("0955 818 100", "Hama Co", "سجل تجاري حماة 42345"); assert.equal(other.status, 200, `another governorate's register with the same digits is still another number: ${other.text}`);
 });
 
+test("teams: the registration-number key reads the words in any order and the company's own governorate, so the same register typed another way is one company and two governorates' registers sharing digits are two (fix review 3 of U-018)", async () => {
+  const S = await start();
+  const put = async (phone, name, regNo, gov = "homs") => (await S.login(phone, "employer")).put("/api/employer/company", { company: { name: { en: name }, gov, regNo, contactName: `Contact ${name}`, whatsapp: phone } });
+  assert.equal((await put("0955 819 001", "Damascus Traders", "72345", "damascus")).status, 200);
+  const aleppo = await put("0955 819 002", "Aleppo Textiles", "سجل تجاري 72345", "aleppo"); assert.equal(aleppo.status, 200, `an Aleppo register with the same digits is another company: ${aleppo.text}`);
+  const again = await put("0955 819 003", "Damascus Copy", "س.ت 72345", "damascus"); assert.deepEqual([again.status, again.body.error], [409, "company_exists"], "the same digits in the same governorate are the same register");
+  let n = 10;
+  for (const [first, second] of [["سجل تجاري دمشق 62234", "62234 دمشق"], ["سجل تجاري دمشق رقم 61234", "رقم السجل التجاري 61234 دمشق"], ["HM-77345", "HM77345"], ["12 345 حلب", "حلب 12345"]]) {
+    n += 2;
+    assert.equal((await put(`0955 819 ${String(n).padStart(3, "0")}`, `Holder ${n}`, first)).status, 200, `${first} is saved`);
+    const dup = await put(`0955 819 ${String(n + 1).padStart(3, "0")}`, `Copy ${n}`, second);
+    assert.deepEqual([dup.status, dup.body.error], [409, "company_exists"], `${second} is the same number as ${first}`);
+  }
+});
+
 test("teams: a registration number held by a company still awaiting verification can be joined (U-023); the request waits, unseen and untexted, until the admin verifies the holder (fix review)", async () => {
   const S = await start(), admin = await S.login("+12025550199");
   const { e: owner } = await employer(S, admin, "0955 816 001", "Pending Freight", false);   // submitted, not yet verified
