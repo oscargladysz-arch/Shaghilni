@@ -43,8 +43,8 @@ The security tests are in `test/security.test.js`, numbered after this list. The
 - **Minimisation.** Employers see a job seeker's details only after that person applies: the profile snapshot sent with that application, the account's phone number and the current verified-student badge. People who switch on *Let recruiters find me* also appear as short cards in candidate search (item 8). The public board carries no private company data; test 2 checks this.
 - **Download my data.** On the profile page. It gives the account, profile, saved jobs, applications with the resume sent, invitations received, student verification, event tickets, job alerts and text records (job seekers), or the company page and listings (company owners), as a JSON file. Plan, charges, team membership, partnerships, blocked companies and a career office's record are not in it yet (see `docs/agent/DEFECTS.md`).
 - **Deletion.**
-  - A person deleting their account erases their profile, saved jobs, sessions, text-message records, leftover sign-in codes, invitations, job alerts, student verification, event tickets, team membership and blocked companies. A career office deleting its account also erases its office record (the university and the contact name). Each application survives only as an anonymous record (status and dates; the resume sent and the employer's note are erased).
-  - An employer deleting their account also closes their listings and removes the contact name and WhatsApp number from the company page (the application phone number and email are not yet cleared: see `docs/agent/DEFECTS.md`).
+  - A person deleting their account erases their profile, saved jobs, sessions, text-message records (texts sent to the number before the account existed, such as a team invitation, included), leftover sign-in codes, invitations, job alerts, student verification, event tickets, team membership and blocked companies. A career office deleting its account also erases its office record (the university and the contact name). Each application survives only as an anonymous record (status and dates; the resume sent and the employer's note are erased).
+  - An employer deleting their account also closes their listings and removes the contact name, WhatsApp number, application phone number and email from the company page.
 - **Automatic retention.** `server/retention.js` runs at start-up and every hour and deletes:
   - sign-in codes, with the IP addresses stored alongside them, after 24 hours;
   - expired sessions;
@@ -216,7 +216,7 @@ or left behind after deletion.
 | University email address | The student (masked); never the career office or employers | The email service, for the code; kept so it verifies one account; deleted with the account |
 | IP addresses | Nobody, through the app | Stored with sign-in codes for 24 hours; kept in memory for rate limits; your host's logs |
 | Sessions | Nobody | Stored only as a hash, with the browser type; deleted at sign-out or when they expire |
-| Text messages | The recipient, in their export | The text provider; kept for 90 days |
+| Text messages | The recipient, in their export (texts sent to the number before the account existed included) | The text provider; kept for 90 days, or until the account is deleted |
 
 **Found and fixed**
 

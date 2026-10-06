@@ -127,7 +127,7 @@ export function registerMe(r, deps) {
     if (u.role === "seeker") out.studentVerification = db.all("SELECT uni, student_no, email, method, status, created_at, decided_at FROM student_verifications WHERE user_id = ?", u.id).map(v => ({ university: v.uni, universityEmail: v.email || null, method: v.method, studentNumber: v.student_no || null, status: v.status, requestedAt: iso(v.created_at), decidedAt: v.decided_at ? iso(v.decided_at) : null }));
     if (u.role === "seeker") out.eventTickets = db.all("SELECT r.code, r.status, r.created_at, r.checked_in_at, e.data FROM event_rsvps r JOIN events e ON e.id = r.event_id WHERE r.user_id = ?", u.id).map(x => ({ event: ((J(x.data) || {}).title) || {}, code: x.code, status: x.status, signedUpAt: iso(x.created_at), checkedInAt: x.checked_in_at ? iso(x.checked_in_at) : null }));
     if (u.role === "seeker") out.jobAlerts = db.all("SELECT data, channel, created_at FROM alerts WHERE user_id = ?", u.id).map(a => ({ search: J(a.data), channel: a.channel, createdAt: iso(a.created_at) }));
-    out.textMessages = db.all("SELECT body, status, created_at FROM notifications WHERE user_id = ? ORDER BY id", u.id)
+    out.textMessages = db.all("SELECT body, status, created_at FROM notifications WHERE user_id = ? OR phone = ? ORDER BY id", u.id, u.phone)
       .map(n => ({ text: n.body, status: n.status, at: iso(n.created_at) }));
     ctx.headers["content-disposition"] = 'attachment; filename="shaghilni-my-data.json"';
     return out;
@@ -142,7 +142,7 @@ export function registerMe(r, deps) {
       db.run("DELETE FROM profiles WHERE user_id = ?", id);
       db.run("DELETE FROM saved WHERE user_id = ?", id);
       db.run("DELETE FROM sessions WHERE user_id = ?", id);
-      db.run("DELETE FROM notifications WHERE user_id = ?", id);
+      db.run("DELETE FROM notifications WHERE user_id = ? OR phone = ?", id, phone);   // texts sent to the number before the account existed too (U-055)
       db.run("DELETE FROM invitations WHERE user_id = ?", id);
       db.run("DELETE FROM alerts WHERE user_id = ?", id);
       db.run("DELETE FROM student_verifications WHERE user_id = ?", id);
@@ -159,7 +159,7 @@ export function registerMe(r, deps) {
         db.run("UPDATE invitations SET status = 'withdrawn', updated_at = ? WHERE company_id = ? AND status IN ('sent','seen')", now(), c.id);
         const d = J(c.data) || {};
         db.run("UPDATE companies SET data = ?, status = 'suspended', review_note = 'Owner deleted the account', updated_at = ? WHERE id = ?",
-          JSON.stringify({ ...d, contactName: "", whatsapp: "" }), now(), c.id);
+          JSON.stringify({ ...d, contactName: "", whatsapp: "", applyPhone: "", applyEmail: "" }), now(), c.id);   // every way to reach the person who left (U-053)
       }
       db.run("UPDATE users SET phone = ?, deleted_at = ? WHERE id = ?", `deleted:${id}:${now()}`, now(), id);
     });
