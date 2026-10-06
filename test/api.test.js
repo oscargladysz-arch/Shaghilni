@@ -340,3 +340,16 @@ test("resume suggestions: the Arabic fact guard reads the duals of million and b
   assert.deepEqual(g("بعت البضائع لزبائن", "بعت البضائع لزبائن في أمريكا").slice(0, 2), [false, "gName"], "the everyday one-word name");
   assert.deepEqual(g("درست في الولايات المتحدة", "درست إدارة الأعمال في الولايات المتحدة").slice(0, 1), [true], "the same country is no new fact");
 });
+
+test("resume suggestions: the Arabic fact guard reads the accusative and اثنا forms, the duals of days, hours and weeks, ثماني مئة as one number named as written, «كنا» openings, and one country under its other names (fix review 4)", async () => {
+  const { loadCore } = await import("../server/core.js"), { factGuard } = loadCore();
+  const g = (orig, sug, facts = orig, job = "") => { const r = factGuard(orig, sug, facts, job); return [r.ok, r.why || "", r.tok || ""]; };
+  for (const [orig, sug] of [["عملت ثلاثاً وعشرين ساعة أسبوعياً", "عملت خمساً وعشرين ساعة أسبوعياً"], ["عملت عشر ساعات يومياً", "عملت اثنتا عشرة ساعة يومياً"], ["حضرت دورة تدريبية", "حضرت دورة تدريبية لمدة يومين"],
+    ["حضرت دورة تدريبية", "حضرت دورة تدريبية مدتها ساعتين"], ["حضرت دورة تدريبية", "حضرت دورة تدريبية لمدة أسبوعين"]])
+    assert.deepEqual(g(orig, sug).slice(0, 2), [false, "gNumber"], sug);
+  assert.deepEqual(g("خدمت الزبائن يومياً", "خدمت ثلاث مئة زبون يومياً")[2], "ثلاث مئة", "a hundred in two words is named as written");
+  for (const [orig, sug, facts] of [["عملت اثني عشر شهراً في المتجر", "عملت اثنا عشر شهراً في المتجر"], ["خدمت ثماني مئة زبون", "خدمت ثمانمئة زبون"], ["بعت لزبائن في الولايات المتحدة", "بعت المنتجات لزبائن في أمريكا"],
+    ["بعت لزبائن في أميركا", "بعت المنتجات لزبائن في أمريكا"], ["بعت لزبائن في بريطانيا", "بعت المنتجات لزبائن في المملكة المتحدة"], ["بعت لزبائن في أمريكا", "بعت المنتجات لزبائن في الولايات المتحدة"]])
+    assert.deepEqual(g(orig, sug, facts).slice(0, 1), [true], `the same fact in another form: ${sug} → ${g(orig, sug, facts)}`);
+  for (const sug of ["كنا ندير جرد المخزون", "أشرفنا على جرد المخزون"]) assert.deepEqual(g("كنا نساعد في جرد المخزون", sug).slice(0, 2), [false, "gInflate"], sug);
+});
