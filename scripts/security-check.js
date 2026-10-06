@@ -31,7 +31,8 @@ const SECRET_PATTERNS = [
   ["Twilio account SID", /\bAC[0-9a-f]{32}\b/],
   ["Private key", /-----BEGIN (?:RSA |EC |OPENSSH |DSA |ENCRYPTED |PGP )?PRIVATE KEY(?: BLOCK)?-----/],
   ["Hard-coded secret", /(?:api[_-]?key|secret|token|password|pepper|textbee[_-]?key|anthropic[_-]?key)\b["']?\s*[:=]\s*(?:[\w.$]+\s*(?:\|\||\?\?)\s*)?["']([A-Za-z0-9_\-]{24,})["']/gi],   // in code or JSON, prefixed names too (textbeeKey, otpPepper, emailApiKey), also as a || fallback (D-50, fix review)
-  ["Hard-coded secret", /(?:^|[\s"'])(?:export\s+|ENV\s+|-\s*)?[A-Z0-9_]*(?:API_KEY|SECRET|TOKEN|PASSWORD|PEPPER)\s*[=:]\s*["']?([A-Za-z0-9_\-]{24,})/gm]   // a settings line: OTP_PEPPER=..., Dockerfile ENV, YAML, a compose list
+  ["Hard-coded secret", /(?:^|[\s"'])(?:export\s+|ENV\s+|-\s*)?[A-Z0-9_]*(?:API_KEY|SECRET|TOKEN|PASSWORD|PEPPER)\s*[=:]\s*["']?([A-Za-z0-9_\-]{24,})/gm, /\.[cm]?js$/],   // a settings line: OTP_PEPPER=..., Dockerfile ENV, YAML, a compose list (not code, where upper-case identifiers are not values: fix review 2)
+  ["Hard-coded secret", /[A-Z0-9_]*(?:API_KEY|SECRET|TOKEN|PASSWORD|PEPPER)\s*(?:\|\||\?\?)\s*["']([A-Za-z0-9_\-]{24,})["']/g]   // a literal behind an env variable, whatever the variable it lands in (fix review 2)
 ];
 const KEY_FILE = /\.(p12|pfx)$/;   // binary key stores: found by name, since their text holds no header to match
 export function scanSecrets(root = ROOT) {
@@ -40,7 +41,7 @@ export function scanSecrets(root = ROOT) {
     if (/^\.env/.test(path.basename(f)) && path.basename(f) !== ".env.example") continue;   // your local settings files (.env, .env.production, .envrc, ...): git ignores .env* and they are supposed to hold secrets; the example must not
     if (KEY_FILE.test(f)) { found.push(`Key file ${path.relative(root, f)}`); continue; }
     const text = readFileSync(f, "utf8");
-    for (const [label, re] of SECRET_PATTERNS) for (const m of text.matchAll(re.global ? re : new RegExp(re.source, re.flags + "g"))) {
+    for (const [label, re, notIn] of SECRET_PATTERNS) for (const m of notIn && notIn.test(f) ? [] : text.matchAll(re.global ? re : new RegExp(re.source, re.flags + "g"))) {
       if (m[1] && /^(.)\1*$/.test(m[1])) continue;   // one repeated character is a placeholder (the fake pepper of ci.yml and BASELINE.md)
       found.push(`${label} in ${path.relative(root, f)} (${m[0].trim().slice(0, 10)}…)`); break;
     }
