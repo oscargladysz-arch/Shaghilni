@@ -131,6 +131,21 @@ test("teams: asking to join, duplicate companies, admins, transfer, leaving and 
   assert.equal((await fadi.get("/api/employer/team")).body.seats.limit, 50);
 });
 
+test("teams: one registration number, one company: Arabic-Indic or Persian digits and a later edit cannot make a second page for it (U-018)", async () => {
+  const S = await start(), admin = await S.login("+12025550199");
+  const page = (name, regNo, phone) => ({ company: { name: { en: name }, gov: "homs", regNo, contactName: `Contact ${name}`, whatsapp: phone } });
+  const first = await S.login("0955 815 001", "employer"); assert.equal((await first.put("/api/employer/company", page("Number Holder", "DM-12345", "0955 815 001"))).status, 200);
+  for (const [label, regNo, phone] of [["Arabic-Indic", "DM-١٢٣٤٥", "0955 815 002"], ["Persian", "DM-۱۲۳۴۵", "0955 815 003"]]) {
+    const r = await (await S.login(phone, "employer")).put("/api/employer/company", page(`Copy ${label}`, regNo, phone));
+    assert.deepEqual([r.status, r.body.error], [409, "company_exists"], `${label} digits are the same number`);
+  }
+  const third = await S.login("0955 815 004", "employer"); assert.equal((await third.put("/api/employer/company", page("Other Co", "DM-99999", "0955 815 004"))).status, 200);
+  const edit = await third.put("/api/employer/company", page("Other Co", "DM-12345", "0955 815 004"));
+  assert.deepEqual([edit.status, edit.body.error], [409, "company_exists"], "an existing company cannot change its number to one already on Shaghilni");
+  assert.equal((await third.put("/api/employer/company", page("Other Co Renamed", "DM-99999", "0955 815 004"))).status, 200, "saving its own number again is fine");
+  assert.equal((await first.put("/api/employer/company", page("Number Holder", "DM-١٢٣٤٥", "0955 815 001"))).status, 200, "and so is the holder typing its own number in Arabic-Indic digits");
+});
+
 test("teams: invitations need a verified company and stop at twenty a day per company, cancelling included (D-10)", async () => {
   const S = await start(), admin = await S.login("+12025550199");
   const draft = await S.login("0955 810 001", "employer");
