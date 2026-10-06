@@ -83,7 +83,7 @@ export function registerTeam(r, deps) {
     return db.tx(() => {
       db.run("DELETE FROM company_members WHERE company_id = ? AND phone = ?", c.id, m.phone);
       db.run("INSERT INTO company_members (company_id, phone, added_by, created_at, role, status, name, user_id, responded_at) VALUES (?, ?, ?, ?, 'admin', 'active', ?, ?, ?)", c.id, ctx.user.phone, u.id, now(), plans.memberName(c, ctx.user.id) || "", ctx.user.id, now());
-      db.run("UPDATE companies SET owner_id = ? WHERE id = ?", u.id, c.id);
+      db.run("UPDATE companies SET owner_id = ?, data = json_set(data, '$.contactName', ?), updated_at = ? WHERE id = ?", u.id, m.name || (J(c.data) || {}).contactName || "", now(), c.id);   // the owner is named by the contact name: the new owner's, from their team row (U-031)
       audit(ctx.user.id, "team.ownership_transferred", "company", c.id, {}); return { ok: true };
     });
   });
