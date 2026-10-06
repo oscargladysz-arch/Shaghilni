@@ -187,6 +187,15 @@ test("teams: the registration-number key reads the words in any order and the co
   }
 });
 
+test("teams: a huge registration number costs no more than a short one to check, so one request cannot stall the server; a governorate outside the list matches like none (fix review 4)", { timeout: 20000 }, async () => {
+  const S = await start(), e = await S.login("0955 819 201", "employer");
+  const t0 = Date.now(), r = await e.put("/api/employer/company", { company: { name: { en: "Long Number Co" }, gov: "homs", regNo: "a1".repeat(20000), contactName: "Long", whatsapp: "0955 819 201" } });
+  assert.equal(r.status, 200, r.text); assert.ok(Date.now() - t0 < 3000, `a 40 KB number is checked in ${Date.now() - t0} ms (the quadratic key took about 8 s)`);
+  assert.equal((await (await S.login("0955 819 202", "employer")).put("/api/employer/company", { company: { name: { en: "Holder" }, gov: "homs", regNo: "سجل تجاري 82345", contactName: "Holder", whatsapp: "0955 819 202" } })).status, 200);
+  const odd = await (await S.login("0955 819 203", "employer")).put("/api/employer/company", { company: { name: { en: "Odd Gov" }, gov: "not-a-governorate", regNo: "82345", contactName: "Odd", whatsapp: "0955 819 203" } });
+  assert.deepEqual([odd.status, odd.body.error], [409, "company_exists"], "a governorate the server does not keep cannot make the number look new");
+});
+
 test("teams: a registration number held by a company still awaiting verification can be joined (U-023); the request waits, unseen and untexted, until the admin verifies the holder (fix review)", async () => {
   const S = await start(), admin = await S.login("+12025550199");
   const { e: owner } = await employer(S, admin, "0955 816 001", "Pending Freight", false);   // submitted, not yet verified
