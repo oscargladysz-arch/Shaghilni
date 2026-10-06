@@ -69,8 +69,10 @@ test("policy campus: verify-student refuses another university's domain, public 
   // positive control: the right domain verifies
   const ok = await verify(sA, "One@Policy-Homs.example"); assert.equal(ok.status, 200, ok.text); assert.equal(ok.body.verification.status, "verified");
   r = await send(sA, "one@policy-homs.example"); assert.equal(r.status, 409); assert.equal(r.body.error, "already_verified");
-  // a second account with the same address gets the real code, both when asking and when confirming
-  r = await send(sB, "one@policy-homs.example"); assert.equal(r.status, 409); assert.equal(r.body.error, "email_taken");
+  // a second account with the same address: asking for a code answers exactly as for a free address, so nobody learns whether an address has an account (U-037); the confirmation refuses it
+  r = await send(sB, "one@policy-homs.example"); assert.equal(r.status, 200, `asking never reveals that the address is taken (U-037): ${r.text}`); assert.equal(r.body.verification.status, "code_sent");
+  assert.equal(S.db.get("SELECT COUNT(*) AS n FROM email_sends WHERE user_id = (SELECT id FROM users WHERE phone = '+963944910002')").n, 1, "and it spends one of the day's five sends, like any other");
+  r = await sB.post("/api/me/verify-student/confirm", { code: r.body.devCode }); assert.equal(r.status, 409); assert.equal(r.body.error, "email_taken", "the right code for a taken address is refused at the confirmation");
   r = await send(sB, "two@policy-homs.example"); assert.equal(r.status, 200, "a free address is sent a code");
   S.db.run("UPDATE email_codes SET email = 'one@policy-homs.example' WHERE user_id = (SELECT id FROM users WHERE phone = '+963944910002')");   // the address was claimed between sending and confirming
   r = await sB.post("/api/me/verify-student/confirm", { code: r.body.devCode }); assert.equal(r.status, 409); assert.equal(r.body.error, "email_taken");

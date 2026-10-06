@@ -95,7 +95,7 @@ test("universities: students verify themselves with their university email, and 
   await a.put("/api/me/profile", { profile: profileAt("homs") });
   assert.equal((await a.get("/api/campus")).status, 403); assert.equal((await office.get("/api/employer")).status, 403);
   await a.del("/api/me"); assert.equal(S.db.get("SELECT COUNT(*) AS n FROM student_verifications WHERE email = 'omar.k@student.hu.example'").n, 0, "deleting the account deletes the verification");
-  for (let i = 0; i < 4; i++) await b.post("/api/me/verify-student", { email: `b${i}@hu.example` });
+  for (let i = 0; i < 3; i++) await b.post("/api/me/verify-student", { email: `b${i}@hu.example` });   // b already spent one send on the taken address above, which counts since U-037
   assert.equal((await b.post("/api/me/verify-student", { email: "b9@hu.example" })).status, 200);
   assert.equal((await b.post("/api/me/verify-student", { email: "b10@hu.example" })).body.error, "too_many_emails", "at most five code emails a day");
 });
