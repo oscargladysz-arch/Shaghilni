@@ -1,7 +1,7 @@
 /* Universities. A career office signs in to see how its students are doing on Shaghilni, verify students who ask,
    and approve employers as partners. It sees totals for all its students, but names and activity only for students
    who asked to be verified by it (they agree to that when they ask). */
-import { createHmac, randomInt } from "node:crypto";
+import { createHmac, randomInt, timingSafeEqual } from "node:crypto";
 import { fail } from "../http.js";
 import { J, now } from "../db.js";
 import { e164 } from "../validate.js";
@@ -69,7 +69,8 @@ export function registerCampus(r, deps) {
     if (!row || row.expires_at <= now()) fail(410, "code_expired");
     if (row.attempts >= 5) fail(429, "code_locked");
     const typed = core.latinDigits(String(ctx.body.code || "")).replace(/\D/g, "");   // Arabic-Indic digits are digits (U-034)
-    if (typed === "" || codeHash(ctx.user.id, typed) !== row.code_hash) {
+    const want = Buffer.from(row.code_hash), got = Buffer.from(typed === "" ? "" : codeHash(ctx.user.id, typed));
+    if (typed === "" || got.length !== want.length || !timingSafeEqual(got, want)) {   // constant time, like the sign-in code (D-45)
       db.run("UPDATE email_codes SET attempts = attempts + 1 WHERE user_id = ?", ctx.user.id); fail(422, "bad_code");
     }
     if ((p.edu || {}).uni !== row.uni) fail(409, "uni_changed");
