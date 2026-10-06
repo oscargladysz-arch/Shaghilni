@@ -36,6 +36,7 @@ const TEXT = {
 export function makeNotifier({ db, sms, log, guard }) {
   function send(user, tpl, vars) {
     if (!tpl || !user || !user.phone || user.phone.startsWith("deleted:")) return;
+    if (notifyStatus.quiet) return;   // demo-accounts: nothing is texted, queued or counted while the demo accounts are made (U-058)
     const lang = user.lang === "en" ? "en" : "ar";
     const body = tpl[lang].replace(/\{(\w+)\}/g, (_, k) => (vars[k] && (vars[k][lang] || vars[k].en || vars[k].ar)) || "");
     // Same guards as sign-in texts: allowed countries only, and nothing once today's cap is reached.

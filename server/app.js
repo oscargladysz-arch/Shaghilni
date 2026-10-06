@@ -122,6 +122,6 @@ export function createApp({ cfg, db, log = console.log, sms: smsOverride, email:
   handler.routes = router.routes;   // read-only listing of the registered JSON routes (test/policy-*.test.js)
   handler.payments = deps.payments;
   registerDemo(router, deps);   // demo-accounts
-  handler.demoReady = demoOn(cfg) ? seedDemoAccounts({ ...deps, router }).catch(err => log(`[demo] ${err.stack || err}`)) : Promise.resolve();   // demo-accounts
+  handler.demoReady = demoOn(cfg) ? (notify.quiet = true, seedDemoAccounts({ ...deps, router }).catch(err => log(`[demo] ${err.stack || err}`)).finally(() => { notify.quiet = false; })) : Promise.resolve();   // demo-accounts: made without texting anyone (U-058)
   return handler;
 }

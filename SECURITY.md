@@ -392,6 +392,7 @@ The launch checklist, with who owns each item (agent, owner, lawyer or provider)
 
 - The demo sign-in (`POST /api/auth/demo`) exists only in development with demo accounts on (the default there; `DEMO_ACCOUNTS=false` turns them off) and `SEED_DEMO` not `false`, and never in production: in production the route isn't registered at all, and no demo accounts are created. Tests check both.
 - It signs in only as the four fixed demo numbers (student, job seeker, company, university career office), with the usual session cookie and rate limits.
+- Making the demo accounts texts nobody: the text sender is muted while they are made, so no text reaches the configured provider and none counts against the daily cap.
 
 
 ## Card payments
