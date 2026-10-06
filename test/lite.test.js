@@ -188,6 +188,18 @@ test("lite: saving the company page keeps the ways to apply chosen in the full a
   assert.deepEqual([d.applyVia, d.applyPhone, d.applyEmail, d.about.en], [{ whatsapp: false, call: true, email: true }, "+963955731002", "jobs@example.com", "About us"], "the Lite form changes what it shows and keeps the rest");
 });
 
+test("lite: the language link on a page answered to a form leads to a page, not to 'not found' (U-050)", async () => {
+  const S = await start(), b = S.browser();
+  const pg = await b.get("/lite/signin");
+  const r1 = await b.post("/lite/signin", { csrf: b.csrf(pg.text), phone: "0933 732 001", consent: "1", role: "seeker", next: "", pow_challenge: /name="pow_challenge" value="([^"]+)"/.exec(pg.text)[1], pow_nonce: "" });
+  const wrong = await b.post("/lite/signin/code", { csrf: b.csrf(r1.text), phone: /name="phone" value="([^"]+)"/.exec(r1.text)[1], code: "000000", role: "seeker", next: "" });
+  for (const [what, res] of [["the code page", r1], ["the wrong-code page", wrong]]) {
+    const href = /<a class="hl[^"]*" href="([^"]+)"/.exec(res.text)[1].replace(/&amp;/g, "&");
+    const other = await b.get(href); assert.notEqual(other.status, 404, `${what}: the language link ${href} is a dead end`);
+    assert.match(other.text, /<html lang="en"/, `${what}: and switches the language`);
+  }
+});
+
 test("lite: people abroad can say where they live, filter for returnees, and save a search as an alert", async () => {
   const S = await start(), b = S.browser();
   await b.signin("0933 750 001");
