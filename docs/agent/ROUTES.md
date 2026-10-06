@@ -34,7 +34,7 @@ Column meanings:
 |---|---|---|---|---|---|---|---|
 | GET | `/api/me` | none (guest → `{user:null}`) | `server/routes/me.js:11` | api :83-84,104,106,228; diaspora :74,77,98; campus, demo, events, recruit, security suites | — | none | Role payloads: profile/saved/applications/invitesNew/studentVerify/campusOffice |
 | PUT | `/api/me/lang` | `need()` | `server/routes/me.js:28` | security :152 (test 3 only) | 3 | none | Persistence never asserted |
-| PUT | `/api/me/profile` | seeker | `server/routes/me.js:35` | api :96-101,124; security :131 (403), :152, :234,255; 11 suites' set-up | 2+3 | none | Also writes the recruit opt-in flag with no audit (`validate.js:59`) |
+| PUT | `/api/me/profile` | seeker | `server/routes/me.js:35` | api :96-101,124; security :131 (403), :152, :234,255; 11 suites' set-up | 2+3 | none | Keeps the stored recruit switch; only `PUT /api/me/recruit` changes it (Stage 4, U-012) |
 | POST | `/api/me/saved/:jobId` | seeker; listing must be published | `server/routes/me.js:42` | api :103-104; security :153 (as `:id`) | 3 | none | — |
 | DELETE | `/api/me/saved/:jobId` | seeker | `server/routes/me.js:48` | api :105-106; security :153 | 3 | none | Idempotent |
 | POST | `/api/jobs/:id/apply` | seeker; published job of a verified company; profile required; channel enabled unless demo | `server/routes/me.js:53` | api :107-117,165; security :88,120,131,153; contact; campus :127; events :115; insights :69; plans :94,110; team :93; lite :121 | 2+3 | `application.created` `me.js:71` (first application only) | Re-apply after withdraw (`me.js:65-67`) writes none |

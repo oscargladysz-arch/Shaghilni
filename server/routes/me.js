@@ -33,7 +33,8 @@ export function registerMe(r, deps) {
   });
 
   r.put("/api/me/profile", seeker, ctx => {
-    const profile = sanitizeProfile(core, ctx.body.profile, ctx.user.phone);
+    const profile = sanitizeProfile(core, ctx.body.profile, ctx.user.phone), prev = db.get("SELECT data FROM profiles WHERE user_id = ?", ctx.user.id);
+    profile.recruit = { open: !!(prev && ((J(prev.data) || {}).recruit || {}).open === true) };   // only PUT /api/me/recruit, which is audited and withdraws invitations, moves the switch (U-012)
     db.run(`INSERT INTO profiles (user_id, data, updated_at) VALUES (?, ?, ?)
             ON CONFLICT(user_id) DO UPDATE SET data = excluded.data, updated_at = excluded.updated_at`, ctx.user.id, JSON.stringify(profile), now());
     return { profile };

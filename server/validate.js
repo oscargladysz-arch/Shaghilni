@@ -55,7 +55,7 @@ export function sanitizeProfile(core, input, phone) {
   // One resume per person: no versions per job, so nothing is kept under p.tailor.
   // Translations of the resume's free text, per language: [text as written, the same text in that language].
   // Only pairs for text still in the profile are kept, so edited or removed lines don't pile up.
-  // Whether checked employers may find this person and send invitations. Off unless they switch it on.
+  // Whether checked employers may find this person and send invitations. Off for a new profile; changed only by PUT /api/me/recruit (U-012).
   p.recruit = { open: !!(m.recruit && m.recruit.open === true) };
   const have = new Set(core.trSources(p));
   p.tr = { en: [], ar: [] };
