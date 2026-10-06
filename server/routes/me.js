@@ -64,11 +64,11 @@ export function registerMe(r, deps) {
     let appId;
     if (existing && existing.status !== "withdrawn") appId = existing.id;
     else if (existing) {
-      db.run("UPDATE applications SET status = 'new', channel = ?, cv_lang = ?, snapshot = ?, updated_at = ? WHERE id = ?", channel, cvLang, p.data, now(), existing.id);
+      db.run("UPDATE applications SET status = 'new', channel = ?, cv_lang = ?, snapshot = ?, apply_pay_mid = ?, updated_at = ? WHERE id = ?", channel, cvLang, p.data, deps.plans.payMid(job), now(), existing.id);
       appId = existing.id;
     } else {
-      appId = Number(db.run("INSERT INTO applications (job_id, user_id, channel, cv_lang, snapshot, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)",
-        id, ctx.user.id, channel, cvLang, p.data, now(), now()).lastInsertRowid);
+      appId = Number(db.run("INSERT INTO applications (job_id, user_id, channel, cv_lang, snapshot, apply_pay_mid, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+        id, ctx.user.id, channel, cvLang, p.data, deps.plans.payMid(job), now(), now()).lastInsertRowid);   // the pay the listing showed when the person applied: a cut before the hire cannot lower the fee (fix review)
       audit(ctx.user.id, "application.created", "application", appId, { jobId: id, channel, cvLang });
     }
     const out = { application: { id: appId, jobId: id, status: "new", cvLang: db.get("SELECT cv_lang FROM applications WHERE id = ?", appId).cv_lang || null } };

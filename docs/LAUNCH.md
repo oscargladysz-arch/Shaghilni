@@ -56,7 +56,7 @@ No item marked owner, lawyer or provider is ever ticked by an agent.
 |---|---|---|---|---|
 | E1 | Daily backups scheduled and copied off the server. With `DB_PATH=/data/shaghilni.db`, run `npm run backup -- /backups` so the System tab finds them. | owner | Admin → System shows the newest backup; a copy exists off the server. | Open |
 | E2 | One restore tested. | owner | Restore a backup on a scratch machine; row counts match the System tab. | Open |
-| E3 | Upgrade check on real data: open a copy of the production database with the new code, confirm `PRAGMA user_version` is 17 and every count is unchanged. | owner, agent | There is no automated upgrade test; this is a manual step before each deploy that adds a migration. | Open |
+| E3 | Upgrade check on real data: open a copy of the production database with the new code, confirm `PRAGMA user_version` is 18 and every count is unchanged. | owner, agent | There is no automated upgrade test; this is a manual step before each deploy that adds a migration. | Open |
 | E4 | Retention matches the privacy notice. | agent | SECURITY.md item 1 lists the periods; the email-code sweep and the "within 24 hours" wording are open (`docs/agent/LEGAL_PROPOSALS.md`, `docs/agent/DEFECTS.md`). | Partial |
 
 ## F · Product content
