@@ -113,6 +113,18 @@ test("policy plans: the placement fee follows the plan at the hire, not at the c
   assert.deepEqual(await confirm(onPro), [], "hired on Pro: no fee although the plan ended before the confirmation (Pro promises no placement fees)");
 });
 
+test("policy plans: the admin plan route reads months and amount typed with Arabic-Indic or Persian digits (U-028)", async () => {
+  const S = await start(), admin = await S.login("+12025550199"), { companyId } = await employerWithLiveJob(S, admin, "0955 920 031", "Digits Co");
+  for (const [months, amountSyp, label] of [["٣", "٤٠٠٠", "Arabic-Indic"], ["۳", "۴۰۰۰", "Persian"]]) {
+    S.db.run("DELETE FROM charges WHERE company_id = ?", companyId);
+    const r = await admin.post(`/api/admin/companies/${companyId}/plan`, { plan: "pro", months, amountSyp }); assert.equal(r.status, 200, r.text);
+    assert.ok(r.body.planUntil && Math.abs(r.body.planUntil - (Date.now() + 90 * 86400e3)) < 60e3, `${label}: three months, not a plan with no end date (${r.body.planUntil})`);
+    assert.deepEqual(S.db.all("SELECT kind, amount_syp, status, note FROM charges WHERE company_id = ?", companyId).map(plain), [{ kind: "plan", amount_syp: 4000, status: "due", note: "pro plan, 3 months" }], `${label}: the invoice is recorded`);
+  }
+  const a = S.db.all("SELECT data FROM audit WHERE action = 'company.plan' AND entity_id = ? ORDER BY id", companyId).map(x => JSON.parse(x.data));
+  assert.deepEqual(a.map(x => [x.months, x.amountSyp]), [[3, 4000], [3, 4000]], "and the audit row says what was set");
+});
+
 test("policy plans: admin billing routes: paid and void repeat without harm (record: no state check), plan with months 0 has no end date (record), a bad plan is 422", async () => {
   const S = await start(), admin = await S.login("+12025550199"), { e, companyId } = await employerWithLiveJob(S, admin, "0955 920 011", "Billing Co");
   const chargeRow = id => plain(S.db.get("SELECT status, paid_at FROM charges WHERE id = ?", id)), audits = () => S.db.get("SELECT COUNT(*) AS n FROM audit WHERE entity = 'charge'").n;
