@@ -305,3 +305,18 @@ test("seed: a sample listing that fails the posting checks is skipped with one l
   assert.deepEqual(JSON.parse(fresh.get("SELECT data FROM audit WHERE action = 'demo.seeded'").data), { companies: 17, jobs: 18 }, "the audit row counts what was inserted");
   assert.ok(lines.some(l => /17 demo companies and 18 demo jobs added/.test(l)), "and so does the log line: " + lines.join(" / "));
 });
+
+test("resume suggestions: the Arabic fact guard reads the other number forms, «أسهمت» and two-word countries, names the word as written, and lets a gender, case or spelling change of a number word through (fix review 2)", async () => {
+  const { loadCore } = await import("../server/core.js"), { factGuard } = loadCore();
+  const g = (orig, sug, facts = orig, job = "") => { const r = factGuard(orig, sug, facts, job); return [r.ok, r.why || "", r.tok || ""]; };
+  for (const sug of ["عملت ست سنوات في التدريس", "عملت ستّ سنوات في التدريس", "عملت ثمان سنوات في التدريس", "خدمت خمسمئة زبون يومياً", "خدمت ثلاثمائة زبون يومياً", "خدمت ألفي زبون شهرياً", "خدمت مئتي زبون", "تجاوزت المبيعات مليوناً"])
+    assert.deepEqual(g("عملت في التدريس", sug).slice(0, 2), [false, "gNumber"], sug);
+  assert.deepEqual(g("خدمت الزبائن", "خدمت ألفي زبون شهرياً")[2], "ألفي", "the reason names the word as written, not as normalised");
+  for (const [orig, sug] of [["عملت خمس سنوات في المتجر", "عملت خمسة أعوام في المتجر"], ["عملت ثلاث سنوات في المتجر", "عملت ثلاثة أعوام في المتجر"], ["خدمت أكثر من مائة زبون", "خدمت أكثر من مئة زبون"], ["عملت عشرين ساعة", "عملت عشرون ساعة"]])
+    assert.deepEqual(g(orig, sug).slice(0, 1), [true], `a number word only changed its form: ${sug}`);
+  assert.deepEqual(g("أشرفت فريق المبيعات في المتجر", "أشرفت على فريق المبيعات في المتجر", "أشرفت فريق المبيعات في المتجر", "القدرة على العمل ضمن فريق").slice(0, 1), [true], "«على» is a stop word, not a word borrowed from the job");
+  assert.deepEqual(g("أسهمت في جرد المخزون", "أدرت جرد المخزون").slice(0, 2), [false, "gInflate"], "«أسهمت» grown into «أدرت»");
+  assert.deepEqual(g("قمت بمساعدة المدير في جرد المخزون", "أدرت جرد المخزون").slice(0, 2), [false, "gInflate"], "«قمت بمساعدة» grown into «أدرت»");
+  assert.deepEqual(g("بعت البضائع للزبائن", "بعت البضائع لزبائن في الولايات المتحدة").slice(0, 2), [false, "gName"], "a two-word country");
+  assert.deepEqual(g("بعت البضائع للزبائن", "بعت البضائع لزبائن في المملكة المتحدة").slice(0, 2), [false, "gName"], "and the other");
+});
