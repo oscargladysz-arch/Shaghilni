@@ -33,6 +33,22 @@ test("policy recruit: switching \"let recruiters find me\" off hides the card at
   assert.equal(S.db.get("SELECT COUNT(*) AS n FROM audit WHERE action = 'recruit.closed' AND actor_id = ?", I.userA).n, 1, "the switch-off is audited");
 });
 
+test("policy recruit: a profile save never moves the \"let recruiters find me\" switch; only the audited switch does (U-012)", async () => {
+  const S = await start(), C = await cast(S), I = C.ids;
+  const listed = async id => (await C.A.e.get("/api/employer/students")).body.students.some(s => s.id === id);
+  const audits = () => S.db.get("SELECT COUNT(*) AS n FROM audit WHERE action LIKE 'recruit.%'").n, before = audits();
+  const { recruit, ...noFlag } = (await C.seekerA.get("/api/me")).body.profile;   // an older client, a second tab or Lite beside the app sends the profile without the switch
+  const saved = await C.seekerA.put("/api/me/profile", { profile: noFlag }); assert.equal(saved.status, 200, saved.text);
+  assert.equal(saved.body.profile.recruit.open, true, "the answer carries the stored switch, still on");
+  assert.ok(await listed(I.cardA), "seeker A is still findable after a save without the switch");
+  assert.ok((await C.seekerA.get("/api/me/invitations")).body.invitations.some(i => i.id === I.invA && i.status !== "withdrawn"), "and the open invitation is untouched");
+  assert.deepEqual((await C.seekerB.put("/api/me/recruit", { open: false })).body, { open: false });
+  const b = (await C.seekerB.get("/api/me")).body.profile;
+  assert.equal((await C.seekerB.put("/api/me/profile", { profile: { ...b, recruit: { open: true } } })).status, 200);
+  assert.ok(!(await listed(I.cardB)), "seeker B, who switched off, is not put back into the search by a stale profile that says on");
+  assert.equal(audits(), before + 1, "the only recruit.* audit row is B's own switch-off");
+});
+
 test("policy recruit: a person who blocked company A cannot be found or invited by A (404), while B still can", async () => {
   const S = await start(), C = await cast(S), I = C.ids;
   assert.ok((await C.A.e.get("/api/employer/students")).body.students.some(s => s.id === I.cardA), "control: A finds seeker A before the block");
