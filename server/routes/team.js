@@ -71,6 +71,7 @@ export function registerTeam(r, deps) {
     const c = active(ctx), me = plans.allow(ctx, c, "manage");
     const m = db.get("SELECT * FROM company_members WHERE company_id = ? AND phone = ?", c.id, String(ctx.params.phone)); if (!m) fail(404, "not_found");
     if (me !== "owner" && m.role === "admin") fail(403, "role_forbidden");   // an admin, or an invitation to be one, is the owner's to remove (U-030)
+    if (m.status === "requested" && c.status !== "verified") fail(409, "company_not_verified");   // a waiting request is not the unverified holder's to confirm or remove (fix review 2)
     db.run("DELETE FROM company_members WHERE company_id = ? AND phone = ?", c.id, m.phone);
     audit(ctx.user.id, m.status === "invited" ? "team.invite_cancelled" : "team.removed", "company", c.id, {}); return { ok: true };
   });
@@ -132,7 +133,7 @@ export function registerTeam(r, deps) {
     const apps = jobIds.length ? db.all(/* sql-safe: only "?" placeholders */ `SELECT id, job_id FROM applications WHERE job_id IN (${jobIds.map(() => "?").join(",")})`, ...jobIds) : [];
     const appJob = new Map(apps.map(a => [a.id, a.job_id])), ph = a => a.map(() => "?").join(",") || "NULL";
     const rows = db.all(/* sql-safe: only "?" placeholders */ `SELECT actor_id, action, entity, entity_id, data, created_at FROM audit WHERE (entity = 'company' AND entity_id = ?) OR (entity = 'job' AND entity_id IN (${ph(jobIds)})) OR (entity = 'application' AND entity_id IN (${ph(apps.map(a => a.id))})) ORDER BY created_at DESC LIMIT 150`, c.id, ...jobIds, ...apps.map(a => a.id));
-    return { activity: rows.filter(x => LABEL[x.action]).slice(0, 100).map(x => { const d = J(x.data) || {}, jid = x.entity === "job" ? x.entity_id : x.entity === "application" ? appJob.get(x.entity_id) : null;
+    return { activity: rows.filter(x => LABEL[x.action] && (c.status === "verified" || x.action !== "team.requested")).slice(0, 100).map(x => { const d = J(x.data) || {}, jid = x.entity === "job" ? x.entity_id : x.entity === "application" ? appJob.get(x.entity_id) : null;
       return { at: x.created_at, who: plans.memberName(c, x.actor_id, ctx.user.lang) || "—", action: x.action, job: jid ? title.get(jid) || null : null, from: d.from || null, to: d.to || null, role: d.role || null }; }) };
   });
 }

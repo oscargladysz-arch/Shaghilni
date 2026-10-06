@@ -38,7 +38,7 @@ export function sanitizeProfile(core, input, phone) {
     v: 1, role,
     name: clean(m.name, 100), nameAr: clean(m.nameAr, 100), nameEn: clean(m.nameEn, 100), phone: core.normPhone(phone) || phone,
     email: clean(m.email, 160), gov: m.gov === "abroad" ? "abroad" : keyOf(core.GOV, m.gov), country: m.gov === "abroad" ? keyOf(core.COUNTRY, m.country) || "other" : "", relocate: bool(m.relocate),
-    langs: [...new Set((Array.isArray(m.langs) ? m.langs : []).filter(l => core.LANGS[l]))].slice(0, 7),
+    langs: [...new Set((Array.isArray(m.langs) ? m.langs : []).filter(l => keyOf(core.LANGS, l)))].slice(0, 7),
     edu: {
       status: ["student", "secondary", "diploma", "bachelor", "master"].includes(e.status) ? e.status : (role === "student" ? "student" : ""),
       uni: e.uni === "other" ? "other" : keyOf(core.UNI, e.uni), uniName: clean(e.uniName, 120), fac: keyOf(core.FAC, e.fac),
@@ -46,8 +46,8 @@ export function sanitizeProfile(core, input, phone) {
       gpa: clean(e.gpa, 20), course: clean(e.course, 300), honors: clean(e.honors, 200)
     },
     prefs: {
-      types: [...new Set((Array.isArray(m.prefs && m.prefs.types) ? m.prefs.types : []).filter(k => core.TYPE[k]))],
-      fields: [...new Set((Array.isArray(m.prefs && m.prefs.fields) ? m.prefs.fields : []).filter(k => core.INTERESTS[k]))],
+      types: [...new Set((Array.isArray(m.prefs && m.prefs.types) ? m.prefs.types : []).filter(k => keyOf(core.TYPE, k)))],
+      fields: [...new Set((Array.isArray(m.prefs && m.prefs.fields) ? m.prefs.fields : []).filter(k => keyOf(core.INTERESTS, k)))],
       level: ["none", "lt1", "y1to3", "y4plus"].includes(m.prefs && m.prefs.level) ? m.prefs.level : ""
     },
     exp: (Array.isArray(m.exp) ? m.exp : []).slice(0, 20).map(entry).filter(x => x.role && x.org),
@@ -117,7 +117,7 @@ export function sanitizeJob(core, input) {
     title: bi(j.title, 120), place: bi(j.place, 120), gov: keyOf(core.GOV, j.gov),
     type: keyOf(core.TYPE, j.type) || "full", level: keyOf(core.LEVEL, j.level) || "entry", mode: keyOf(core.MODE, j.mode) || "onsite",
     pay: [lo, Math.max(lo, hi)],
-    langs: [...new Set((Array.isArray(j.langs) ? j.langs : []).filter(l => core.LANGS[l]))].slice(0, 7),
+    langs: [...new Set((Array.isArray(j.langs) ? j.langs : []).filter(l => keyOf(core.LANGS, l)))].slice(0, 7),
     recruits: (Array.isArray(j.recruits) ? j.recruits : []).filter(r => Array.isArray(r) && keyOf(core.UNI, r[0]) && keyOf(core.FAC, r[1])).slice(0, 10).map(r => [r[0], r[1]]),
     anyFaculty: bool(j.anyFaculty), noDegree: bool(j.noDegree), support: bool(j.support), returnees: bool(j.returnees), unis: (Array.isArray(j.unis) ? j.unis : []).map(k => keyOf(core.UNI, k)).filter(Boolean).filter((k, i, a) => a.indexOf(k) === i).slice(0, 8), progStart: /^\d{4}-(0[1-9]|1[0-2])$/.test(String(j.progStart || "")) ? j.progStart : "", progEnd: /^\d{4}-(0[1-9]|1[0-2])$/.test(String(j.progEnd || "")) ? j.progEnd : "", openings: intIn(j.openings || 1, 1, 500),
     summary: bi(j.summary, 1500), duties: biList(j.duties, 12, 200), needs: biList(j.needs, 12, 200), provides: biList(j.provides, 12, 200),
