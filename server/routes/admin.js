@@ -171,10 +171,10 @@ export function registerAdmin(r, deps) {
   r.post("/api/admin/companies/:id/plan", admin, ctx => {
     const c = db.get("SELECT * FROM companies WHERE id = ?", Number(ctx.params.id)); if (!c) fail(404, "not_found");
     const plan = ["free", "pro", "enterprise"].includes(ctx.body.plan) ? ctx.body.plan : null; if (!plan) fail(422, "bad_plan");
-    const months = Math.max(0, Math.min(36, Number(core.latinDigits(String(ctx.body.months ?? ""))) || 0)), until = plan === "free" || !months ? null : now() + months * 30 * 86400e3;   // Arabic-Indic digits are digits (U-028)
+    const num = v => { const s = core.latinDigits(String(v ?? "")).trim().replace(/(\d)[,\u066C](?=\d{3}(?!\d))/g, "$1"); if (s && !/^\d+(?:\.\d+)?$/.test(s)) fail(422, "bad_number"); return Number(s) || 0; };   // Arabic-Indic digits are digits (U-028) and "4,000" or "٤٬٠٠٠" is 4000; anything else is refused, never read as 0 (fix review)
+    const months = Math.min(36, num(ctx.body.months)), amt = Math.round(num(ctx.body.amountSyp)), until = plan === "free" || !months ? null : now() + months * 30 * 86400e3;
     db.run("UPDATE companies SET plan = ?, plan_until = ? WHERE id = ?", plan, until, c.id);
     db.run("UPDATE plan_requests SET handled_at = ? WHERE company_id = ? AND handled_at IS NULL", now(), c.id);
-    const amt = Math.max(0, Math.round(Number(core.latinDigits(String(ctx.body.amountSyp ?? ""))) || 0));
     if (amt) db.run("INSERT INTO charges (company_id, kind, amount_syp, note, created_at) VALUES (?, 'plan', ?, ?, ?)", c.id, amt, `${plan} plan${months ? ", " + months + " months" : ""}`, now());
     audit(ctx.user.id, "company.plan", "company", c.id, { plan, months, amountSyp: amt });
     return { ok: true, plan, planUntil: until };
