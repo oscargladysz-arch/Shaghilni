@@ -127,3 +127,14 @@ test("demo accounts: the uninstall step leaves no mention of them in the README"
   assert.deepEqual(left, [], "after npm run demo-accounts:uninstall the README no longer describes deleted code");
   assert.ok(after.includes("npm run demo:remove"), "the sample listings and their removal are a separate feature and stay documented");
 });
+
+test("demo accounts: the uninstall step also takes their passages out of SECURITY.md and PRODUCT.md, and leaves no unmarked demo comment in the hooked files (U-062)", () => {
+  const read = rel => readFileSync(new URL(`../${rel}`, import.meta.url), "utf8"), script = read("scripts/demo-accounts.js");
+  for (const rel of ["SECURITY.md", "PRODUCT.md"]) {
+    assert.ok(script.includes(`"${rel}"`), `scripts/demo-accounts.js edits ${rel}`);
+    const after = read(rel).replace(/<!-- demo-accounts:start -->[\s\S]*?<!-- demo-accounts:end -->\n?/g, "");   // the same expression the script uses for the README
+    assert.deepEqual(after.match(/demo accounts?|demo-accounts|demo\.js\b|auth\/demo|DEMO_ACCOUNTS/gi) || [], [], `after the uninstall ${rel} no longer describes deleted code`);
+  }
+  const cfg = read("server/config.js").split("\n").filter(l => !/\/\/ demo-accounts\b/.test(l)).join("\n");   // the script's dropMarked
+  assert.doesNotMatch(cfg, /demo accounts?/i, "server/config.js keeps no comment about the demo accounts once their line is gone");
+});
