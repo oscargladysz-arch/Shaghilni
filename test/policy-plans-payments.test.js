@@ -113,6 +113,34 @@ test("policy plans: the placement fee follows the plan at the hire, not at the c
   assert.deepEqual(await confirm(onPro), [], "hired on Pro: no fee although the plan ended before the confirmation (Pro promises no placement fees)");
 });
 
+test("policy plans: undoing a hire keeps its fee basis: cutting the pay to 1 or moving up to Pro and hiring again still owes the first fee, with one congratulations; a note on a hire older than migration 17 fixes no plan (Stage 4 fix review)", async () => {
+  const S = await start(), admin = await S.login("+12025550199");
+  const F = await employerWithLiveJob(S, admin, "0955 922 001", "Undo Then Rehire Co"), G = await employerWithLiveJob(S, admin, "0955 922 002", "Pre Seventeen Co");
+  const a = await seekerOpen(S, "0944 922 001", "Hired Twice"), b = await seekerOpen(S, "0944 922 002", "Hired Before Seventeen");
+  const sourcedHire = async (e, jobId, who) => { const inv = await e.post(`/api/employer/students/${who.id}/invite`, { kind: "job", jobId }); assert.equal(inv.status, 200, inv.text);
+    assert.equal((await who.s.post(`/api/me/invitations/${inv.body.invitation.id}/respond`, { answer: "yes" })).status, 200);
+    const ap = await who.s.post(`/api/jobs/${jobId}/apply`, { channel: "web", cvLang: "ar" }); assert.equal(ap.status, 200, ap.text); await hire(e, ap.body.application.id); return ap.body.application.id; };
+  const basis = id => plain(S.db.get("SELECT hire_pay_mid, hire_plan FROM applications WHERE id = ?", id));
+  const confirm = async id => { const r = await admin.post(`/api/admin/applications/${id}/confirm-hire`, {}); assert.equal(r.status, 200, r.text); return r.body.charges; };
+  // F hires on Free, undoes it, cuts the listing's pay to 1, moves up to Pro, and hires again
+  const onFree = await sourcedHire(F.e, F.jobId, a); assert.deepEqual(basis(onFree), { hire_pay_mid: MID, hire_plan: "free" });
+  const texts = S.texts.length;
+  assert.equal((await F.e.put(`/api/employer/applications/${onFree}`, { status: "interview" })).status, 200, "undo");
+  assert.equal((await F.e.put(`/api/employer/jobs/${F.jobId}`, { job: { ...JOB, pay: [1, 1] } })).status, 200, "pay cut to 1");
+  assert.equal((await admin.post(`/api/admin/companies/${F.companyId}/plan`, { plan: "pro", months: 1 })).status, 200, "moved up to Pro");
+  assert.equal((await F.e.put(`/api/employer/applications/${onFree}`, { status: "hired" })).status, 200, "hired again");
+  assert.deepEqual(basis(onFree), { hire_pay_mid: MID, hire_plan: "free" }, "the basis of the first hire stands");
+  assert.equal(S.texts.length, texts, "the person was congratulated once: the undo and the hire again text nobody");
+  assert.deepEqual(await confirm(onFree), [{ kind: "hire_fee", amountSyp: MID }], "the fee is the first hire's, not 1 SYP and not waived by Pro");
+  // G's hire predates migration 17 (no plan recorded): a note saved while G is on Pro must not fix Pro as the plan of the hire
+  const old = await sourcedHire(G.e, G.jobId, b); S.db.run("UPDATE applications SET hire_plan = NULL WHERE id = ?", old);
+  assert.equal((await admin.post(`/api/admin/companies/${G.companyId}/plan`, { plan: "pro", months: 1 })).status, 200);
+  assert.equal((await G.e.put(`/api/employer/applications/${old}`, { note: "Starts on Sunday." })).status, 200);
+  assert.equal(basis(old).hire_plan, null, "a note writes no plan: only the move into hired records one");
+  assert.equal((await admin.post(`/api/admin/companies/${G.companyId}/plan`, { plan: "free" })).status, 200);
+  assert.deepEqual(await confirm(old), [{ kind: "hire_fee", amountSyp: MID }], "with no plan recorded, the live plan (Free) decides, as documented");
+});
+
 test("policy plans: the admin plan route reads months and amount typed with Arabic-Indic or Persian digits (U-028)", async () => {
   const S = await start(), admin = await S.login("+12025550199"), { companyId } = await employerWithLiveJob(S, admin, "0955 920 031", "Digits Co");
   for (const [months, amountSyp, label] of [["٣", "٤٠٠٠", "Arabic-Indic"], ["۳", "۴۰۰۰", "Persian"]]) {
