@@ -326,7 +326,7 @@ The demo accounts are made through the app's own actions the first time the serv
 
 **Taking the demo out:**
 - `npm run demo-accounts:purge` removes the demo accounts and everything they made from a database, and keeps them from coming back.
-- `npm run demo-accounts:uninstall` deletes the demo code: `server/demo.js`, `public/js/demo.js`, its test, and the lines marked `// demo-accounts`. The few remaining hooks in the app (on the home screen, the banner, and Lite's sign-in page) do nothing once the demo code is gone.
+- `npm run demo-accounts:uninstall` deletes the demo code: `server/demo.js`, `public/js/demo.js`, its test, and the lines marked `// demo-accounts`, with the passages about them in this README, `SECURITY.md`, `PRODUCT.md` and `.env.example`. The few remaining hooks in the app (on the home screen, the banner, and Lite's sign-in page) do nothing once the demo code is gone.
 - The sample job listings are separate: `npm run demo:remove` takes those out. Run the purge first while the demo accounts are in the database: their invitations point at the sample listings, and the removal stops with a foreign-key error otherwise.
 
 **What the demo adds elsewhere.** Universities: a fourth account, the Homs University career office (0944 000 301), with a fictional student email domain, Omar and Yazan verified by email, Yasmin Trading approved as a partner and Qasioun Advisory's partnership request waiting. Events: a careers day at Homs University run by its career office, with Yasmin Trading attending and Omar holding a ticket. Teams: Yasmin Trading's team has Lina (admin) and Karim (hiring manager), with Fadi's request to join waiting.
