@@ -41,6 +41,25 @@ test("posting checks on the server: fee wording is refused (fee_requested), miss
   assert.equal(gAr.body.job.status, "draft"); assert.deepEqual(gAr.body.job.flags, [{ type: "gender", word: "موظفة" }], "Arabic wording is flagged on a draft too (engine.js findGender runs in the server sandbox)");
 });
 
+test("posting checks on the server: an explicit demand for the candidate's money is refused in the listing's own text too, and a benefit the company pays or covers is never refused, whichever box it is in (fix review 3)", async () => {
+  const S = await start(), admin = await S.login(ADMIN_PHONE), A = await employerWithLiveJob(S, admin, "0955 910 031", "Policy Fee Demands"), e = A.e;
+  for (const [where, job] of [["summary", { ...JOB, summary: { en: "Candidates must pay 50,000 SYP for training before starting." } }],
+    ["summary (Arabic)", { ...JOB, summary: { ar: "على المتقدم دفع ٥٠ ألف ليرة قبل البدء" } }],
+    ["summary (Arabic, another order)", { ...JOB, summary: { ar: "يدفع المتقدم مبلغ ٥٠ ألف ليرة قبل البدء" } }],
+    ["needs", { ...JOB, needs: { en: ["You will pay for your own uniform"] } }],
+    ["duties", { ...JOB, duties: { en: ["Applicants have to pay 20 USD for the uniform"] } }],
+    ["summary, paid by the trainee", { ...JOB, summary: { en: "Training costs of 100 USD are paid by the trainee." } }]]) {
+    const r = await refused(`a demand in the ${where}`, e.post("/api/employer/jobs", { job, submit: true }), "fee_requested", 422);
+    assert.ok(typeof r.body.detail === "string" && r.body.detail, `the phrase is named (${where})`);
+  }
+  for (const provides of [{ en: ["Medical costs fully covered"] }, { en: ["Training costs will be paid by the company"] }, { ar: ["تتحمل الشركة رسوم التسجيل في النقابة"] }, { ar: ["تتحمل الشركة دفع رسوم التسجيل في النقابة"] },
+    { en: ["No application fees"] }, { en: ["Registration fees: covered by us"] }, { ar: ["رسوم اشتراك النادي الرياضي مدفوعة"] }, { ar: ["الشركة تدفع رسوم التسجيل"] }, { ar: ["تأمين صحي وتغطية رسوم التسجيل في النقابة"] },
+    { en: ["Paid annual leave and on-the-job training", "Fees for professional exams covered by the company"] }, { en: ["Health insurance; medical costs paid in full by the employer"] }, { en: ["You will pay nothing to apply"] }]) {
+    const r = await e.post("/api/employer/jobs", { job: { ...JOB, provides }, submit: true });
+    assert.equal(r.status, 200, `a benefit is not a demand: ${JSON.stringify(provides)} → ${r.text}`);
+  }
+});
+
 test("posting checks on the server: an explicit fee demand is refused in every box; a bare fee word outside the listing's text (a benefit, a place, a job title) goes to the reviewer as a flag (U-020, Stage 4 fix reviews)", async () => {
   const S = await start(), admin = await S.login(ADMIN_PHONE), A = await employerWithLiveJob(S, admin, "0955 910 021", "Policy Fee Fields"), e = A.e;
   for (const [where, job, word] of [["what they offer", { ...JOB, provides: { en: ["Training, deposit required before starting"] } }, "deposit required"],
