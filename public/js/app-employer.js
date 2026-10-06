@@ -1,7 +1,7 @@
 /* ---------- employer: company, listings, job form and applicants ---------- */
 const JS_TONE = { draft: "pill--muted", pending: "pill--warn", published: "pill--good", rejected: "pill--bad", closed: "pill--muted" };
 const CO_TONE = { draft: "pill--muted", pending: "pill--warn", verified: "pill--good", rejected: "pill--bad", suspended: "pill--bad" };
-const MOVES = { new: ["shortlisted", "interview", "rejected"], shortlisted: ["interview", "hired", "rejected", "new"], interview: ["hired", "rejected", "shortlisted"], rejected: ["shortlisted", "new"], hired: [], withdrawn: [] };
+const MOVES = { new: ["shortlisted", "interview", "rejected"], shortlisted: ["interview", "hired", "rejected", "new"], interview: ["hired", "rejected", "shortlisted"], rejected: ["shortlisted", "new"], hired: ["interview"], withdrawn: [] };
 const EMP = { job: null, apps: [], appsJob: null };
 const page = inner => html`<div class="page scroll"><div class="page-in">${inner}</div></div>`;
 const backLink = (to, key) => html`<button class="back" type="button" data-act="go" data-to="${to}">${icon("back", 15, 2.2, "flip")}${t(key)}</button>`;
@@ -209,7 +209,7 @@ ${P ? html`<span class="acard-act">
 ${a.phone ? html`<a class="btn btn--ghost" href="tel:${a.phone}">${icon("phone", 15)}${t("apCall")}</a><a class="btn btn--ghost" href="https://wa.me/${a.phone.replace(/\D/g, "")}" target="_blank" rel="noopener">${icon("chat", 15)}WhatsApp</a>` : ""}
 <button class="btn btn--soft" type="button" data-act="emp-resume" data-app="${a.id}">${icon("doc", 15)}${t("apResume")}</button></span>
 ${a.movedBy || a.noteBy ? html`<span class="tm-by">${[a.movedBy ? t("tmMovedBy", { name: a.movedBy }) : "", a.noteBy ? t("tmNoteBy", { name: a.noteBy }) : ""].filter(Boolean).join(" · ")}</span>` : ""}
-${canDo("hire") && (MOVES[a.status] || []).length ? html`<span class="moves"><span class="lbl">${t("apMove")}</span>${MOVES[a.status].map(s => html`<button class="chip" type="button" data-act="emp-move" data-app="${a.id}" data-to="${s}">${t("est_" + s)}</button>`)}</span>` : ""}
+${canDo("hire") && (MOVES[a.status] || []).length && !a.hireConfirmed ? html`<span class="moves"><span class="lbl">${t("apMove")}</span>${MOVES[a.status].map(s => html`<button class="chip" type="button" data-act="emp-move" data-app="${a.id}" data-to="${s}">${t("est_" + s)}</button>`)}</span>` : ""}
 <span class="field"><label class="lbl" for="apNote-${a.id}">${t("apNote")}</label><textarea class="inp inp--note" id="apNote-${a.id}">${a.note}</textarea>
 <button class="link" type="button" data-act="emp-note" data-app="${a.id}">${t("apSaveNote")}</button></span>` : ""}
 </span></li>`;

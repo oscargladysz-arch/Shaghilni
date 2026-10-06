@@ -8,7 +8,7 @@ const MOVES = {   // allowed application status changes, by current status
   shortlisted: ["interview", "hired", "rejected", "new"],
   interview: ["hired", "rejected", "shortlisted"],
   rejected: ["shortlisted", "new"],
-  hired: [], withdrawn: []
+  hired: ["interview"], withdrawn: []   // a hire goes back to interview only while the Shaghilni team has not confirmed it (U-003)
 };
 
 export function registerEmployer(r, deps) {
@@ -152,12 +152,13 @@ export function registerEmployer(r, deps) {
     const status = ctx.body.status || a.status;
     plans.allow(ctx, c, status !== a.status ? "hire" : "view");   // hiring managers can write notes; moving people takes a recruiter
     if (status !== a.status && !(MOVES[a.status] || []).includes(status)) fail(409, "bad_transition", { from: a.status, to: status });
-    db.run("UPDATE applications SET status = ?, employer_note = ?, updated_at = ?, hired_at = CASE WHEN ? = 'hired' THEN COALESCE(hired_at, ?) ELSE hired_at END, hire_pay_mid = CASE WHEN ? = 'hired' THEN COALESCE(hire_pay_mid, ?) ELSE hire_pay_mid END, hire_plan = CASE WHEN ? = 'hired' THEN COALESCE(hire_plan, ?) ELSE hire_plan END, moved_by = CASE WHEN ? THEN ? ELSE moved_by END, note_by = CASE WHEN ? THEN ? ELSE note_by END WHERE id = ?",
+    if (status !== a.status && a.hire_confirmed_at) fail(409, "hire_confirmed");   // a confirmed hire is final
+    db.run("UPDATE applications SET status = ?, employer_note = ?, updated_at = ?, hired_at = CASE WHEN ? = 'hired' THEN COALESCE(hired_at, ?) ELSE NULL END, hire_pay_mid = CASE WHEN ? = 'hired' THEN COALESCE(hire_pay_mid, ?) ELSE NULL END, hire_plan = CASE WHEN ? = 'hired' THEN COALESCE(hire_plan, ?) ELSE NULL END, moved_by = CASE WHEN ? THEN ? ELSE moved_by END, note_by = CASE WHEN ? THEN ? ELSE note_by END WHERE id = ?",
       status, note, now(), status, now(), status, plans.payMid(J(a.j_data) || {}), status, plans.planOf(c), status !== a.status ? 1 : 0, ctx.user.id, note !== a.employer_note ? 1 : 0, ctx.user.id, a.id);   // the pay and the plan at the time of the hire decide the fee (D-09, U-029)
     if (status !== a.status) {
       audit(ctx.user.id, "application.moved", "application", a.id, { from: a.status, to: status });
       const seekerUser = db.get("SELECT * FROM users WHERE id = ?", a.user_id);
-      notify(seekerUser, status, { co: (J(c.data) || {}).name, title: (J(a.j_data) || {}).title });
+      if (a.status !== "hired") notify(seekerUser, status, { co: (J(c.data) || {}).name, title: (J(a.j_data) || {}).title });   // undoing a hire texts nobody: the interview text would follow a congratulations (U-003)
     }
     return { ok: true, status };
   });
