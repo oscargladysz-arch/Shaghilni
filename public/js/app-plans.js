@@ -72,7 +72,7 @@ ${A.full ? "" : html`<section class="card"><p class="card-p">${t("plAnUpsell")}<
 <tbody>${A.jobs.map(j => html`<tr><td>${L(bi(j.title)) || "—"}</td><td class="num">${fmt(j.applications)}</td><td class="num">${fmt(j.shortlisted)}</td><td class="num">${fmt(j.interview)}</td><td class="num">${fmt(j.hired)}</td>${A.full ? html`<td class="num">${fmt(j.fromSearch)}</td>` : ""}</tr>`)}</tbody></table></div>`));
 }
 function downloadCSV(name, rows) {
-  const cols = rows.length ? Object.keys(rows[0]) : ["none"], q = v => { const s0 = String(v == null ? "" : v), s = typeof v === "string" && /^(?:[=@\t\r]|[+-](?![\d\s.]|$))/.test(s0) ? "'" + s0 : s0; return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; };   // a cell that would run as a formula is kept as text (D-43)
+  const cols = rows.length ? Object.keys(rows[0]) : ["none"], q = v => { const s0 = String(v == null ? "" : v), s = typeof v === "string" && /^(?:[=@\t\r]|[+-](?![\d\s.]*$))/.test(s0) ? "'" + s0 : s0; return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; };   // a cell that would run as a formula is kept as text (D-43); a sign stays only on a cell that is wholly a number or a phone number (fix review)
   const iso = v => (typeof v === "number" && v > 1e12 ? new Date(v).toISOString().slice(0, 10) : v);
   const text = "\uFEFF" + [cols.join(","), ...rows.map(r => cols.map(c => q(iso(r[c]))).join(","))].join("\n");
   const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([text], { type: "text/csv;charset=utf-8" })); a.download = name; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500);
