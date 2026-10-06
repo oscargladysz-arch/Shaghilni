@@ -38,12 +38,11 @@ export function registerEmployer(r, deps) {
 
   r.put("/api/employer/company", employer, ctx => {
     { const own = myCompany(ctx); if (own) plans.allow(ctx, own, "manage");
-      else {   // one company, one page: if this registration number is already on Shaghilni, ask to join instead
-        const reg = String((ctx.body.company || {}).regNo || "").toUpperCase().replace(/[^A-Z0-9]/g, "");
-        const dup = reg && db.all("SELECT id, data, status FROM companies").find(x => String((J(x.data) || {}).regNo || "").toUpperCase().replace(/[^A-Z0-9]/g, "") === reg);
-        if (dup) fail(409, "company_exists", { id: dup.id, name: (J(dup.data) || {}).name || {}, verified: dup.status === "verified" });
-        if (db.get("SELECT 1 AS x FROM company_members WHERE phone = ? AND status IN ('invited', 'requested')", ctx.user.phone)) fail(409, "membership_pending");
-      } }
+      // one company, one page: if this registration number is already on Shaghilni, ask to join instead; Arabic-Indic digits are digits, and an existing page changing its number is checked too (U-018)
+      const key = s => core.latinDigits(String(s || "")).toUpperCase().replace(/[^A-Z0-9]/g, ""), reg = key((ctx.body.company || {}).regNo);
+      const dup = reg && (!own || key((J(own.data) || {}).regNo) !== reg) && db.all("SELECT id, data, status FROM companies").find(x => (!own || x.id !== own.id) && key((J(x.data) || {}).regNo) === reg);
+      if (dup) fail(409, "company_exists", { id: dup.id, name: (J(dup.data) || {}).name || {}, verified: dup.status === "verified" });
+      if (!own && db.get("SELECT 1 AS x FROM company_members WHERE phone = ? AND status IN ('invited', 'requested')", ctx.user.phone)) fail(409, "membership_pending"); }
     const data = sanitizeCompany(core, ctx.body.company);
     const c = myCompany(ctx);
     if (!c) {
