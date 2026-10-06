@@ -196,6 +196,16 @@ test("teams: a team invitation texted before the account existed is in that pers
   assert.equal(S.db.get("SELECT COUNT(*) AS n FROM notifications WHERE phone = '+963955814002'").n, 0, "and no text to the number is left after the account is deleted");
 });
 
+test("teams: an invitation to a number that already has an account spends the day's invitations too, so the invite form is no free account check (D-41)", async () => {
+  const S = await start(), admin = await S.login("+12025550199");
+  const { e: owner } = await employer(S, admin, "0955 817 001", "Oracle Check Co");
+  await admin.post(`/api/admin/companies/${cid(S, "Oracle Check Co")}/plan`, { plan: "enterprise", months: 1 });
+  await S.login("0944 817 001");   // a job seeker's number
+  for (let i = 1; i <= 20; i++) { const r = await owner.post("/api/employer/team", { name: "Probe", phone: "0944 817 001", role: "recruiter" }); assert.equal(r.body.error, "phone_taken", `try ${i}`); }
+  const r21 = await owner.post("/api/employer/team", { name: "Probe", phone: "0944 817 001", role: "recruiter" });
+  assert.deepEqual([r21.status, r21.body.error], [429, "rate_limited"], "the twenty-first try of the day is refused before anything is looked up");
+});
+
 test("teams: asking to join texts the company's managers at most five times a day per account, withdrawing included (U-032)", async () => {
   const S = await start(), admin = await S.login("+12025550199");
   await employer(S, admin, "0955 813 001", "Join Target Co");
