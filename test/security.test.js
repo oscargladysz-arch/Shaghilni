@@ -413,6 +413,16 @@ test("9 · API keys never reach the browser", async () => {
   assert.deepEqual(scanSecrets(), [], "no secrets committed in the code");
 });
 
+test("9 · the email service key and the bank's two secrets never reach the browser either (D-49)", async () => {
+  const secrets = ["em_" + "E".repeat(30), "qnb_api_" + "Q".repeat(30), "qnb_hook_" + "H".repeat(30)];
+  const S = await start({ values: { emailApiKey: secrets[0], emailApiUrl: "https://mail.example/send", emailFrom: "jobs@example.com", qnbApiSecret: secrets[1], qnbWebhookSecret: secrets[2] } });
+  assert.equal(S.cfg.emailApiKey, secrets[0], "the planted email key is the one in use");
+  const c = S.client(), page = (await c.get("/")).text, assets = [...page.matchAll(/(?:src|href)="(\/assets\/[^"]+)"/g)].map(m => m[1]);
+  const bodies = [page, ...(await Promise.all(assets.map(a => realFetch(S.base + a).then(r => r.text())))), (await c.get("/api/config")).text, (await c.get("/api/jobs")).text,
+    (await c.get("/api/auth/challenge")).text, (await c.get("/api/me")).text, (await c.get("/lite")).text];
+  for (const b of bodies) for (const x of secrets) assert.ok(!b.includes(x), "a secret reached the browser");
+});
+
 test("10 · environment lockdown: production refuses unsafe settings, and the scanner passes a good setup", () => {
   const prod = extra => () => loadConfig({ skipDotEnv: true, env: { NODE_ENV: "production", OTP_PEPPER: "p".repeat(40), BASE_URL: "https://shaghilni.test", ...extra } });
   assert.throws(prod({ OTP_PEPPER: "" }), /OTP_PEPPER/);

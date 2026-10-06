@@ -247,16 +247,18 @@ hard-coded or committed.
 
 **Result for this version**
 
-- **The secrets:** `OTP_PEPPER`, `ANTHROPIC_API_KEY`, `TEXTBEE_API_KEY`, and `TWILIO_AUTH_TOKEN` with its account SID. All are read only in `server/config.js`, used only on the server, and never logged. The browser learns only whether AI suggestions are switched on (`/api/config`).
-- **Tested:** security test 9 starts a server with planted secrets. It checks that the page, every script and stylesheet, and the public API responses never contain them.
+- **The secrets:** seven. `OTP_PEPPER` (hashes sign-in codes and student email codes; signs the sign-in challenge, Lite's form tokens and the development test-payment page; salts the daily visitor code), `ANTHROPIC_API_KEY`, `TEXTBEE_API_KEY`, `TWILIO_AUTH_TOKEN` with its account SID, `EMAIL_API_KEY` (sent only to the address in `EMAIL_API_URL`), and `QNB_API_SECRET` and `QNB_WEBHOOK_SECRET` (read, but unused until the bank's adapter is written). All are read only in `server/config.js`, used only on the server, and never logged. The browser learns only whether AI suggestions are switched on (`/api/config`).
+- **Tested:** two security tests (both numbered 9) start a server with all seven secrets planted. They check that the page, every script and stylesheet, Lite and the public API responses never contain them.
 - **Scanned:** the scanner checks the repository for key patterns: Anthropic, OpenAI, AWS, the Twilio account SID, private keys, and hard-coded secrets under any name this app uses, in code (`textbeeKey: "..."`) or as a settings line (`OTP_PEPPER=...`). Your local settings files (`.env`, `.env.production` and the like) are skipped, since they are meant to hold secrets; `.env.example` is checked.
 - **Ignored:** every `.env` variant (`.env`, `.env.production`, `.env.local`...) is listed in both `.gitignore` and `.dockerignore`, so none can reach GitHub or the Docker image; only `.env.example` is kept in the repository. The image is also built from named folders only (`Dockerfile`).
 - **Rotation:**
   - Anthropic keys in the Anthropic Console, under API keys;
   - textbee in its dashboard;
-  - Twilio in its console.
+  - Twilio in its console;
+  - the email key at the email service `EMAIL_API_URL` points to;
+  - the QNB secrets with the bank, once the adapter exists.
 
-  Changing `OTP_PEPPER` only cancels the codes and challenges in flight; sessions aren't affected.
+  Restart the server after each change: settings are read once at start. Changing `OTP_PEPPER` cancels the sign-in codes and challenges in flight, any Lite form open at that moment (one refused submit), student email codes in flight and the development test-payment signature, and gives that day's visitors a new visitor code (counted twice in the traffic report); sessions aren't affected.
 
 **You must**
 
