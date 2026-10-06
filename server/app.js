@@ -102,7 +102,8 @@ export function createApp({ cfg, db, log = console.log, sms: smsOverride, email:
 
   function handler(req, res) {
     if (cfg.prod) res.setHeader("strict-transport-security", "max-age=31536000; includeSubDomains");   // production only: browsers then refuse plain http
-    const url = new URL(req.url, "http://localhost"), t0 = process.hrtime.bigint();
+    let url; try { url = new URL(req.url, "http://localhost"); } catch { return send(req, res, 400, "Bad request", { "content-type": "text/plain; charset=utf-8" }); }   // a request line the parser rejects is the sender's error, never a crash (D-39)
+    const t0 = process.hrtime.bigint();
     res.on("finish", () => { try { traffic.observe(req, res, url, t0); } catch (e) { /* measuring never breaks a request */ } });
     if (url.pathname === "/hire" || url.pathname === "/hire/") { res.writeHead(302, { location: "/lite/hire" }); return res.end(); }
     // Card payments: the bank's signed results, the return page and (in development) the test payment page. Not under /api, so no CSRF header: each is checked on its own.
