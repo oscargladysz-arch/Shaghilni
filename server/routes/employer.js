@@ -3,6 +3,7 @@ import { PLANS } from "../plans.js";
 import { now, J } from "../db.js";
 import { sanitizeCompany, companyMissing, sanitizeJob, checkJob, e164 } from "../validate.js";
 import { companyOut, employerJobOut, applicantCounts } from "../serialize.js";
+const REG_WORDS = new Set(["سجل", "تجاري", "رقم", "محافظه", "في"]);   // سجل تجاري رقم, محافظة, في: the register's own words, after norm (ة → ه); س.ت is dropped as a pair
 
 const MOVES = {   // allowed application status changes, by current status
   new: ["shortlisted", "interview", "rejected"],
@@ -39,8 +40,8 @@ export function registerEmployer(r, deps) {
 
   r.put("/api/employer/company", employer, ctx => {
     { const own = myCompany(ctx); if (own) plans.allow(ctx, own, "manage");
-      // one company, one page: if this registration number is already on Shaghilni, ask to join instead; Arabic-Indic digits are digits, Arabic words count like Latin ones (the governorate of the register), and an existing page changing its number is checked too (U-018, fix review)
-      const key = s => core.norm(s).toUpperCase().replace(/[^A-Z0-9\u0621-\u064A]/g, ""), reg = key((ctx.body.company || {}).regNo);
+      // one company, one page: if this registration number is already on Shaghilni, ask to join instead; Arabic-Indic digits are digits, Arabic words count like Latin ones (the governorate of the register) except the register's own words and the article, and an existing page changing its number is checked too (U-018, fix reviews 1 and 2)
+      const key = s => core.norm(s).toUpperCase().split(/[^A-Z0-9\u0621-\u064A]+/).map(w => w.replace(/^ال(?=[\u0621-\u064A]{2})/, "")).filter((w, i, a) => w && !REG_WORDS.has(w) && !(w === "س" && a[i + 1] === "ت") && !(w === "ت" && a[i - 1] === "س")).join(""), reg = key((ctx.body.company || {}).regNo);
       const dup = reg && (!own || key((J(own.data) || {}).regNo) !== reg) && db.all("SELECT id, data, status FROM companies").find(x => (!own || x.id !== own.id) && key((J(x.data) || {}).regNo) === reg);
       if (dup) fail(409, "company_exists", { id: dup.id, name: (J(dup.data) || {}).name || {}, verified: dup.status === "verified" });
       if (!own && db.get("SELECT 1 AS x FROM company_members WHERE phone = ? AND status IN ('invited', 'requested')", ctx.user.phone)) fail(409, "membership_pending"); }
