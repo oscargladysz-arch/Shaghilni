@@ -14,7 +14,7 @@ const esc = s => String(s).replace(/[&<>"']/g, c => ESC[c]);
 const toH = v => v == null || v === false ? "" : Array.isArray(v) ? v.map(toH).join("")
   : (typeof v === "object" && v[RAW]) ? v.s : esc(v);
 const html = (strs, ...vals) => raw(strs.reduce((out, s, i) => out + s + (i < vals.length ? toH(vals[i]) : ""), ""));
-const put = (el, h) => { if (el) el.innerHTML = h.s; };   /* html-safe: the only HTML sink; h comes from the escaping html`` template */
+const put = (el, h) => { if (el) el.innerHTML = h.s; };   /* html-safe: h comes from the escaping html`` template (the other sink, hydrateIcons in boot.js, writes the built-in icon markup) */
 const fill = (s, v = {}) => String(s).replace(/\{(\w+)\}/g, (m, k) => (k in v ? v[k] : m));
 const fmt = n => Number(n).toLocaleString("en-US");
 const NS = "shaghilni.app.";
