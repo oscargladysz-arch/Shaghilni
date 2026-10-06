@@ -113,9 +113,11 @@ test("policy team: recruiters and hiring managers manage nobody; a company admin
   await refused(cadmin, "PUT", `/api/employer/team/${enc(PH.recruiter)}`, { role: "admin" }, "role_forbidden", "nor promote anyone to admin");
   await refused(cadmin, "POST", `/api/employer/team/requests/${enc(askerPhone)}`, { decision: "yes", role: "admin" }, "role_forbidden", "nor approve a request as admin");
   await refused(cadmin, "POST", "/api/employer/team/transfer", { phone: admin2Phone }, "role_forbidden", "nor transfer");
-  // recorded: an admin MAY invite a new admin (test/team.test.js:119 "admins invite"); SECURITY.md:382 says only the owner approves admins, team.js:34 does not check
-  const inv = await cadmin.post("/api/employer/team", { name: "Policy Third Admin", phone: "0955 920 004", role: "admin" }); assert.equal(inv.status, 200, inv.text);
-  assert.equal((await cadmin.del(`/api/employer/team/${enc("+963955920004")}`)).status, 200, "and cancel that invitation");
+  // nor invite an admin, nor cancel the owner's admin invitation: the owner-only rule the team page shows is the server's (D-31, U-030)
+  await refused(cadmin, "POST", "/api/employer/team", { name: "Policy Third Admin", phone: "0955 920 004", role: "admin" }, "role_forbidden", "nor invite an admin");
+  const inv = await C.A.e.post("/api/employer/team", { name: "Policy Third Admin", phone: "0955 920 004", role: "admin" }); assert.equal(inv.status, 200, `the owner invites an admin: ${inv.text}`);
+  await refused(cadmin, "DELETE", `/api/employer/team/${enc("+963955920004")}`, undefined, "role_forbidden", "nor cancel the owner's admin invitation");
+  assert.equal((await C.A.e.del(`/api/employer/team/${enc("+963955920004")}`)).status, 200, "the owner cancels it");
   // and what the admin may do
   assert.equal((await cadmin.post("/api/employer/team", { name: "Policy Hire", phone: "0955 920 005", role: "hiring_manager" })).status, 200, "an admin invites");
   assert.equal((await cadmin.put(`/api/employer/team/${enc(PH.hiring)}`, { role: "recruiter" })).status, 200, "changes a non-admin's role");

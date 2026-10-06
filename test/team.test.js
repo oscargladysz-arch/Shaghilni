@@ -116,7 +116,8 @@ test("teams: asking to join, duplicate companies, admins, transfer, leaving and 
   assert.equal((await owner.post(`/api/employer/team/requests/${encodeURIComponent(T.requests[0].phone)}`, { decision: "yes", role: "admin" })).status, 200);
   assert.equal((await fadi.get("/api/employer")).body.me.role, "admin");
   // admins run the team but don't manage other admins or billing
-  assert.equal((await fadi.post("/api/employer/team", { name: "Sami", phone: "0955 801 003", role: "admin" })).status, 200, "admins invite");
+  assert.equal((await fadi.post("/api/employer/team", { name: "Sami", phone: "0955 801 003", role: "admin" })).body.error, "role_forbidden", "admins don't invite admins (D-31, U-030)");
+  assert.equal((await owner.post("/api/employer/team", { name: "Sami", phone: "0955 801 003", role: "admin" })).status, 200, "the owner does");
   const sami = await S.login("0955 801 003", "employer"); await sami.post("/api/employer/membership/accept");
   assert.equal((await fadi.del("/api/employer/team/%2B963955801003")).body.error, "role_forbidden", "only the owner removes an admin");
   assert.equal((await fadi.post("/api/employer/team/transfer", { phone: "+963955801003" })).body.error, "role_forbidden");
