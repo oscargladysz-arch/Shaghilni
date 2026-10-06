@@ -113,7 +113,7 @@ Column meanings:
 | POST | `/api/employer/team/transfer` | employer + billing (owner); target active member | `server/routes/team.js:77` | team :122 (403), :124 | — | `team.ownership_transferred` :85 | Old owner's member name becomes the company contact name (`plans.js:36`) |
 | POST | `/api/employer/membership/:answer` | employer without a company; pending invited/requested row; `accept\|decline\|cancel` | `server/routes/team.js:90` | team :81,83,120 (accept only) | — | `team.joined` {role} :96; `team.invite_declined` / `team.request_withdrawn` :100 | decline/cancel untested |
 | GET | `/api/employer/companies/search` | employer (any, even without a company); `q` ≥ 2 chars; verified only | `server/routes/team.js:104` | team :111 | — | none | LIMIT 400 before the name filter |
-| POST | `/api/employer/companies/:id/join` | employer; no company; no pending row; target verified | `server/routes/team.js:110` | team :112,114 | — | `team.requested` :116 | Requester's free-text name goes verbatim into the managers' SMS |
+| POST | `/api/employer/companies/:id/join` | employer; no company; no pending row; target verified; five a day per account (Stage 4, U-032) | `server/routes/team.js:110` | team :112,114 | — | `team.requested` :116 | Requester's free-text name goes verbatim into the managers' SMS |
 | GET | `/api/employer/activity` | employer + manage | `server/routes/team.js:124` | team :100 (200), :102 (403) | — | none | LIMIT 150 before the LABEL filter |
 
 ### Universities and student verification (`server/routes/campus.js`) · 13

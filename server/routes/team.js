@@ -114,6 +114,7 @@ export function registerTeam(r, deps) {
     if (pending(ctx.user.phone)) fail(409, "request_pending");
     const c = db.get("SELECT * FROM companies WHERE id = ? AND status = 'verified'", Number(ctx.params.id)); if (!c) fail(404, "not_found");
     const name = clean(ctx.body.name, 80); if (!name) fail(422, "name_required");
+    if (!limit(`team-join:${ctx.user.id}`, 5, 86400e3)) fail(429, "rate_limited");   // five requests a day per account, each texting the managers; withdrawing does not give one back (U-032, as D-10)
     db.run("INSERT INTO company_members (company_id, phone, added_by, created_at, role, status, name, user_id) VALUES (?, ?, ?, ?, 'recruiter', 'requested', ?, ?)", c.id, ctx.user.phone, ctx.user.id, now(), name, ctx.user.id);
     audit(ctx.user.id, "team.requested", "company", c.id, {});
     for (const p of managers(c)) tell(p, "team_request", { co: coName(c), name: { en: name, ar: name } });

@@ -289,6 +289,7 @@ hard-coded or committed.
 | Code checks | 5 attempts per code; 60 checks an hour per address | fixed |
 | Sign-in challenges, per address | 60 per 10 minutes (API; a Lite page view is not counted, sending the code still is) | fixed |
 | Team invitations (each sends a text), per company | 20 a day, verified companies only | fixed |
+| Requests to join a company (each texts its owner and admins), per account | 5 a day, withdrawn ones included | fixed |
 | **Where texts may go** | Syria plus the main diaspora countries; admin numbers anywhere | `SMS_ALLOWED_PREFIXES` |
 | **Texts per day, whole site** | 1,000 | `SMS_DAILY_CAP` |
 | **Texts per day to numbers outside Syria** | 150 | `SMS_INTL_DAILY_CAP` |
