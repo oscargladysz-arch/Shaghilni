@@ -11,7 +11,7 @@ export function makeEmail(cfg, log) {
   if (!(cfg.emailApiUrl && cfg.emailApiKey && cfg.emailFrom)) return null;
   return async (to, subject, text) => {
     const res = await fetch(cfg.emailApiUrl, { method: "POST", headers: { "content-type": "application/json", authorization: `Bearer ${cfg.emailApiKey}` },
-      body: JSON.stringify({ from: cfg.emailFrom, to, subject, text }) });
+      body: JSON.stringify({ from: cfg.emailFrom, to, subject, text }), signal: AbortSignal.timeout(15000) });   // like texts: a hung provider never holds a request or the alert run (D-46)
     if (!res.ok) throw new Error(`email ${res.status}`);
   };
 }
