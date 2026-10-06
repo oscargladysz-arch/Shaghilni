@@ -180,6 +180,21 @@ test("1 · a placement billed to a programme is the programme's charge: the empl
   assert.ok(!/Example Donor Internship Programme|"amountUsd":450/.test(mine.text), "nor the programme's name or rate");
 });
 
+test("1 · a flood of one-minute keys does not reset a daily count: the limiter prunes each key by its own window (fix review of U-032, D-41, D-10)", async () => {
+  const { makeLimiter } = await import("../server/http.js"), real = Date.now; let t = real();
+  Date.now = () => t;
+  try {
+    const limit = makeLimiter();
+    assert.deepEqual(Array.from({ length: 6 }, () => limit("team-join:1", 5, 86400e3)), [true, true, true, true, true, false], "five a day");
+    t += 61e3;
+    for (let i = 0; i < 50001; i++) limit(`a:2001:db8::${i}`, 100, 60e3);   // one IPv6 /64 is enough addresses
+    t += 1;
+    assert.equal(limit("team-join:1", 5, 86400e3), false, "the sixth request of the day is still refused after the flood");
+    t += 86400e3;
+    assert.equal(limit("team-join:1", 5, 86400e3), true, "control: a day later it is allowed again");
+  } finally { Date.now = real; }
+});
+
 test("1 · a text provider's error answer never carries a full phone number into the server log or the texts table (leaks review)", async () => {
   const cfgOf = provider => ({ sms: { provider, textbeeKey: "k", twilioSid: "AC0", twilioToken: "t", twilioFrom: "+15550000000" } });
   try {
