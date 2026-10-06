@@ -10,6 +10,10 @@ const biList = (o, items, max) => ({
   ar: (Array.isArray(o && o.ar) ? o.ar : []).map(x => clean(x, max)).filter(Boolean).slice(0, items)
 });
 export const keyOf = (table, v) => (typeof v === "string" && Object.prototype.hasOwnProperty.call(table, v) ? v : "");   // a string and the table's own key: never a list (["damascus"] is coerced to a key) or a prototype name (U-038)
+// An unmistakable demand for the candidate's money, refused in every box of a listing; a bare fee word outside the listing's own text is only flagged (U-020, fix reviews: "tuition fees covered" is a benefit).
+const FEE_DEMAND = /\b(?:(?<!\b(?:we|company|employer|the\s+company)\s+(?:will\s+)?(?:pay|pays|cover|covers|reimburse|reimburses)\s+(?:\w+\s+){0,2})(?:registration|training|application|processing|joining|interview|placement|medical|admin(?:istration)?)\s+(?:fees?|costs?|charges?|deposit)(?!\s+(?:are\s+|is\s+)?(?:covered|paid\s+by|reimbursed|refunded|waived|included))|pay\s+to\s+apply|(?<!\b(?:we|company|employer)\s)pay\s+(?:a|an)\s+(?:[\w,.]+\s+){0,3}?(?:fee|deposit)|(?:you|candidates?|applicants?|trainees?)\s+(?:must\s+|should\s+|will\s+|have\s+to\s+|need\s+to\s+)?pay\b|deposit\s+(?:is\s+)?required|required\s+deposit)\b/i;
+const FEE_DEMAND_AR = ["دفع رسم", "دفع رسوم", "دفع مبلغ", "رسم تسجيل", "رسم التسجيل", "رسوم تسجيل", "رسوم التسجيل", "رسم اشتراك", "رسوم اشتراك", "مبلغ تأمين", "تأمين مالي", "كفالة مالية", "بدل تسجيل", "يدفع المتقدم", "على المتقدم دفع"];
+const feeDemand = (core, text) => { const m = text.match(FEE_DEMAND); if (m) return m[0]; const n = ` ${core.norm(text)} `; return FEE_DEMAND_AR.map(core.norm).find(p => n.includes(` ${p} `)) || null; };
 const ym = v => (/^\d{4}-(0[1-9]|1[0-2])$/.test(String(v || "")) ? String(v) : "");
 
 export function e164(core, raw) {
@@ -133,7 +137,7 @@ export function checkJob(core, j) {
   if (!j.summary.en && !j.summary.ar) missing.push("summary");
   const text = [j.title.en, j.title.ar, j.summary.en, j.summary.ar, ...j.duties.en, ...j.duties.ar, ...j.needs.en, ...j.needs.ar].join(" ");
   const aside = [j.place.en, j.place.ar, j.contact.name.en, j.contact.name.ar, j.contact.role.en, j.contact.role.ar, j.contact.status.en, j.contact.status.ar, ...j.provides.en, ...j.provides.ar, j.tags].join(" "), all = [text, aside].join(" ");
-  const fee = core.findFee(text), gender = core.findGender(text), flags = gender ? [{ type: "gender", word: gender }] : [];
+  const fee = core.findFee(text) || feeDemand(core, aside), gender = core.findGender(text), flags = gender ? [{ type: "gender", word: gender }] : [];
   const feeAside = !fee && core.findFee(aside); if (feeAside) flags.push({ type: "fee", word: feeAside });   // fee words in the other boxes go to the reviewer, so no box is a way round the check (U-020) and a benefit such as "tuition fees covered" is not refused (fix review)
   // Contact details anywhere in the free text are flagged for the reviewer, not blocked: the number is meant to reach a signed-in applicant only (D-30)
   const every = core.latinDigits(all);
