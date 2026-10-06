@@ -127,6 +127,30 @@ test("1 · an employer who leaves takes the application phone number and email o
   assert.ok(!S.db.get("SELECT data FROM companies WHERE id = ?", companyId).data.includes("955100052"), "the number is nowhere in the record");
 });
 
+test("1 · download my data carries what the notice says is held: plan, invoices, payments, plan requests, partnerships, team membership and blocked companies (U-014)", async () => {
+  const S = await start(), admin = await S.login("+12025550199");
+  const { e: owner, companyId, jobId } = await employerWithLiveJob(S, admin, "0955 100 071", "Export Co");
+  assert.equal((await admin.post(`/api/admin/companies/${companyId}/plan`, { plan: "pro", months: 1, amountSyp: 400000 })).status, 200);
+  assert.equal((await owner.post("/api/employer/plan/request", { plan: "enterprise", payMethod: "bank_syp" })).status, 200);
+  assert.equal((await owner.post("/api/employer/partners", { uni: "homs" })).status, 200);
+  assert.equal((await owner.post("/api/employer/team", { name: "Rana Recruiter", phone: "0955 100 072", role: "recruiter" })).status, 200);
+  const member = await S.login("0955 100 072", "employer"); assert.equal((await member.post("/api/employer/membership/accept")).status, 200);
+  const seeker = await S.login("0944 100 071"); await seeker.put("/api/me/profile", { profile: PROFILE }); assert.equal((await seeker.put("/api/me/recruit", { open: true })).status, 200);
+  const sid = (await seeker.get("/api/me")).body.user.id;
+  assert.equal((await owner.post(`/api/employer/students/${sid}/invite`, { kind: "job", jobId })).status, 200);
+  const inv = (await seeker.get("/api/me/invitations")).body.invitations[0]; assert.equal((await seeker.post(`/api/me/invitations/${inv.id}/block`)).status, 200);
+  const mine = (await owner.get("/api/me/export")).body;
+  assert.equal(mine.plan && mine.plan.plan, "pro", "the owner's file has the company's plan");
+  assert.deepEqual((mine.charges || []).map(c => [c.kind, c.amountSyp, c.status]), [["plan", 400000, "due"]], "its invoices");
+  assert.ok(Array.isArray(mine.payments), "its card payments (none here)");
+  assert.deepEqual((mine.planRequests || []).map(r => [r.plan, r.payMethod]), [["enterprise", "bank_syp"]], "its plan requests");
+  assert.deepEqual((mine.partnerships || []).map(p => [p.university, p.status]), [["homs", "requested"]], "its university partnerships");
+  const theirs = (await member.get("/api/me/export")).body;
+  assert.deepEqual((theirs.teamMembership || []).map(m => [m.company && m.company.en, m.role, m.status, m.name]), [["Export Co", "recruiter", "active", "Rana Recruiter"]], "a teammate's file has their membership");
+  assert.equal(theirs.charges, undefined, "but not the company's billing, which is the owner's");
+  assert.deepEqual(((await seeker.get("/api/me/export")).body.blockedCompanies || []).map(b => b.company && b.company.en), ["Export Co"], "a job seeker's file has the companies they blocked");
+});
+
 test("1 · a text provider's error answer never carries a full phone number into the server log or the texts table (leaks review)", async () => {
   const cfgOf = provider => ({ sms: { provider, textbeeKey: "k", twilioSid: "AC0", twilioToken: "t", twilioFrom: "+15550000000" } });
   try {
