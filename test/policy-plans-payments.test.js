@@ -211,7 +211,12 @@ test("policy plans: the admin plan route reads grouped amounts ('4,000', '٤٬٠
     assert.equal(!!r.body.planUntil, months !== "", `${JSON.stringify(months)}: an end date when months are given`);
   }
   const before = plain(S.db.get("SELECT plan, plan_until FROM companies WHERE id = ?", companyId));
-  for (const [months, amountSyp] of [["٣ أشهر", "4000"], ["3", "4000 SYP"], ["three", ""], ["-1", ""]]) {
+  for (const [months, amountSyp, amt] of [["1", "250.000", 250000], ["1", "1.500.000", 1500000]]) {   // a dot used to group thousands (fix review 2)
+    S.db.run("DELETE FROM charges WHERE company_id = ?", companyId);
+    assert.equal((await admin.post(`/api/admin/companies/${companyId}/plan`, { plan: "pro", months, amountSyp })).status, 200);
+    assert.deepEqual(S.db.all("SELECT amount_syp FROM charges WHERE company_id = ?", companyId).map(x => x.amount_syp), [amt], `${amountSyp} is ${amt}, not ${parseFloat(amountSyp)}`);
+  }
+  for (const [months, amountSyp] of [["٣ أشهر", "4000"], ["3", "4000 SYP"], ["three", ""], ["-1", ""], ["1.5", ""], ["1", "0.4"], ["1", "12.50"]]) {
     const r = await admin.post(`/api/admin/companies/${companyId}/plan`, { plan: "enterprise", months, amountSyp });
     assert.deepEqual([r.status, r.body.error], [422, "bad_number"], `${JSON.stringify([months, amountSyp])} is refused, not read as 0`);
   }
