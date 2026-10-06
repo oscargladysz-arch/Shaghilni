@@ -170,8 +170,8 @@ export function registerEmployer(r, deps) {
   const ownerOnly = (ctx, c) => plans.allow(ctx, c, "billing");
   r.get("/api/employer/plan", employer, ctx => {
     const c = myCompany(ctx); if (!c) fail(409, "company_not_verified");
-    const charges = db.all("SELECT id, kind, amount_syp, status, note, created_at, paid_at FROM charges WHERE company_id = ? AND programme_id IS NULL ORDER BY created_at DESC LIMIT 100", c.id)
-      .map(x => ({ id: x.id, kind: x.kind, amountSyp: x.amount_syp, status: x.status, note: x.note, createdAt: x.created_at, paidAt: x.paid_at }));
+    const charges = db.all("SELECT id, kind, amount_syp, amount_usd, status, note, created_at, paid_at FROM charges WHERE company_id = ? AND programme_id IS NULL ORDER BY created_at DESC LIMIT 100", c.id)
+      .map(x => ({ id: x.id, kind: x.kind, amountSyp: x.amount_syp, amountUsd: x.amount_usd, status: x.status, note: x.note, createdAt: x.created_at, paidAt: x.paid_at }));
     const pending = db.get("SELECT id, plan, pay_method, created_at FROM plan_requests WHERE company_id = ? AND handled_at IS NULL ORDER BY created_at DESC LIMIT 1", c.id);
     return { ...plans.summary(c), charges, request: pending ? { plan: pending.plan, payMethod: pending.pay_method, ref: plans.ref(c.id, pending.id), createdAt: pending.created_at } : null, isOwner: c.owner_id === ctx.user.id };
   });

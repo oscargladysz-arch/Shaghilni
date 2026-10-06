@@ -39,9 +39,9 @@ export function makePlans({ db, cfg }) {
     const u = db.get("SELECT phone FROM users WHERE id = ?", userId); if (!u) return null;
     const m = u.phone.startsWith("deleted:") ? null : db.get("SELECT name FROM company_members WHERE company_id = ? AND phone = ? AND status = 'active'", c.id, u.phone); return (m && m.name) || FORMER[lang === "ar" ? "ar" : "en"]; };
   const summary = c => {
-    const p = planOf(c), L = PLANS[p], due = db.get("SELECT COUNT(*) AS n, COALESCE(SUM(amount_syp), 0) AS syp FROM charges WHERE company_id = ? AND status = 'due' AND programme_id IS NULL", c.id);   // a programme-billed placement is the programme's charge, not the employer's (D-08)
+    const p = planOf(c), L = PLANS[p], due = db.get("SELECT COUNT(*) AS n, COALESCE(SUM(amount_syp), 0) AS syp, COALESCE(SUM(amount_usd), 0) AS usd FROM charges WHERE company_id = ? AND status = 'due' AND programme_id IS NULL", c.id);   // a programme-billed placement is the programme's charge, not the employer's (D-08)
     return { plan: p, planUntil: p === "free" ? null : c.plan_until || null, limits: L, usage: { invites: invitesUsed(c.id), sponsored: sponsoredUsed(c.id), team: teamUsed(c.id) },
-      prices: { pro: cfg.planProPrice || "", enterprise: cfg.planEnterprisePrice || "" }, feesDue: { n: due.n, syp: due.syp } };
+      prices: { pro: cfg.planProPrice || "", enterprise: cfg.planEnterprisePrice || "" }, feesDue: { n: due.n, syp: due.syp, usd: due.usd } };
   };
   const need = (c, feature) => { if (!limits(c)[feature]) fail(403, "plan_required"); };
   const payMid = d => { const p = Array.isArray(d && d.pay) ? d.pay : [], a = Number(p[0]) || 0, b = Number(p[1]) || a; return Math.round((a + b) / 2); };
