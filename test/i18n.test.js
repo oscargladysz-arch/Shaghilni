@@ -4,7 +4,7 @@
    ratcheted in test/ratchets.json: they may only go down. */
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync, readdirSync } from "node:fs";
+import { readFileSync, readdirSync, existsSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import vm from "node:vm";
@@ -107,7 +107,7 @@ test("i18n: every error code the server can answer has an err_ sentence in both 
 
 test("i18n: every complete literal key the client passes to t() exists in both languages, so no screen shows a raw key (U-040)", () => {
   const STR = loadSTR(["lookups.js", "i18n.js", "i18n2.js", "i18n3.js", "i18n4.js"]), extra = { en: {}, ar: {} };
-  for (const [lang, m] of [["en", /Object\.assign\(STR\.en, (\{[\s\S]*?\})\);/], ["ar", /Object\.assign\(STR\.ar, (\{[\s\S]*?\})\);/]]) { const b = JS("demo.js").match(m); if (b) Object.assign(extra[lang], vm.runInNewContext(`(${b[1]})`)); }   // demo.js adds its own strings (R17)
+  for (const [lang, m] of [["en", /Object\.assign\(STR\.en, (\{[\s\S]*?\})\);/], ["ar", /Object\.assign\(STR\.ar, (\{[\s\S]*?\})\);/]]) { const b = existsSync(new URL("../public/js/demo.js", import.meta.url)) && JS("demo.js").match(m); if (b) Object.assign(extra[lang], vm.runInNewContext(`(${b[1]})`)); }   // demo.js adds its own strings, and is gone after demo-accounts:uninstall (R17)
   const missing = [];
   for (const f of readdirSync(new URL("../public/js/", import.meta.url)).filter(f => f.endsWith(".js") && !/^i18n/.test(f))) {
     for (const [, k] of JS(f).matchAll(/\bt\("([A-Za-z0-9_]+)"\s*[,)]/g)) for (const lang of ["en", "ar"]) if (!(k in STR[lang]) && !(k in extra[lang])) missing.push(`${f}: ${k} (${lang})`);
