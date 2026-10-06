@@ -111,6 +111,20 @@ test("1 · data handling: export, deletion that erases texts and codes, employer
   assert.deepEqual([co.whatsapp, co.contactName], ["", ""], "contact details are removed from the company page");
 });
 
+test("1 · an employer who leaves takes the application phone number and email off the company page as well (U-053)", async () => {
+  const S = await start(), admin = await S.login("+12025550199");
+  const { e, companyId } = await employerWithLiveJob(S, admin, "0955 100 051", "Leaving Stores");
+  const put = await e.put("/api/employer/company", { company: { name: { en: "Leaving Stores" }, gov: "aleppo", regNo: "REG-Leaving Stores", contactName: "Contact Leaving Stores", whatsapp: "0955 100 051",
+    applyVia: { whatsapp: true, call: true, email: true }, applyPhone: "0955 100 052", applyEmail: "owner.private@example.com" } });
+  assert.equal(put.status, 200, put.text);
+  const before = JSON.parse(S.db.get("SELECT data FROM companies WHERE id = ?", companyId).data);
+  assert.deepEqual([before.applyPhone, before.applyEmail], ["+963955100052", "owner.private@example.com"], "the application channels are on the company record");
+  assert.equal((await e.del("/api/me")).status, 200);
+  const co = JSON.parse(S.db.get("SELECT data FROM companies WHERE id = ?", companyId).data);
+  assert.deepEqual([co.contactName, co.whatsapp, co.applyPhone, co.applyEmail], ["", "", "", ""], "every contact detail of the person who left is removed, the application phone and email included");
+  assert.ok(!S.db.get("SELECT data FROM companies WHERE id = ?", companyId).data.includes("955100052"), "the number is nowhere in the record");
+});
+
 test("2 · access control (the equivalent of row-level security): no account can reach another's data", async () => {
   const S = await start(), admin = await S.login("+12025550199");
   const a = await employerWithLiveJob(S, admin, "0955 200 001", "Alpha Co");
