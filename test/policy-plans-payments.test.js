@@ -141,6 +141,25 @@ test("policy plans: undoing a hire keeps its fee basis: cutting the pay to 1 or 
   assert.deepEqual(await confirm(old), [{ kind: "hire_fee", amountSyp: MID }], "with no plan recorded, the live plan (Free) decides, as documented");
 });
 
+test("policy plans: the fee basis is the pay the listing showed when the person applied, or on the day of the hire if higher: cutting the pay just before recording the hire does not lower the fee (fix review)", async () => {
+  const S = await start(), admin = await S.login("+12025550199"), F = await employerWithLiveJob(S, admin, "0955 922 011", "Cut Before Hire Co");
+  const a = await seekerOpen(S, "0944 922 011", "Applied At Full Pay"), b = await seekerOpen(S, "0944 922 012", "Applied Long Ago");
+  const applied = async who => { const inv = await F.e.post(`/api/employer/students/${who.id}/invite`, { kind: "job", jobId: F.jobId }); assert.equal(inv.status, 200, inv.text);
+    assert.equal((await who.s.post(`/api/me/invitations/${inv.body.invitation.id}/respond`, { answer: "yes" })).status, 200);
+    const ap = await who.s.post(`/api/jobs/${F.jobId}/apply`, {}); assert.equal(ap.status, 200, ap.text);
+    for (const st of ["shortlisted", "interview"]) assert.equal((await F.e.put(`/api/employer/applications/${ap.body.application.id}`, { status: st })).status, 200, st);
+    return ap.body.application.id; };
+  const ida = await applied(a), idb = await applied(b);
+  S.db.run("UPDATE applications SET apply_pay_mid = NULL WHERE id = ?", idb);   // b applied before migration 18: no pay was recorded with the application
+  assert.equal((await F.e.put(`/api/employer/jobs/${F.jobId}`, { job: { ...JOB, pay: [1, 1] } })).status, 200, "the pay is cut to 1 just before the hire");
+  for (const id of [ida, idb]) assert.equal((await F.e.put(`/api/employer/applications/${id}`, { status: "hired" })).status, 200);
+  assert.equal(S.db.get("SELECT hire_pay_mid FROM applications WHERE id = ?", ida).hire_pay_mid, MID, "the pay shown when the person applied stands");
+  assert.equal(S.db.get("SELECT hire_pay_mid FROM applications WHERE id = ?", idb).hire_pay_mid, 1, "control: with no pay recorded at the application, the pay on the day of the hire (as before)");
+  assert.equal((await F.e.put(`/api/employer/jobs/${F.jobId}`, { job: JOB, submit: true })).status, 200, "the pay is put back and the listing resubmitted");
+  const r = await admin.post(`/api/admin/applications/${ida}/confirm-hire`, {}); assert.equal(r.status, 200, r.text);
+  assert.deepEqual(r.body.charges, [{ kind: "hire_fee", amountSyp: MID }], "the fee is the full one, not 1 SYP");
+});
+
 test("policy plans: an invoice in US dollars is recorded and shown in dollars, for the owners offered dollar invoicing (U-024)", async () => {
   const S = await start(), admin = await S.login("+12025550199"), { e, companyId } = await employerWithLiveJob(S, admin, "0955 920 033", "Dollar Invoice Co");
   assert.equal((await e.post("/api/employer/plan/request", { plan: "pro", payMethod: "usd" })).status, 200, "the owner asks to be invoiced in dollars");
