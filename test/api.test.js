@@ -236,6 +236,25 @@ test("resume suggestions: own bullets only, and the fact guard filters Claude's 
   assert.deepEqual([r.body.items[1].ok, r.body.items[1].why], [false, "gNumber"], "an invented number is blocked on the server");
 });
 
+test("resume suggestions: the fact guard holds back Arabic suggestions that add a number word, a bigger role or a place, as it does in English (U-010)", async () => {
+  const { loadCore } = await import("../server/core.js"), { factGuard } = loadCore();
+  const g = (orig, sug, facts = orig) => { const r = factGuard(orig, sug, facts, ""); return [r.ok, r.why || "", r.tok || ""]; };
+  assert.deepEqual(g("ساعدت في جرد المخزون", "أدرت جرد المخزون").slice(0, 2), [false, "gInflate"], "helped → ran is a bigger role");
+  assert.deepEqual(g("وساعدت في جرد المخزون", "قدت جرد المخزون").slice(0, 2), [false, "gInflate"], "with the و prefix too");
+  assert.deepEqual(g("خدمت الزبائن يومياً", "خدمت خمسين زبوناً يومياً"), [false, "gNumber", "خمسين"], "a number word that was not there");
+  assert.deepEqual(g("خدمت الزبائن يومياً", "خدمت مئات الزبائن يومياً").slice(0, 2), [false, "gNumber"], "hundreds");
+  assert.deepEqual(g("رفعت المبيعات", "رفعت المبيعات بنسبة عشرين بالمئة").slice(0, 2), [false, "gNumber"], "a percentage in words");
+  assert.deepEqual(g("خدمت الزبائن في المتجر", "خدمت الزبائن في متجر دمشق"), [false, "gName", "دمشق"], "a governorate the facts don't have");
+  assert.deepEqual(g("خدمت الزبائن في المتجر", "خدمت الزبائن في متجر بحلب").slice(0, 2), [false, "gName"], "with a ب prefix");
+  assert.deepEqual(g("بعت البضائع للزبائن", "بعت البضائع لزبائن في لبنان").slice(0, 2), [false, "gName"], "a country");
+  // controls: nothing new, so nothing is held back
+  assert.deepEqual(g("خدمت الزبائن في المتجر", "خدمت الزبائن في متجر دمشق", "عملت في دمشق. خدمت الزبائن في المتجر").slice(0, 1), [true], "the place is in the person's own facts");
+  assert.deepEqual(g("خدمت خمسين زبوناً", "خدمت خمسين زبوناً يومياً").slice(0, 1), [true], "the number word was already there");
+  assert.deepEqual(g("نظمت جداول الورديات", "رتبت جداول الورديات").slice(0, 1), [true], "a plain rewording");
+  assert.deepEqual(g("ساعدت في جرد المخزون", "ساعدت في جرد المخزون أسبوعياً").slice(0, 1), [true], "still helping");
+  assert.deepEqual(g("Helped with stock counts", "Led stock counts").slice(0, 2), [false, "gInflate"], "English unchanged");
+});
+
 test("account deletion erases personal data but keeps the hire on record", async () => {
   assert.equal((await seeker.del("/api/me")).status, 200);
   assert.equal((await seeker.get("/api/me")).body.user, null, "signed out");
