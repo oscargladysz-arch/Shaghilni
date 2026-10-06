@@ -157,18 +157,36 @@ test("teams: a registration number written with Arabic words keeps them: Damascu
   const hamza = await put("0955 817 005", "Copy Hamza", "سجل تجارى دمشق ١٢٣٤٥"); assert.deepEqual([hamza.status, hamza.body.error], [409, "company_exists"], "and so is a spelling variant (ى for ي)");
 });
 
-test("teams: a registration number held by a company still awaiting verification can be joined (U-023)", async () => {
+test("teams: a registration number held by a company still awaiting verification can be joined (U-023); the request waits, unseen and untexted, until the admin verifies the holder (fix review)", async () => {
   const S = await start(), admin = await S.login("+12025550199");
   const { e: owner } = await employer(S, admin, "0955 816 001", "Pending Freight", false);   // submitted, not yet verified
   const second = await S.login("0955 816 002", "employer");
   const dup = await second.put("/api/employer/company", { company: { name: { en: "Pending Freight Too" }, gov: "homs", regNo: "REG-Pending Freight", contactName: "Second", whatsapp: "0955 816 002" } });
   assert.deepEqual([dup.status, dup.body.error, dup.body.detail.verified], [409, "company_exists", false], "the number is taken and the answer points to the company");
+  const toOwner = () => S.texts.filter(x => x.to === "+963955816001").length, before = toOwner();
   const ask = await second.post(`/api/employer/companies/${dup.body.detail.id}/join`, { name: "Second Person" });
   assert.equal(ask.status, 200, `the pointer leads to a request, not a dead end: ${ask.text}`);
+  // an unchecked holder (here pending; a draft squatting someone else's number likewise) gets neither the requester's name and number nor a way to text them
+  assert.equal(toOwner(), before, "the unverified holder is not texted the request");
+  assert.deepEqual((await owner.get("/api/employer/team")).body.requests, [], "nor sees it on the team page");
+  const early = await owner.post(`/api/employer/team/requests/${encodeURIComponent("+963955816002")}`, { decision: "yes", role: "recruiter" });
+  assert.deepEqual([early.status, early.body.error], [409, "company_not_verified"], "nor decides it");
+  assert.equal(S.db.get("SELECT status FROM company_members WHERE phone = '+963955816002'").status, "requested", "the request waits");
+  assert.equal((await admin.post(`/api/admin/companies/${dup.body.detail.id}/verify`, { screened: true })).status, 200, "the admin verifies the holder");
   const team = (await owner.get("/api/employer/team")).body;
-  assert.ok(team.requests.some(r => r.name === "Second Person"), "the owner sees the request on the team page");
+  assert.ok(team.requests.some(r => r.name === "Second Person"), "the owner now sees the request on the team page");
   assert.equal((await owner.post(`/api/employer/team/requests/${encodeURIComponent("+963955816002")}`, { decision: "yes", role: "recruiter" })).status, 200, "and approves it");
   assert.equal(S.db.get("SELECT status FROM company_members WHERE phone = '+963955816002'").status, "active", "the person is on the team");
+  // a draft holder (never submitted) is joinable so the requester is not stuck, and likewise learns nothing
+  const squat = await S.login("0955 816 003", "employer");
+  assert.equal((await squat.put("/api/employer/company", { company: { name: { en: "Squatter" }, gov: "homs", regNo: "REG-REAL-1", contactName: "Squatter", whatsapp: "0955 816 003" } })).status, 200);
+  const real = await S.login("0955 816 004", "employer");
+  const d2 = await real.put("/api/employer/company", { company: { name: { en: "Real Co" }, gov: "homs", regNo: "REG-REAL-1", contactName: "Real", whatsapp: "0955 816 004" } });
+  assert.equal((await real.post(`/api/employer/companies/${d2.body.detail.id}/join`, { name: "Victim Full Name" })).status, 200);
+  const sq = await squat.get("/api/employer/team");
+  assert.ok(!sq.text.includes("Victim Full Name") && !sq.text.includes("955816004"), "the draft holder sees neither the name nor the number");
+  assert.equal(S.texts.filter(x => x.to === "+963955816003" && /Victim/.test(x.body)).length, 0, "and is not texted the name");
+  assert.equal((await squat.post(`/api/employer/team/requests/${encodeURIComponent("+963955816004")}`, { decision: "yes" })).status, 409, "and cannot approve or text the requester");
 });
 
 test("teams: invitations need a verified company and stop at twenty a day per company, cancelling included (D-10)", async () => {
