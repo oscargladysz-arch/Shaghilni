@@ -15,6 +15,7 @@ import { createApp } from "../server/app.js";
 import { seedDemo, countDemo } from "../server/seed.js";
 import { leadingZeroBits } from "../server/auth.js";
 import { makeSms } from "../server/sms.js";
+import { makeEmail } from "../server/alerts.js";
 import { scanSecrets, scanCode, auditSettings, parseEnvFile } from "../scripts/security-check.js";
 
 const realFetch = globalThis.fetch;
@@ -175,6 +176,25 @@ test("1 · a text provider's error answer never carries a full phone number into
       assert.ok(!/963944000001/.test(err.message), `${provider}: the provider's echo of the number is masked: ${err.message}`);
     }
   } finally { globalThis.fetch = realFetch; }
+});
+
+test("1 · the email service gets a time limit like the text and AI services, so a hung provider cannot hold a request or the alert run (D-46)", async () => {
+  const send = makeEmail({ emailApiUrl: "https://mail.example/send", emailApiKey: "k", emailFrom: "jobs@example.com" }, () => {}), realTimeout = AbortSignal.timeout;
+  let gotSignal = false;
+  try {
+    AbortSignal.timeout = () => realTimeout.call(AbortSignal, 50);   // the 15-second limit, shortened for the test
+    globalThis.fetch = (url, opts) => new Promise((_, no) => { gotSignal = !!(opts && opts.signal); if (opts && opts.signal) opts.signal.addEventListener("abort", () => no(opts.signal.reason)); });   // a provider that never answers
+    const t0 = Date.now(), err = await Promise.race([send("a@example.com", "s", "t").then(() => null, e => e), new Promise(r => setTimeout(() => r("still waiting"), 2000))]);
+    assert.ok(gotSignal, "the request carries an abort signal");
+    assert.notEqual(err, "still waiting", "the send gives up instead of waiting forever");
+    assert.ok(Date.now() - t0 < 1500);
+  } finally { AbortSignal.timeout = realTimeout; globalThis.fetch = realFetch; }
+});
+
+test("1 · the student email code is compared in constant time, like every other code (D-45)", () => {
+  const src = readFileSync(new URL("../server/routes/campus.js", import.meta.url), "utf8");
+  assert.match(src, /import \{[^}]*timingSafeEqual[^}]*\} from "node:crypto"/, "campus.js uses timingSafeEqual");
+  assert.doesNotMatch(src, /codeHash\([^)]*\) !== row\.code_hash/, "and no plain string comparison of the code hash");
 });
 
 test("2 · access control (the equivalent of row-level security): no account can reach another's data", async () => {
