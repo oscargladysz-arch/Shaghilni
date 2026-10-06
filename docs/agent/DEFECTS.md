@@ -22,7 +22,8 @@ Reproduction scripts named below live in the Stage 0 scratchpad (`/tmp/claude-0/
 | Found by the review of the Stage 4 fixes | 29 | D-57 to D-85: P2 8 · P3 21 (D-57 rated P1 by two reviewers, P3 by its refuter); 28 fixed (D-85 by narrowing two rows), D-64 recorded (section below) |
 | Found by the second review of the Stage 4 fixes | 26 | D-86 to D-111: P2 3 · P3 23 (D-86, D-90 and D-91 rated P2 by their reviewers, P3 by their refuters); 24 fixed (D-99 in part, the rest in the third review), D-96 and D-104 recorded (section below) |
 | Found by the third review of the Stage 4 fixes | 18 | D-112 to D-129: P2 3 · P3 15 (D-125 rated P2 by its reviewer, P3 by its refuter); 17 fixed (D-115 and D-118 in part), D-117 recorded (section below) |
-| Fixed by Stage 4 | 121 | round 1: U-003, U-006, U-012 to U-015, U-018, U-020 to U-023, U-028, U-029, U-031, U-032, U-035, U-037, U-050, U-053 to U-055, U-058; browser flow: D-38, U-061; round 2: U-001, U-009, U-010, U-024, U-030 with D-31, U-038, U-040, U-059, U-062; security re-review: D-39 to D-43, D-45, D-46, D-48 to D-54, D-56; fix review: D-57 to D-63, D-65 to D-85; second fix review: D-86 to D-95, D-97 to D-103, D-105 to D-111; third fix review: D-112 to D-116, D-118 to D-129; accessibility: U-056, U-146, U-184 |
+| Found by the fourth review of the Stage 4 fixes | 16 | D-130 to D-145: P1 1 · P2 4 · P3 11 (D-133 rated P3 by one of its refuters); 15 fixed, D-135 recorded (section below) |
+| Fixed by Stage 4 | 136 | round 1: U-003, U-006, U-012 to U-015, U-018, U-020 to U-023, U-028, U-029, U-031, U-032, U-035, U-037, U-050, U-053 to U-055, U-058; browser flow: D-38, U-061; round 2: U-001, U-009, U-010, U-024, U-030 with D-31, U-038, U-040, U-059, U-062; security re-review: D-39 to D-43, D-45, D-46, D-48 to D-54, D-56; fix review: D-57 to D-63, D-65 to D-85; second fix review: D-86 to D-95, D-97 to D-103, D-105 to D-111; third fix review: D-112 to D-116, D-118 to D-129; fourth fix review: D-130 to D-134, D-136 to D-145; accessibility: U-056, U-146, U-184 |
 | Fixed by Stage 3 | 33 | D-02, D-04 to D-10, D-12, D-13, D-15 to D-17, D-19 to D-30, D-32; U-007, U-017, U-034, U-041 (page), U-045, U-046, U-048 (Status rows). With Stages 1 and 2, all thirty D-01 to D-30 are closed. The Stage 3 review then fixed six P1/P2 follow-ups inside the same fixes (D-17 live sessions, D-09 on a note, D-30 numbers in the audit log and false positives, audit filters with Arabic-Indic digits, suspend-then-verify) |
 
 Severity changed by the verifier: D-03 P1 → P2; D-20 P2 → P3. All others kept the reporter's tier.
@@ -821,6 +822,29 @@ Three lenses (server and scripts, client and engine, tests and docs truth) read 
 | D-127 | P3 | **FIXED** (demo test corrected) | The D-105 test checked its own copy of the script's regex, so a broken script passed | truth |
 | D-128 | P3 | **FIXED** (HANDOVER.md, this file) | "Every commit … on a full green suite" was false for the red-test commits | truth |
 | D-129 | P3 | **FIXED** (SECURITY.md item 6, the `engine.js` comment) | SECURITY.md said both HTML sinks are fed by the escaping template; the icon hydration writes built-in markup | truth |
+
+## Stage 4 · fourth review of the Stage 4 fixes
+
+The same three lenses read `git diff b390158 0e14a35` (the third review's fixes) on a frozen copy, told which limits are recorded design (a false split of a registration number, an exotic Arabic form), with a disprove-first refuter per P1 or P2 (10 agents). 18 findings: 2 merged (the benefit wordings and the plural demands were each reported by two lenses), leaving 16. The fee rule was redesigned rather than tuned again (A-51): refusal only for a demand whose payer is the candidate, a flag for any other payment wording in any box.
+
+| # | Sev | Status | Title | Lens |
+|---|---|---|---|---|
+| D-130 | P1 | **FIXED** (`server/routes/employer.js`; team "a huge registration number costs no more than a short one") | The fix-review-3 key ran on the raw body before the 60-character cap and copied its word list per word: a 40 KB number took 8 s, 256 KB would stall the single process for minutes | server |
+| D-131 | P2 | **FIXED** (`server/validate.js`; policy-employer-listings "a demand whose payer is the candidate is refused in any box"; A-51) | The company-payer exception took any تتحمل/الشركة before «دفع رسم» as the company paying, so «تطلب الشركة من المتقدم دفع رسم …» and «يتحمل المتقدم دفع رسم …» passed unflagged | server |
+| D-132 | P2 | **FIXED** (same) | Plural, feminine and trainee subjects («على المتقدمين دفع», «يدفع المتدرب»), "the trainee pays" and "you will need to pay 50 USD" were neither refused nor flagged; reported twice | server, truth |
+| D-133 | P2 (P3 by one refuter) | **FIXED** (same) | Benefits were still refused: "We'll pay a monthly fee", «دفع رسوم النقابة على حساب الشركة», «دفع مبلغ شهري كبدل مواصلات»; reported twice | server, truth |
+| D-134 | P2 | **FIXED** (same) | Running the demand check on the listing's own text refused duties: "You will pay suppliers", "You will pay close attention to detail" | server |
+| D-135 | P3 | Recorded | A number with no digits ("N/A", «لا يوجد», «قيد الترخيص») is a key, so a second company in the same governorate writing the same placeholder is pointed at the first. Older than Stage 4 (it then collided in every governorate); the fix, that a number needs a digit, means reworking the tests' letter-only fixtures | server |
+| D-136 | P3 | **FIXED** with D-130 (the sanitised governorate) | A governorate outside the list made a taken number look new | truth |
+| D-137 | P3 | **FIXED** (`public/js/engine.js`; api "reads the accusative and اثنا forms") | The accusative unit forms (ثلاثاً, خمساً) were no numbers, so a changed compound number passed | client |
+| D-138 | P3 | **FIXED** (same) | أمريكا beside «الولايات المتحدة» (or أميركا) was held back as a new place | client |
+| D-139 | P3 | **FIXED** (same) | A hundred in two words was named normalised («ثلاثميه»), and «ثماني مئة» was not joined | client |
+| D-140 | P3 | **FIXED** (same) | «كنا» opened nothing: the lists had no first-person plural present (نساعد, ندير) | client |
+| D-141 | P3 | **FIXED** (same) | «اثنا/اثنتا» were missing from the "two" group | client |
+| D-142 | P3 | **FIXED** (`err_company_not_verified`, ARABIC_REVIEW row 47) | The D-118 wording answered a new company's first listing with a sentence about name changes | client |
+| D-143 | P3 | **FIXED** (the fix-review-4 api test asserts them) | The fix-review-3 api test's name promised the day, hour and week duals, which nothing asserted | truth |
+| D-144 | P3 | **FIXED** (test name narrowed) | The fix-review-3 policy test's name said "whichever box"; it checked what the job offers only | truth |
+| D-145 | P3 | **FIXED** (HANDOVER.md, STATE.md) | The list of fixes without a red test left out D-118's copy change | truth |
 
 ## Merged duplicates
 
