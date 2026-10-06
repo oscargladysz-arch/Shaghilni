@@ -19,7 +19,7 @@ if (what === "purge") {
   for (const rel of ["server/demo.js", "public/js/demo.js", "test/demo.test.js"]) del(rel);
   for (const rel of ["server/app.js", "server/assets.js", "server/config.js", "server/notify.js"]) edit(rel, dropMarked);
   edit("public/css/app.css", s => s.replace(/\/\* demo-accounts:start \*\/[\s\S]*?\/\* demo-accounts:end \*\/\n?/, ""));
-  edit("README.md", s => s.replace(/<!-- demo-accounts:start -->[\s\S]*?<!-- demo-accounts:end -->\n?/g, ""));
+  for (const rel of ["README.md", "SECURITY.md", "PRODUCT.md"]) edit(rel, s => s.replace(/<!-- demo-accounts:start -->[\s\S]*?<!-- demo-accounts:end -->\n?/g, ""));   // the docs that describe them (U-062)
   edit("package.json", s => { const p = JSON.parse(s); delete p.scripts["demo-accounts:purge"]; delete p.scripts["demo-accounts:uninstall"]; return JSON.stringify(p, null, 2) + "\n"; });
   del("scripts/demo-accounts.js");
   console.log("\nThe demo accounts are gone from the code. Run npm test to check. (Demo accounts already in a database: run the purge first, before uninstalling.)");

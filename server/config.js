@@ -48,7 +48,7 @@ export function loadConfig(overrides = {}) {
     // Syria, plus the countries where most Syrians abroad live. Texts abroad cost more, so they have their own daily cap.
     smsAllowedPrefixes: e.SMS_ALLOWED_PREFIXES === undefined ? ["+963", "+49", "+90", "+961", "+962", "+964", "+20", "+971", "+966", "+974", "+965", "+46", "+31", "+43", "+45", "+47", "+33", "+32", "+44", "+1"] : list(e.SMS_ALLOWED_PREFIXES),
     smsIntlDailyCap: num(e.SMS_INTL_DAILY_CAP, 150),
-    // Demo accounts (a student, a job seeker and a verified company): only when asked for, and never in production.
+    // demo-accounts: a student, a job seeker, a verified company and a career office, only when asked for, and never in production
     demoAccounts: e.DEMO_ACCOUNTS ? e.DEMO_ACCOUNTS === "true" : e.NODE_ENV !== "test",   // demo-accounts: on when you run it yourself, off in tests, never in production
     // Card payments: a payment provider (a bank's hosted payment page) and monthly prices in PAY_CURRENCY.
     payProvider: e.PAY_PROVIDER || "", payCurrency: (e.PAY_CURRENCY || "SYP").toUpperCase(),
