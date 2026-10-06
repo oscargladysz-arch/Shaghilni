@@ -350,7 +350,9 @@ CREATE INDEX pageviews_at ON pageviews(at);
 CREATE TABLE shares (id INTEGER PRIMARY KEY, at INTEGER NOT NULL, day TEXT NOT NULL, app TEXT NOT NULL, path TEXT NOT NULL);
 CREATE INDEX shares_day ON shares(day);
 CREATE TABLE client_errors (id INTEGER PRIMARY KEY, at INTEGER NOT NULL, day TEXT NOT NULL, message TEXT NOT NULL, source TEXT NOT NULL DEFAULT '', path TEXT NOT NULL DEFAULT '', variant TEXT NOT NULL DEFAULT '', browser TEXT NOT NULL DEFAULT '');
-CREATE INDEX client_errors_day ON client_errors(day);`
+CREATE INDEX client_errors_day ON client_errors(day);`,
+// 16 · the middle of the pay range a listing showed when the employer recorded the hire: the placement fee's basis, so a later pay edit cannot cut it (D-09)
+`ALTER TABLE applications ADD COLUMN hire_pay_mid INTEGER;`
 ];
 
 export function openDb(file) {

@@ -207,7 +207,7 @@ test("policy team: a member of A never sees or acts on B's team; B's owner canno
   assert.equal((await B.del(`/api/employer/team/${enc(betaPhone)}`)).status, 200); assert.equal((await betaMember.get("/api/employer")).body.company, null);
 });
 
-test("policy team: A's activity log never carries B's actions and names people, not numbers; a removed teammate is shown by number (U-007)", async () => {
+test("policy team: A's activity log never carries B's actions and names people, not numbers; a removed teammate is a former teammate, never a number (U-007)", async () => {
   const S = await start(), C = await cast(S), I = C.ids, A = C.A.e, B = C.B.e;
   const log = async () => (await A.get("/api/employer/activity")).body.activity;
   const base = await log(); assert.ok(base.length >= 4, "A has activity from the cast");
@@ -230,10 +230,12 @@ test("policy team: A's activity log never carries B's actions and names people, 
   assert.ok(!act.some(x => /\+?963\d{6}|\d{3} \d{3} \d{3}/.test(String(x.who))), "nobody is a phone number while they are on the team: " + act.map(x => x.who).join(", "));
   assert.deepEqual(act.filter(x => x.who === "Policy Hiring").map(x => x.action), ["team.joined"], "the hiring manager's note is not an entry (employer.js:156 audits moves only), their joining is");
   for (const x of act) assert.deepEqual(Object.keys(x).sort(), ["action", "at", "from", "job", "role", "to", "who"], "entries carry no actor id or phone field");
-  // recorded (DEFECTS.md U-007): once removed, the recruiter's past entries name them by their full phone number (plans.js:38 falls back to u.phone when the member row is gone)
+  // U-007: once removed, the recruiter's past entries say "former teammate" in the viewer's language, never the number (the name went with the membership row)
   assert.equal((await A.del(`/api/employer/team/${enc(PH.recruiter)}`)).status, 200);
   const gone = (await log()).find(x => x.action === "job.created" && x.job && x.job.en === "Alpha clerk");
-  assert.equal(gone.who, PH.recruiter, "U-007: a removed teammate is shown to owners and admins as their number, not 'Policy Recruiter'");
+  assert.match(gone.who, /^(former teammate|زميل سابق)$/, "U-007: a removed teammate is a former teammate, not a number: " + gone.who);
+  assert.ok(!/963|\d{3} \d{3}|deleted:/.test(JSON.stringify(await log())), "no number or deletion marker anywhere in the log after the removal");
+  const posted = (await A.get("/api/employer")).body.jobs.find(j => j.id === job.id); assert.match(posted.postedBy, /^(former teammate|زميل سابق)$/, "U-007: the listing's Posted by says the same");
 });
 
 test("policy team: who sees members' phone numbers in the team listing, by role (recorded)", async () => {

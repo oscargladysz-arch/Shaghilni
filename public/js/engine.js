@@ -170,11 +170,10 @@ function deriveProfile(me) {
     else if (e.status === "diploma") facYear[lg] = fac(lg) ? tl(lg, "eduShortDiploma", { fac: fac(lg) }) : tl(lg, "edu_diploma");
     else facYear[lg] = tl(lg, "edu_secondary");
   }
-  const slug = nm.toLowerCase().normalize("NFKD").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "profile";
   return { name: { en: nm, ar: nmAr }, initials: { en: initialsOf(nm), ar: initialsOf(nmAr) },
            uni: e.uni && UNI[e.uni] ? e.uni : null, fac: e.fac && FAC[e.fac] ? e.fac : null, year: e.year || 0, grad: e.grad || 0,
            gov: me.gov, country: me.country || "", langs: me.langs.length ? me.langs : ["ar"], facYear, phone: me.phone || "", email: me.email || "",
-           cv: "shaghilni.sy/cv/" + slug, student, status: e.status, level: (me.prefs && me.prefs.level) || "", relocate: !!me.relocate, demo: !!me.demo };
+           student, status: e.status, level: (me.prefs && me.prefs.level) || "", relocate: !!me.relocate, demo: !!me.demo };
 }
 function rescore() { for (const j of JOBS) { const a = assess(j); j._score = a ? a.score : 0; } }
 const JOB = new Map();
@@ -1140,7 +1139,7 @@ function placeOf(p) {
 /* Job alerts: does a saved search match a job? Shared by the server (to send alerts) and the app (to count new ones). */
 function alertMatches(a, j) {
   if (!a || !j) return false;
-  if (a.gov && j.gov !== a.gov) return false;
+  if (a.gov && j.gov !== a.gov && j.gov !== "remote") return false;   // a remote job shows under every governorate on the board, so it matches a governorate alert too (D-26)
   if (a.type && j.type !== a.type) return false;
   if (a.tab && a.tab !== "all" && !inTab(j, a.tab)) return false;
   if (a.q) { const hay = norm([j.title && j.title.en, j.title && j.title.ar, j.co && j.co.en, j.co && j.co.ar].filter(Boolean).join(" ")); if (!norm(a.q).split(" ").filter(Boolean).every(w => hay.includes(w))) return false; }

@@ -43,11 +43,13 @@ test("policy events: a draft is invisible to guests, seekers and other offices; 
   assert.equal((await C.seekerA.get(`/api/events/${eventA}`)).body.event.mine.status, "going");
   assert.equal((await C.seekerB.get(`/api/events/${eventA}`)).body.event.mine, null, "B holds nothing for event A");
   assert.equal(S.db.get("SELECT COUNT(*) AS n FROM event_rsvps WHERE event_id = ?", eventA).n, 1, "no row was invented for B");
-  // a cancelled event: no new tickets; the holder's list says cancelled. Today the event page answers 404 to the ticket holder too (DEFECTS.md U-041, recorded, not endorsed).
+  // a cancelled event: no new tickets; the holder's list says cancelled, and the event page still opens for the ticket holder, saying so (U-041); strangers and guests get 404 as for any unpublished event
   assert.equal((await C.officeA.put(`/api/organize/events/${eventA}`, { event: EV(), status: "cancelled" })).body.event.status, "cancelled");
   assert.equal((await C.seekerB.post(`/api/events/${eventA}/rsvp`)).body.error, "not_found");
   assert.deepEqual((await C.seekerA.get("/api/me/events")).body.tickets.map(t => [t.id, t.mine.status]), [[eventA, "cancelled"]]);
-  assert.equal((await C.seekerA.get(`/api/events/${eventA}`)).status, 404);   // U-041
+  const held = await C.seekerA.get(`/api/events/${eventA}`); assert.equal(held.status, 200, "U-041: the ticket holder can still open the cancelled event");
+  assert.deepEqual([held.body.event.status, held.body.event.mine.status], ["cancelled", "cancelled"], "U-041: and reads that it was cancelled");
+  assert.equal((await C.seekerB.get(`/api/events/${eventA}`)).status, 404, "someone without a ticket gets nothing"); assert.equal((await C.actors.guest.get(`/api/events/${eventA}`)).status, 404);
   assert.ok(!(await C.actors.guest.get("/api/events")).body.events.some(e => e.id === eventA), "and it leaves the public list");
 });
 

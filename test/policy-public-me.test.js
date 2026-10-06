@@ -41,12 +41,12 @@ test("public board: a guest and a seeker who has not applied learn which ways to
     for (const j of board.body.jobs) { for (const k of COMPANY_PRIVATE) assert.equal(k in j, false, `${who}: board listing ${j.id} carries ${k}`); assert.equal(typeof j.applyEmail, "boolean"); }   // sample listings too
     noSecrets(board.text, SECRETS, `${who}: GET /api/jobs`); noSecrets(one.text, SECRETS, `${who}: GET /api/jobs/${A.jobId}`);
   }
-  // today (D-30): the free-text place, contact and tags fields are published verbatim and never flagged, so an employer can put the numbers there themselves
+  // D-30 (fixed in Stage 3): numbers and emails in the free-text place, contact and tags fields are flagged for the reviewer; the text itself is still the employer's to publish once reviewed
   const loud = await A.e.post("/api/employer/jobs", { job: { ...JOB, title: { en: "Loud listing" }, place: { en: "Call 0955 910 003" }, contact: { name: { en: "Contact Public Alpha" }, status: { en: "jobs@public-alpha.example" } }, tags: "0955 910 001" }, submit: true });
-  assert.equal(loud.status, 200, loud.text); assert.deepEqual(loud.body.check.flags, [], "today (D-30): no contact-details flag for the reviewer");
+  assert.equal(loud.status, 200, loud.text); assert.deepEqual(loud.body.check.flags.map(f => f.type + ":" + f.word).sort(), ["contact:0955 910 001", "contact:0955 910 003", "contact:jobs@public-alpha.example"], "D-30: every number and email in the text is a contact flag for the reviewer");
   assert.equal((await admin.post(`/api/admin/jobs/${loud.body.job.id}/approve`)).status, 200);
   const pub = (await guest.get(`/api/jobs/${loud.body.job.id}`)).body.job;
-  assert.deepEqual([pub.place.en, pub.contact.name.en, pub.contact.status.en, pub.tags], ["Call 0955 910 003", "Contact Public Alpha", "jobs@public-alpha.example", "0955 910 001"], "today (D-30): free text reaches guests verbatim");
+  assert.deepEqual([pub.place.en, pub.contact.name.en, pub.contact.status.en, pub.tags], ["Call 0955 910 003", "Contact Public Alpha", "jobs@public-alpha.example", "0955 910 001"], "the reviewer approved it, so the text reaches guests as written (the flags never do)");
 });
 
 test("unlisted listings: draft, pending, rejected and closed jobs and the jobs of a suspended or re-verifying company answer 404 not_found to guests and seekers on read, save and apply, like a job that never existed", async () => {

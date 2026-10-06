@@ -5,7 +5,7 @@ This file maps the 13-item *30-Minute Pre-Launch Security Checklist* onto Shaghi
 Run both commands before every launch and after every change:
 
 ```bash
-npm test                                             # 133 tests in 30 files (API, security, route policy, recruiters, import, Lite, payments, plans, universities, teams, events, demo, diaspora, applying, insights, traffic, i18n, ratchets)
+npm test                                             # 147 tests in 30 files (API, security, route policy, recruiters, import, Lite, payments, plans, universities, teams, events, demo, diaspora, applying, insights, traffic, i18n, ratchets)
 npm run security:check -- --url https://your-domain  # the code, your settings and the live site
 ```
 
@@ -37,13 +37,13 @@ The security tests are in `test/security.test.js`, numbered after this list. The
 
 **Built**
 
-- **The documents.** A privacy notice and terms of use, in Arabic and English, at `/#/privacy` and `/#/terms`. They're linked from the welcome screen, the sign-in step and the profile page, and live in `public/js/legal.js`. They describe what this code actually does: what's collected, who sees it, which providers receive what, and how long each thing is kept. That accuracy matters, because a privacy notice that doesn't match reality is itself a legal risk. In the US, the FTC treats a false privacy promise as a deceptive practice.
+- **The documents.** A privacy notice and terms of use, in Arabic and English, at `/#/privacy` and `/#/terms`, and for Lite at `/lite/privacy` and `/lite/terms` (the same texts, no JavaScript). They're linked from the welcome screen, the sign-in step and the profile page, and live in `public/js/legal.js`. They describe what this code actually does: what's collected, who sees it, which providers receive what, and how long each thing is kept. That accuracy matters, because a privacy notice that doesn't match reality is itself a legal risk. In the US, the FTC treats a false privacy promise as a deceptive practice.
 - **Kept current.** On 26 September 2026 the notice and terms were updated to cover resume translation, and `TERMS_VERSION` was changed with them, so sign-in records acceptance of the new version. On 28 September 2026 they were updated again for Recruiters (now open to every job seeker, not only students) and resume uploads: what students who switch it on share, and the rule that employers may invite students only to real jobs and to events that are free for them. `TERMS_VERSION` changed again. The current version, 2026-10-04, also covers job alerts, teams and billing, sponsored listings, visit counts, events, university-email verification, card payments and email alerts; `public/js/legal.js` is the record of the current wording.
 - **Explicit consent at sign-in.** The box reads: *"I'm 18 or older and I agree to the Terms of use and the Privacy notice, including my data being stored and processed outside Syria."* The app and Shaghilni Lite send no code until the box is ticked, and the server creates no account unless the acceptance flag arrives with a correct code. The version and time of acceptance are stored with the account. When you change either document, change `TERMS_VERSION` in `server/config.js`, and sign-in records acceptance of the new version.
 - **Minimisation.** Employers see a job seeker's details only after that person applies: the profile snapshot sent with that application, the account's phone number and the current verified-student badge. People who switch on *Let recruiters find me* also appear as short cards in candidate search (item 8). The public board carries no private company data; test 2 checks this.
 - **Download my data.** On the profile page. It gives the account, profile, saved jobs, applications with the resume sent, invitations received, student verification, event tickets, job alerts and text records (job seekers), or the company page and listings (company owners), as a JSON file. Plan, charges, team membership, partnerships, blocked companies and a career office's record are not in it yet (see `docs/agent/DEFECTS.md`).
 - **Deletion.**
-  - A person deleting their account erases their profile, saved jobs, sessions, text-message records, leftover sign-in codes, invitations, job alerts, student verification, event tickets, team membership and blocked companies. Each application survives only as an anonymous record (status and dates; the resume sent and the employer's note are erased).
+  - A person deleting their account erases their profile, saved jobs, sessions, text-message records, leftover sign-in codes, invitations, job alerts, student verification, event tickets, team membership and blocked companies. A career office deleting its account also erases its office record (the university and the contact name). Each application survives only as an anonymous record (status and dates; the resume sent and the employer's note are erased).
   - An employer deleting their account also closes their listings and removes the contact name and WhatsApp number from the company page (the application phone number and email are not yet cleared: see `docs/agent/DEFECTS.md`).
 - **Automatic retention.** `server/retention.js` runs at start-up and every hour and deletes:
   - sign-in codes, with the IP addresses stored alongside them, after 24 hours;
@@ -95,7 +95,7 @@ Security test 2 attacks it:
 
 ## 3. Server-side validation on every form
 
-Every endpoint rebuilds its input field by field (`server/validate.js`). It checks types, lengths, allowed values, phone formats and pay ranges, and runs the listing checks for fees and discriminatory wording. The browser's checks exist only for convenience; the server's are the ones that count. Bodies over 256 KB are refused, and so is anything that isn't JSON.
+Every endpoint rebuilds its input field by field (`server/validate.js`). It checks types, lengths, allowed values, phone formats and pay ranges, and runs the listing checks for fees and discriminatory wording, and flags phone numbers and emails anywhere in a listing's text (place, contact lines and tags included) for the reviewer. The browser's checks exist only for convenience; the server's are the ones that count. Bodies over 256 KB are refused, and so is anything that isn't JSON.
 
 Security test 3 sends more than 1,000 junk requests to 34 of the API's endpoints (the hand-written list in `test/security.test.js`), and `test/policy-junk.test.js` sends about 2,000 more to every POST, PUT and DELETE route in the policy table (malformed JSON, wrong types, 100 KB strings, bidi and control characters, SQL metacharacters, prototype keys, deep nesting, huge arrays), as a guest, a job seeker, an employer and an admin. The junk includes wrong types, arrays, objects nested 500 levels deep, prototype-pollution payloads, NoSQL-style operators, SQL fragments and bad IDs. The test requires that:
 
@@ -110,7 +110,7 @@ The review and this test found two bugs, both fixed:
 
 ## 4. Error handling that does not leak data
 
-- **Expected problems** return a short code, such as `{"error":"wrong_code"}`, which the app turns into a message in the person's language (a code without a translation shows the general "something went wrong" message).
+- **Expected problems** return a short code, such as `{"error":"wrong_code"}`, which the app turns into a message in the person's language (a code without a translation shows the general "something went wrong" message; `test/i18n.test.js` checks that every code the server answers has one).
 - **Unexpected problems** return only `{"error":"server_error"}`. The details go to the server log. Security test 4 breaks the database on purpose and checks that the answer contains no stack trace, file path or SQL.
 - **Account existence.** Sign-in never reveals whether a number has an account. Someone else's listing or application answers "not found", so its existence isn't confirmed.
 - **Logs.** The server log masks phone numbers (`+9639•••222`), except the development `console` text provider, which prints each message whole (never use it in production; the scanner fails it), and the path of an unexpected error on the team routes, which is to be masked (see `docs/agent/DEFECTS.md`).
@@ -186,10 +186,10 @@ present, point to the code, and list any gaps with a fix and a test that would p
 | **A03 Software Supply Chain Failures** | No runtime dependencies at all. Fonts and code are served from your own server. The Docker image uses the official `node:22-alpine` and runs as the unprivileged `node` user. | Rebuild the image monthly to pick up Node and Alpine security patches. Puppeteer is a test-only install. |
 | **A04 Cryptographic Failures** | HTTPS enforced with HSTS. Codes stored as SHA-256 with a secret pepper. Session tokens come from `crypto.randomBytes` and are stored only as hashes. Constant-time comparisons; HMAC-signed challenges. | The app doesn't encrypt the database file. Use an encrypted disk (most hosts encrypt by default) and keep backups private. |
 | **A05 Injection** | Bound SQL parameters everywhere. The four places that build SQL text are reviewed, marked and contain no user input, and the scanner fails on any new one. All HTML goes through one escaping template; strict CSP; no `eval` and no shell. | None known |
-| **A06 Insecure Design** | Threats handled by design: employer verification with a recorded sanctions-screening step, review of every listing (edits made while a listing awaits review or is closed are not re-checked yet), the no-fees rule in the listing checks, SMS-pumping guards, consent and minimisation. | Verification and sanctions screening are manual, so they're only as good as the people doing them |
-| **A07 Authentication Failures** | See item 5 | An admin account is only as safe as the admin's phone number. Ask your carrier for a SIM-swap PIN and keep `ADMIN_PHONES` short. |
+| **A06 Insecure Design** | Threats handled by design: employer verification with a recorded sanctions-screening step (only a submitted company can be verified; a suspension is lifted by verifying it again), review of every listing (an edit in any state makes it a draft that is checked and reviewed again), the no-fees rule in the listing checks, SMS-pumping guards, consent and minimisation. | Verification and sanctions screening are manual, so they're only as good as the people doing them |
+| **A07 Authentication Failures** | See item 5 | An admin account is only as safe as the admin's phone number. Ask your carrier for a SIM-swap PIN and keep `ADMIN_PHONES` short. A number taken off the list is demoted at its next sign-in and its sessions end. |
 | **A08 Software or Data Integrity Failures** | No scripts from CDNs. Built files are named by content hash. Database migrations are versioned and run in transactions. The audit log records who changed what. | None known |
-| **A09 Security Logging and Alerting Failures** | The audit log records sign-ups, consent, deletions, company and listing changes and decisions, and every application move (except a re-application after a withdrawal: `docs/agent/DEFECTS.md`, U-083) and hire confirmation. The server log records errors, failed texts and reached caps. | **No automatic alerts yet,** and the admin screens don't show the audit log (it's at `/api/admin/audit`). Watch the log, or add an alert on your host. |
+| **A09 Security Logging and Alerting Failures** | The audit log records sign-ups, consent, deletions, company and listing changes and decisions, and every application move (except a re-application after a withdrawal: `docs/agent/DEFECTS.md`, U-083) and hire confirmation. The server log records errors, failed texts and reached caps. | **No automatic alerts yet,** but the admin's *Audit log* tab shows the log with filters, older pages and a spreadsheet export (actors masked like the logs). Watch the log, or add an alert on your host. |
 | **A10 Mishandling of Exceptional Conditions** | Every request is wrapped, and unexpected errors answer 500 without details. Unhandled rejections are logged, and a fatal error exits so the host restarts a clean process. Fuzz-tested (test 3); a broken database is tested (test 4). | None known |
 
 ## 8. Data leak audit
@@ -211,7 +211,7 @@ or left behind after deletion.
 | Employer notes on applicants | The company's team (owner, admins, recruiters and hiring managers) | Erased when the applicant deletes their account; not in the audit log |
 | Candidate cards in recruiter search | Verified employers' owners, admins and recruiters (not hiring managers), and only for people who switched on *Let recruiters find me*: first name and last initial, education, experience level, recent job titles, governorate, skills and languages. Never the phone number or email | Nowhere else. Hidden again as soon as the student switches it off or blocks the company |
 | Uploaded resume files | Nobody. The file is read in the browser and never uploaded; the importer makes no network calls (tested) | Only the details the person chooses to add are saved, exactly like typed ones |
-| Invitations and replies | The student, and the owner, admins and recruiters of the company that sent them (hiring managers see neither the sent list nor any number). That company gets the student's full name and number only after the student says yes to an event | The student gets a text. Deleted with the student's account; withdrawn when the employer deletes theirs |
+| Invitations and replies | The student, and the owner, admins and recruiters of the company that sent them (hiring managers see neither the sent list nor any number). That company gets the student's full name and number only after the student says yes to an event | The student gets a text. Deleted with the student's account; withdrawn when the employer deletes theirs, when the admin suspends or rejects the company, and when the student switches recruiter search off |
 | Event sign-ups (ticket code, check-in time) | The person; the event's organiser sees name, university and faculty to check them in; confirmed companies see only attendees who switched on *Let recruiters find me* | In the export; the code goes by text; reports hold totals only; deleted with the account |
 | University email address | The student (masked); never the career office or employers | The email service, for the code; kept so it verifies one account; deleted with the account |
 | IP addresses | Nobody, through the app | Stored with sign-in codes for 24 hours; kept in memory for rate limits; your host's logs |
@@ -287,7 +287,8 @@ hard-coded or committed.
 | Sign-in codes, per number | 3 per 15 minutes | fixed |
 | Sign-in codes, per address | 30 an hour | fixed |
 | Code checks | 5 attempts per code; 60 checks an hour per address | fixed |
-| Sign-in challenges, per address | 60 per 10 minutes | fixed |
+| Sign-in challenges, per address | 60 per 10 minutes (API; a Lite page view is not counted, sending the code still is) | fixed |
+| Team invitations (each sends a text), per company | 20 a day, verified companies only | fixed |
 | **Where texts may go** | Syria plus the main diaspora countries; admin numbers anywhere | `SMS_ALLOWED_PREFIXES` |
 | **Texts per day, whole site** | 1,000 | `SMS_DAILY_CAP` |
 | **Texts per day to numbers outside Syria** | 150 | `SMS_INTL_DAILY_CAP` |
@@ -354,7 +355,7 @@ It exits with an error when anything fails, so it can gate a deploy. Security te
 
 1. **Sign everyone out:** `node -e "new (require('node:sqlite').DatabaseSync)(process.env.DB_PATH || 'data/shaghilni.db').exec('DELETE FROM sessions')"`. On Docker, run it inside the container: `docker exec shaghilni node -e "…"`.
 2. **Rotate any key that may be exposed** (item 9), and change `OTP_PEPPER`.
-3. **Find out what happened.** Signed in as an admin, open `https://your-domain/api/admin/audit?limit=200` to read the audit log, and read the server log alongside it. Keep copies of both.
+3. **Find out what happened.** Signed in as an admin, open the *Audit log* tab of the admin screen (filters by action, item, account and day; *Older entries* pages back through the whole log; the spreadsheet export keeps a copy), or `https://your-domain/api/admin/audit?limit=200&before=<id>` for the raw rows, and read the server log alongside it. Keep copies of both.
 4. **Tell the people affected and the authorities, as the law requires.** Summaries of Law No. 12 of 2024 say breaches that may cause harm must be reported to the data-protection authority and to the people affected, within set time limits. Agree the exact steps with your lawyer now, not during an incident.
 5. **Fix the cause,** add a test that reproduces the problem, and write down what changed.
 
@@ -380,10 +381,10 @@ The launch checklist, with who owns each item (agent, owner, lawyer or provider)
 ## Plans, teams and billing
 
 - **Nothing here touches job seekers' chances.** Sponsored listings are at most two, lifted to the top and labelled *Sponsored*, only for a signed-in job seeker whose fit score is 60% or more; everyone else sees them in the usual order, unlabelled. No job seeker can pay for anything.
-- **Teammates** are matched by phone number. A number that belongs to a job seeker, an admin or another company can't be added. Only the company owner can request or pay for plans and hand the company over. The owner and admins edit company details and manage the team (only the owner changes, removes or approves admins, though an admin can still invite one: `docs/agent/DEFECTS.md`, D-31); removing a teammate ends their access immediately.
+- **Teammates** are matched by phone number. A number that belongs to a job seeker, an admin or another company can't be added. Only the company owner can request or pay for plans and hand the company over. The owner and admins edit company details and manage the team (only the owner changes, removes or approves admins, though an admin can still invite one: `docs/agent/DEFECTS.md`, D-31); removing a teammate ends their access immediately, and a former teammate (removed, left or deleted) is shown as "former teammate" in the activity log and on listings and applicants, never by number.
 - **Placement fees are computed on the server** at the moment an admin confirms a hire, from the invitation and application records, and only once per hire.
-- **Reports** contain no candidate names or contact details: placements list dates, job title, governorate, type and pay range; the compliance record lists company submission, verification, rejection, suspension and plan changes, listing approvals, rejections and sponsorships, and hire confirmations (its sanctions-screening column is not filled in yet: see `docs/agent/DEFECTS.md`, D-07).
-- **Every plan change, charge update, sponsorship start and team change is in the audit log** (switching a sponsorship off is not yet recorded: see `docs/agent/DEFECTS.md`, D-28).
+- **Reports** contain no candidate names or contact details: placements list dates, job title, governorate, type and pay range; the compliance record lists company submission, verification, rejection, suspension and plan changes, listing approvals, rejections and sponsorships, and hire confirmations, with the sanctions-screening column filled in for every verification since Stage 3 (D-07).
+- **Every plan change, charge update, sponsorship start and team change is in the audit log,** and so is a sponsorship switched off; a sponsorship that ends because the listing was closed, edited or rejected is in the log as that action.
 
 
 ## Demo accounts

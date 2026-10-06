@@ -50,6 +50,8 @@ test("policy Lite gating: every GET page × guest, seeker, owner, recruiter, hir
       office: r => r.status === 200 && /university career office/.test(r.text) && !/<nav class="tb"/.test(r.text), admin: r => r.status === 200 && adminNote.test(r.text) && !/<nav class="tb"/.test(r.text) }],
     ["/lite/profile", { guest: gate("/lite/profile"), seeker: /name="name"/, owner: toMe, recruiter: toMe, hiring: toMe, pending: toMe, office: toMe, admin: toMe }],
     ["/lite/profile?step=3", { guest: gate("/lite/profile"), seeker: /action="\/lite\/profile\/exp"/, owner: toMe, office: toMe, admin: toMe }],
+    ["/lite/privacy", Object.fromEntries(["guest", "seeker", "owner", "recruiter", "hiring", "pending", "office", "admin"].map(r => [r, /<h1>(Privacy notice|إشعار الخصوصية)<\/h1>/]))],   // the legal pages are for everyone, in the visitor's language (D-12)
+    ["/lite/terms", Object.fromEntries(["guest", "seeker", "owner", "recruiter", "hiring", "pending", "office", "admin"].map(r => [r, /<h1>(Terms of use|شروط الاستخدام)<\/h1>/]))],
     ["/lite/signin", { guest: /name="pow_challenge"/, seeker: toMe, owner: toHire, recruiter: toHire, hiring: toHire, pending: toHire, office: toMe, admin: toMe }],
     ["/lite/signin?role=employer", { guest: /name="role" value="employer"/, seeker: toMe, owner: toHire }],
     ["/lite/signin?next=%2Flite%2Fresume", { guest: /name="next" value="\/lite\/resume"/, seeker: "/lite/resume" }],
@@ -115,8 +117,8 @@ test("policy Lite gating: every GET page × guest, seeker, owner, recruiter, hir
   assert.equal(S.db.get("SELECT COUNT(*) AS n FROM invitations WHERE user_id = ?", I.cardB).n, 0, "nobody's refused invite reached seeker B");
   assert.equal(S.db.get("SELECT COUNT(*) AS n FROM applications WHERE job_id = ?", I.jobA).n, 1, "only seeker A's application exists");
 
-  // U-016 (DEFECTS.md U-016, confirmed here; fails until lite.js findCandidate looks the candidate up by id): Lite looks a candidate up in the UNFILTERED first-60 list (lite.js findCandidate), so once
-  // 60 newer opted-in profiles exist, a candidate found through a filtered search gets 404 and a silent redirect, while the API invites them.
+  // U-016 (fixed in Stage 2): Lite used to look a candidate up in the UNFILTERED first-60 list, so once
+  // 60 newer opted-in profiles existed a candidate found through a filtered search got 404 and a silent redirect; findCandidate now looks the card up by id.
   assert.equal((await ownerB.get(`/lite/candidates/${I.cardA}/invite`)).status, 200, "before: owner B can open the invite form for seeker A");
   const t0 = Date.now();
   S.db.tx(() => { for (let i = 1; i <= 60; i++) {
@@ -125,7 +127,7 @@ test("policy Lite gating: every GET page × guest, seeker, owner, recruiter, hir
   } });
   const filtered = await ownerB.get("/lite/candidates?gov=aleppo");
   assert.match(filtered.text, cardA, "the filtered search still finds seeker A");
-  assert.equal((await ownerB.get(`/lite/candidates/${I.cardA}/invite`)).status, 200, "U-016: a candidate the filtered search lists can be opened for an invitation (lite.js findCandidate reads the unfiltered first 60)");
+  assert.equal((await ownerB.get(`/lite/candidates/${I.cardA}/invite`)).status, 200, "U-016: a candidate the filtered search lists can be opened for an invitation (lite.js findCandidate looks the card up by id)");
   assert.equal((await ownerB.post(`/lite/candidates/${I.cardA}/invite`, { csrf: tOB, kind: "event", title: "Open day", date: inDays(5), place: "Aleppo" })).location, "/lite/candidates/sent?done=invited", "U-016: and invited, as the API below allows");
   assert.equal(S.db.get("SELECT COUNT(*) AS n FROM invitations WHERE user_id = ? AND company_id = ?", I.cardA, I.companyB).n, 1, "U-016: the invitation row exists");
   assert.equal((await C.B.e.post(`/api/employer/students/${I.cardA}/invite`, { kind: "event", event: { title: "Open day", date: inDays(5), place: "Aleppo" } })).status, 200, "the API invites the same candidate (a second event invite is allowed: recruit.js:92-102 caps open invitations at 3 and refuses only the same job)");

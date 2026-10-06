@@ -13,7 +13,7 @@ after(closeAll);
 const PHONE_UA = "Mozilla/5.0 (Linux; Android 12; SM-A125F) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Mobile Safari/537.36";
 const audits = (S, entity, id) => S.db.all("SELECT action, data FROM audit WHERE entity = ? AND entity_id = ? ORDER BY id", entity, id).map(x => ({ action: x.action, data: x.data ? JSON.parse(x.data) : null }));
 
-test("policy admin: company review needs screening to verify and a note to reject or suspend; a draft and a suspended company are verified by id today (U-046)", async () => {
+test("policy admin: company review needs screening to verify and a note to reject or suspend; only a submitted company can be verified, and a suspension is lifted by verifying again (U-046)", async () => {
   const S = await start(), admin = await S.login(ADMIN_PHONE), A = await employerWithLiveJob(S, admin, "0955 910 001", "Review Alpha");
   const draft = await S.login("0955 910 002", "employer");
   const put = await draft.put("/api/employer/company", { company: { name: { en: "Review Draft" }, gov: "aleppo", regNo: "REG-Review-Draft", contactName: "Contact Draft", whatsapp: "0955 910 002" } });
@@ -27,22 +27,31 @@ test("policy admin: company review needs screening to verify and a note to rejec
   }
   for (const what of ["verify", "reject", "suspend"]) { const r = await admin.post(`/api/admin/companies/999999/${what}`, { screened: true, note: "x" }); assert.equal(r.status, 404, r.text); assert.equal(r.body.error, "not_found"); }
   assert.equal(S.db.get("SELECT status FROM companies WHERE id = ?", A.companyId).status, "verified", "nothing refused above moved A");
-  // U-046: a company that was never submitted is verified by id (today's behaviour; the product rule wants a state check)
-  const vd = await admin.post(`/api/admin/companies/${dId}/verify`, { screened: true }); assert.equal(vd.status, 200, vd.text); assert.equal(vd.body.company.status, "verified");
-  assert.equal(S.db.get("SELECT submitted_at FROM companies WHERE id = ?", dId).submitted_at, null, "U-046: verified without ever being submitted");
+  // U-046: a company that was never submitted, a sample company, a rejected one and one already verified cannot be verified by id
+  const vd = await admin.post(`/api/admin/companies/${dId}/verify`, { screened: true }); assert.deepEqual([vd.status, vd.body.error], [409, "bad_state"], "U-046: a draft was never submitted");
+  assert.equal(S.db.get("SELECT status FROM companies WHERE id = ?", dId).status, "draft", "and stays a draft");
+  const demoId = S.db.get("SELECT id FROM companies WHERE is_demo = 1 LIMIT 1").id;
+  assert.deepEqual((r => [r.status, r.body.error])(await admin.post(`/api/admin/companies/${demoId}/verify`, { screened: true })), [409, "bad_state"], "U-046: sample data is not a company to verify");
+  assert.deepEqual((r => [r.status, r.body.error])(await admin.post(`/api/admin/companies/${A.companyId}/verify`, { screened: true })), [409, "bad_state"], "U-046: a verified company is not verified twice");
+  const rj = await S.login("0955 910 003", "employer"); const rjId = (await rj.put("/api/employer/company", { company: { name: { en: "Review Rejected" }, gov: "aleppo", regNo: "REG-Review-Rej", contactName: "Contact Rej", whatsapp: "0955 910 003" } })).body.company.id;
+  assert.equal((await rj.post("/api/employer/company/submit")).status, 200); assert.equal((await admin.post(`/api/admin/companies/${rjId}/reject`, { note: "Registration number unclear" })).status, 200);
+  assert.deepEqual((r => [r.status, r.body.error])(await admin.post(`/api/admin/companies/${rjId}/verify`, { screened: true })), [409, "bad_state"], "U-046: a rejected company must resubmit first");
+  assert.deepEqual((r => [r.status, r.body.error])(await admin.post(`/api/admin/companies/${rjId}/reject`, { note: "Again" })), [409, "bad_state"], "a rejected company is not rejected twice");
+  assert.deepEqual((r => [r.status, r.body.error])(await admin.post(`/api/admin/companies/${dId}/suspend`, { note: "Never submitted" })), [409, "bad_state"], "a draft cannot be suspended, so suspend-then-verify cannot reach verified around the state check (review)");
+  assert.equal((await rj.post("/api/employer/company/submit")).body.company.status, "pending"); assert.equal((await admin.post(`/api/admin/companies/${rjId}/verify`, { screened: true })).body.company.status, "verified", "resubmitted, then verified");
   // suspend with a note: the listing leaves the public site, the note is kept and audited
   const sus = await admin.post(`/api/admin/companies/${A.companyId}/suspend`, { note: "Policy test suspension" }); assert.equal(sus.status, 200, sus.text);
   assert.equal(sus.body.company.status, "suspended"); assert.equal(sus.body.company.reviewNote, "Policy test suspension");
   assert.equal((await S.client().get(`/api/jobs/${A.jobId}`)).status, 404, "a suspended company's listings are not public");
   assert.equal((await A.e.post("/api/employer/company/submit")).body.error, "suspended", "the employer cannot resubmit a suspended company");
-  // U-046: a suspended company is verified by id (today's behaviour)
+  // a suspended company cannot resubmit, so the admin lifts the suspension by verifying it again (screened again)
   const vs = await admin.post(`/api/admin/companies/${A.companyId}/verify`, { screened: true }); assert.equal(vs.status, 200, vs.text); assert.equal(vs.body.company.status, "verified");
   assert.equal((await S.client().get(`/api/jobs/${A.jobId}`)).status, 200, "and its listing is public again");
   // reject with a note works on the (re-)verified company too: no state check anywhere in setCompany (admin.js:46-56)
   const rej = await admin.post(`/api/admin/companies/${A.companyId}/reject`, { note: "Policy test rejection" }); assert.equal(rej.status, 200, rej.text); assert.equal(rej.body.company.status, "rejected");
   assert.deepEqual(audits(S, "company", A.companyId).filter(x => /^company\.(verified|suspended|rejected)$/.test(x.action)).map(x => [x.action, x.data.note]),
     [["company.verified", ""], ["company.suspended", "Policy test suspension"], ["company.verified", ""], ["company.rejected", "Policy test rejection"]], "every decision is in the audit log with its note");
-  assert.deepEqual(audits(S, "company", dId).map(x => x.action), ["company.created", "company.verified"], "U-046: the draft went straight from created to verified");
+  assert.deepEqual(audits(S, "company", dId).map(x => x.action), ["company.created"], "U-046: the refused verification of the draft wrote nothing");
 });
 
 test("policy admin: listing review approves only a pending listing of a verified company (409 bad_state, 409 company_not_verified); reject needs a note", async () => {
@@ -102,9 +111,9 @@ test("policy admin: the audit log clamps limit to 1..200, takes junk limits, and
   assert.ok(all.length >= 30 && all.length < 200, `${all.length} rows from the cast`);
   for (const action of ["team.invited", "team.joined", "campus.office_added", "invitation.sent", "company.verified", "job.approved", "company.plan", "user.created", "terms.accepted"]) assert.ok(all.some(e => e.action === action), `${action} was logged`);
   assert.deepEqual(all.map(e => e.id), [...all.map(e => e.id)].sort((a, b) => b - a), "newest first");
-  assert.deepEqual(Object.keys(all[0]).sort(), ["action", "actor_id", "created_at", "data", "entity", "entity_id", "id"]);
+  assert.deepEqual(Object.keys(all[0]).sort(), ["action", "actor", "actor_id", "created_at", "data", "entity", "entity_id", "id"], "the row plus the actor shown masked (Stage 3 audit screen)");
   assert.ok(all.every(e => e.data === null || typeof e.data === "object"), "data comes back parsed");
-  const raw = JSON.stringify(all.map(({ created_at, ...e }) => e));   // timestamps are 13 digits: dropped so they cannot look like a number
+  const raw = JSON.stringify(all.map(({ created_at, actor, ...e }) => e));   // timestamps are 13 digits: dropped so they cannot look like a number; the masked actor is checked by the audit-screen test below
   const PHONE = /\+963|\+1202|963(955|944)\d{6}|09(55|44) 9\d\d \d{3}|955900|944900/;
   assert.ok(!PHONE.test(raw), `a phone number in the audit log: ${(raw.match(PHONE) || [])[0]}`);
   assert.ok(PHONE.test(JSON.stringify((await admin.get("/api/admin/companies?status=verified")).body)), "the pattern does catch the owner numbers where they are shown on purpose");
@@ -116,6 +125,33 @@ test("policy admin: the audit log clamps limit to 1..200, takes junk limits, and
   assert.deepEqual([await n("?limit=-5"), await n("?limit=-1"), await n("?limit=0"), await n("?limit=abc"), await n("?limit="), await n("?limit=1e9"), await n("?limit=5.9"), await n("?limit=%00"), await n("?limit=200abc")], [1, 1, 50, 50, 50, 1, 5, 50, 200],
     "a negative limit is 1 (SECURITY.md: -5 once meant everything), zero and junk are the default, 1e9 reads as 1");
   assert.equal((await admin.get("/api/admin/audit?limit=1")).body.entries[0].action, "test.noise", "limit=1 is the newest row");
+});
+
+test("policy admin: the audit screen's API filters by action, item, actor and dates, pages with a cursor to the oldest row, and shows actors masked (P1-3, U-048)", async () => {
+  const S = await start(), C = await cast(S), admin = C.admin;
+  const get = async q => { const r = await admin.get("/api/admin/audit" + q); assert.equal(r.status, 200, q + " " + r.text); return r.body; };
+  const all = (await get("?limit=200")).entries;
+  assert.ok(all.every(e => e.actor === null || e.actor === "deleted" || /^\+\d{4}•••\d{3}$/.test(e.actor)), "actors are masked like the logs: " + JSON.stringify([...new Set(all.map(e => e.actor))]));
+  assert.ok(all.some(e => /^\+\d{4}•••\d{3}$/.test(e.actor)), "and at least the admin's own actions carry one");
+  const approved = (await get("?action=job.approved")).entries; assert.ok(approved.length >= 2 && approved.every(e => e.action === "job.approved"), "exact action");
+  const jobs = (await get("?action=job.")).entries; assert.ok(jobs.length > approved.length && jobs.every(e => e.action.startsWith("job.")), "a trailing dot is a prefix");
+  assert.equal((await get("?action=job%")).entries.length, 0, "no wildcard sneaks in");
+  const comp = (await get(`?entity=company&entityId=${C.ids.companyA}`)).entries; assert.ok(comp.length >= 2 && comp.every(e => e.entity === "company" && e.entity_id === C.ids.companyA), "item filter");
+  const adminId = S.db.get("SELECT id FROM users WHERE phone = ?", ADMIN_PHONE).id;
+  const byAdmin = (await get(`?actor=${adminId}`)).entries; assert.ok(byAdmin.length >= 2 && byAdmin.every(e => e.actor_id === adminId), "actor filter");
+  const arabic = s => String(s).replace(/[0-9]/g, d => "٠١٢٣٤٥٦٧٨٩"[d]);
+  assert.equal((await get(`?actor=${arabic(adminId)}&limit=${arabic(200)}`)).entries.length, byAdmin.length, "a filter typed with Arabic-Indic digits filters the same (review)");
+  const today = new Date().toISOString().slice(0, 10);
+  assert.equal((await get(`?from=${today}&to=${today}`)).entries.length, all.length, "today's rows are all of them");
+  assert.equal((await get("?from=2030-01-01")).entries.length, 0); assert.equal((await get("?to=2000-01-01")).entries.length, 0);
+  for (const q of ["?from=abc", "?to=%00", "?actor=abc", "?entityId=-1", "?action=" + "x".repeat(500), "?entity=%27%20OR%201=1%20--", "?before=abc", "?before=-5", "?limit=abc&before=%00"]) assert.equal((await admin.get("/api/admin/audit" + q)).status, 200, "junk filter " + q);
+  for (let i = 0; i < 120; i++) S.db.run("INSERT INTO audit (actor_id, action, entity, entity_id, data, created_at) VALUES (NULL, 'test.noise', 'test', ?, NULL, ?)", i, Date.now());
+  const seen = []; let before = 0, pages = 0;
+  while (pages++ < 50) { const page = (await get(`?limit=50${before ? "&before=" + before : ""}`)).entries; if (!page.length) break; seen.push(...page.map(e => e.id)); before = page[page.length - 1].id; if (page.length < 50) break; }
+  assert.equal(new Set(seen).size, seen.length, "no row twice"); assert.deepEqual(seen, [...seen].sort((a, b) => b - a), "newest first across pages");
+  assert.equal(seen.length, S.db.get("SELECT COUNT(*) AS n FROM audit").n, "the cursor reaches the oldest row (U-048)");
+  const raw = JSON.stringify((await get("?limit=200")).entries.map(({ created_at, actor, ...e }) => e));
+  assert.ok(!/\+963|\+1202|963(955|944)\d{6}|09(55|44) 9\d\d \d{3}|955900|944900/.test(raw), "no phone number anywhere but the masked actor");
 });
 
 const countMap = o => !!o && typeof o === "object" && !Array.isArray(o) && Object.values(o).every(v => typeof v === "number");

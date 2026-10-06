@@ -1,9 +1,11 @@
 import { fail } from "../http.js";
 import { now, J } from "../db.js";
 import { companyOut, employerJobOut, applicantCounts } from "../serialize.js";
+import { checkJob } from "../validate.js";
+import { mask } from "../guard.js";
 
 export function registerAdmin(r, deps) {
-  const { db, auth, audit } = deps, plans = deps.plans;
+  const { db, auth, audit, core } = deps, plans = deps.plans;
   const admin = auth.need("admin");
   const WEEK = 7 * 86400e3;
 
@@ -48,14 +50,20 @@ export function registerAdmin(r, deps) {
     if (!c) fail(404, "not_found");
     const note = String(ctx.body.note || "").trim().slice(0, 1000);
     if ((status === "rejected" || status === "suspended") && !note) fail(422, "note_required");
+    if ((status === "rejected" || status === "suspended") && (c.is_demo || !["pending", "verified"].includes(c.status))) fail(409, "bad_state");   // only a submitted or verified company is rejected or suspended, so nothing reaches "verified" through a suspension (review of U-046)
     db.run(`UPDATE companies SET status = ?, review_note = ?, updated_at = ?, screened_at = COALESCE(?, screened_at), screened_by = COALESCE(?, screened_by),
             verified_at = COALESCE(?, verified_at), verified_by = COALESCE(?, verified_by) WHERE id = ?`,
       status, note, now(), extra.screened_at ?? null, extra.screened_by ?? null, extra.verified_at ?? null, extra.verified_by ?? null, c.id);
-    audit(ctx.user.id, `company.${status}`, "company", c.id, { note });
+    audit(ctx.user.id, `company.${status}`, "company", c.id, { note, ...(extra.screened_at ? { screened: true } : {}) });   // the compliance report reads `screened` (D-07)
+    if (status === "suspended" || status === "rejected") for (const i of db.all("SELECT id FROM invitations WHERE company_id = ? AND status IN ('sent','seen')", c.id)) {   // a company under suspicion keeps no open invitation: nobody hands it a number meanwhile (U-017)
+      db.run("UPDATE invitations SET status = 'withdrawn', updated_at = ? WHERE id = ?", now(), i.id); audit(ctx.user.id, "invitation.withdrawn", "invitation", i.id, { reason: "company_" + status });
+    }
     return { company: companyOut(db.get("SELECT * FROM companies WHERE id = ?", c.id)) };
   };
   r.post("/api/admin/companies/:id/verify", admin, ctx => {
     if (ctx.body.screened !== true) fail(422, "screening_required");   // checked against the US sanctions list
+    const c = db.get("SELECT status, is_demo FROM companies WHERE id = ?", Number(ctx.params.id)); if (!c) fail(404, "not_found");
+    if (c.is_demo || !["pending", "suspended"].includes(c.status)) fail(409, "bad_state");   // verification needs a submitted company; a suspension is lifted here, since the employer cannot resubmit (U-046)
     return setCompany(ctx, "verified", { screened_at: now(), screened_by: ctx.user.id, verified_at: now(), verified_by: ctx.user.id });
   });
   r.post("/api/admin/companies/:id/reject", admin, ctx => setCompany(ctx, "rejected"));
@@ -73,6 +81,7 @@ export function registerAdmin(r, deps) {
     if (!j) fail(404, "not_found");
     if (j.status !== "pending") fail(409, "bad_state");
     if (j.c_status !== "verified") fail(409, "company_not_verified");
+    const check = checkJob(core, J(j.data) || {}); if (check.fee) fail(422, "fee_requested", check.fee);   // the posting checks run again at approval, whatever reached the queue (D-05)
     db.run("UPDATE jobs SET status = 'published', published_at = COALESCE(published_at, ?), reviewed_by = ?, review_note = ?, updated_at = ? WHERE id = ?",
       now(), ctx.user.id, String(ctx.body.note || "").slice(0, 1000), now(), j.id);
     audit(ctx.user.id, "job.approved", "job", j.id, null);
@@ -83,7 +92,7 @@ export function registerAdmin(r, deps) {
     if (!j) fail(404, "not_found");
     const note = String(ctx.body.note || "").trim().slice(0, 1000);
     if (!note) fail(422, "note_required");
-    db.run("UPDATE jobs SET status = 'rejected', review_note = ?, reviewed_by = ?, updated_at = ? WHERE id = ?", note, ctx.user.id, now(), j.id);
+    db.run("UPDATE jobs SET status = 'rejected', sponsored_until = NULL, review_note = ?, reviewed_by = ?, updated_at = ? WHERE id = ?", note, ctx.user.id, now(), j.id);   // a rejected listing holds no sponsored slot (D-29)
     audit(ctx.user.id, "job.rejected", "job", j.id, { note });
     return { ok: true };
   });
@@ -114,7 +123,7 @@ export function registerAdmin(r, deps) {
       // A placement fee only when a Free-plan employer hires someone it found and invited through candidate search.
       const sourced = c && db.get("SELECT 1 AS x FROM invitations WHERE company_id = ? AND user_id = ? AND status = 'accepted' AND created_at <= ?", c.id, a.user_id, a.created_at);
       if (sourced && plans.limits(c).sourcedFee) {
-        const amt = plans.payMid(J(j.data) || {});
+        const amt = a.hire_pay_mid || plans.payMid(J(j.data) || {});   // the pay shown when the hire was recorded; the live pay only for hires older than migration 16 (D-09)
         db.run("INSERT INTO charges (company_id, application_id, kind, amount_syp, note, created_at) VALUES (?, ?, 'hire_fee', ?, ?, ?)", c.id, a.id, amt, "Placement fee: a hire found through candidate search", now());
         out.push({ kind: "hire_fee", amountSyp: amt });
       }
@@ -128,9 +137,22 @@ export function registerAdmin(r, deps) {
     return { ok: true, charges: out };
   });
 
+  /* The audit screen's feed: newest first, at most 200 a page, older pages by cursor (before = the last id seen), filtered by action
+     (exact, or a prefix ending in "."), item (entity and entityId), actor (account id) and day range. The actor is shown masked, like the logs. */
   r.get("/api/admin/audit", admin, ctx => {
-    const limit = Math.max(1, Math.min(200, parseInt(ctx.query.get("limit"), 10) || 50));
-    return { entries: db.all("SELECT * FROM audit ORDER BY id DESC LIMIT ?", limit).map(e => ({ ...e, data: J(e.data) })) };
+    const q = k => core.latinDigits(String(ctx.query.get(k) || "")).slice(0, 80), limit = Math.max(1, Math.min(200, parseInt(q("limit"), 10) || 50));   // Arabic-Indic digits in a filter count as digits (review)
+    const before = parseInt(q("before"), 10), actor = parseInt(q("actor"), 10), entityId = parseInt(q("entityId"), 10), action = q("action"), entity = q("entity");
+    const day = s => (/^\d{4}-\d{2}-\d{2}$/.test(s) ? Date.parse(s + "T00:00:00Z") : NaN), from = day(q("from")), to = day(q("to"));
+    const where = ["1 = 1"], args = [];
+    if (before > 0) { where.push("a.id < ?"); args.push(before); }
+    if (actor > 0) { where.push("a.actor_id = ?"); args.push(actor); }
+    if (entity) { where.push("a.entity = ?"); args.push(entity); }
+    if (entityId > 0) { where.push("a.entity_id = ?"); args.push(entityId); }
+    if (action) { if (action.endsWith(".")) { where.push("a.action LIKE ? ESCAPE '\\'"); args.push(action.replace(/[\\%_]/g, "\\$&") + "%"); } else { where.push("a.action = ?"); args.push(action); } }
+    if (from > 0) { where.push("a.created_at >= ?"); args.push(from); }
+    if (to > 0) { where.push("a.created_at < ?"); args.push(to + 86400e3); }
+    const rows = db.all(/* sql-safe: the fragments are fixed strings chosen by code above; every value is a "?" placeholder */ `SELECT a.*, u.phone AS actor_phone FROM audit a LEFT JOIN users u ON u.id = a.actor_id WHERE ${where.join(" AND ")} ORDER BY a.id DESC LIMIT ?`, ...args, limit);
+    return { entries: rows.map(({ actor_phone, ...e }) => ({ ...e, data: J(e.data), actor: actor_phone ? (actor_phone.startsWith("deleted:") ? "deleted" : mask(actor_phone)) : null })) };
   });
 
   /* ---------- billing: plans, charges and programmes, all handled by hand for now ---------- */

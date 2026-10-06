@@ -132,3 +132,24 @@ test("universities: employers see verified students, partner with universities a
   await admin.post(`/api/admin/applications/${apps[0].id}/confirm-hire`, {});
   const T = (await office.get("/api/campus")).body.stats; assert.deepEqual([T.internsHired, T.hires, T.employers], [1, 1, 1], "a confirmed intern hire is counted");
 });
+
+test("universities: a verification code typed with Arabic-Indic digits is accepted (U-034)", async () => {
+  const S = await start({}, EMAIL), admin = await S.login("+12025550199");
+  await admin.post("/api/admin/campus/domains", { uni: "homs", domain: "hu.example" });
+  const a = await S.login("0933 785 101"); await a.put("/api/me/profile", { profile: profileAt("homs") });
+  assert.equal((await a.post("/api/me/verify-student", { email: "omar@hu.example" })).status, 200);
+  const arabic = s => String(s).replace(/[0-9]/g, d => "٠١٢٣٤٥٦٧٨٩"[d]);
+  const ok = await a.post("/api/me/verify-student/confirm", { code: arabic(codeFor("omar@hu.example")) });
+  assert.equal(ok.status, 200, ok.text); assert.equal(ok.body.verification.status, "verified", "the right code in Arabic-Indic digits verifies the student");
+});
+
+test("universities: a career office's own export includes its office record, and deleting the account removes it (D-22)", async () => {
+  const S = await start(), admin = await S.login("+12025550199");
+  await admin.post("/api/admin/campus", { phone: "0944 786 001", uni: "homs", name: "Homs Career Office" }); const office = await S.login("0944 786 001");
+  const ex = (await office.get("/api/me/export")).body;
+  assert.equal(ex.account.role, "university"); assert.deepEqual([ex.campusOffice && ex.campusOffice.university, ex.campusOffice && ex.campusOffice.name], ["homs", "Homs Career Office"], "D-22: the export carries the office record");
+  const uid = S.db.get("SELECT id FROM users WHERE phone = ?", "+963944786001").id;
+  assert.equal((await office.del("/api/me")).status, 200);
+  assert.equal(S.db.get("SELECT COUNT(*) AS n FROM campus_offices WHERE user_id = ?", uid).n, 0, "D-22: the office row, with the contact name, goes with the account");
+  assert.ok(!(await admin.get("/api/admin/campus")).body.offices.some(o => o.phone === "+963944786001"), "and the admin's office list no longer shows it");
+});

@@ -2,6 +2,7 @@
 import { test, after } from "node:test";
 import assert from "node:assert/strict";
 import http from "node:http";
+import { readFileSync } from "node:fs";
 import { loadConfig } from "../server/config.js";
 import { openDb } from "../server/db.js";
 import { createApp } from "../server/app.js";
@@ -74,10 +75,17 @@ test("diaspora: numbers abroad can sign in, within their own daily cap; a profil
   assert.equal((await s.put("/api/me/profile", { profile: p })).status, 200);
   const me = (await s.get("/api/me")).body.profile; assert.deepEqual([me.gov, me.country], ["abroad", "de"]);
   const R = S.core.buildResume(me, "general", "en"); assert.ok(R.contact.some(x => /Germany/.test(x)), "the resume says where they live");
+  // D-25: the fit caption says where they live too, through placeOf, which the app's fit box must use (app.js has no test runtime: the source is pinned)
+  const cap = l => S.core.fill(S.core.STR[l].whyCapAlt, { edu: "x", home: S.core.placeOf(me)[l] });
+  assert.match(cap("en"), /living in Germany/); assert.match(cap("ar"), /مقيم في ألمانيا/); assert.doesNotMatch(cap("en") + cap("ar"), /living in \.|مقيم في \./);
+  const app = readFileSync(new URL("../public/js/app.js", import.meta.url), "utf8");
+  assert.ok(!app.includes("home: L(GOV[P.gov])") && app.includes("home: L(placeOf(P))"), "D-25: the fit box builds {home} with placeOf, so people abroad do not read \"living in .\"");
   assert.equal((await s.put("/api/me/profile", { profile: { ...GRAD, gov: "abroad", country: "atlantis" } })).status, 200);
   assert.equal((await s.get("/api/me")).body.profile.country, "other", "an unknown country is stored as another country");
   const base = (await S.client().get("/api/jobs")).body.jobs[0], remote = { ...base, gov: "remote" }, onsite = { ...base, gov: "damascus", returnees: true };
   assert.equal(S.core.fitFor(me, remote).parts.find(x => x.key === "placeRemote").state, "ok", "remote jobs fit people abroad");
+  assert.equal(S.core.alertMatches({ gov: "damascus" }, remote), true, "D-26: a remote listing matches an alert for any governorate, as it shows under every governorate on the board");
+  assert.equal(S.core.alertMatches({ gov: "remote" }, { ...base, gov: "damascus" }), false, "an alert for remote work matches remote listings only");
   assert.equal(S.core.fitFor(me, onsite).parts.find(x => x.key === "placeReturn").state, "part", "and jobs that welcome returnees count for them");
 });
 
@@ -94,11 +102,13 @@ test("job alerts: save a search, count new matches, and get one digest a day by 
   assert.equal((await t.post("/api/me/alerts", { alert: { gov: "damascus" }, channel: "sms" })).body.alert.channel, "sms");
   const jid = await publish(S, admin, e, { title: { en: "Junior Accountant", ar: "محاسب مبتدئ" }, gov: "damascus" });
   const other = await publish(S, admin, e, { title: { en: "Driver", ar: "سائق" }, gov: "aleppo" });
+  const remoteJob = await publish(S, admin, e, { title: { en: "Remote Accountant", ar: "محاسب عن بعد" }, gov: "remote" });
   const list = (await s.get("/api/me/alerts")).body;
-  assert.equal(list.alerts[0].newCount, 1, "only the matching job counts"); assert.equal(list.emailOn, true);
-  assert.equal((await s.get("/api/me")).body.alertsNew, 1, "and the app can show it");
+  assert.equal(list.alerts[0].newCount, 2, "the matching job in Damascus and the remote one count; the driver in Aleppo does not (D-26)"); assert.equal(list.emailOn, true);
+  assert.equal((await s.get("/api/me")).body.alertsNew, 2, "and the app can show it");
   const run1 = await S.app.runAlerts(); assert.equal(run1.sent, 2, "one email and one text");
   assert.equal(mails.length, 1); assert.equal(mails[0].to, "omar@example.com"); assert.match(mails[0].text, new RegExp(`/lite/job/${jid}`)); assert.doesNotMatch(mails[0].text, new RegExp(`/lite/job/${other}\\b`));
+  assert.match(mails[0].text, new RegExp(`/lite/job/${remoteJob}\\b`), "the digest lists the remote job too (D-26)");
   assert.ok(S.texts.some(x => /new jobs for your alert|وظائف جديدة لتنبيهك/.test(x.body)), "the text goes through the usual notifier");
   await publish(S, admin, e, { title: { en: "Senior Accountant", ar: "محاسب أول" }, gov: "damascus" });
   assert.equal((await S.app.runAlerts()).sent, 0, "at most one digest a day");
@@ -116,10 +126,44 @@ test("returnees: employers can say they welcome Syrians coming home, and people 
   const jid = await publish(S, admin, e, { returnees: true });
   const j = (await S.client().get("/api/jobs")).body.jobs.find(x => x.id === jid); assert.equal(j.returnees, true);
   assert.equal(S.core.alertMatches({ tab: "returnees" }, j), true); assert.equal(S.core.alertMatches({ tab: "returnees" }, { ...j, returnees: false }), false);
+  // D-13: the demo marks its own multinational listings as welcoming returnees; a real multinational employer's listing is never rewritten, on any later start
+  const real = await S.login("0955 740 011", "employer");
+  await real.put("/api/employer/company", { company: { name: { en: "Orontes Global" }, cat: "multinational", gov: "damascus", regNo: "REG-OG", contactName: "Contact", whatsapp: "0955 740 011" } });
+  await real.post("/api/employer/company/submit");
+  const co = (await admin.get("/api/admin/companies?status=pending")).body.companies.find(c => c.name.en === "Orontes Global"); await admin.post(`/api/admin/companies/${co.id}/verify`, { screened: true });
+  const realId = await publish(S, admin, real, { returnees: false });
+  assert.equal(seedDemo(S.db, () => {}), false, "a second start seeds nothing");
+  const after = (await S.client().get("/api/jobs")).body.jobs;
+  assert.equal(after.find(x => x.id === realId).returnees, false, "the real employer's listing keeps returnees: false (D-13)");
+  assert.equal(S.db.get("SELECT json_extract(data, '$.returnees') AS r FROM jobs WHERE id = ?", realId).r, 0);
+  assert.ok(after.filter(x => x.demo && x.co.en === "Chevron").every(x => x.returnees === true), "the demo's own multinational listings still say so");
 });
 
 test("diaspora: the shipped .env.example keeps the default destinations (Syria plus the diaspora countries) instead of narrowing texts to Syria", () => {
   const template = parseEnvFile(new URL("../.env.example", import.meta.url).pathname);
   const cfg = loadConfig({ skipDotEnv: true, isolated: true, env: { ...template, NODE_ENV: "test" } });
   for (const p of ["+963", "+49", "+90", "+961", "+1"]) assert.ok(cfg.smsAllowedPrefixes.includes(p), `${p} is allowed with the template settings (got ${cfg.smsAllowedPrefixes.join(",")})`);
+});
+
+test("diaspora: an international number typed with Arabic-Indic or Persian digits signs in and can be invited to a team (D-19)", async () => {
+  const S = await start(), admin = await S.login("+12025550199"), c = S.client();
+  const r1 = await c.post("/api/auth/code", { phone: "+٤٩١٥١٢٣٤٥٦٧٨٩" }); assert.equal(r1.status, 200, r1.text); assert.equal(r1.body.phone, "+4915123456789", "Arabic-Indic digits");
+  const r2 = await c.post("/api/auth/code", { phone: "+۴۹۱۵۱۲۳۴۵۶۷۸۸" }); assert.equal(r2.status, 200, r2.text); assert.equal(r2.body.phone, "+4915123456788", "Persian digits");
+  const { e } = await employer(S, admin, "0955 745 001", "Digits Co");
+  assert.equal((await e.post("/api/employer/team", { name: "Hans", phone: "+٤٩١٥١٢٣٤٥٦٧٨٠", role: "recruiter" })).status, 200, "a teammate abroad can be invited with Arabic-Indic digits");
+  assert.equal((await e.get("/api/employer/team")).body.invites[0].phone, "+4915123456780", "and is stored in E.164");
+});
+
+test("board: a seeker's saved listings and live sponsored listings stay on the feed past the 500 newest (D-27)", async () => {
+  const S = await start(), admin = await S.login("+12025550199"), { e, jobId: savedJob } = await employer(S, admin, "0955 746 001", "Qasioun Advisory");
+  const co = S.db.get("SELECT id FROM companies WHERE json_extract(data, '$.name.en') = ?", "Qasioun Advisory").id;
+  const sponsoredJob = await publish(S, admin, e, { title: { en: "Sponsored role" } });
+  await admin.post(`/api/admin/companies/${co}/plan`, { plan: "pro", months: 1 }); assert.equal((await e.post(`/api/employer/jobs/${sponsoredJob}/sponsor`, { on: true })).status, 200);
+  const s = await S.login("0933 746 001"); assert.equal((await s.post(`/api/me/saved/${savedJob}`)).status, 200);
+  const t0 = Date.now(); S.db.tx(() => { for (let i = 1; i <= 520; i++) S.db.run("INSERT INTO jobs (company_id, data, status, published_at, created_at, updated_at) VALUES (?, ?, 'published', ?, ?, ?)", co, JSON.stringify({ ...JOB, title: { en: "Filler " + i } }), t0 + i, t0 + i, t0 + i); });
+  const mine = (await s.get("/api/jobs")).body.jobs, ids = new Set(mine.map(j => j.id));
+  assert.ok(ids.has(savedJob), "D-27: the listing I saved is still on the board"); assert.ok(ids.has(sponsoredJob), "D-27: the live sponsored listing is still on the board");
+  assert.equal(mine.length, 502, "the 500 newest plus those two"); assert.equal(mine[0].title.en, "Filler 520", "newest first");
+  const guest = (await S.client().get("/api/jobs")).body.jobs;
+  assert.ok(guest.some(j => j.id === sponsoredJob) && !guest.some(j => j.id === savedJob), "a guest gets the sponsored one, not somebody's saved one"); assert.equal(guest.length, 501);
 });

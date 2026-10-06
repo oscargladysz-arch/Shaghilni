@@ -140,8 +140,8 @@ function saveDraft() { if ((OB.mode === "new" || OB.mode === "profile") && OB.d 
 function closeOnboarding() { saveDraft(); OB.open = false; $("#onb").hidden = true; $("#app").inert = false; }
 function obGo(step, dir) { OB.step = step; OB.errors = {}; saveDraft(); renderOnb(dir || "fwd"); }
 // The number as typed, with the chosen country code: Syrian numbers keep their usual forms (09…, 9…, +963…).
-function obPhoneFull() { const cc = OB.cc || "963", raw = String(OB.phoneRaw || "").trim(); if (cc === "963" || /^(\+|00)/.test(raw)) return raw; return "+" + cc + raw.replace(/\D/g, "").replace(/^0+/, ""); }
-function phoneOk(raw) { const sy = normPhone(raw); if (sy) return sy; const d = String(raw || "").replace(/[^\d+]/g, ""); return /^\+[1-9]\d{7,14}$/.test(d) ? d : null; }
+function obPhoneFull() { const cc = OB.cc || "963", raw = String(OB.phoneRaw || "").trim(); if (cc === "963" || /^(\+|00)/.test(raw)) return raw; return "+" + cc + latinDigits(raw).replace(/\D/g, "").replace(/^0+/, ""); }
+function phoneOk(raw) { const sy = normPhone(raw); if (sy) return sy; const d = latinDigits(raw || "").replace(/[^\d+]/g, ""); return /^\+[1-9]\d{7,14}$/.test(d) ? d : null; }   // latinDigits: Arabic-Indic digits abroad too (D-19)
 async function sendCode() {
   const ph = phoneOk(obPhoneFull());
   if (!ph) { OB.errors = { phone: "obErrPhone" }; OB.focusErr = true; renderOnb(); return; }

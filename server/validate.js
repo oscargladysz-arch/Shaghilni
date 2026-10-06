@@ -15,7 +15,7 @@ const ym = v => (/^\d{4}-(0[1-9]|1[0-2])$/.test(String(v || "")) ? String(v) : "
 export function e164(core, raw) {
   const sy = core.normPhone(raw || "");
   if (sy) return sy.replace(/\s/g, "");
-  const d = String(raw || "").replace(/[^\d+]/g, "");
+  const d = core.latinDigits(raw || "").replace(/[^\d+]/g, "");   // Arabic-Indic and Persian digits count as digits abroad too (D-19)
   return /^\+[1-9]\d{7,14}$/.test(d) ? d : null;
 }
 
@@ -131,8 +131,11 @@ export function checkJob(core, j) {
   if (!j.langs.length) missing.push("langs");
   if (!j.summary.en && !j.summary.ar) missing.push("summary");
   const text = [j.title.en, j.title.ar, j.summary.en, j.summary.ar, ...j.duties.en, ...j.duties.ar, ...j.needs.en, ...j.needs.ar].join(" ");
-  const fee = core.findFee(text), gender = core.findGender(text);
-  return { missing, fee: fee || null, flags: gender ? [{ type: "gender", word: gender }] : [] };
+  const fee = core.findFee(text), gender = core.findGender(text), flags = gender ? [{ type: "gender", word: gender }] : [];
+  // Contact details anywhere in the free text are flagged for the reviewer, not blocked: the number is meant to reach a signed-in applicant only (D-30)
+  const every = core.latinDigits([text, j.place.en, j.place.ar, j.contact.name.en, j.contact.name.ar, j.contact.role.en, j.contact.role.ar, j.contact.status.en, j.contact.status.ar, ...j.provides.en, ...j.provides.ar, j.tags].join(" "));
+  for (const w of new Set((every.match(/\+?\d[\d\s\-().]{5,}\d|[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/g) || []).map(x => x.trim()).filter(x => x.includes("@") || x.replace(/\D/g, "").length >= 9)).values()) { if (flags.length >= 6) break; flags.push({ type: "contact", word: w }); }
+  return { missing, fee: fee || null, flags };
 }
 
 /* A saved search for job alerts: only known filters, and a short keyword. */

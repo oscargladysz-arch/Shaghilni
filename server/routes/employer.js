@@ -21,17 +21,17 @@ export function registerEmployer(r, deps) {
     if (!j) fail(404, "not_found");
     return { c, j };
   };
-  const jobsOf = (c, me) => {
+  const jobsOf = (c, me, lang) => {
     const rows = db.all("SELECT * FROM jobs WHERE company_id = ? ORDER BY updated_at DESC", c.id);
     const counts = applicantCounts(db, rows.map(x => x.id)), co = companyOut(c);
-    return rows.map(x => ({ ...employerJobOut(x, co, counts.get(x.id) || {}), postedBy: x.created_by ? plans.memberName(c, x.created_by) : null, mine: !!me && x.created_by === me }));
+    return rows.map(x => ({ ...employerJobOut(x, co, counts.get(x.id) || {}), postedBy: x.created_by ? plans.memberName(c, x.created_by, lang) : null, mine: !!me && x.created_by === me }));
   };
 
   r.get("/api/employer", employer, ctx => {
     const c = myCompany(ctx);
     const role = c ? plans.roleOf(c, ctx.user) : null;
     const p = !c && db.get("SELECT m.status, m.role, c.data AS c_data FROM company_members m JOIN companies c ON c.id = m.company_id WHERE m.phone = ? AND m.status IN ('invited', 'requested')", ctx.user.phone);
-    return { company: companyOut(c), jobs: c ? jobsOf(c, ctx.user.id) : [], missing: c ? companyMissing(J(c.data)) : [], plan: c ? plans.summary(c) : null, isOwner: !c || c.owner_id === ctx.user.id,
+    return { company: companyOut(c), jobs: c ? jobsOf(c, ctx.user.id, ctx.user.lang) : [], missing: c ? companyMissing(J(c.data)) : [], plan: c ? plans.summary(c) : null, isOwner: !c || c.owner_id === ctx.user.id,
       me: c ? { role, name: plans.memberName(c, ctx.user.id) } : null, pending: p ? { status: p.status, role: p.role, company: (J(p.c_data) || {}).name || {} } : null,
       partners: c ? db.all("SELECT uni, status FROM uni_partners WHERE company_id = ?", c.id) : [] };
   });
@@ -79,7 +79,7 @@ export function registerEmployer(r, deps) {
     if (check.missing.length) fail(422, "incomplete", check.missing);
     if (check.fee) fail(422, "fee_requested", check.fee);
     db.run("UPDATE jobs SET status = 'pending', flags = ?, submitted_at = ?, updated_at = ? WHERE id = ?", JSON.stringify(check.flags), now(), now(), jobRow.id);
-    audit(ctx.user.id, "job.submitted", "job", jobRow.id, { flags: check.flags });
+    audit(ctx.user.id, "job.submitted", "job", jobRow.id, { flags: check.flags.map(f => (f.type === "contact" ? { type: "contact" } : f)) });   // the log never holds the number or address itself (R12)
   };
 
   r.post("/api/employer/jobs", employer, ctx => {
@@ -91,17 +91,17 @@ export function registerEmployer(r, deps) {
       c.id, JSON.stringify(data), JSON.stringify(checkJob(core, data).flags), now(), now(), ctx.user.id).lastInsertRowid);
     audit(ctx.user.id, "job.created", "job", id, null);
     if (ctx.body.submit) submitJob(ctx, c, { id }, data);
-    return { job: jobsOf(c, ctx.user.id).find(x => x.id === id), check: checkJob(core, data) };
+    return { job: jobsOf(c, ctx.user.id, ctx.user.lang).find(x => x.id === id), check: checkJob(core, data) };
   });
 
   r.put("/api/employer/jobs/:id", employer, ctx => {
     const { c, j } = myJob(ctx, ctx.params.id); plans.allow(ctx, c, "hire");
     const data = sanitizeJob(core, ctx.body.job);
-    const back = j.status === "published" || j.status === "rejected" ? "draft" : j.status === "closed" ? "closed" : j.status;
-    db.run("UPDATE jobs SET data = ?, status = ?, flags = ?, updated_at = ? WHERE id = ?", JSON.stringify(data), back, JSON.stringify(checkJob(core, data).flags), now(), j.id);
+    const back = ["published", "rejected", "pending", "closed"].includes(j.status) ? "draft" : j.status;   // new text is reviewed again, whatever state it was in (D-05, D-06); a sponsorship ends with the edit (D-29)
+    db.run("UPDATE jobs SET data = ?, status = ?, flags = ?, sponsored_until = NULL, updated_at = ? WHERE id = ?", JSON.stringify(data), back, JSON.stringify(checkJob(core, data).flags), now(), j.id);
     audit(ctx.user.id, "job.updated", "job", j.id, { from: j.status, to: back });
     if (ctx.body.submit) submitJob(ctx, c, j, data);
-    return { job: jobsOf(c, ctx.user.id).find(x => x.id === j.id), check: checkJob(core, data) };
+    return { job: jobsOf(c, ctx.user.id, ctx.user.lang).find(x => x.id === j.id), check: checkJob(core, data) };
   });
 
   r.post("/api/employer/jobs/:id/submit", employer, ctx => {
@@ -109,15 +109,15 @@ export function registerEmployer(r, deps) {
     const { c, j } = myJob(ctx, ctx.params.id);
     if (!["draft", "rejected"].includes(j.status)) fail(409, "bad_state");
     submitJob(ctx, c, j, J(j.data));
-    return { job: jobsOf(c).find(x => x.id === j.id) };
+    return { job: jobsOf(c, undefined, ctx.user.lang).find(x => x.id === j.id) };
   });
   r.post("/api/employer/jobs/:id/close", employer, ctx => {
     plans.allow(ctx, myCompany(ctx), "hire");
     const { c, j } = myJob(ctx, ctx.params.id);
     if (j.status !== "published") fail(409, "bad_state");
-    db.run("UPDATE jobs SET status = 'closed', updated_at = ? WHERE id = ?", now(), j.id);
+    db.run("UPDATE jobs SET status = 'closed', sponsored_until = NULL, updated_at = ? WHERE id = ?", now(), j.id);   // a closed listing holds no sponsored slot (D-29)
     audit(ctx.user.id, "job.closed", "job", j.id, null);
-    return { job: jobsOf(c).find(x => x.id === j.id) };
+    return { job: jobsOf(c, undefined, ctx.user.lang).find(x => x.id === j.id) };
   });
   r.post("/api/employer/jobs/:id/reopen", employer, ctx => {
     plans.allow(ctx, myCompany(ctx), "hire");
@@ -126,7 +126,7 @@ export function registerEmployer(r, deps) {
     if (c.status !== "verified") fail(409, "company_not_verified");
     db.run("UPDATE jobs SET status = ?, updated_at = ? WHERE id = ?", j.published_at ? "published" : "draft", now(), j.id);
     audit(ctx.user.id, "job.reopened", "job", j.id, null);
-    return { job: jobsOf(c).find(x => x.id === j.id) };
+    return { job: jobsOf(c, undefined, ctx.user.lang).find(x => x.id === j.id) };
   });
 
   r.get("/api/employer/jobs/:id/applications", employer, ctx => {
@@ -138,7 +138,7 @@ export function registerEmployer(r, deps) {
       hireConfirmed: !!a.hire_confirmed_at, note: a.employer_note || "", cvLang: a.cv_lang || null, profile: J(a.snapshot) || {},
       phone: a.u_phone.startsWith("deleted:") ? null : a.u_phone,
       verifiedUni: deps.campus ? deps.campus.verifiedUni(a.user_id, ((J(a.snapshot) || {}).edu || {}).uni) : "",
-      movedBy: a.moved_by ? plans.memberName(co, a.moved_by) : null, noteBy: a.note_by ? plans.memberName(co, a.note_by) : null
+      movedBy: a.moved_by ? plans.memberName(co, a.moved_by, ctx.user.lang) : null, noteBy: a.note_by ? plans.memberName(co, a.note_by, ctx.user.lang) : null
     })) };
   });
 
@@ -150,8 +150,8 @@ export function registerEmployer(r, deps) {
     const status = ctx.body.status || a.status;
     plans.allow(ctx, c, status !== a.status ? "hire" : "view");   // hiring managers can write notes; moving people takes a recruiter
     if (status !== a.status && !(MOVES[a.status] || []).includes(status)) fail(409, "bad_transition", { from: a.status, to: status });
-    db.run("UPDATE applications SET status = ?, employer_note = ?, updated_at = ?, hired_at = CASE WHEN ? = 'hired' THEN ? ELSE hired_at END, moved_by = CASE WHEN ? THEN ? ELSE moved_by END, note_by = CASE WHEN ? THEN ? ELSE note_by END WHERE id = ?",
-      status, note, now(), status, now(), status !== a.status ? 1 : 0, ctx.user.id, note !== a.employer_note ? 1 : 0, ctx.user.id, a.id);
+    db.run("UPDATE applications SET status = ?, employer_note = ?, updated_at = ?, hired_at = CASE WHEN ? = 'hired' THEN ? ELSE hired_at END, hire_pay_mid = CASE WHEN ? = 'hired' THEN COALESCE(hire_pay_mid, ?) ELSE hire_pay_mid END, moved_by = CASE WHEN ? THEN ? ELSE moved_by END, note_by = CASE WHEN ? THEN ? ELSE note_by END WHERE id = ?",
+      status, note, now(), status, now(), status, plans.payMid(J(a.j_data) || {}), status !== a.status ? 1 : 0, ctx.user.id, note !== a.employer_note ? 1 : 0, ctx.user.id, a.id);   // the pay at the time of the hire is the fee's basis (D-09)
     if (status !== a.status) {
       audit(ctx.user.id, "application.moved", "application", a.id, { from: a.status, to: status });
       const seekerUser = db.get("SELECT * FROM users WHERE id = ?", a.user_id);
@@ -165,7 +165,7 @@ export function registerEmployer(r, deps) {
   const ownerOnly = (ctx, c) => plans.allow(ctx, c, "billing");
   r.get("/api/employer/plan", employer, ctx => {
     const c = myCompany(ctx); if (!c) fail(409, "company_not_verified");
-    const charges = db.all("SELECT id, kind, amount_syp, status, note, created_at, paid_at FROM charges WHERE company_id = ? ORDER BY created_at DESC LIMIT 100", c.id)
+    const charges = db.all("SELECT id, kind, amount_syp, status, note, created_at, paid_at FROM charges WHERE company_id = ? AND programme_id IS NULL ORDER BY created_at DESC LIMIT 100", c.id)
       .map(x => ({ id: x.id, kind: x.kind, amountSyp: x.amount_syp, status: x.status, note: x.note, createdAt: x.created_at, paidAt: x.paid_at }));
     const pending = db.get("SELECT id, plan, pay_method, created_at FROM plan_requests WHERE company_id = ? AND handled_at IS NULL ORDER BY created_at DESC LIMIT 1", c.id);
     return { ...plans.summary(c), charges, request: pending ? { plan: pending.plan, payMethod: pending.pay_method, ref: plans.ref(c.id, pending.id), createdAt: pending.created_at } : null, isOwner: c.owner_id === ctx.user.id };
@@ -183,7 +183,7 @@ export function registerEmployer(r, deps) {
   r.post("/api/employer/jobs/:id/sponsor", employer, ctx => {
     const { c, j } = myJob(ctx, ctx.params.id); plans.allow(ctx, c, "manage");
     if (c.status !== "verified") fail(409, "company_not_verified");
-    if (!ctx.body.on) { db.run("UPDATE jobs SET sponsored_until = NULL WHERE id = ?", j.id); return { ok: true, sponsoredUntil: null }; }
+    if (!ctx.body.on) { db.run("UPDATE jobs SET sponsored_until = NULL WHERE id = ?", j.id); if (j.sponsored_until > now()) audit(ctx.user.id, "job.unsponsored", "job", j.id, null); return { ok: true, sponsoredUntil: null }; }   // the end is logged like the start (D-28)
     if (j.status !== "published") fail(409, "not_published");
     const L = plans.limits(c); if (!L.sponsored) fail(403, "plan_required");
     if (!(j.sponsored_until > now()) && plans.sponsoredUsed(c.id) >= L.sponsored) fail(409, "sponsor_limit");

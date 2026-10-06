@@ -89,6 +89,8 @@ test("events: sign up for a ticket, and organisers check people in by code or QR
   assert.equal((await admin.post(`/api/organize/events/${ev.id}/checkin`, { code: "ZZZZZZ" })).body.error, "ticket_not_found");
   const tb = S.db.get("SELECT code FROM event_rsvps WHERE status = 'cancelled'").code;
   assert.equal((await admin.post(`/api/organize/events/${ev.id}/checkin`, { code: tb })).body.error, "ticket_cancelled");
+  S.db.run("UPDATE event_rsvps SET code = 'Q7R8S9' WHERE event_id = ? AND code = ?", ev.id, tc);   // a code with digits, typed in lower case with Arabic-Indic and Persian digits (U-045)
+  const typed = await admin.post(`/api/organize/events/${ev.id}/checkin`, { code: "q٧r٨s۹" }); assert.equal(typed.status, 200, typed.text); assert.equal(typed.body.already, false, "check-in reads Arabic-Indic digits");
   assert.equal((await a.get(`/api/events/${ev.id}`)).body.event.mine.checkedIn, true);
   assert.equal((await a.get("/api/organize/events")).status, 403, "job seekers can't organise");
   await a.del("/api/me"); assert.equal(S.db.get("SELECT COUNT(*) AS n FROM event_rsvps WHERE code = ?", ta.code).n, 0, "deleting an account deletes its tickets");

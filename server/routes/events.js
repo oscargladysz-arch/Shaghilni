@@ -54,9 +54,9 @@ export function registerEvents(r, deps) {
       .map(e => out(e, { companies: companiesOf(e.id).length, mine: mine.get(e.id) || null })) };
   });
   r.get("/api/events/:id", ctx => {
-    const e = getEv(ctx.params.id); if (e.status !== "published" && !(ctx.user && canManage(ctx, e))) fail(404, "not_found");
-    const rs = ctx.user && ctx.user.role === "seeker" ? db.get("SELECT status, code, checked_in_at FROM event_rsvps WHERE event_id = ? AND user_id = ?", e.id, ctx.user.id) : null;
-    return { event: out(e, { companies: companiesOf(e.id), mine: rs ? { status: rs.status, code: rs.code, checkedIn: !!rs.checked_in_at } : null }) };
+    const e = getEv(ctx.params.id), rs = ctx.user && ctx.user.role === "seeker" ? db.get("SELECT status, code, checked_in_at FROM event_rsvps WHERE event_id = ? AND user_id = ?", e.id, ctx.user.id) : null;
+    if (e.status !== "published" && !(ctx.user && canManage(ctx, e)) && !(e.status === "cancelled" && rs)) fail(404, "not_found");   // a ticket holder can still read a cancelled event (U-041)
+    return { event: out(e, { companies: companiesOf(e.id), mine: rs ? { status: e.status === "published" ? rs.status : "cancelled", code: rs.code, checkedIn: !!rs.checked_in_at } : null }) };
   });
 
   /* ---------- job seekers: sign up, get a ticket ---------- */
@@ -119,7 +119,7 @@ export function registerEvents(r, deps) {
   r.post("/api/organize/events/:id/checkin", organiser, ctx => {
     const e = manage(ctx, ctx.params.id);
     // Accepts the short code, or what the ticket's QR code holds: "SHG-EV-<event>-<code>".
-    const raw = String(ctx.body.code || "").trim().toUpperCase(), m = /^SHG-EV-(\d+)-([A-Z0-9]{6})$/.exec(raw), code = m ? m[2] : raw.replace(/[^A-Z0-9]/g, "");
+    const raw = core.latinDigits(String(ctx.body.code || "")).trim().toUpperCase(), m = /^SHG-EV-(\d+)-([A-Z0-9]{6})$/.exec(raw), code = m ? m[2] : raw.replace(/[^A-Z0-9]/g, "");   // latinDigits: Arabic-Indic digits are digits (U-045)
     if (m && Number(m[1]) !== e.id) fail(409, "wrong_event");
     const rs = db.get("SELECT r.*, p.data AS p_data FROM event_rsvps r LEFT JOIN profiles p ON p.user_id = r.user_id WHERE r.event_id = ? AND r.code = ?", e.id, code);
     if (!rs) fail(404, "ticket_not_found");

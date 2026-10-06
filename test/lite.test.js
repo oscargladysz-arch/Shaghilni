@@ -10,8 +10,8 @@ import { seedDemo } from "../server/seed.js";
 const servers = [];
 after(() => { for (const s of servers) s.close(); });
 const inDays = n => new Date(Date.now() + n * 86400e3).toISOString().slice(0, 10);
-async function start() {
-  const cfg = loadConfig({ skipDotEnv: true, isolated: true, env: { NODE_ENV: "test", ADMIN_PHONES: "+12025550199" }, values: { powBits: 0, anthropicKey: "" } });
+async function start(env = {}) {
+  const cfg = loadConfig({ skipDotEnv: true, isolated: true, env: { NODE_ENV: "test", ADMIN_PHONES: "+12025550199", ...env }, values: { powBits: 0, anthropicKey: "" } });
   const db = openDb(":memory:"), texts = [];
   seedDemo(db, () => {});
   const server = http.createServer(createApp({ cfg, db, log: () => {}, sms: async (to, body) => { texts.push({ to, body }); } }));
@@ -105,6 +105,9 @@ test("lite: a job seeker signs in, builds a profile step by step, applies, saves
   assert.equal((await b.post("/lite/recruit", { csrf: b.csrf(me0.text), open: "1" }, { "sec-fetch-site": "cross-site" })).status, 403, "and so is one sent from another site");
   const tok = b.csrf(me0.text);
   assert.equal((await b.post("/lite/profile", { csrf: tok, step: "1", name: "لينا حداد", gov: "damascus", email: "" })).location, "/lite/profile?step=2");
+  for (const q of ["", "?lang=en"]) { const s2 = await b.get("/lite/profile?step=2" + q.replace("?", "&")); assert.doesNotMatch(s2.text, /\b(rcSt_|lvl_|edu_|err_|st_)[a-z]/, "every education status has a label, students included (D-04)"); }
+  assert.match((await b.get("/lite/profile?step=2&lang=en")).text, /<option value="student">Current student</, "the student option is a sentence, not a key");
+  await b.get("/lite/profile?step=2&lang=ar");   // back to Arabic for the rest of the flow (the language choice sticks)
   assert.equal((await b.post("/lite/profile", { csrf: tok, step: "2", status: "bachelor", uni: "damascus", uniName: "", fac: "business", year: "", grad: "2023", gpa: "" })).location, "/lite/profile?step=3");
   const noOrg = await b.post("/lite/profile/exp", { csrf: tok, i: "", role: "Sales assistant", org: "", place: "", start: "2023-09", end: "", bullets: "" });
   assert.equal(noOrg.status, 200); assert.match(noOrg.text, /aria-invalid="true"/, "a job without a company is sent back with the field marked");
@@ -140,6 +143,7 @@ test("lite: a job seeker signs in, builds a profile step by step, applies, saves
 test("lite: a recruiter signs up, gets verified, then finds and invites a candidate", async () => {
   const S = await start(), admin = await S.login("+12025550199");
   const seeker = await S.login("0933 730 001"); await seeker.put("/api/me/profile", { profile: GRAD }); await seeker.put("/api/me/recruit", { open: true });
+  const student = await S.login("0933 730 002"); await student.put("/api/me/profile", { profile: { ...GRAD, name: "Omar Nabil", email: "omar@example.com", edu: { status: "student", uni: "damascus", fac: "business", year: 3, grad: 2027 } } }); await student.put("/api/me/recruit", { open: true });
   const r = S.browser();
   assert.match((await r.get("/lite/hire")).text, /أنشئ حساب جهة توظيف/);
   assert.equal((await r.signin("0955 730 001", "employer", "/lite/hire/company")).location, "/lite/hire/company");
@@ -156,6 +160,8 @@ test("lite: a recruiter signs up, gets verified, then finds and invites a candid
   await admin.post(`/api/admin/companies/${co.id}/verify`, { screened: true });
   const list = await r.get("/lite/candidates?stage=grad");
   assert.match(list.text, /لينا ح\./); assert.doesNotMatch(list.text, /933730001|lina@example/, "no phone numbers or emails on candidate cards");
+  const everyone = await r.get("/lite/candidates"); assert.match(everyone.text, /عمر ن\./, "the student is listed too");
+  assert.doesNotMatch(everyone.text, /\b(rcSt_|lvl_|edu_|err_|st_)[a-z]/, "a student's card shows a translated status, not a raw key (D-04)");
   const id = /\/lite\/candidates\/(\d+)\/invite/.exec(list.text)[1], inv = await r.get(`/lite/candidates/${id}/invite`);
   const fee = await r.post(`/lite/candidates/${id}/invite`, { csrf: r.csrf(inv.text), kind: "event", title: "Open day", date: inDays(9), place: "Damascus", link: "", message: "There is an application fee of 5,000 SYP" });
   assert.match(fee.text, /role="alert"/, "a message asking for money is refused");
@@ -187,4 +193,46 @@ test("lite: people abroad can say where they live, filter for returnees, and sav
   const id = /action="\/lite\/alerts\/(\d+)\/delete"/.exec(meP.text)[1];
   assert.equal((await b.post(`/lite/alerts/${id}/delete`, { csrf: tok })).location, "/lite/me");
   assert.equal(S.db.get("SELECT COUNT(*) AS n FROM alerts WHERE user_id = ?", uid).n, 0);
+});
+
+test("lite: the privacy notice and the terms are readable without JavaScript, in both languages, with the organisation's details filled in (D-12)", async () => {
+  const S = await start({ LEGAL_NAME: "Example Org (not a real entity)", CONTACT_EMAIL: "privacy@example.com" }), b = S.browser();
+  const ar = await b.get("/lite/privacy");
+  assert.equal(ar.status, 200); assert.match(ar.text, /<html lang="ar" dir="rtl">/); assert.doesNotMatch(ar.text, /<script/, "no script on a legal page");
+  assert.match(ar.text, /<h1>إشعار الخصوصية<\/h1>/, "the Arabic privacy notice"); assert.doesNotMatch(ar.text, /شروط الاستخدام<\/h1>/, "and not the terms");
+  assert.ok(ar.text.includes("Example Org (not a real entity)") && ar.text.includes("privacy@example.com"), "LEGAL_NAME and CONTACT_EMAIL are filled in");
+  assert.doesNotMatch(ar.text, /\{(name|contact|days|date)\}/, "no placeholder is left"); assert.match(ar.text, /2026/, "the version date is shown");
+  const en = await b.get("/lite/terms?lang=en");
+  assert.equal(en.status, 200); assert.match(en.text, /<html lang="en" dir="ltr">/); assert.match(en.text, /<h1>Terms of use<\/h1>/); assert.doesNotMatch(en.text, /<h1>Privacy notice/);
+  assert.match(en.text, /href="\/lite\/privacy"/, "each document links to the other"); assert.doesNotMatch(en.text, /<script/);
+  assert.match((await b.get("/lite/privacy")).text, /<html lang="en" dir="ltr">.*<h1>Privacy notice<\/h1>/s, "the language choice sticks (ll cookie)");
+  for (const p of ["/lite/signin", "/lite", "/lite/hire"]) { const t = (await b.get(p)).text; assert.match(t, /href="\/lite\/terms"/); assert.match(t, /href="\/lite\/privacy"/); assert.doesNotMatch(t, /\/#\/(terms|privacy)/, p + " no longer points at the JavaScript-only pages"); }
+  for (const p of ["/lite/privacy", "/lite/terms", "/lite/privacy?lang=ar", "/lite/terms?lang=ar"]) { const w = await S.raw(p); assert.equal(w.headers["content-encoding"], "gzip"); assert.ok(w.bytes < 6144, `${p}: long-form text, its own budget of 6 KB over the wire (${w.bytes} bytes)`); }
+});
+
+test("lite: the code field takes Arabic-Indic digits, and looking at the sign-in page spends no challenge (D-23, D-24)", async () => {
+  const S = await start(), b = S.browser();
+  const pg = await b.get("/lite/signin");
+  const r1 = await b.post("/lite/signin", { csrf: b.csrf(pg.text), phone: "0933 790 001", consent: "1", role: "seeker", next: "", pow_challenge: /name="pow_challenge" value="([^"]+)"/.exec(pg.text)[1], pow_nonce: "" });
+  const input = /<input id="code"[^>]*>/.exec(r1.text)[0];
+  assert.doesNotMatch(input, /pattern=/, "D-23: no pattern attribute, so a browser lets Arabic-Indic digits through to the server, which accepts them");
+  const arabic = c => String(c).replace(/[0-9]/g, d => "٠١٢٣٤٥٦٧٨٩"[d]);
+  assert.equal((await b.post("/lite/signin/code", { csrf: b.csrf(r1.text), phone: "+963933790001", code: arabic(/(\d{6})/.exec([...S.texts].reverse().find(x => x.to === "+963933790001").body)[1]), role: "seeker", next: "" })).location, "/lite/me", "the code in Arabic-Indic digits signs in");
+  const v = S.browser();   // D-24: sixty-one views of the sign-in page and one of the recruiter page, then the API's challenge is still there
+  for (let i = 1; i <= 61; i++) { const r = await v.get("/lite/signin"); assert.equal(r.status, 200, `view ${i} of the sign-in page`); assert.match(r.text, /name="pow_challenge"/); }
+  assert.equal((await v.get("/lite/hire")).status, 200);
+  assert.equal((await S.client().get("/api/auth/challenge")).status, 200, "D-24: page views do not spend the address's sixty challenges");
+});
+
+test("lite: remote listings show under every governorate, and a saved listing stays past the 500 newest (D-26, D-27)", async () => {
+  const S = await start(), admin = await S.login("+12025550199"), { e } = await employer(S, admin, "0955 795 001", "Remote Co"), b = S.browser();
+  const post = async over => { const j = (await e.post("/api/employer/jobs", { job: { title: { en: "Field trainee" }, gov: "homs", type: "full", level: "entry", pay: [1500000, 2000000], langs: ["ar"], summary: { en: "Work with us." }, ...over }, submit: true })).body.job; await admin.post(`/api/admin/jobs/${j.id}/approve`); return j.id; };
+  await post({ title: { en: "Remote Translator", ar: "مترجم عن بعد" }, gov: "remote" });
+  for (const gov of ["damascus", "aleppo"]) assert.match((await b.get(`/lite?gov=${gov}&lang=en`)).text, /Remote Translator/, `D-26: the remote listing shows under ${gov}`);
+  const keep = await post({ title: { en: "Keep me", ar: "احتفظ بي" }, gov: "homs" });
+  assert.equal((await b.signin("0933 795 001")).location, "/lite/me");
+  const job = await b.get(`/lite/job/${keep}`); assert.equal((await b.post(`/lite/job/${keep}/save`, { csrf: b.csrf(job.text) })).status, 303);
+  const co = S.db.get("SELECT id FROM companies WHERE json_extract(data, '$.name.en') = ?", "Remote Co").id, t0 = Date.now();
+  S.db.tx(() => { for (let i = 1; i <= 520; i++) S.db.run("INSERT INTO jobs (company_id, data, status, published_at, created_at, updated_at) VALUES (?, ?, 'published', ?, ?, ?)", co, JSON.stringify({ title: { en: "Filler " + i }, gov: "homs", type: "full", level: "entry", pay: [1500000, 2000000], langs: ["ar"], summary: { en: "x" } }), t0 + i, t0 + i, t0 + i); });
+  assert.match((await b.get("/lite?saved=1&lang=en")).text, /Keep me/, "D-27: the saved listing is on the Saved page although it is older than the 500 newest");
 });

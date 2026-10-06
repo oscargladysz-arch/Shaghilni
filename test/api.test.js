@@ -58,7 +58,9 @@ let seeker, employer, admin, employerJobId, seekerAppId;
 test("public board lists the seeded demo jobs", async () => {
   const c = client(), r = await c.get("/api/jobs");
   assert.equal(r.status, 200);
-  assert.equal(r.body.jobs.length, 19);
+  assert.equal(r.body.jobs.length, 18, "18 of the 19 sample listings pass the posting checks (D-02)");
+  assert.ok(r.body.jobs.every(x => Array.isArray(x.pay) && x.pay[0] > 0), "no sample listing is on the board without pay (D-02)");
+  assert.ok(r.body.jobs.every(x => !x.contact || !(x.contact.name && x.contact.name.en)), "no sample listing names an invented employee of a real organisation (D-15)");
   const j = r.body.jobs.find(x => x.co.en === "Chevron");
   assert.ok(j.title.en && j.title.ar && Array.isArray(j.duties.en) && j.demo === true && j.hasWhatsapp === false);
   assert.equal((await c.get(`/api/jobs/${j.id}`)).body.job.id, j.id);
@@ -151,11 +153,22 @@ test("admin: verification needs sanctions screening; review publishes listings",
   assert.equal(gendered.status, 200);
   const pending = (await admin.get("/api/admin/jobs?status=pending")).body.jobs.find(x => x.id === employerJobId);
   assert.equal(pending.flags[0].type, "gender");
+  // D-30: a phone number or an email in the free text (place, contact lines, tags, provides) is flagged for the reviewer, not blocked
+  const contact = await employer.put(`/api/employer/jobs/${employerJobId}`, { job: { ...JOB, place: { en: "Mezzeh, call ٠٩٥٥ ١٢٣ ٤٥٦" }, contact: { name: { en: "Rami" }, status: { en: "Write to jobs@example.com" } }, tags: "whatsapp 0944-123-456" }, submit: true });
+  assert.equal(contact.status, 200, contact.text); assert.equal(contact.body.check.fee, null, "contact details are not a fee");
+  const words = contact.body.check.flags.filter(f => f.type === "contact").map(f => f.word);
+  assert.ok(words.length >= 3 && words.some(w => /0955 123 456/.test(w)) && words.some(w => /jobs@example\.com/.test(w)) && words.some(w => /0944-123-456/.test(w)), "D-30: the phone numbers (Arabic-Indic digits included) and the email are flagged: " + JSON.stringify(contact.body.check.flags));
+  assert.deepEqual((await admin.get("/api/admin/jobs?status=pending")).body.jobs.find(x => x.id === employerJobId).flags.filter(f => f.type === "contact").map(f => f.word), words, "and the reviewer's queue carries the flags");
+  const subs = db.all("SELECT data FROM audit WHERE action = 'job.submitted' AND entity_id = ?", employerJobId).map(x => x.data);
+  assert.ok(subs.length && !/0955 123 456|jobs@example\.com|0944-123-456|\d{7,}/.test(subs.join(" ")), "the audit log records that contact details were flagged, never the number or the address (R12): " + subs.at(-1));
+  assert.ok(JSON.parse(subs.at(-1)).flags.some(f => f.type === "contact" && !("word" in f)), "contact flags in the log carry the type only");
+  const plain = await employer.put(`/api/employer/jobs/${employerJobId}`, { job: { ...JOB, summary: { en: "Summer internship 2025-2026, pay 1500000 SYP, start 12.05.2026, registration 123456." }, place: { en: "Office 2024 - 2026" } }, submit: true });
+  assert.equal(plain.status, 200, plain.text); assert.deepEqual(plain.body.check.flags.filter(f => f.type === "contact"), [], "years, dates, salaries and short numbers are not contact details");
   assert.equal((await admin.post(`/api/admin/jobs/${employerJobId}/reject`, {})).body.error, "note_required");
   await employer.put(`/api/employer/jobs/${employerJobId}`, { job: JOB, submit: true });
   assert.equal((await admin.post(`/api/admin/jobs/${employerJobId}/approve`)).status, 200);
   const board = (await client().get("/api/jobs")).body.jobs;
-  assert.equal(board.length, 20);
+  assert.equal(board.length, 19, "18 sample listings plus the one just approved");
   const live = board.find(x => x.id === employerJobId);
   assert.equal(live.title.en, "Junior accountant");
   assert.equal(live.hasWhatsapp, true);
@@ -188,19 +201,19 @@ test("pipeline: status moves are checked, seekers are texted, hires need confirm
   assert.deepEqual([ov.counts.hired, ov.counts.confirmedHires, ov.queues.hires], [1, 0, 1]);
   await admin.post(`/api/admin/applications/${seekerAppId}/confirm-hire`, { note: "Called Rami" });
   ov = (await admin.get("/api/admin/overview")).body;
-  assert.deepEqual([ov.counts.confirmedHires, ov.queues.hires, ov.counts.liveJobs, ov.counts.demoJobs], [1, 0, 1, 19]);
+  assert.deepEqual([ov.counts.confirmedHires, ov.queues.hires, ov.counts.liveJobs, ov.counts.demoJobs], [1, 0, 1, 18]);
   assert.equal(ov.weeks.at(-1).confirmedHires, 1);
 });
 
 test("edits send live listings and renamed companies back to review", async () => {
   await employer.put(`/api/employer/jobs/${employerJobId}`, { job: { ...JOB, openings: 3 } });
-  assert.equal((await client().get("/api/jobs")).body.jobs.length, 19, "an edited listing leaves the board until reviewed");
+  assert.equal((await client().get("/api/jobs")).body.jobs.length, 18, "an edited listing leaves the board until reviewed");
   await employer.post(`/api/employer/jobs/${employerJobId}/submit`);
   await admin.post(`/api/admin/jobs/${employerJobId}/approve`);
   await employer.put("/api/employer/company", { company: { name: { en: "Beit Accounting Group", ar: "بيت المحاسبة" }, sector: "finance", gov: "damascus",
     regNo: "DM-12345", contactName: "Rami", whatsapp: "0955 666 777" } });
   assert.equal((await employer.get("/api/employer")).body.company.status, "pending");
-  assert.equal((await client().get("/api/jobs")).body.jobs.length, 19, "a company under re-verification has no live listings");
+  assert.equal((await client().get("/api/jobs")).body.jobs.length, 18, "a company under re-verification has no live listings");
 });
 
 test("resume suggestions: own bullets only, and the fact guard filters Claude's output", async () => {
@@ -259,4 +272,15 @@ test("static client: security headers, fingerprinted gzipped assets, SPA routes"
   assert.equal((await c.get("/api/nope")).status, 404);
   assert.equal((await c.call("PATCH", "/api/jobs")).status, 405);
   assert.equal((await c.get("/api/config")).body.ai, true);
+});
+
+test("seed: a sample listing that fails the posting checks is skipped with one log line, and the invented contact block is never loaded (D-02, D-15)", () => {
+  const fresh = openDb(":memory:"), lines = [];
+  assert.equal(seedDemo(fresh, m => lines.push(m)), true);
+  assert.equal(fresh.get("SELECT COUNT(*) AS n FROM jobs WHERE status = 'published' AND NOT (json_extract(data, '$.pay[0]') > 0)").n, 0, "nothing published without pay");
+  assert.equal(fresh.get("SELECT COUNT(*) AS n FROM jobs WHERE json_extract(data, '$.title.en') = 'Laboratory Internship in Marine Sciences'").n, 0, "the pay-less sample listing is not in the database");
+  assert.equal(lines.filter(l => /\[seed\] skipped .*Marine Sciences/.test(l)).length, 1, "one log line names it: " + lines.join(" / "));
+  assert.equal(fresh.get("SELECT COUNT(*) AS n FROM jobs WHERE json_extract(data, '$.contact') IS NOT NULL").n, 0, "no sample listing carries a contact person (D-15, pending D1)");
+  assert.deepEqual(JSON.parse(fresh.get("SELECT data FROM audit WHERE action = 'demo.seeded'").data), { companies: 17, jobs: 18 }, "the audit row counts what was inserted");
+  assert.ok(lines.some(l => /17 demo companies and 18 demo jobs added/.test(l)), "and so does the log line: " + lines.join(" / "));
 });

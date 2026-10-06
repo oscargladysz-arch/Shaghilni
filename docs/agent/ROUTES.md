@@ -22,7 +22,7 @@ Column meanings:
 | POST | `/api/auth/code` | none; PoW when `OTP_POW_BITS>0`; 30/address/h, 3/number/15 min; allowlist; daily caps | `server/routes/public.js:26` | api :72-75,86-88; security :216-222,307-311; every suite's login helper (14 files) | 3 | none | Failed send still consumes quotas (`auth.js:57-60` before :63) |
 | POST | `/api/auth/verify` | none; valid code; 60/address/h; 5 attempts; `terms_required` for new accounts | `server/routes/public.js:27` | api :76-85,89-92; security :70-81,211-215; all login helpers | 3 | `user.created` `auth.js:97`; `terms.accepted` `auth.js:103` | Admin promotion `auth.js:99`, never demotion (D-17) |
 | POST | `/api/auth/logout` | none (guests get 200) | `server/routes/public.js:28` | security :204-206; lite :136 (via `/lite/signout`) | — | none | — |
-| GET | `/api/jobs` | none | `server/routes/public.js:29` | api :59,157-161,197,203; security :135-136,187,273,335-339; plans :121,126; diaspora :78,116; campus :125; contact :72 | 2 | none | `LIMIT 500` (D-27); board leak check in test 2 |
+| GET | `/api/jobs` | none | `server/routes/public.js:29` | api :59,157-161,197,203; security :135-136,187,273,335-339; plans :121,126; diaspora :78,116; campus :125; contact :72 | 2 | none | Stage 3: 500 newest plus live sponsored listings and the signed-in seeker's saved ones (D-27 fixed) |
 | GET | `/api/jobs/:id` | none (published + verified company only) | `server/routes/public.js:30` | api :64-65; security :152 (junk ids) | 3 | none | — |
 | GET | `/api/health` | none | `server/routes/public.js:35` | security :313 (test 11) | — | none | Docker healthcheck; counts toward the API limit |
 | GET | `/api/config` | none | `server/routes/public.js:36` | api :261; security :79,273; demo :65,96,105; payments :71,78 | — | none | `ai, dev, demo, card, legalName, contactEmail, termsVersion, sessionDays` |
@@ -41,7 +41,7 @@ Column meanings:
 | GET | `/api/me/applications` | seeker | `server/routes/me.js:80` | api :114,182; security :128,133,202,206; demo :69,72 | 2 | none | — |
 | POST | `/api/me/applications/:id/withdraw` | seeker; own application; not hired | `server/routes/me.js:91` | api :113,183; security :127,153; recruit | 2+3 | `application.withdrawn` `me.js:96` (every call, even repeated) | Rejected/withdrawn rows can be withdrawn again |
 | GET | `/api/me/export` | `need()` | `server/routes/me.js:101` | security :91-98,129,133; diaspora :110 | 2 | none | Export gaps: see STATE area 13 |
-| DELETE | `/api/me` | `need()`; admin → 409 `admin_cannot_delete` | `server/routes/me.js:136` | api :227; security :105,108; campus :97; events :94; recruit :129 | — | `user.deleted` `me.js:164` | Leaves `campus_offices` (D-22), `applyPhone/applyEmail`, `email_sends` |
+| DELETE | `/api/me` | `need()`; admin → 409 `admin_cannot_delete` | `server/routes/me.js:136` | api :227; security :105,108; campus :97; events :94; recruit :129 | — | `user.deleted` `me.js:164` | Stage 3: also deletes the career office's `campus_offices` row (D-22 fixed) |
 
 ### Resume AI (`server/routes/resume.js`) · 2
 
@@ -68,7 +68,7 @@ Column meanings:
 | POST | `/api/employer/students/:id/invite` | same as search; target findable; caps (3 open, 40/day, monthly plan quota) | `server/routes/recruit.js:85` | recruit :86,96-103,119-120,127; plans :63,73-76,91; events :114; lite :127,160-163; security :158 | 3 | `invitation.sent` `recruit.js:122` | — |
 | GET | `/api/employer/invitations` | employer + company `verified` only (`verified()`, no role check) | `server/routes/recruit.js:127` | recruit :113,121; lite :166; security :158 | 3 | none | D-03: hiring managers read full name + phone after an event yes |
 | POST | `/api/employer/invitations/:id/withdraw` | employer + company `verified`; own company; open only; no role check | `server/routes/recruit.js:141` | recruit :122; security :159 | 3 | `invitation.withdrawn` `recruit.js:147` | D-03 |
-| PUT | `/api/me/recruit` | seeker + profile | `server/routes/recruit.js:152` | recruit :64-66,84; plans :64; campus :113-114; events :101; insights :66; lite :119,142; security :131 (403), :159 | 2+3 | `recruit.opened`/`recruit.closed` `recruit.js:157` | — |
+| PUT | `/api/me/recruit` | seeker + profile | `server/routes/recruit.js:152` | recruit :64-66,84; plans :64; campus :113-114; events :101; insights :66; lite :119,142; security :131 (403), :159 | 2+3 | `recruit.opened`/`recruit.closed` `recruit.js:157` | Stage 3: switching off withdraws the person's open invitations, audited `invitation.withdrawn` {reason: opted_out} (D-32 fixed) |
 | GET | `/api/me/invitations` | seeker + profile | `server/routes/recruit.js:161` | recruit :83,105,123-124; plans :92; demo :70,74; lite :128; security :131 (403), :159 | 2+3 | none (side effect: `sent` → `seen` `recruit.js:166`) | — |
 | POST | `/api/me/invitations/:id/respond` | seeker + profile; own; open | `server/routes/recruit.js:176` | recruit :110-112; plans :93; lite :130; security :160 | 3 | `invitation.accepted`/`declined` `recruit.js:184` | — |
 | POST | `/api/me/invitations/:id/block` | seeker + profile; own invitation | `server/routes/recruit.js:188` | recruit :125; security :160 | 3 | `recruiter.blocked` `recruit.js:194` | No unblock route |
@@ -83,8 +83,8 @@ Column meanings:
 | POST | `/api/employer/jobs` | employer; company exists; hire role | `server/routes/employer.js:85` | api :132; team :40,57,85,87; campus :123; diaspora :115; security :65,154; 8 helpers | 3 | `job.created` :92; `job.submitted` :82 when `submit:true` | — |
 | PUT | `/api/employer/jobs/:id` | employer; own company's job (404); hire | `server/routes/employer.js:97` | api :148,150,155,196; security :124 (404), :154 | 2+3 | `job.updated` {from,to} :102; `job.submitted` when `submit:true` | D-05: pending stays pending unchecked; D-06: closed stays closed |
 | POST | `/api/employer/jobs/:id/submit` | employer; hire; draft or rejected; company verified; `checkJob` | `server/routes/employer.js:107` | api :135,198; security :125 (404), :154 | 2+3 | `job.submitted` {flags} :82 | Only place the fee block fails a request |
-| POST | `/api/employer/jobs/:id/close` | employer; hire; published only | `server/routes/employer.js:114` | security :125 (404 only) | 2 | `job.closed` :119 | No success-path test; D-29 (sponsored slot kept) |
-| POST | `/api/employer/jobs/:id/reopen` | employer; hire; closed only; company verified | `server/routes/employer.js:122` | security :125 (404 only) | 2 | `job.reopened` :128 | D-06: republishes edited text without review |
+| POST | `/api/employer/jobs/:id/close` | employer; hire; published only | `server/routes/employer.js:114` | security :125 (404 only) | 2 | `job.closed` :119 | Stage 3: clears `sponsored_until` (D-29 fixed); success path in plans and policy-employer-listings tests |
+| POST | `/api/employer/jobs/:id/reopen` | employer; hire; closed only; company verified | `server/routes/employer.js:122` | security :125 (404 only) | 2 | `job.reopened` :128 | Stage 3: an edited closed listing is a draft, so reopen answers bad_state (D-06 fixed) |
 | GET | `/api/employer/jobs/:id/applications` | employer; own job; view role | `server/routes/employer.js:132` | api :168,229; team :94,98; contact :78,81; campus :129; plans :95; security :121 (404), :155 | 2+3 | none | — |
 | PUT | `/api/employer/applications/:id` | employer; own company's application; hire for a status move, view for a note | `server/routes/employer.js:145` | api :174-181; team :95-97; security :89,122 (404), :155; campus :131; events :117; insights :71; plans :65 | 2+3 | `application.moved` {from,to} :156 only when status changes | Note-only edits write none and accept non-strings |
 
@@ -96,7 +96,7 @@ Column meanings:
 | POST | `/api/employer/plan/request` | employer; company verified; billing (owner) | `server/routes/employer.js:173` | plans :78-81; team :90 (403); payments :79 | — | `plan.requested` :179 | — |
 | POST | `/api/employer/jobs/:id/sponsor` | employer; own job; manage; verified; published; plan limit | `server/routes/employer.js:183` | plans :118-127 | — | `job.sponsored` {until} :191 on; **none** when `on:false` (:186) | D-28 |
 | GET | `/api/employer/analytics` | employer; verified; view | `server/routes/employer.js:193` | plans :132,136; demo :77 | — | none | — |
-| GET | `/api/employer/reports/:kind` | employer; verified; manage; plan feature `reports`; kind ∈ placements\|compliance | `server/routes/employer.js:205` | plans :134,137,138 | — | none | D-07 (sanctions column empty) |
+| GET | `/api/employer/reports/:kind` | employer; verified; manage; plan feature `reports`; kind ∈ placements\|compliance | `server/routes/employer.js:205` | plans :134,137,138 | — | none | Stage 3: compliance rows carry `sanctionsScreened: yes` for verifications made since (D-07 fixed) |
 | POST | `/api/employer/plan/checkout` | employer; verified; billing; provider ready and prices set | `server/routes/employer.js:222` | payments :72,80-81,94,97,99 (seeker 403),104,113 | — | `plan.checkout` `server/payments.js:77` | — |
 | GET | `/api/employer/payments/:id` | employer; verified; payment scoped to the company (`payments.js:124`); no team-role check | `server/routes/employer.js:226` | payments :84,88,98,112 | — | none | — |
 
@@ -139,7 +139,7 @@ Column meanings:
 | Method | Path | Guard | File:line | Tests that hit it | Matrix | Audit | Notes |
 |---|---|---|---|---|---|---|---|
 | GET | `/api/events` | none (optional session; `mine` for seekers) | `server/routes/events.js:49` | events :81 | — | none | Published, `starts_at > now − 6 h`, LIMIT 100 |
-| GET | `/api/events/:id` | none (404 unless published or manageable) | `server/routes/events.js:54` | events :82,87,92,108,112 | — | none | 404 to ticket holders once cancelled |
+| GET | `/api/events/:id` | none (404 unless published or manageable) | `server/routes/events.js:54` | events :82,87,92,108,112 | — | none | Stage 3: a ticket holder can read a cancelled event, `mine.status` says cancelled (U-041 fixed) |
 | POST | `/api/events/:id/rsvp` | seeker; published; not over (3 h); profile; capacity | `server/routes/events.js:61` | events :73,75,77-80,103 | — | `event.rsvp` :72 | Ticket also by SMS |
 | DELETE | `/api/events/:id/rsvp` | seeker; not after check-in | `server/routes/events.js:77` | events :80 | — | none | — |
 | GET | `/api/me/events` | seeker | `server/routes/events.js:81` | events :83; demo :71 | — | none | No client screen uses it |
@@ -159,15 +159,15 @@ Column meanings:
 |---|---|---|---|---|---|---|---|
 | GET | `/api/admin/overview` | admin | `server/routes/admin.js:10` | api :142,187,190,232; security :131 (403), :133 (401) | 2 | none | `counts` include demo-listing applications; client uses `queues` only |
 | GET | `/api/admin/companies` | admin | `server/routes/admin.js:40` | api :143; security :63,131 (403), :155 (`?status=%27;drop`); helpers in 12 suites | 2+3 | none | — |
-| POST | `/api/admin/companies/:id/verify` | admin; `screened === true` | `server/routes/admin.js:57` | api :146-147; security :64,155; helpers in 12 suites | 3 | `company.verified` {note} :54 | No state check: a draft or suspended company can be verified (probe); `screened` not stored in the audit data (D-07) |
-| POST | `/api/admin/companies/:id/reject` | admin; note required | `server/routes/admin.js:61` | security :156 (junk only) | 3 | `company.rejected` {note} :54 | Never asserted |
-| POST | `/api/admin/companies/:id/suspend` | admin; note required | `server/routes/admin.js:62` | **none** | — | `company.suspended` {note} :54 | Sessions not revoked; listings stay `published` in the DB |
+| POST | `/api/admin/companies/:id/verify` | admin; `screened === true`; company pending or suspended (409 bad_state otherwise, U-046 fixed in Stage 3) | `server/routes/admin.js:57` | api :146-147; security :64,155; helpers in 12 suites | 3 | `company.verified` {note} :54 | Stage 3: audit data `{note, screened: true}` (D-07 fixed) |
+| POST | `/api/admin/companies/:id/reject` | admin; note required | `server/routes/admin.js:61` | security :156 (junk only) | 3 | `company.rejected` {note} :54 | Stage 3: withdraws the company's open invitations, audited with the reason (U-017 fixed) |
+| POST | `/api/admin/companies/:id/suspend` | admin; note required | `server/routes/admin.js:62` | **none** | — | `company.suspended` {note} :54 | Stage 3: withdraws the company's open invitations, audited with the reason (U-017 fixed) |
 | GET | `/api/admin/jobs` | admin | `server/routes/admin.js:64` | api :152 | — | none | Pending queue, `is_demo = 0` |
-| POST | `/api/admin/jobs/:id/approve` | admin; pending; company verified | `server/routes/admin.js:71` | api :156,199; security :66,156; helpers in 8 suites | 3 | `job.approved` :78 | Does not re-run `checkJob` (D-05) |
+| POST | `/api/admin/jobs/:id/approve` | admin; pending; company verified | `server/routes/admin.js:71` | api :156,199; security :66,156; helpers in 8 suites | 3 | `job.approved` :78 | Stage 3: re-runs `checkJob` → 422 fee_requested (D-05 fixed) |
 | POST | `/api/admin/jobs/:id/reject` | admin; note required | `server/routes/admin.js:81` | api :154 (`note_required` only); security :156 | 3 | `job.rejected` {note} :87 | — |
 | GET | `/api/admin/hires` | admin; `?state=confirmed` | `server/routes/admin.js:92` | api :184; security :157 (`?state=%00`) | 3 | none | LIMIT 200 |
-| POST | `/api/admin/applications/:id/confirm-hire` | admin; application `hired` | `server/routes/admin.js:104` | api :189; insights :72; plans :98-112; campus; events; security :156 | 3 | `hire.confirmed` {note} :110 (also on repeat calls) | Fee/programme charges gated by `first` (:108); charge rows carry no audit of their own (D-08 context) |
-| GET | `/api/admin/audit` | admin; `limit` 1..200 | `server/routes/admin.js:131` | api :239; security :157 (limit=-5, abc), :174-175 | 3 | none | No filters or pagination; no screen |
+| POST | `/api/admin/applications/:id/confirm-hire` | admin; application `hired` | `server/routes/admin.js:104` | api :189; insights :72; plans :98-112; campus; events; security :156 | 3 | `hire.confirmed` {note} :110 (also on repeat calls) | Stage 3: the placement fee uses `applications.hire_pay_mid`, stored when the employer recorded the hire (D-09 fixed); a repeat is a no-op (U-128) |
+| GET | `/api/admin/audit` | admin; `limit` 1..200 | `server/routes/admin.js:131` | api :239; security :157 (limit=-5, abc), :174-175 | 3 | none | Stage 3 (P1-3): filters action/entity/entityId/actor/from/to, cursor `before`, masked `actor`; the admin Audit log tab (`public/js/app-audit.js`) reads it; U-048 fixed |
 | GET | `/api/admin/billing` | admin | `server/routes/admin.js:137` | plans :83,104; insights :74 | — | none | — |
 | POST | `/api/admin/companies/:id/plan` | admin; plan ∈ free\|pro\|enterprise; months 0..36 | `server/routes/admin.js:148` | plans :75,108,119,135; team :76,130; insights :73 | — | `company.plan` {plan, months, amountSyp} :156 | `months` 0 → no expiry |
 | POST | `/api/admin/charges/:id/:what` | admin; `paid\|void` else 404 | `server/routes/admin.js:159` | plans :105; insights :74 | — | `charge.paid`/`charge.void` :163 | No state check (paid→void→paid) |
@@ -224,7 +224,7 @@ All Lite POSTs require the signed per-browser token (`lt` cookie + `csrf` field,
 | GET | `/lite/recruiters` | seeker; via `GET /api/me/invitations` | `server/lite.js:603` (recruitersPage :254) | lite :128 | — | none (invitations marked seen) | No block action |
 | GET | `/lite/resume` (`?cv=en\|ar`) | seeker | `server/lite.js:603` (resumePage :287) | lite :132-135 | — | none | Loads `/lite/p.<hash>.js` |
 | GET | `/lite/me` | signed in (gate); employer → `/lite/hire`; university/admin get a note | `server/lite.js:604` (mePage :316) | lite :103,118,137,186 | — | none | — |
-| GET | `/lite/profile?step=1-5` | seeker | `server/lite.js:604` (profilePage :403) | lite :112,114,174-175 | — | none | Education dropdown shows raw `edu_student` (D-04) |
+| GET | `/lite/profile?step=1-5` | seeker | `server/lite.js:604` (profilePage :403) | lite :112,114,174-175 | — | none | Stage 3: every education status has a label (D-04 fixed) |
 | POST | `/lite/profile` | seeker; via `PUT /api/me/profile` | `server/lite.js:604` (profilePost :410) | lite :107-108,113,115,176 | — | none | — |
 | POST | `/lite/profile/exp` | seeker; via `PUT /api/me/profile` | `server/lite.js:604` (expPost :424) | lite :109,111 | — | none | Edit path untested |
 | POST | `/lite/profile/exp/delete` | seeker; via `PUT /api/me/profile` | `server/lite.js:604` (expDelete :438) | **none** | — | none | — |
@@ -232,7 +232,9 @@ All Lite POSTs require the signed per-browser token (`lt` cookie + `csrf` field,
 | POST | `/lite/alerts/:id/delete` | seeker; via `DELETE /api/me/alerts/:id` | `server/lite.js:605` (alertDelete :397) | lite :188 | — | none | — |
 | POST | `/lite/invite/:id` | signed in; via `POST /api/me/invitations/:id/respond` | `server/lite.js:606` (invitePost :272) | lite :130 | — | via API `invitation.accepted/declined` | — |
 | POST | `/lite/recruit` | signed in; via `PUT /api/me/recruit` | `server/lite.js:606` (recruitPost :282) | lite :104-105 (403 cases), :119 | — | via API `recruit.opened/closed` | — |
-| GET | `/lite/signin` | none; signed-in users redirected | `server/lite.js:607` (signinPage :453) | lite :48 (helper), :93-95 | — | none | Loads `/lite/pow.js`; D-23 (`pattern="[0-9]{6}"`); D-24 (one PoW challenge per GET) |
+| GET | `/lite/privacy` | none (everyone) | `server/lite.js` (legalPage) | lite: legal pages test; policy-lite gating | — | none | Stage 3 (D-12): the `LEGAL` texts via `core.LEGAL`, `{name}/{contact}/{days}` from config, date from `TERMS_VERSION`; 3.5–4.3 KB gzipped |
+| GET | `/lite/terms` | none (everyone) | `server/lite.js` (legalPage) | lite: legal pages test; policy-lite gating | — | none | Stage 3 (D-12): as above; 2.0–2.5 KB gzipped |
+| GET | `/lite/signin` | none; signed-in users redirected | `server/lite.js:607` (signinPage :453) | lite :48 (helper), :93-95 | — | none | Loads `/lite/pow.js`; Stage 3: no `pattern` on the code field (D-23 fixed) and a page view spends no challenge (D-24 fixed) |
 | POST | `/lite/signin` | none; consent box required (:462); via `POST /api/auth/code` | `server/lite.js:607` (signinPost :459) | lite :49 (helper used at :102,145,166,173) | — | none | No-JS form with `OTP_POW_BITS>0` → `pow_required` (probe) |
 | POST | `/lite/signin/code` | none; via `POST /api/auth/verify` with `accept:true` always (:475) | `server/lite.js:607` (codePost :472) | lite :52 (helper) | — | via API `user.created`, `terms.accepted` | Consent tick not carried to this step |
 | POST | `/lite/signout` | form token only; via `POST /api/auth/logout` | `server/lite.js:607` (signoutPost :484) | lite :136 | — | none | — |
@@ -291,7 +293,7 @@ Routes with **no test at all** (any file): `PUT /api/me/alerts/:id`, `PUT /api/e
 | `DELETE /api/events/:id/rsvp` | no | RSVP is audited, cancellation is not |
 | `POST /api/t`, `POST /api/t/error` | no | beacons |
 | `POST /api/auth/demo` | no (dev only) | session only |
-| `POST /api/employer/jobs/:id/sponsor` with `on:false` | **flag** | privileged (manage role, money-related); returns before the audit call (`employer.js:186` vs `:191`) — D-28; SECURITY.md:388 says every sponsorship change is logged |
+| `POST /api/employer/jobs/:id/sponsor` with `on:false` | **flag** | Stage 3: `job.unsponsored` audit row when it was sponsored (D-28 fixed) |
 | `PUT /api/employer/applications/:id` note-only | **flag** | employer action on an applicant's record with no row (`employer.js:155`); README.md:199 says employer actions are recorded |
 | `POST /api/jobs/:id/apply` re-apply branch | no | second application after a withdrawal (`me.js:65-67`) writes nothing; first does |
 | `GET /api/me/invitations` | no | not a write route, but has the side effect `sent → seen` (`recruit.js:166`) |

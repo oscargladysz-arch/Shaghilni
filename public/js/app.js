@@ -225,7 +225,7 @@ function fitHTML(j) {
   const P = PROFILE, tr = tier(a.score);
   return html`<div class="fit tier-${tr}">
 ${ringHTML(a.score, true)}
-<div><p class="fit-n num">${a.score}%</p><p class="fit-tier">${t("scoreTier_" + tr)}</p><p class="fit-cap">${P.fac && P.uni ? t("whyCap", { fac: L(FAC[P.fac]), uni: L(UNI[P.uni]), home: L(GOV[P.gov]) }) : t("whyCapAlt", { edu: L(P.facYear), home: L(GOV[P.gov]) })}</p></div>
+<div><p class="fit-n num">${a.score}%</p><p class="fit-tier">${t("scoreTier_" + tr)}</p><p class="fit-cap">${P.fac && P.uni ? t("whyCap", { fac: L(FAC[P.fac]), uni: L(UNI[P.uni]), home: L(placeOf(P)) }) : t("whyCapAlt", { edu: L(P.facYear), home: L(placeOf(P)) })}</p></div>
 <div class="fit-rows">${a.parts.map(p => html`<div class="fit-row"><span class="fit-k">${t(p.k)}</span><span>${t(p.key, p.vars)}</span><span class="fit-pts num">${p.pts}/${p.max}</span><span class="meter"><span class="meter-fill" style="--w:${(p.pts / p.max).toFixed(3)}"></span></span></div>`)}</div>
 ${a.capped ? html`<p class="fine" style="grid-column:1 / -1">${t("capped")}</p>` : ""}
 </div>`;

@@ -8,7 +8,7 @@ import { e164 } from "../validate.js";
 import { ROLES } from "../plans.js";
 
 export function registerTeam(r, deps) {
-  const { db, core, auth, audit, notify, plans } = deps;
+  const { db, core, auth, audit, notify, plans, limit } = deps;
   const employer = auth.need("employer");
   const coName = c => (J(c.data) || {}).name || {};
   const active = ctx => { const c = plans.companyFor(ctx.user); if (!c) fail(409, "no_company"); return c; };
@@ -31,6 +31,7 @@ export function registerTeam(r, deps) {
   });
   r.post("/api/employer/team", employer, ctx => {
     const c = active(ctx); plans.allow(ctx, c, "manage");
+    if (c.status !== "verified") fail(409, "company_not_verified");   // an unchecked company sends no text in Shaghilni's name (D-10)
     const role = ROLES.includes(ctx.body.role) ? ctx.body.role : null; if (!role) fail(422, "bad_role");
     const name = clean(ctx.body.name, 80); if (!name) fail(422, "name_required");
     const phone = e164(core, ctx.body.phone); if (!phone) fail(422, "invalid_phone");
@@ -39,6 +40,7 @@ export function registerTeam(r, deps) {
     if (u && u.role !== "employer") fail(409, "phone_taken");
     if (u && db.get("SELECT 1 AS x FROM companies WHERE owner_id = ?", u.id)) fail(409, "phone_taken");
     if (db.get("SELECT 1 AS x FROM company_members WHERE phone = ?", phone)) fail(409, "phone_taken");
+    if (!limit(`team-invite:${c.id}`, 20, 86400e3)) fail(429, "rate_limited");   // twenty invitations a day per company; cancelling does not give them back (D-10)
     db.run("INSERT INTO company_members (company_id, phone, added_by, created_at, role, status, name) VALUES (?, ?, ?, ?, ?, 'invited', ?)", c.id, phone, ctx.user.id, now(), role, name);
     audit(ctx.user.id, "team.invited", "company", c.id, { role });
     tell(phone, "team_invite", { co: coName(c), role: roleWord(role), by: { en: plans.memberName(c, ctx.user.id), ar: plans.memberName(c, ctx.user.id) } });
@@ -119,7 +121,7 @@ export function registerTeam(r, deps) {
   });
 
   /* ---------- who did what: the team's activity, for owners and admins ---------- */
-  const LABEL = { "job.created": 1, "job.updated": 1, "job.submitted": 1, "job.closed": 1, "job.reopened": 1, "job.sponsored": 1, "application.moved": 1, "company.updated": 1, "company.submitted": 1,
+  const LABEL = { "job.created": 1, "job.updated": 1, "job.submitted": 1, "job.closed": 1, "job.reopened": 1, "job.sponsored": 1, "job.unsponsored": 1, "application.moved": 1, "company.updated": 1, "company.submitted": 1,
     "team.invited": 1, "team.joined": 1, "team.requested": 1, "team.request_approved": 1, "team.request_declined": 1, "team.role_changed": 1, "team.removed": 1, "team.left": 1, "team.invite_cancelled": 1, "team.ownership_transferred": 1, "plan.requested": 1, "invite.sent": 1 };
   r.get("/api/employer/activity", employer, ctx => {
     const c = active(ctx); plans.allow(ctx, c, "manage");
@@ -128,6 +130,6 @@ export function registerTeam(r, deps) {
     const appJob = new Map(apps.map(a => [a.id, a.job_id])), ph = a => a.map(() => "?").join(",") || "NULL";
     const rows = db.all(/* sql-safe: only "?" placeholders */ `SELECT actor_id, action, entity, entity_id, data, created_at FROM audit WHERE (entity = 'company' AND entity_id = ?) OR (entity = 'job' AND entity_id IN (${ph(jobIds)})) OR (entity = 'application' AND entity_id IN (${ph(apps.map(a => a.id))})) ORDER BY created_at DESC LIMIT 150`, c.id, ...jobIds, ...apps.map(a => a.id));
     return { activity: rows.filter(x => LABEL[x.action]).slice(0, 100).map(x => { const d = J(x.data) || {}, jid = x.entity === "job" ? x.entity_id : x.entity === "application" ? appJob.get(x.entity_id) : null;
-      return { at: x.created_at, who: plans.memberName(c, x.actor_id) || "—", action: x.action, job: jid ? title.get(jid) || null : null, from: d.from || null, to: d.to || null, role: d.role || null }; }) };
+      return { at: x.created_at, who: plans.memberName(c, x.actor_id, ctx.user.lang) || "—", action: x.action, job: jid ? title.get(jid) || null : null, from: d.from || null, to: d.to || null, role: d.role || null }; }) };
   });
 }

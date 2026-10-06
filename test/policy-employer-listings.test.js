@@ -2,7 +2,7 @@
    publishing, the listing state machine, the team levels on the listing family, and what an employer learns about an
    applicant (the snapshot sent, the account phone, the student badge: SECURITY.md item 1 "Minimisation"). Every refusal
    is paired with the allowed actor or state succeeding, so no 403, 409 or 422 is vacuous. The assertions marked D-05 and
-   D-06 describe TODAY's behaviour and name the defect (docs/agent/DEFECTS.md): the Stage 3 fix must update them. */
+   D-06 state the rule since Stage 3: an edit while a listing awaits review or is closed makes it a draft again. */
 import { test, after } from "node:test";
 import assert from "node:assert/strict";
 import { start, cast, employerWithLiveJob, closeAll, ADMIN_PHONE, JOB, PROFILE } from "./policy/harness.js";
@@ -73,7 +73,7 @@ test("verification gates publishing: a draft, pending or rejected company cannot
   assert.deepEqual(S.db.all("SELECT action FROM audit WHERE entity = 'company' AND entity_id = ? ORDER BY id", co.id).map(x => x.action), ["company.created", "company.submitted", "company.rejected", "company.submitted", "company.verified", "company.suspended"], "every decision is in the audit log");
 });
 
-test("listing state machine: submit only from draft or rejected, close only from published, reopen only from closed, approve only pending; D-05 and D-06 recorded as they are today", async () => {
+test("listing state machine: submit only from draft or rejected, close only from published, reopen only from closed, approve only pending; an edit while pending or closed is a draft again (D-05, D-06)", async () => {
   const S = await start(), admin = await S.login(ADMIN_PHONE), A = await employerWithLiveJob(S, admin, "0955 910 003", "Policy States"), e = A.e;
   const pub = id => S.client().get(`/api/jobs/${id}`);
   const d = (await e.post("/api/employer/jobs", { job: JOB })).body.job; assert.equal(d.status, "draft");
@@ -82,12 +82,17 @@ test("listing state machine: submit only from draft or rejected, close only from
   assert.equal((await e.post(`/api/employer/jobs/${d.id}/submit`)).body.job.status, "pending", "draft → submit → pending");
   await refused("submit twice", e.post(`/api/employer/jobs/${d.id}/submit`)); await refused("close pending", e.post(`/api/employer/jobs/${d.id}/close`)); await refused("reopen pending", e.post(`/api/employer/jobs/${d.id}/reopen`));
   assert.equal((await pub(d.id)).status, 404, "pending is not public");
-  // D-05 (DEFECTS.md): an edit while pending keeps the pending status and is never re-checked; the fee word is reported in `check` but not enforced.
-  // The Stage 3 fix turns the edit into a draft that must be submitted again, so these two lines must change with it.
+  // D-05: an edit while pending is a draft again, so the text goes through the posting checks before an admin sees it
   const fee = await e.put(`/api/employer/jobs/${d.id}`, { job: titled("Storekeeper, deposit required") });
   assert.equal(fee.status, 200, fee.text); assert.equal(fee.body.check.fee, "deposit", "the check sees the fee word");
-  assert.equal(fee.body.job.status, "pending", "D-05: today an edit while pending stays pending (the fix makes it a draft)");
-  assert.equal((await e.put(`/api/employer/jobs/${d.id}`, { job: JOB })).body.job.status, "pending", "D-05: clean text again, still pending without a new submission");
+  assert.equal(fee.body.job.status, "draft", "D-05: an edit while pending makes the listing a draft");
+  await refused("submit the fee wording", e.post(`/api/employer/jobs/${d.id}/submit`), "fee_requested", 422);
+  assert.ok(!(await admin.get("/api/admin/jobs?status=pending")).body.jobs.some(j => j.id === d.id), "D-05: the edited text is not in the review queue");
+  assert.equal((await e.put(`/api/employer/jobs/${d.id}`, { job: JOB })).body.job.status, "draft", "D-05: clean text again, still a draft until submitted");
+  assert.equal((await e.post(`/api/employer/jobs/${d.id}/submit`)).body.job.status, "pending", "draft → submit → pending again");
+  S.db.run("UPDATE jobs SET data = json_set(data, '$.title.en', 'Storekeeper, deposit required') WHERE id = ?", d.id);   // fee wording that somehow reached the queue
+  await refused("approve fee wording", admin.post(`/api/admin/jobs/${d.id}/approve`), "fee_requested", 422);   // D-05: approve re-runs the posting checks
+  S.db.run("UPDATE jobs SET data = json_set(data, '$.title.en', 'Storekeeper') WHERE id = ?", d.id);
   await refused("reject without a note", admin.post(`/api/admin/jobs/${d.id}/reject`, {}), "note_required", 422);
   assert.equal((await admin.post(`/api/admin/jobs/${d.id}/reject`, { note: "Say which branch" })).status, 200); assert.equal(status(S, d.id), "rejected");
   await refused("close rejected", e.post(`/api/employer/jobs/${d.id}/close`)); await refused("reopen rejected", e.post(`/api/employer/jobs/${d.id}/reopen`)); await refused("approve rejected", admin.post(`/api/admin/jobs/${d.id}/approve`));
@@ -98,14 +103,17 @@ test("listing state machine: submit only from draft or rejected, close only from
   await refused("submit published", e.post(`/api/employer/jobs/${p}/submit`)); await refused("reopen published", e.post(`/api/employer/jobs/${p}/reopen`)); await refused("approve published", admin.post(`/api/admin/jobs/${p}/approve`));
   assert.equal((await e.post(`/api/employer/jobs/${p}/close`)).body.job.status, "closed", "published → close → closed"); assert.equal((await pub(p)).status, 404, "closed listings leave the board");
   await refused("close twice", e.post(`/api/employer/jobs/${p}/close`)); await refused("submit closed", e.post(`/api/employer/jobs/${p}/submit`)); await refused("approve closed", admin.post(`/api/admin/jobs/${p}/approve`));
-  // D-06 (DEFECTS.md): an edit while closed stays closed and reopen republishes the edited text with no review.
-  // The Stage 3 fix turns the edit into a draft (reopen then answers 409 bad_state and the text goes submit → approve), so these four lines must change with it.
+  // D-06: an edit while closed is a draft again; the only way back to the board is submit (posting checks) → approve
   const edited = await e.put(`/api/employer/jobs/${p}`, { job: titled("Storekeeper, deposit required") });
-  assert.equal(edited.status, 200, edited.text); assert.equal(edited.body.check.fee, "deposit"); assert.equal(edited.body.job.status, "closed", "D-06: today an edit while closed stays closed (the fix makes it a draft)");
-  assert.equal((await e.post(`/api/employer/jobs/${p}/reopen`)).body.job.status, "published", "D-06: today reopen republishes with no review (the fix answers 409 bad_state)");
-  assert.equal((await pub(p)).body.job.title.en, "Storekeeper, deposit required", "D-06: the unreviewed text is on the board");
-  assert.ok(!(await admin.get("/api/admin/jobs?status=pending")).body.jobs.some(j => j.id === p), "D-06: and nothing is in the review queue");
-  assert.deepEqual(S.db.all("SELECT action FROM audit WHERE entity = 'job' AND entity_id = ? ORDER BY id", p).map(x => x.action), ["job.created", "job.submitted", "job.approved", "job.closed", "job.updated", "job.reopened"], "every move of a listing is in the audit log");
+  assert.equal(edited.status, 200, edited.text); assert.equal(edited.body.check.fee, "deposit"); assert.equal(edited.body.job.status, "draft", "D-06: an edit while closed makes the listing a draft");
+  await refused("reopen the edited draft", e.post(`/api/employer/jobs/${p}/reopen`));
+  assert.equal((await pub(p)).status, 404, "D-06: the unreviewed text is not on the board");
+  await refused("submit the fee wording", e.post(`/api/employer/jobs/${p}/submit`), "fee_requested", 422);
+  assert.equal((await e.put(`/api/employer/jobs/${p}`, { job: titled("Storekeeper") })).body.job.status, "draft");
+  assert.equal((await e.post(`/api/employer/jobs/${p}/submit`)).body.job.status, "pending", "D-06: the edited text goes back to review");
+  assert.ok((await admin.get("/api/admin/jobs?status=pending")).body.jobs.some(j => j.id === p), "and is in the review queue");
+  assert.equal((await admin.post(`/api/admin/jobs/${p}/approve`)).status, 200); assert.equal((await pub(p)).body.job.title.en, "Storekeeper", "reviewed text is on the board again");
+  assert.deepEqual(S.db.all("SELECT action FROM audit WHERE entity = 'job' AND entity_id = ? ORDER BY id", p).map(x => x.action), ["job.created", "job.submitted", "job.approved", "job.closed", "job.updated", "job.updated", "job.submitted", "job.approved"], "every move of a listing is in the audit log");
 });
 
 test("team levels on listings: a hiring manager reads applicants and writes notes only; a recruiter runs listings and moves applicants; the company page and its submission need manage", async () => {

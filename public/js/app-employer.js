@@ -46,7 +46,7 @@ function listingRow(j) {
   const n = (j.counts && j.counts.applicants) || 0;
   return html`<li class="acard"><span class="acard-main"><span class="acard-t">${L(bi(j.title)) || "—"}</span>
 <span class="acard-s">${j.gov && GOV[j.gov] ? L(GOV[j.gov]) : "—"} · ${j.pay && j.pay[0] ? payText(j).main : "—"}</span>
-<span class="acard-meta"><span class="pill ${JS_TONE[j.status]}">${t("js_" + j.status)}</span>${j.flags && j.flags.length ? html`<span>${t("adFlagGender", { x: j.flags[0].word })}</span>` : ""}${j.status === "rejected" && j.reviewNote ? html`<span>${t("jNote", { note: j.reviewNote })}</span>` : ""}${j.postedBy ? html`<span>${t("tmPostedBy", { name: j.postedBy })}</span>` : ""}</span></span>
+<span class="acard-meta"><span class="pill ${JS_TONE[j.status]}">${t("js_" + j.status)}</span>${j.flags && j.flags.length ? html`<span>${t(j.flags[0].type === "contact" ? "adFlagContact" : "adFlagGender", { x: j.flags[0].word })}</span>` : ""}${j.status === "rejected" && j.reviewNote ? html`<span>${t("jNote", { note: j.reviewNote })}</span>` : ""}${j.postedBy ? html`<span>${t("tmPostedBy", { name: j.postedBy })}</span>` : ""}</span></span>
 <span class="acard-act"><button class="btn btn--soft" type="button" data-act="go" data-to="#/company/jobs/${j.id}/applicants">${icon("user", 15)}${tn("jApplicants", n)}</button>
 ${canDo("hire") ? html`<button class="btn btn--ghost" type="button" data-act="go" data-to="#/company/jobs/${j.id}">${icon("edit", 15)}${t("jEdit")}</button>` : ""}
 ${canDo("hire") && (j.status === "draft" || j.status === "rejected") ? html`<button class="btn btn--ghost" type="button" data-act="emp-job-submit" data-job="${j.id}">${t("jSubmit")}</button>` : ""}
@@ -78,7 +78,7 @@ ${f("coRegNo", "coRegNo", c.regNo, ' dir="ltr" autocomplete="off"')}</div>
 <div class="ap-way"><label class="tick"><input type="checkbox" id="coViaCall"${c.applyVia && c.applyVia.call ? raw(" checked") : ""}><span>${icon("phone", 15)}${t("coWayCall")}</span></label>
 <input class="inp" id="coApplyPhone" type="tel" inputmode="tel" dir="ltr" placeholder="09•• ••• •••" value="${c.applyPhone || ""}" aria-label="${t("coApplyPhoneL")}"></div>
 <div class="ap-way"><label class="tick"><input type="checkbox" id="coViaEmail"${c.applyVia && c.applyVia.email ? raw(" checked") : ""}><span>${icon("send", 15)}${t("coWayEmail")}</span></label>
-<input class="inp" id="coApplyEmail" type="email" dir="ltr" placeholder="jobs@company.com" value="${c.applyEmail || ""}" aria-label="${t("coApplyEmailL")}"></div></fieldset>
+<input class="inp" id="coApplyEmail" type="email" dir="ltr" placeholder="jobs@example.com" value="${c.applyEmail || ""}" aria-label="${t("coApplyEmailL")}"></div></fieldset>
 <p class="hint">${t("coWhatsappHint")}</p>
 ${f("coWebsite", "coWebsite", c.website, ' type="url" dir="ltr" placeholder="https://"')}
 <div class="field" lang="ar" dir="rtl"><label class="lbl" for="coAboutAr">${tl("ar", "coAboutAr")}</label><textarea class="inp inp--area" id="coAboutAr" dir="rtl" lang="ar">${ab.ar || ""}</textarea></div>

@@ -4,7 +4,7 @@ import { test, after } from "node:test";
 import assert from "node:assert/strict";
 import http from "node:http";
 import vm from "node:vm";
-import { readFileSync, mkdtempSync, mkdirSync, writeFileSync } from "node:fs";
+import { readFileSync, readdirSync, mkdtempSync, mkdirSync, writeFileSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { createHash } from "node:crypto";
@@ -397,7 +397,38 @@ test("16 · sample listings are never seeded in production, whatever SEED_DEMO s
   const db = openDb(":memory:");
   assert.deepEqual(countDemo(db), { companies: 0, jobs: 0 });
   seedDemo(db, () => {});
-  assert.deepEqual(countDemo(db), { companies: 17, jobs: 19 });
+  assert.deepEqual(countDemo(db), { companies: 17, jobs: 18 });
   db.run("DELETE FROM jobs WHERE is_demo = 1"); db.run("DELETE FROM companies WHERE is_demo = 1");
   assert.deepEqual(countDemo(db), { companies: 0, jobs: 0 }, "nothing left after npm run demo:remove");
+});
+
+test("17 · a number taken out of ADMIN_PHONES loses its open sessions at once and the admin role at its next sign-in (D-17)", async () => {
+  const S = await start(), admin = await S.login("+12025550199");
+  assert.equal((await admin.get("/api/admin/overview")).status, 200, "an admin while the number is listed");
+  // the same database served by a second process whose ADMIN_PHONES no longer lists the number (a redeploy with a changed setting)
+  const cfg2 = loadConfig({ skipDotEnv: true, isolated: true, env: { NODE_ENV: "test", ADMIN_PHONES: "" }, values: { powBits: 0, anthropicKey: "" } });
+  const srv2 = http.createServer(createApp({ cfg: cfg2, db: S.db, log: () => {}, sms: async (to, body) => { S.texts.push({ to, body }); } }));
+  await new Promise(r => srv2.listen(0, "127.0.0.1", r)); servers.push(srv2);
+  const base2 = `http://127.0.0.1:${srv2.address().port}`; let jar = "";
+  const call2 = async (method, path, body) => { const res = await realFetch(base2 + path, { method, headers: { "content-type": "application/json", "x-shaghilni": "1", ...(jar ? { cookie: jar } : {}) }, body: body === undefined ? undefined : JSON.stringify(body) }); const sc = res.headers.get("set-cookie"); if (sc) jar = sc.split(";")[0]; return { status: res.status, body: await res.json().catch(() => null) }; };
+  const old = await realFetch(base2 + "/api/admin/overview", { headers: { cookie: admin.cookie, "x-shaghilni": "1" } });
+  assert.equal(old.status, 401, "D-17: the session opened while the number was an admin ends at the first request a process without the number sees, before any sign-in");
+  const r = await call2("POST", "/api/auth/code", { phone: "+12025550199" }); assert.equal(r.status, 200);
+  const v = await call2("POST", "/api/auth/verify", { phone: "+12025550199", code: S.lastCode("+12025550199"), role: "seeker", accept: true });
+  assert.equal(v.status, 200); assert.equal(v.body.user.role, "seeker", "D-17: signed in as an ordinary account, not an admin");
+  assert.equal((await call2("GET", "/api/admin/overview")).status, 403, "D-17: the admin routes are closed to the new session");
+  assert.equal(S.db.get("SELECT role FROM users WHERE phone = ?", "+12025550199").role, "seeker", "the role is changed in the database");
+  assert.equal((await admin.get("/api/admin/overview")).status, 401, "D-17: the session opened while the number was an admin has ended");
+  assert.deepEqual(S.db.all("SELECT action, data FROM audit WHERE action = 'user.demoted'").map(x => [x.action, JSON.parse(x.data)]), [["user.demoted", { from: "admin", to: "seeker" }]], "the demotion is in the audit log");
+});
+
+test("18 · no invented domain, address or entity in the code or the copy (R6, D-20)", () => {
+  const dir = new URL("../", import.meta.url), files = [];
+  const walk = d => { for (const f of readdirSync(d, { withFileTypes: true })) { const p = path.join(d, f.name); if (f.isDirectory()) walk(p); else if (f.name.endsWith(".js")) files.push(p); } };
+  for (const sub of ["server", "public/js", "scripts"]) walk(path.join(dir.pathname, sub));
+  const INVENTED = /shaghilni\.sy\b|@company\.com|our US company|شركتنا في الولايات المتحدة|shaghilni\.com\b/;
+  const hits = files.flatMap(f => readFileSync(f, "utf8").split("\n").map((l, i) => (INVENTED.test(l) ? `${path.relative(dir.pathname, f)}:${i + 1}: ${l.trim().slice(0, 100)}` : null)).filter(Boolean));
+  assert.deepEqual(hits, [], "invented domains or entities (placeholders must be obviously fake: example.com, jobs.example):\n" + hits.join("\n"));
+  const prod = extra => () => loadConfig({ skipDotEnv: true, env: { NODE_ENV: "production", OTP_PEPPER: "p".repeat(40), BASE_URL: "https://shaghilni.test", ...extra } });
+  assert.throws(prod({ BASE_URL: "" }), e => /BASE_URL/.test(e.message) && !/shaghilni\.sy/.test(e.message), "the BASE_URL error names an example domain, not an invented real-looking one");
 });

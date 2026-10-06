@@ -4,7 +4,7 @@ const OFAC_URL = "https://sanctionssearch.ofac.treas.gov/";
 async function renderAdmin() {
   const v = $("#view"), sub = S.sub[0] || "";
   const q = (S.admin && S.admin.overview && S.admin.overview.queues) || { companies: 0, jobs: 0, hires: 0 };
-  const tabs = [["", "adOverview", 0], ["companies", "adCompanies", q.companies], ["jobs", "adJobs", q.jobs], ["hires", "adHires", q.hires], ["campus", "adCampus", 0], ["events", "adEvents", 0], ["billing", "adBilling", 0], ["traffic", "adTraffic", 0], ["system", "adSystem", 0]];
+  const tabs = [["", "adOverview", 0], ["companies", "adCompanies", q.companies], ["jobs", "adJobs", q.jobs], ["hires", "adHires", q.hires], ["campus", "adCampus", 0], ["events", "adEvents", 0], ["billing", "adBilling", 0], ["audit", "adAudit", 0], ["traffic", "adTraffic", 0], ["system", "adSystem", 0]];
   put(v, page(html`<h1 class="lh-title">${t("adTitle")}</h1>
 <nav class="tabs" aria-label="${t("adTitle")}">${tabs.map(([k, key, n]) => html`<button class="tab" type="button" data-act="go" data-to="#/admin${k ? "/" + k : ""}"${sub === k ? raw(' aria-current="page"') : ""}>${t(key)}${n ? html`<span class="nav-n num">${n}</span>` : ""}</button>`)}</nav>
 <div id="admBody">${stateHTML("spin", t("loading"))}</div>`));
@@ -15,6 +15,7 @@ async function renderAdmin() {
     else if (sub === "billing") await drawBilling();
     else if (sub === "campus") await drawCampusAdmin();
     else if (sub === "events") await drawEventsAdmin();
+    else if (sub === "audit") await drawAudit(false);
     else if (sub === "traffic") await drawTraffic();
     else if (sub === "system") await drawSystem();
     else { await loadAdminCounts(); await drawInsights(); }
@@ -56,8 +57,8 @@ async function drawJobs() {
   put(b, html`<ul class="alist">${list.map(j => { const x = { ...j, title: bi(j.title), co: bi(j.co), summary: bi(j.summary), duties: biList(j.duties), needs: biList(j.needs), provides: biList(j.provides) };
     return html`<li class="acard acard--ap"><span class="acard-main">
 <span class="acard-t">${L(x.title)}</span><span class="acard-s">${L(x.co)} · ${j.gov && GOV[j.gov] ? L(GOV[j.gov]) : "—"} · ${x.pay && x.pay[0] ? payText(x).main : "—"}</span>
-<span class="acard-meta">${j.companyStatus !== "verified" ? html`<span class="pill pill--warn">${t("coStatus_" + j.companyStatus)}</span>` : ""}${(j.flags || []).map(f => html`<span class="pill pill--warn">${t("adFlagGender", { x: f.word })}</span>`)}</span>
-<details class="rules"><summary class="rules-sum">${t("hAbout")}</summary><p class="card-p">${L(x.summary)}</p>
+<span class="acard-meta">${j.companyStatus !== "verified" ? html`<span class="pill pill--warn">${t("coStatus_" + j.companyStatus)}</span>` : ""}${(j.flags || []).map(f => html`<span class="pill pill--warn">${t(f.type === "contact" ? "adFlagContact" : "adFlagGender", { x: f.word })}</span>`)}</span>
+<details class="rules"><summary class="rules-sum">${t("hAbout")}</summary><p class="card-p">${L(x.summary)}</p>${[L(bi(j.place)), L(bi(j.contact && j.contact.name)), L(bi(j.contact && j.contact.role)), L(bi(j.contact && j.contact.status)), j.tags].filter(Boolean).length ? html`<p class="card-p"><span class="lbl">${t("hContact")}:</span> ${[L(bi(j.place)), L(bi(j.contact && j.contact.name)), L(bi(j.contact && j.contact.role)), L(bi(j.contact && j.contact.status)), j.tags].filter(Boolean).join(" · ")}</p>` : ""}
 ${[["hDuties", x.duties], ["hNeeds", x.needs], ["hProvides", x.provides]].map(([k, arr]) => (L(arr).length ? html`<p class="lbl">${t(k)}</p><ul class="rules-list">${L(arr).map(s => html`<li>${s}</li>`)}</ul>` : ""))}</details>
 <span class="field"><label class="lbl" for="note-j${j.id}">${t("adNote")}</label><textarea class="inp inp--note" id="note-j${j.id}"></textarea></span>
 <span class="acard-act"><button class="btn btn--primary" type="button" data-act="adm-approve" data-id2="${j.id}"${j.companyStatus !== "verified" ? raw(" disabled") : ""}>${icon("check", 15, 2.4)}${t("adApprove")}</button>

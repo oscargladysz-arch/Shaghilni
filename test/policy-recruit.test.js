@@ -12,7 +12,7 @@ const inDays = n => new Date(Date.now() + n * 86400e3).toISOString().slice(0, 10
 const EVENT = (title, days = 10) => ({ kind: "event", event: { title, date: inDays(days), place: "Faculty hall" } });
 const PHONE_A = "+963944900001", PHONE_B = "+963944900002";
 
-test("policy recruit: switching \"let recruiters find me\" off hides the card at once; an open invitation stays answerable (recorded)", async () => {
+test("policy recruit: switching \"let recruiters find me\" off hides the card at once and ends the open invitations (D-32)", async () => {
   const S = await start(), C = await cast(S), I = C.ids;
   assert.ok((await C.A.e.get("/api/employer/students")).body.students.some(s => s.id === I.cardA), "control: A finds seeker A while the switch is on");
   assert.deepEqual((await C.seekerA.put("/api/me/recruit", { open: false })).body, { open: false });
@@ -22,14 +22,14 @@ test("policy recruit: switching \"let recruiters find me\" off hides the card at
   const inv = await C.A.e.post(`/api/employer/students/${I.cardA}/invite`, EVENT("Open day"));
   assert.deepEqual([inv.status, inv.body.error], [404, "not_found"], "an opted-out person cannot be invited, and the answer never says they exist");
   assert.ok(!(await C.A.e.get("/api/employer/students")).text.includes(PHONE_A.slice(4)), "no phone number anywhere in the search answer");
-  // recorded: the invitation sent before the switch went off is still in the inbox and can still be answered
-  // (recruit.js:176-186 checks ownership and status only; policy note "own invitation only"; no product rule ends it)
+  // D-32: the invitation sent before the switch went off is withdrawn with it, so nothing more can reach the company through it
   const inbox = (await C.seekerA.get("/api/me/invitations")).body.invitations;
-  assert.ok(inbox.some(i => i.id === I.invA), "the open invitation is still in the inbox after opting out");
+  assert.ok(!inbox.some(i => i.id === I.invA), "D-32: the open invitation leaves the inbox when the person opts out");
   const yes = await C.seekerA.post(`/api/me/invitations/${I.invA}/respond`, { answer: "yes" });
-  assert.deepEqual([yes.status, yes.body.invitation], [200, { id: I.invA, status: "accepted" }], "recorded: an open invitation can still be answered after opting out");
+  assert.deepEqual([yes.status, yes.body.error], [409, "bad_transition"], "D-32: it can no longer be answered");
   const sent = (await C.A.e.get("/api/employer/invitations")).body.invitations.find(i => i.id === I.invA);
-  assert.deepEqual([sent.status, sent.student.phone, sent.student.name.en], ["accepted", null, "Seeker A."], "a job yes never hands over the number, opted in or not");
+  assert.deepEqual([sent.status, sent.student.phone, sent.student.name.en], ["withdrawn", null, "Seeker A."], "the company sees it withdrawn, with the short name and no number");
+  assert.deepEqual(S.db.all("SELECT data FROM audit WHERE action = 'invitation.withdrawn' AND entity_id = ?", I.invA).map(x => JSON.parse(x.data)), [{ reason: "opted_out" }], "the withdrawal is audited with its reason");
   assert.equal(S.db.get("SELECT COUNT(*) AS n FROM audit WHERE action = 'recruit.closed' AND actor_id = ?", I.userA).n, 1, "the switch-off is audited");
 });
 
@@ -75,14 +75,16 @@ test("policy recruit: a hiring manager gets 403 role_forbidden; a pending, missi
   const suspended = await Promise.all([C.B.e.get("/api/employer/students"), C.B.e.post(`/api/employer/students/${I.cardB}/invite`, EVENT("Beta again")), C.B.e.get("/api/employer/invitations"), C.B.e.post(`/api/employer/invitations/${sentB.body.invitation.id}/withdraw`)]);
   for (const r of suspended) assert.deepEqual([r.status, r.body.error], [409, "company_not_verified"], "a suspended company is refused on all four (not U-022: nothing of the sent list is readable)");
   assert.ok(!suspended.some(r => r.text.includes(PHONE_B.slice(4)) || r.text.includes("Seeker Beta")), "nothing of the sent list leaks while suspended");
-  // recorded (U-017): the suspended company's open invitation stays live for the person; a yes hands over the number once the company is re-verified
-  const inboxB = (await C.seekerB.get("/api/me/invitations")).body.invitations.find(i => i.id === sentB.body.invitation.id);
-  assert.ok(inboxB, "recorded (U-017): the suspended company's invitation is still in the inbox");
-  assert.equal(inboxB.company.verified, false, "the inbox at least marks the company as not verified");
-  const yes = await C.seekerB.post(`/api/me/invitations/${inboxB.id}/respond`, { answer: "yes" });
-  assert.deepEqual([yes.status, yes.body.invitation.status], [200, "accepted"], "recorded (U-017): a yes to a suspended company's invitation is accepted");
+  // U-017: suspending the company withdraws its open invitations, so nobody hands over a number to a company under suspicion
+  const invB = sentB.body.invitation.id;
+  assert.ok(!(await C.seekerB.get("/api/me/invitations")).body.invitations.some(i => i.id === invB), "U-017: the suspended company's invitation leaves the inbox");
+  const yes = await C.seekerB.post(`/api/me/invitations/${invB}/respond`, { answer: "yes" });
+  assert.deepEqual([yes.status, yes.body.error], [409, "bad_transition"], "U-017: it can no longer be answered");
+  assert.deepEqual(S.db.all("SELECT data FROM audit WHERE action = 'invitation.withdrawn' AND entity_id = ?", invB).map(x => JSON.parse(x.data)), [{ reason: "company_suspended" }], "the withdrawal is audited with its reason");
   assert.equal((await C.admin.post(`/api/admin/companies/${I.companyB}/verify`, { screened: true })).status, 200, "the admin re-verifies B");
-  assert.equal((await C.B.e.get("/api/employer/invitations")).body.invitations.find(i => i.id === inboxB.id).student.phone, PHONE_B, "recorded (U-017): the number handed over during the suspension is visible after re-verification");
+  const after = (await C.B.e.get("/api/employer/invitations")).body.invitations.find(i => i.id === invB);
+  assert.deepEqual([after.status, after.student.phone], ["withdrawn", null], "U-017: after re-verification the old invitation stays withdrawn and carries no number");
+  assert.equal((await C.B.e.post(`/api/employer/students/${I.cardB}/invite`, EVENT("Beta open day, again"))).status, 200, "control: the re-verified company can invite afresh");
 });
 
 test("policy recruit: the sent list carries the person's number only for an accepted EVENT invitation, never for a job or an open or declined one", async () => {
@@ -157,4 +159,13 @@ test("policy recruit: seeker B never sees A's invitation and gets 404 on respond
   assert.deepEqual([sent.student.phone, sent.student.name.en], [PHONE_A, "Seeker Alpha"], "an event yes: full name and number for this company");
   assert.ok(!(await C.B.e.get("/api/employer/invitations")).text.includes(PHONE_A.slice(4)), "B, who was not accepted, never sees the number");
   assert.ok(!(await C.A.e.get("/api/employer/students")).text.includes(PHONE_A.slice(4)), "and the search card still carries no number");
+});
+
+test("policy recruit: rejecting a company withdraws its open invitations too (U-017)", async () => {
+  const S = await start(), C = await cast(S), I = C.ids;
+  assert.ok((await C.seekerA.get("/api/me/invitations")).body.invitations.some(i => i.id === I.invA), "control: seeker A holds A's open invitation");
+  assert.equal((await C.admin.post(`/api/admin/companies/${I.companyA}/reject`, { note: "Registration document unclear" })).status, 200);
+  assert.ok(!(await C.seekerA.get("/api/me/invitations")).body.invitations.some(i => i.id === I.invA), "the invitation leaves the inbox");
+  assert.deepEqual((r => [r.status, r.body.error])(await C.seekerA.post(`/api/me/invitations/${I.invA}/respond`, { answer: "yes" })), [409, "bad_transition"], "and cannot be answered");
+  assert.deepEqual(S.db.all("SELECT data FROM audit WHERE action = 'invitation.withdrawn' AND entity_id = ?", I.invA).map(x => JSON.parse(x.data)), [{ reason: "company_rejected" }], "audited with its reason");
 });

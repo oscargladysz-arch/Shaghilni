@@ -68,7 +68,8 @@ export function registerCampus(r, deps) {
     const row = db.get("SELECT * FROM email_codes WHERE user_id = ?", ctx.user.id);
     if (!row || row.expires_at <= now()) fail(410, "code_expired");
     if (row.attempts >= 5) fail(429, "code_locked");
-    if (String(ctx.body.code || "").replace(/\D/g, "") === "" || codeHash(ctx.user.id, String(ctx.body.code).replace(/\D/g, "")) !== row.code_hash) {
+    const typed = core.latinDigits(String(ctx.body.code || "")).replace(/\D/g, "");   // Arabic-Indic digits are digits (U-034)
+    if (typed === "" || codeHash(ctx.user.id, typed) !== row.code_hash) {
       db.run("UPDATE email_codes SET attempts = attempts + 1 WHERE user_id = ?", ctx.user.id); fail(422, "bad_code");
     }
     if ((p.edu || {}).uni !== row.uni) fail(409, "uni_changed");
