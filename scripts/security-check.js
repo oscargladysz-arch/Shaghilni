@@ -8,7 +8,7 @@ import { loadConfig } from "../server/config.js";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const SKIP = new Set(["node_modules", ".git", "data", "backups", "shots", "fonts", "screenshots"]);
-const TEXT = /\.(js|mjs|cjs|json|md|html|css|txt|yml|yaml|sh|example)$|^Dockerfile$|^\.env/;
+const TEXT = /\.(js|mjs|cjs|json|md|html|css|txt|yml|yaml|sh|example|pem|key|crt|cer|p12|pfx|toml|ini|cfg)$|^Dockerfile$|^\.env|^id_(?:rsa|dsa|ecdsa|ed25519)$/;   // key and certificate files too, so the private-key pattern can find them (D-51)
 
 function files(root) {
   const out = [];
@@ -92,6 +92,7 @@ export function auditSettings(env) {
   add(env.LEGAL_NAME ? "PASS" : "WARN", env.LEGAL_NAME ? `Legal name: ${env.LEGAL_NAME}` : "LEGAL_NAME is not set: the documents say 'Shaghilni'; use your registered company name");
   add(env.TRUST_PROXY === "true" ? "PASS" : "WARN", env.TRUST_PROXY === "true" ? "TRUST_PROXY is on (right behind Render, Railway, Fly, nginx or Caddy)" : "TRUST_PROXY is off: correct only if nothing sits in front of the server");
   if (env.OTP_DEV_ECHO === "true") add("WARN", "OTP_DEV_ECHO=true is ignored in production; remove it");
+  if (cfg.emailApiUrl && !/^https:\/\//.test(cfg.emailApiUrl)) add("WARN", "EMAIL_API_URL is not https://: the email key would travel in clear");   // D-52
   // SEED_DEMO is not checked: sample listings are never seeded in production (server/config.js). A database that already holds them is reported at start-up and on the Insights screen.
   return out;
 }

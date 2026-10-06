@@ -3,6 +3,10 @@ data/
 backups/
 .env*
 !.env.example
+*.pem
+*.key
+*.p12
+*.pfx
 test/e2e/shots/
 *.db
 *.db-wal

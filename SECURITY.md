@@ -330,13 +330,13 @@ Security test 12 checks all of this. It also checks the challenge end to end, us
 
 `npm run security:check` checks four things:
 
-1. The repository, for committed secrets.
+1. The repository, for committed secrets: code, settings and documentation files, and key and certificate files (`.pem`, `.key`, `id_rsa` and the like), which `.gitignore` also keeps out.
 2. The code, for:
    - unreviewed SQL built from text, raw HTML writes, `eval` and shell calls;
    - inline scripts, and scripts from other sites.
 
    Reviewed exceptions carry a `sql-safe` or `html-safe` marker comment.
-3. Your production settings, from `.env` or `--env file` (real environment variables take precedence). It fails when `NODE_ENV` is not `production`, when the lockdown would refuse to start, when no admin is set, when texts only go to the log or when the privacy contact is missing.
+3. Your production settings, from `.env` or `--env file` (real environment variables take precedence). It fails when `NODE_ENV` is not `production`, when the lockdown would refuse to start, when no admin is set, when texts only go to the log or when the privacy contact is missing, and warns when the email service address is not `https://` (the email key would travel in clear).
 4. With `--url`, the live site:
    - the security headers, including HSTS, and no software versions in them;
    - no secrets in `/api/config`;
