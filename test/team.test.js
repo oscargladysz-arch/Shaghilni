@@ -154,6 +154,19 @@ test("teams: invitations need a verified company and stop at twenty a day per co
   assert.equal((await other.post("/api/employer/team", { name: "Theirs", phone: "0955 812 001", role: "recruiter" })).status, 200, "the cap is per company");
 });
 
+test("teams: a team invitation texted before the account existed is in that person's export and erased with the account (U-055)", async () => {
+  const S = await start(), admin = await S.login("+12025550199");
+  const { e: owner } = await employer(S, admin, "0955 814 001", "Invite Export Co");
+  assert.equal((await owner.post("/api/employer/team", { name: "New Recruiter", phone: "0955 814 002", role: "recruiter" })).status, 200);
+  assert.equal(S.db.get("SELECT COUNT(*) AS n FROM notifications WHERE phone = '+963955814002' AND user_id IS NULL").n, 1, "the invitation went to a number with no account yet");
+  const joiner = await S.login("0955 814 002", "employer");
+  assert.equal((await joiner.post("/api/employer/membership/accept")).status, 200);
+  const ex = (await joiner.get("/api/me/export")).body;
+  assert.ok(ex.textMessages.some(t => /Invite Export Co/.test(t.text)), "the invitation text is part of the person's download");
+  assert.equal((await joiner.del("/api/me")).status, 200);
+  assert.equal(S.db.get("SELECT COUNT(*) AS n FROM notifications WHERE phone = '+963955814002'").n, 0, "and no text to the number is left after the account is deleted");
+});
+
 test("teams: asking to join texts the company's managers at most five times a day per account, withdrawing included (U-032)", async () => {
   const S = await start(), admin = await S.login("+12025550199");
   await employer(S, admin, "0955 813 001", "Join Target Co");
