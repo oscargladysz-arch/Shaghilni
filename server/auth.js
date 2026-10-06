@@ -76,7 +76,11 @@ export function makeAuth({ db, cfg, core, sms, limit, audit, log, guard }) {
     if (row.attempts >= 5) fail(429, "too_many_attempts");
     db.run("UPDATE otps SET attempts = attempts + 1 WHERE id = ?", row.id);
     const good = timingSafeEqual(Buffer.from(row.code_hash, "hex"), Buffer.from(codeHash(phone, code), "hex"));
-    if (!good) fail(400, "wrong_code");
+    if (!good) {   // a guessing attempt leaves a trace: a masked log line each time, an audit row when the code locks (D-42)
+      log(`[auth] wrong sign-in code for ${mask(phone)} (${row.attempts + 1} of 5)`);
+      if (row.attempts + 1 >= 5) { const u = db.get("SELECT id FROM users WHERE phone = ?", phone); audit(u ? u.id : null, "auth.locked", "user", u ? u.id : null, null); }
+      fail(400, "wrong_code");
+    }
 
     const lang = ctx.body.lang === "en" ? "en" : "ar";
     const admin = cfg.adminPhones.includes(phone);
