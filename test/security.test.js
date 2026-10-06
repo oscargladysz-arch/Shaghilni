@@ -537,6 +537,21 @@ test("13 · spreadsheet exports turn a cell that would run as a formula into pla
   assert.deepEqual(cells, ['\'=HYPERLINK("http://evil.example","x")', "'@SUM(A1)", "'-cmd|' /C calc'!A0", "'+HYPERLINK(1)", "'\tlead", "+963944000001", "-5", "-3.5", "plain"]);
 });
 
+test("13 · the scanner opens key and certificate files, and warns when the email key would go to a plain-http address (D-51, D-52)", () => {
+  const tmp = mkdtempSync(path.join(os.tmpdir(), "shg-scan-")), pem = ["-----BEGIN RSA PRIVATE KEY-----", "MIIB" + "A".repeat(60), "-----END RSA PRIVATE KEY-----"].join("\n");
+  for (const f of ["server.pem", "deploy.key", "id_rsa"]) writeFileSync(path.join(tmp, f), pem + "\n");
+  const found = scanSecrets(tmp).join("; ");
+  for (const f of ["server.pem", "deploy.key", "id_rsa"]) assert.match(found, new RegExp(`Private key in ${f.replace(".", "\\.")}`), `${f} is opened and its key found (${found})`);
+  const good = { NODE_ENV: "production", OTP_PEPPER: "p".repeat(40), BASE_URL: "https://shaghilni.test", ADMIN_PHONES: "+963944000000", SMS_PROVIDER: "textbee",
+    TEXTBEE_API_KEY: "key", CONTACT_EMAIL: "privacy@example.com", LEGAL_NAME: "Example Org (not a real entity)", TRUST_PROXY: "true" };
+  const mail = { EMAIL_API_URL: "https://mail.example/send", EMAIL_API_KEY: "k", EMAIL_FROM: "jobs@example.com" };
+  assert.deepEqual(auditSettings({ ...good, ...mail }).filter(r => r[0] !== "PASS"), [], "an https email service passes");
+  const warn = auditSettings({ ...good, ...mail, EMAIL_API_URL: "http://mail.example/send" }).filter(r => r[0] === "WARN").map(r => r[1]).join(" ");
+  assert.match(warn, /EMAIL_API_URL/, "a plain-http email service is reported: the key would travel in clear");
+  const ign = readFileSync(new URL("../.gitignore", import.meta.url), "utf8").split("\n");
+  for (const p of ["*.pem", "*.key", "*.p12", "*.pfx"]) assert.ok(ign.includes(p), `.gitignore keeps ${p} out of the repository`);
+});
+
 test("14 · the scanner stays clean for a correct production setup whether or not SEED_DEMO is set: sample listings are never seeded in production", () => {
   const good = { NODE_ENV: "production", OTP_PEPPER: "p".repeat(40), BASE_URL: "https://shaghilni.test", ADMIN_PHONES: "+963944000000", SMS_PROVIDER: "textbee",
     TEXTBEE_API_KEY: "key", CONTACT_EMAIL: "privacy@example.com", LEGAL_NAME: "Example Org (not a real entity)", TRUST_PROXY: "true" };
