@@ -1,4 +1,5 @@
 import { fail } from "../http.js";
+import { PLANS } from "../plans.js";
 import { now, J } from "../db.js";
 import { sanitizeCompany, companyMissing, sanitizeJob, checkJob, e164 } from "../validate.js";
 import { companyOut, employerJobOut, applicantCounts } from "../serialize.js";
@@ -152,9 +153,9 @@ export function registerEmployer(r, deps) {
     plans.allow(ctx, c, status !== a.status ? "hire" : "view");   // hiring managers can write notes; moving people takes a recruiter
     if (status !== a.status && !(MOVES[a.status] || []).includes(status)) fail(409, "bad_transition", { from: a.status, to: status });
     if (status !== a.status && a.hire_confirmed_at) fail(409, "hire_confirmed");   // a confirmed hire is final
-    const into = status === "hired" && a.status !== "hired";   // the basis is written only on the move into hired, and the first one stands: an undo and a re-hire never lower the fee (fix review)
-    db.run("UPDATE applications SET status = ?, employer_note = ?, updated_at = ?, hired_at = CASE WHEN ? = 'hired' THEN COALESCE(hired_at, ?) ELSE NULL END, hire_pay_mid = CASE WHEN ? THEN COALESCE(hire_pay_mid, MAX(COALESCE(apply_pay_mid, 0), ?)) ELSE hire_pay_mid END, hire_plan = CASE WHEN ? THEN COALESCE(hire_plan, ?) ELSE hire_plan END, moved_by = CASE WHEN ? THEN ? ELSE moved_by END, note_by = CASE WHEN ? THEN ? ELSE note_by END WHERE id = ?",
-      status, note, now(), status, now(), into ? 1 : 0, plans.payMid(J(a.j_data) || {}), into ? 1 : 0, plans.planOf(c), status !== a.status ? 1 : 0, ctx.user.id, note !== a.employer_note ? 1 : 0, ctx.user.id, a.id);   // the plan at the first hire and the pay shown when the person applied, or at the first hire if higher, decide the fee (D-09, U-029, fix review)
+    const into = status === "hired" && a.status !== "hired";   // the basis is written only on the move into hired, and an undo and a re-hire never lower the fee (fix reviews)
+    db.run("UPDATE applications SET status = ?, employer_note = ?, updated_at = ?, hired_at = CASE WHEN ? = 'hired' THEN COALESCE(hired_at, ?) ELSE NULL END, hire_pay_mid = CASE WHEN ? THEN MAX(COALESCE(hire_pay_mid, 0), COALESCE(apply_pay_mid, 0), ?) ELSE hire_pay_mid END, hire_plan = CASE WHEN ? THEN ? ELSE hire_plan END, moved_by = CASE WHEN ? THEN ? ELSE moved_by END, note_by = CASE WHEN ? THEN ? ELSE note_by END WHERE id = ?",
+      status, note, now(), status, now(), into ? 1 : 0, plans.payMid(J(a.j_data) || {}), into ? 1 : 0, a.hire_plan && (PLANS[a.hire_plan] || PLANS.free).sourcedFee ? a.hire_plan : plans.planOf(c), status !== a.status ? 1 : 0, ctx.user.id, note !== a.employer_note ? 1 : 0, ctx.user.id, a.id);   // the pay shown when the person applied or at a hire, whichever is higher, and the plan at the hire decide the fee; a re-hire after an undo keeps a plan that charges it and can only raise the pay (D-09, U-029, fix reviews)
     if (status !== a.status) {
       audit(ctx.user.id, "application.moved", "application", a.id, { from: a.status, to: status });
       const seekerUser = db.get("SELECT * FROM users WHERE id = ?", a.user_id);
