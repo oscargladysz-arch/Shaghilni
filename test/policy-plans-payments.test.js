@@ -141,6 +141,18 @@ test("policy plans: undoing a hire keeps its fee basis: cutting the pay to 1 or 
   assert.deepEqual(await confirm(old), [{ kind: "hire_fee", amountSyp: MID }], "with no plan recorded, the live plan (Free) decides, as documented");
 });
 
+test("policy plans: an invoice in US dollars is recorded and shown in dollars, for the owners offered dollar invoicing (U-024)", async () => {
+  const S = await start(), admin = await S.login("+12025550199"), { e, companyId } = await employerWithLiveJob(S, admin, "0955 920 033", "Dollar Invoice Co");
+  assert.equal((await e.post("/api/employer/plan/request", { plan: "pro", payMethod: "usd" })).status, 200, "the owner asks to be invoiced in dollars");
+  const r = await admin.post(`/api/admin/companies/${companyId}/plan`, { plan: "pro", months: 12, amountUsd: "1,200" }); assert.equal(r.status, 200, r.text);
+  const P = (await e.get("/api/employer/plan")).body;
+  assert.deepEqual(P.charges.map(c => [c.kind, c.amountSyp, c.amountUsd, c.status]), [["plan", 0, 1200, "due"]], "the dollar invoice is on the plan page");
+  assert.deepEqual(P.feesDue, { n: 1, syp: 0, usd: 1200 }, "and in the fees due, in dollars, not as Syrian pounds");
+  const a = JSON.parse(S.db.get("SELECT data FROM audit WHERE action = 'company.plan' AND entity_id = ? ORDER BY id DESC LIMIT 1", companyId).data);
+  assert.deepEqual([a.amountSyp, a.amountUsd], [0, 1200], "the audit row says which currency");
+  assert.deepEqual((await admin.post(`/api/admin/companies/${companyId}/plan`, { plan: "pro", months: 1, amountUsd: "$1200" })).body.error, "bad_number", "a dollar sign is not a figure");
+});
+
 test("policy plans: the admin plan route reads months and amount typed with Arabic-Indic or Persian digits (U-028)", async () => {
   const S = await start(), admin = await S.login("+12025550199"), { companyId } = await employerWithLiveJob(S, admin, "0955 920 031", "Digits Co");
   for (const [months, amountSyp, label] of [["٣", "٤٠٠٠", "Arabic-Indic"], ["۳", "۴۰۰۰", "Persian"]]) {
