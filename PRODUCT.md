@@ -57,7 +57,7 @@ What a neighbouring product couldn't truthfully copy:
 **Product rules:**
 
 - Job seekers never pay for anything, and nothing a job seeker can buy moves them up the queue.
-- Pay is required on every listing; listings asking applicants for fees are blocked (a fee word in the text, or a demand that the candidate pay in any box; a fee word elsewhere, such as a benefit the company covers, is flagged for the reviewer).
+- Pay is required on every listing; listings asking applicants for fees are blocked (a fee word in the text, or in any box a demand whose payer is the candidate; any other payment wording, such as a benefit the company covers, is flagged for the reviewer).
 - Recruiters and universities see a person's details only when that person has opted in.
 - There is one resume per person; tailoring never creates versions.
 
