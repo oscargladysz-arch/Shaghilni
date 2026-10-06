@@ -27,7 +27,7 @@ export function registerTeam(r, deps) {
     return { me: { role: me, phone: ctx.user.phone }, seats: { used: plans.teamUsed(c.id), limit: plans.limits(c).team },
       owner: { phone: owner ? owner.phone : null, name: plans.memberName(c, c.owner_id), lastActive: owner ? owner.last_login_at : null },
       members: rows.filter(m => m.status === "active").map(m => out(c, m)), invites: rows.filter(m => m.status === "invited").map(m => out(c, m)),
-      requests: plans.can(c, ctx.user, "manage") ? rows.filter(m => m.status === "requested").map(m => out(c, m)) : [] };
+      requests: c.status === "verified" && plans.can(c, ctx.user, "manage") ? rows.filter(m => m.status === "requested").map(m => out(c, m)) : [] };   // a request waits unseen until the company is verified (fix review of U-023)
   });
   r.post("/api/employer/team", employer, ctx => {
     const c = active(ctx); plans.allow(ctx, c, "manage");
@@ -48,6 +48,7 @@ export function registerTeam(r, deps) {
   });
   r.post("/api/employer/team/requests/:phone", employer, ctx => {
     const c = active(ctx); plans.allow(ctx, c, "manage");
+    if (c.status !== "verified") fail(409, "company_not_verified");   // an unchecked company decides nothing and texts nobody in Shaghilni's name (D-10); a draft can hold someone else's number (fix review of U-023)
     const m = db.get("SELECT * FROM company_members WHERE company_id = ? AND phone = ? AND status = 'requested'", c.id, String(ctx.params.phone)); if (!m) fail(404, "not_found");
     if (ctx.body.decision !== "yes") { db.run("DELETE FROM company_members WHERE company_id = ? AND phone = ?", c.id, m.phone); audit(ctx.user.id, "team.request_declined", "company", c.id, {}); tell(m.phone, "team_declined", { co: coName(c) }); return { ok: true }; }
     const role = ROLES.includes(ctx.body.role) ? ctx.body.role : "recruiter";
@@ -117,7 +118,7 @@ export function registerTeam(r, deps) {
     if (!limit(`team-join:${ctx.user.id}`, 5, 86400e3)) fail(429, "rate_limited");   // five requests a day per account, each texting the managers; withdrawing does not give one back (U-032, as D-10)
     db.run("INSERT INTO company_members (company_id, phone, added_by, created_at, role, status, name, user_id) VALUES (?, ?, ?, ?, 'recruiter', 'requested', ?, ?)", c.id, ctx.user.phone, ctx.user.id, now(), name, ctx.user.id);
     audit(ctx.user.id, "team.requested", "company", c.id, {});
-    for (const p of managers(c)) tell(p, "team_request", { co: coName(c), name: { en: name, ar: name } });
+    if (c.status === "verified") for (const p of managers(c)) tell(p, "team_request", { co: coName(c), name: { en: name, ar: name } });   // an unverified holder is told nothing: the request waits for the admin's check
     return { ok: true, status: "requested" };
   });
 
