@@ -91,7 +91,7 @@ test("policy plans: the placement fee is charged once, on Free only, only for a 
   const fees = S.db.all("SELECT company_id, application_id, amount_syp, status FROM charges WHERE kind = 'hire_fee'").map(plain);
   assert.deepEqual(fees, [{ company_id: F.companyId, application_id: apps.sourced, amount_syp: MID, status: "due" }], "exactly one hire_fee row in the whole database");
   assert.equal(S.db.get("SELECT COUNT(*) AS n FROM applications WHERE hire_confirmed_at IS NOT NULL").n, 5, "every hire is confirmed exactly once");
-  assert.deepEqual((await F.e.get("/api/employer/plan")).body.feesDue, { n: 1, syp: MID }); assert.deepEqual((await P.e.get("/api/employer/plan")).body.feesDue, { n: 0, syp: 0 });
+  assert.deepEqual((await F.e.get("/api/employer/plan")).body.feesDue, { n: 1, syp: MID, usd: 0 }); assert.deepEqual((await P.e.get("/api/employer/plan")).body.feesDue, { n: 0, syp: 0, usd: 0 });
 });
 
 test("policy plans: the placement fee follows the plan at the hire, not at the confirmation: a Pro hire stays free after the plan ends, a Free hire keeps its fee after an upgrade (U-029)", async () => {
