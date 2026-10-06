@@ -7,6 +7,11 @@ import { openDb } from "../server/db.js";
 import { createApp } from "../server/app.js";
 import { seedDemo } from "../server/seed.js";
 import * as coreMod from "../server/core.js";
+import { spawnSync } from "node:child_process";
+import { mkdtempSync, existsSync, readdirSync, statSync, rmSync, writeFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
+import { tmpdir } from "node:os";
+import path from "node:path";
 
 const servers = [];
 after(() => { for (const s of servers) s.close(); });
@@ -94,4 +99,21 @@ test("traffic: page views counted privately; crawlers and do-not-track left out;
   assert.ok(Y.requests.lastHour.n > 5 && Y.requests.lastHour.failed === 0); assert.equal(Y.rows.pageviews, 4); assert.ok(Y.uptimeSeconds >= 0 && Y.memoryMb > 0);
   S.db.run("UPDATE pageviews SET at = ? WHERE id = ?", Date.now() - 200 * 86400e3, rows[0].id);
   assert.ok(S.app.cleanup().traffic >= 1, "page views are deleted after 180 days");
+});
+
+test("backup: a DB_PATH that names no database (or an empty file) fails loudly, writes no 'backup' and creates no empty database; a real one is copied (U-059)", () => {
+  const dir = mkdtempSync(path.join(tmpdir(), "shaghilni-backup-")), out = path.join(dir, "out");
+  const run = db => spawnSync(process.execPath, ["--disable-warning=ExperimentalWarning", fileURLToPath(new URL("../scripts/backup.js", import.meta.url)), out], { env: { PATH: process.env.PATH, NODE_ENV: "test", DB_PATH: db }, encoding: "utf8" });
+  try {
+    const missing = path.join(dir, "missing.db"), r = run(missing);
+    assert.notEqual(r.status, 0, `a missing database must fail, got exit ${r.status}: ${r.stdout.trim()}`);
+    assert.ok(!existsSync(out) || readdirSync(out).length === 0, "no backup file written");
+    assert.ok(!existsSync(missing), "no empty database created at the wrong path");
+    const empty = path.join(dir, "empty.db"); writeFileSync(empty, ""); assert.notEqual(run(empty).status, 0, "an empty file left by an earlier run is no database");
+    assert.ok(!existsSync(out) || readdirSync(out).length === 0, "still no backup file");
+    const real = path.join(dir, "real.db"), db = openDb(real); seedDemo(db, () => {}); db.close();
+    const ok = run(real); assert.equal(ok.status, 0, ok.stderr);
+    const files = readdirSync(out); assert.equal(files.length, 1, "one backup written");
+    assert.ok(statSync(path.join(out, files[0])).size > 4096, "the copy holds the tables");
+  } finally { rmSync(dir, { recursive: true, force: true }); }
 });
