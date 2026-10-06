@@ -167,3 +167,25 @@ test("plans: analytics for everyone, full analytics and reports with paid plans"
   const comp = (await e.get("/api/employer/reports/compliance")).body.rows; assert.ok(comp.some(x => x.action === "company.verified"), "the compliance record includes verification");
   assert.equal(comp.find(x => x.action === "company.verified").sanctionsScreened, "yes", "D-07: the verification row says the company was screened (the admin had to tick it)");
 });
+
+test("admin billing: a company listed under both plan requests and verified companies gets two forms with their own fields, and each Save sends its own form's figures (fix review 2)", async () => {
+  const { readFileSync } = await import("node:fs"), vm = (await import("node:vm")).default;
+  const els = new Map(), body = { innerHTML: "" }, posts = [];
+  const B = { requests: [{ companyId: 7, company: { name: { en: "Both Lists Co" } }, plan: "pro", payMethod: "usd", ref: "SHG-7-1", note: "" }], charges: [{ id: 1, kind: "plan", company: { name: { en: "Both Lists Co" } }, amountSyp: 4000000, amountUsd: 300 }], programmes: [], companies: [{ id: 7, name: { en: "Both Lists Co" }, plan: "free", planUntil: null }] };
+  const ctx = vm.createContext({ console, S: { lang: "en" }, ADM: {}, toast() {}, errText: e => String(e), setTimeout: () => 0,
+    api: { get: async () => B, post: async (path, data) => { posts.push({ path, data }); return {}; } },
+    document: { querySelector: s => (s === "#admBody" ? body : els.get(s) || null) } });
+  for (const f of ["lookups.js", "i18n.js", "i18n2.js", "i18n3.js", "i18n4.js", "engine.js", "app-plans.js"]) vm.runInContext(readFileSync(new URL(`../public/js/${f}`, import.meta.url), "utf8"), ctx, { filename: f });
+  await vm.runInContext("drawBilling()", ctx);
+  const ids = [...body.innerHTML.matchAll(/\bid="([^"]+)"/g)].map(m => m[1]), dup = ids.filter((x, i) => ids.indexOf(x) !== i);
+  assert.deepEqual(dup, [], "no two fields share an id, so a Save cannot read the other form");
+  assert.match(body.innerHTML, /4,000,000 SYP · \$300/, "an invoice in both currencies shows both on the admin's due list, as on the employer's page");
+  // the admin fills the second form (Verified companies) and saves it
+  const buttons = [...body.innerHTML.matchAll(/<button[^>]*data-act="adm-plan-set"[^>]*>/g)].map(m => m[0]), last = buttons.at(-1);
+  assert.equal(buttons.length, 2, "two plan forms for the company");
+  const data = Object.fromEntries([...last.matchAll(/data-([a-z0-9]+)="([^"]*)"/g)].map(m => [m[1], m[2]]));
+  const form = body.innerHTML.slice(body.innerHTML.lastIndexOf('<span class="bill-form">'));
+  for (const [re, value] of [[/<select[^>]*id="([^"]+)"/, "enterprise"], [/id="(bm-[^"]+)"/, "12"], [/id="(ba-[^"]+)"/, ""], [/id="(bu-[^"]+)"/, "2400"]]) els.set("#" + form.match(re)[1], { value });
+  await vm.runInContext("billingAct", ctx)("adm-plan-set", { dataset: data });
+  assert.deepEqual(posts.map(p => [p.path, p.data.plan, p.data.months, p.data.amountUsd]), [["/api/admin/companies/7/plan", "enterprise", "12", "2400"]], "the figures typed in the form whose Save was pressed");
+});
