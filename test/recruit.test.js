@@ -1,6 +1,8 @@
 /* Recruiters and students: who can be found, what employers see, invitations and replies. */
 import { test, after } from "node:test";
 import assert from "node:assert/strict";
+import vm from "node:vm";
+import { readFileSync } from "node:fs";
 import http from "node:http";
 import { loadConfig } from "../server/config.js";
 import { openDb } from "../server/db.js";
@@ -130,3 +132,17 @@ test("invitations: checks, replies, contact details only after a yes, blocking a
   assert.equal(S.db.get("SELECT COUNT(*) AS n FROM invitations WHERE user_id = ?", sid).n, 0, "deleting the account deletes the invitations");
   assert.equal(S.db.get("SELECT COUNT(*) AS n FROM recruiter_blocks WHERE user_id = ?", sid).n, 0);
 });
+
+test("recruiters: an online event invitation shows its link in the full app's inbox card, as Lite does (U-013)", () => {
+  const js = f => readFileSync(new URL(`../public/js/${f}`, import.meta.url), "utf8"), ctx = vm.createContext({ console, S: { lang: "en" } });
+  for (const f of ["lookups.js", "i18n.js", "i18n2.js", "i18n3.js", "i18n4.js", "engine.js"]) vm.runInContext(js(f), ctx, { filename: f });
+  vm.runInContext('const sep = () => ", "; function dayLabel(ts) { return String(ts); }', ctx);   // the two helpers app-recruit.js borrows from app.js and app-seeker.js
+  vm.runInContext(js("app-recruit.js"), ctx, { filename: "app-recruit.js" });
+  ctx.inv = { id: 7, kind: "event", status: "new", company: { name: { en: "Online Co" }, abbr: "OC", sector: "trade", verified: true }, message: "", createdAt: 1,
+    event: { title: "Online open day", date: "2026-10-16", place: "", link: "https://meet.example.com/open-day" } };
+  const card = vm.runInContext("invCard(inv).s", ctx);
+  assert.match(card, /href="https:\/\/meet\.example\.com\/open-day"/, "the link the company typed is on the card");
+  assert.match(card, /rel="noopener[^"]*"/, "and opens without handing the page to the other site");
+  ctx.inv.event = { ...ctx.inv.event, link: 'https://x.example/"><script>' }; assert.doesNotMatch(vm.runInContext("invCard(inv).s", ctx), /<script>/, "escaped like every other value");
+});
+
