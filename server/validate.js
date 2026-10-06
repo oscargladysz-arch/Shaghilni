@@ -122,7 +122,8 @@ export function sanitizeJob(core, input) {
   };
 }
 /* Posting checks, the same ones the employer sees while typing: pay and place are required,
-   asking candidates for a fee blocks the listing, gendered wording is flagged for review. */
+   asking candidates for a fee blocks the listing, gendered wording is flagged for review, and so is a fee word in
+   the place, contact lines, what the job offers or the tags. */
 export function checkJob(core, j) {
   const missing = [];
   if (!j.title.en && !j.title.ar) missing.push("title");
@@ -131,8 +132,9 @@ export function checkJob(core, j) {
   if (!j.langs.length) missing.push("langs");
   if (!j.summary.en && !j.summary.ar) missing.push("summary");
   const text = [j.title.en, j.title.ar, j.summary.en, j.summary.ar, ...j.duties.en, ...j.duties.ar, ...j.needs.en, ...j.needs.ar].join(" ");
-  const all = [text, j.place.en, j.place.ar, j.contact.name.en, j.contact.name.ar, j.contact.role.en, j.contact.role.ar, j.contact.status.en, j.contact.status.ar, ...j.provides.en, ...j.provides.ar, j.tags].join(" ");
-  const fee = core.findFee(all), gender = core.findGender(text), flags = gender ? [{ type: "gender", word: gender }] : [];   // the fee check reads every free-text field, so another box is no way round it (U-020)
+  const aside = [j.place.en, j.place.ar, j.contact.name.en, j.contact.name.ar, j.contact.role.en, j.contact.role.ar, j.contact.status.en, j.contact.status.ar, ...j.provides.en, ...j.provides.ar, j.tags].join(" "), all = [text, aside].join(" ");
+  const fee = core.findFee(text), gender = core.findGender(text), flags = gender ? [{ type: "gender", word: gender }] : [];
+  const feeAside = !fee && core.findFee(aside); if (feeAside) flags.push({ type: "fee", word: feeAside });   // fee words in the other boxes go to the reviewer, so no box is a way round the check (U-020) and a benefit such as "tuition fees covered" is not refused (fix review)
   // Contact details anywhere in the free text are flagged for the reviewer, not blocked: the number is meant to reach a signed-in applicant only (D-30)
   const every = core.latinDigits(all);
   for (const w of new Set((every.match(/\+?\d[\d\s\-().]{5,}\d|[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/g) || []).map(x => x.trim()).filter(x => x.includes("@") || x.replace(/\D/g, "").length >= 9)).values()) { if (flags.length >= 6) break; flags.push({ type: "contact", word: w }); }
