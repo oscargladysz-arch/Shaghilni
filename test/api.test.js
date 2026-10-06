@@ -256,6 +256,8 @@ test("resume suggestions: the fact guard holds back Arabic suggestions that add 
 });
 
 test("account deletion erases personal data but keeps the hire on record", async () => {
+  const co = (await employer.get("/api/employer")).body.company;   // renamed by the test above, so under review; a company under review reads no applicant (fix review 2): verify it again first
+  assert.equal((await admin.post(`/api/admin/companies/${co.id}/verify`, { screened: true })).status, 200);
   assert.equal((await seeker.del("/api/me")).status, 200);
   assert.equal((await seeker.get("/api/me")).body.user, null, "signed out");
   const list = (await employer.get(`/api/employer/jobs/${employerJobId}/applications`)).body.applications;
