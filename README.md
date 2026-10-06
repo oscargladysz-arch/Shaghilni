@@ -144,7 +144,7 @@ Two settings matter more than they look:
 
 ## Running it
 
-**Backups.** `npm run backup` writes a consistent copy to `backups/shaghilni-YYYY-MM-DD-HH-MM.db` while the site keeps running. Schedule it daily (for example with cron) and copy the files off the server. To restore, stop the app, replace the database file, delete any `-wal` and `-shm` files next to it, and start again.
+**Backups.** `npm run backup` writes a consistent copy to `backups/shaghilni-YYYY-MM-DD-HH-MM.db` while the site keeps running; it stops with an error, and writes nothing, if `DB_PATH` names no database. Schedule it daily (for example with cron, which then reports the failure) and copy the files off the server. To restore, stop the app, replace the database file, delete any `-wal` and `-shm` files next to it, and start again.
 
 **Demo listings.** `npm run demo:remove` deletes the demo companies and listings, including any applications made to them. They won't be added again.
 
