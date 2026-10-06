@@ -86,6 +86,14 @@ test("demo accounts: four accounts with real-looking activity, ready to sign in 
   assert.equal(again.db.get("SELECT COUNT(*) AS n FROM users WHERE phone = '+963933000101'").n, 1);
 });
 
+test("demo accounts: making them hands no text to the text provider and leaves the day's text count untouched (U-058)", async () => {
+  const S = await start({ SEED_DEMO: "true", DEMO_ACCOUNTS: "true" }); await S.app.demoReady;
+  assert.equal(S.texts.length, 0, `the demo accounts are fictional numbers inside real network ranges: no text is sent (${S.texts.length})`);
+  assert.equal(S.db.get("SELECT COUNT(*) AS n FROM notifications").n, 0, "and none is queued or counted against the daily cap");
+  const c = S.client(); assert.equal((await c.post("/api/auth/code", { phone: "+963944123456" })).status, 200, "sign-in texts still go out afterwards");
+  assert.equal(S.texts.length, 1);
+});
+
 test("demo accounts: the purge removes them and everything they made, and they don't come back", async () => {
   const S = await start({ SEED_DEMO: "true", DEMO_ACCOUNTS: "true" }); await S.app.demoReady;
   const jobsBefore = S.db.get("SELECT COUNT(*) AS n FROM jobs").n;
