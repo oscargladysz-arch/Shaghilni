@@ -118,6 +118,7 @@ function assess(j) {
   else if (j.anyFaculty) f = P.student ? { state: "ok", pts: 24, key: "fieldAny" } : { state: "part", pts: 10, key: "fieldAnyStudents" };
   else if (P.fac && facs.some(x => rel.includes(x))) f = { state: "part", pts: 21, key: "fieldRelated", vars: { fac: L(FAC[facs.find(x => rel.includes(x))]) } };
   else if (j.noDegree) f = P.fac ? { state: "part", pts: 8, key: "fieldNone" } : { state: "ok", pts: 28, key: "fieldNoneFits" };
+  else if (!facs.length) f = { state: "part", pts: 17, key: "fieldOpen" };   // the listing names no field of study: neither a match nor a miss (D-177, A-52)
   else f = { state: "no", pts: 0, key: "fieldMiss", vars: { fac: listJoin([...new Set(facs)].slice(0, 2).map(x => L(FAC[x]))) } };
   parts.push({ k: "fField", max: 35, ...f });
 

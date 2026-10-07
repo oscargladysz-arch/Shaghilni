@@ -1,7 +1,7 @@
 import { fail } from "../http.js";
 import { PLANS } from "../plans.js";
 import { now, J } from "../db.js";
-import { sanitizeCompany, companyMissing, sanitizeJob, checkJob, e164 } from "../validate.js";
+import { sanitizeCompany, companyMissing, sanitizeJob, checkJob, hideNumbers, e164 } from "../validate.js";
 import { companyOut, employerJobOut, applicantCounts } from "../serialize.js";
 const REG_WORDS = new Set(["سجل", "تجاري", "رقم", "محافظه", "في"]);   // سجل تجاري رقم, محافظة, في: the register's own words, after norm (ة → ه); س.ت is dropped as a pair
 
@@ -82,7 +82,7 @@ export function registerEmployer(r, deps) {
     if (check.missing.length) fail(422, "incomplete", check.missing);
     if (check.fee) fail(422, "fee_requested", check.fee);
     db.run("UPDATE jobs SET status = 'pending', flags = ?, submitted_at = ?, updated_at = ? WHERE id = ?", JSON.stringify(check.flags), now(), now(), jobRow.id);
-    audit(ctx.user.id, "job.submitted", "job", jobRow.id, { flags: check.flags.map(f => (f.type === "contact" ? { type: "contact" } : f)) });   // the log never holds the number or address itself (R12)
+    audit(ctx.user.id, "job.submitted", "job", jobRow.id, { flags: check.flags.map(f => (f.type === "contact" ? { type: "contact" } : { ...f, word: hideNumbers(f.word) })) });   // the log never holds the number or address itself, nor one inside a flagged fee wording (R12, D-176)
   };
 
   r.post("/api/employer/jobs", employer, ctx => {
@@ -127,6 +127,7 @@ export function registerEmployer(r, deps) {
     const { c, j } = myJob(ctx, ctx.params.id);
     if (j.status !== "closed") fail(409, "bad_state");
     if (c.status !== "verified") fail(409, "company_not_verified");
+    const check = checkJob(core, J(j.data) || {}); if (check.fee) fail(422, "fee_requested", check.fee);   // a listing that asks candidates for money never goes back on the board (D-174)
     db.run("UPDATE jobs SET status = ?, updated_at = ? WHERE id = ?", j.published_at ? "published" : "draft", now(), j.id);
     audit(ctx.user.id, "job.reopened", "job", j.id, null);
     return { job: jobsOf(c, undefined, ctx.user.lang).find(x => x.id === j.id) };

@@ -166,7 +166,7 @@ export function registerMe(r, deps) {
       db.run(`UPDATE applications SET snapshot = '{"deleted":true}', employer_note = NULL WHERE user_id = ?`, id);
       const c = db.get("SELECT * FROM companies WHERE owner_id = ?", id);
       if (c) {   // an employer leaving: close their listings and remove the people's contact details from the company page
-        db.run("UPDATE jobs SET status = 'closed', updated_at = ? WHERE company_id = ? AND status != 'closed'", now(), c.id);
+        db.run("UPDATE jobs SET status = 'closed', updated_at = ? WHERE company_id = ? AND status = 'published'", now(), c.id);   // live listings only: a draft, a rejected listing or an edit awaiting review keeps its state, so Reopen cannot publish text no reviewer approved (D-174)
         db.run("UPDATE invitations SET status = 'withdrawn', updated_at = ? WHERE company_id = ? AND status IN ('sent','seen')", now(), c.id);
         const d = J(c.data) || {};
         db.run("UPDATE companies SET data = ?, status = 'suspended', review_note = 'Owner deleted the account', updated_at = ? WHERE id = ?",

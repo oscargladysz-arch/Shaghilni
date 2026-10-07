@@ -54,7 +54,7 @@ ${c.about && (c.about.ar || c.about.en) ? html`<p class="card-p">${L(bi(c.about)
 async function drawJobs() {
   const list = (await api.get("/api/admin/jobs?status=pending")).jobs, b = $("#admBody"); if (!b) return;
   if (!list.length) { put(b, stateHTML("check", t("adEmpty"))); return; }
-  ADM.jobs = list;   // Approve reads which listings carry a fee flag (P2-6)
+  ADM.jobs = list;   // Approve reads which listings carry a fee flag (P2-6) and which version was read (D-175)
   put(b, html`<ul class="alist">${list.map(j => { const fee = (j.flags || []).find(f => f.type === "fee"); const x = { ...j, title: bi(j.title), co: bi(j.co), summary: bi(j.summary), duties: biList(j.duties), needs: biList(j.needs), provides: biList(j.provides) };
     return html`<li class="acard acard--ap"><span class="acard-main">
 <span class="acard-t">${L(x.title)}</span><span class="acard-s">${L(x.co)} · ${j.gov && GOV[j.gov] ? L(GOV[j.gov]) : "—"} · ${x.pay && x.pay[0] ? payText(x).main : "—"}</span>
@@ -91,9 +91,10 @@ async function admAct(act, el) {
       run(() => api.post(`/api/admin/companies/${id}/verify`, { screened: true, note: note("#note-c" + id) }), "tVerified"); break; }
     case "adm-reject": run(() => api.post(`/api/admin/companies/${id}/reject`, { note: note("#note-c" + id) }), "tSentBack"); break;
     case "adm-suspend": run(() => api.post(`/api/admin/companies/${id}/suspend`, { note: note("#note-c" + id) }), "tSuspended"); break;
-    case "adm-approve": { const fee = (ADM.jobs || []).some(j => j.id === id && (j.flags || []).some(f => f.type === "fee")), box = $("#fee-" + id);
+    case "adm-approve": { const j = (ADM.jobs || []).find(x => x.id === id) || {}, fee = (j.flags || []).find(f => f.type === "fee"), box = $("#fee-" + id);
       if (fee && (!box || !box.checked)) { toast({ title: t("err_fee_check_required"), ic: "alert" }); if (box) box.focus(); break; }   // the server refuses it too (P2-6)
-      run(() => api.post(`/api/admin/jobs/${id}/approve`, fee ? { feeChecked: true, note: note("#note-j" + id) } : { note: note("#note-j" + id) }).then(loadJobs).then(rescore), "tPublished"); break; }
+      run(() => api.post(`/api/admin/jobs/${id}/approve`, { ...(fee ? { feeChecked: true, feeWord: fee.word } : {}), submittedAt: j.submittedAt, note: note("#note-j" + id) })
+        .catch(err => { if (err && (err.code === "job_changed" || err.code === "fee_check_required")) renderAdmin(); throw err; }).then(loadJobs).then(rescore), "tPublished"); break; }   // a listing changed since it was read: the queue is drawn again (D-175)
     case "adm-jreject": run(() => api.post(`/api/admin/jobs/${id}/reject`, { note: note("#note-j" + id) }), "tSentBack"); break;
     case "adm-confirm": { const pg = $("#hp-" + id); run(() => api.post(`/api/admin/applications/${id}/confirm-hire`, { programmeId: pg && pg.value ? Number(pg.value) : null }), "tConfirmed"); break; }
     case "adm-plan-set": case "adm-charge": case "adm-prog-add": billingAct(act, el); break;

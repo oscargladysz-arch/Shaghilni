@@ -1,7 +1,7 @@
 import { fail } from "../http.js";
 import { now, J } from "../db.js";
 import { companyOut, employerJobOut, applicantCounts } from "../serialize.js";
-import { checkJob } from "../validate.js";
+import { checkJob, hideNumbers } from "../validate.js";
 import { mask } from "../guard.js";
 import { PLANS } from "../plans.js";
 
@@ -75,18 +75,20 @@ export function registerAdmin(r, deps) {
     const rows = db.all(`SELECT j.*, c.data AS c_data, c.status AS c_status, c.id AS c_id FROM jobs j JOIN companies c ON c.id = j.company_id
       WHERE j.status = ? AND j.is_demo = 0 ORDER BY COALESCE(j.submitted_at, j.updated_at) ASC`, status);
     const counts = applicantCounts(db, rows.map(x => x.id));
-    return { jobs: rows.map(j => ({ ...employerJobOut(j, companyOut({ id: j.c_id, data: j.c_data, status: j.c_status }), counts.get(j.id) || {}), companyStatus: j.c_status })) };
+    return { jobs: rows.map(j => ({ ...employerJobOut(j, companyOut({ id: j.c_id, data: j.c_data, status: j.c_status }), counts.get(j.id) || {}),
+      ...(j.status === "pending" ? { flags: checkJob(core, J(j.data) || {}).flags } : {}), companyStatus: j.c_status })) };   // a pending listing shows the flags approval will check, not those of an older word list (D-179)
   });
   r.post("/api/admin/jobs/:id/approve", admin, ctx => {
     const j = db.get("SELECT j.*, c.status AS c_status FROM jobs j JOIN companies c ON c.id = j.company_id WHERE j.id = ?", Number(ctx.params.id));
     if (!j) fail(404, "not_found");
     if (j.status !== "pending") fail(409, "bad_state");
     if (j.c_status !== "verified") fail(409, "company_not_verified");
+    if (ctx.body.submittedAt !== undefined && ctx.body.submittedAt !== j.submitted_at) fail(409, "job_changed");   // the reviewer approves the version they read (D-175)
     const check = checkJob(core, J(j.data) || {}); if (check.fee) fail(422, "fee_requested", check.fee);   // the posting checks run again at approval, whatever reached the queue (D-05)
-    const feeFlag = check.flags.find(f => f.type === "fee"); if (feeFlag && ctx.body.feeChecked !== true) fail(422, "fee_check_required", feeFlag.word);   // fee wording is published only once the reviewer says they read it (P2-6)
+    const feeFlag = check.flags.find(f => f.type === "fee"); if (feeFlag && (ctx.body.feeChecked !== true || ctx.body.feeWord !== feeFlag.word)) fail(422, "fee_check_required", feeFlag.word);   // fee wording is published only once the reviewer says they read it, naming the word (P2-6, D-175)
     db.run("UPDATE jobs SET status = 'published', published_at = COALESCE(published_at, ?), reviewed_by = ?, review_note = ?, updated_at = ? WHERE id = ?",
       now(), ctx.user.id, String(ctx.body.note || "").slice(0, 1000), now(), j.id);
-    audit(ctx.user.id, "job.approved", "job", j.id, feeFlag ? { feeChecked: true, feeWord: feeFlag.word } : null);
+    audit(ctx.user.id, "job.approved", "job", j.id, feeFlag ? { feeChecked: true, feeWord: hideNumbers(feeFlag.word) } : null);
     return { ok: true };
   });
   r.post("/api/admin/jobs/:id/reject", admin, ctx => {
