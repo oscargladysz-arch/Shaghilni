@@ -55,10 +55,29 @@ const JOB = { title: { en: "Junior accountant", ar: "محاسب مبتدئ" }, g
 
 let seeker, employer, admin, employerJobId, seekerAppId;
 
+test("seed: the 50 sample listings added for D1 pass the posting checks with no flag at all, use real lookup keys, match English and Arabic item for item, name no contact person, and describe the role without money words (D1)", async () => {
+  const { readFileSync } = await import("node:fs"), { loadCore } = await import("../server/core.js"), { sanitizeJob, checkJob } = await import("../server/validate.js"), core = loadCore();
+  const seed = JSON.parse(readFileSync(new URL("../seed/demo.json", import.meta.url), "utf8")), keys = new Set(seed.companies.map(c => c.key)), added = seed.jobs.slice(19);
+  assert.equal(added.length, 50, "50 listings after the original 19");
+  assert.equal(new Set(seed.companies.map(c => c.key)).size, seed.companies.length, "company keys are unique");
+  for (const j of added) {
+    const { company, daysAgo, ...data } = j, s = sanitizeJob(core, data), c = checkJob(core, s), name = (j.title || {}).en;
+    assert.ok(keys.has(company), `${name}: its company is in the file`);
+    assert.deepEqual([c.missing, c.fee, c.flags], [[], null, []], `${name}: passes the posting checks with no flag`);
+    for (const k of ["gov", "type", "level", "mode"]) assert.equal(s[k], data[k], `${name}: ${k} is a real lookup key`);
+    assert.deepEqual(s.recruits, data.recruits || [], `${name}: every university and faculty is a real key`);
+    assert.ok(!("contact" in j), `${name}: no invented contact person`);
+    for (const k of ["title", "summary", "place"]) assert.ok(data[k].en && data[k].ar, `${name}: ${k} in both languages`);
+    for (const k of ["duties", "needs", "provides"]) assert.ok(data[k].en.length >= 2 && data[k].en.length === data[k].ar.length, `${name}: ${k} item for item in both languages`);
+    const text = JSON.stringify([data.title, data.summary, data.duties, data.needs, data.provides, data.place, data.tags]);
+    assert.doesNotMatch(text, /\b(?:pay|paid|payment|fees?|deposit|costs?|price|syp|usd)\b|[$€]|دفع|رسوم|مبلغ|تسديد|سداد|تكاليف|تكلفة|مصاريف|ليرة|دولار/i, `${name}: the role, not money (pay has its own field)`);
+  }
+});
+
 test("public board lists the seeded demo jobs", async () => {
   const c = client(), r = await c.get("/api/jobs");
   assert.equal(r.status, 200);
-  assert.equal(r.body.jobs.length, 18, "18 of the 19 sample listings pass the posting checks (D-02)");
+  assert.equal(r.body.jobs.length, 68, "68 of the 69 sample listings pass the posting checks (D-02; 50 added for D1)");
   assert.ok(r.body.jobs.every(x => Array.isArray(x.pay) && x.pay[0] > 0), "no sample listing is on the board without pay (D-02)");
   assert.ok(r.body.jobs.every(x => !x.contact || !(x.contact.name && x.contact.name.en)), "no sample listing names an invented employee of a real organisation (D-15)");
   const j = r.body.jobs.find(x => x.co.en === "Chevron");
@@ -201,7 +220,7 @@ test("pipeline: status moves are checked, seekers are texted, hires need confirm
   assert.deepEqual([ov.counts.hired, ov.counts.confirmedHires, ov.queues.hires], [1, 0, 1]);
   await admin.post(`/api/admin/applications/${seekerAppId}/confirm-hire`, { note: "Called Rami" });
   ov = (await admin.get("/api/admin/overview")).body;
-  assert.deepEqual([ov.counts.confirmedHires, ov.queues.hires, ov.counts.liveJobs, ov.counts.demoJobs], [1, 0, 1, 18]);
+  assert.deepEqual([ov.counts.confirmedHires, ov.queues.hires, ov.counts.liveJobs, ov.counts.demoJobs], [1, 0, 1, 68]);
   assert.equal(ov.weeks.at(-1).confirmedHires, 1);
 });
 
@@ -301,9 +320,9 @@ test("seed: a sample listing that fails the posting checks is skipped with one l
   assert.equal(fresh.get("SELECT COUNT(*) AS n FROM jobs WHERE status = 'published' AND NOT (json_extract(data, '$.pay[0]') > 0)").n, 0, "nothing published without pay");
   assert.equal(fresh.get("SELECT COUNT(*) AS n FROM jobs WHERE json_extract(data, '$.title.en') = 'Laboratory Internship in Marine Sciences'").n, 0, "the pay-less sample listing is not in the database");
   assert.equal(lines.filter(l => /\[seed\] skipped .*Marine Sciences/.test(l)).length, 1, "one log line names it: " + lines.join(" / "));
-  assert.equal(fresh.get("SELECT COUNT(*) AS n FROM jobs WHERE json_extract(data, '$.contact') IS NOT NULL").n, 0, "no sample listing carries a contact person (D-15, pending D1)");
-  assert.deepEqual(JSON.parse(fresh.get("SELECT data FROM audit WHERE action = 'demo.seeded'").data), { companies: 17, jobs: 18 }, "the audit row counts what was inserted");
-  assert.ok(lines.some(l => /17 demo companies and 18 demo jobs added/.test(l)), "and so does the log line: " + lines.join(" / "));
+  assert.equal(fresh.get("SELECT COUNT(*) AS n FROM jobs WHERE json_extract(data, '$.contact') IS NOT NULL").n, 0, "no sample listing carries a contact person (D-15; D1 answered: the names stay, development only)");
+  assert.deepEqual(JSON.parse(fresh.get("SELECT data FROM audit WHERE action = 'demo.seeded'").data), { companies: 32, jobs: 68 }, "the audit row counts what was inserted");
+  assert.ok(lines.some(l => /32 demo companies and 68 demo jobs added/.test(l)), "and so does the log line: " + lines.join(" / "));
 });
 
 test("resume suggestions: the Arabic fact guard reads the other number forms, «أسهمت» and two-word countries, names the word as written, and lets a gender, case or spelling change of a number word through (fix review 2)", async () => {
