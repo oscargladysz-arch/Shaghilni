@@ -37,7 +37,7 @@ No item marked owner, lawyer or provider is ever ticked by an agent.
 | C2 | `LEGAL_NAME` and `CONTACT_EMAIL` set to the real operating entity and a monitored mailbox. | owner | The scanner's `Legal name:` and `Privacy contact:` lines. | Blocked on D4 and D6 (D6 deferred by the owner) |
 | C3 | A named person responsible for personal data, and a breach plan. | owner | Written down and named in the privacy notice if the lawyer asks for it. | Open |
 | C4 | The employment-office licence application is under way. | owner | | Open |
-| C5 | Native Arabic review of every new or changed string. | owner, reviewer | Every row of `docs/agent/ARABIC_REVIEW.md` ticked. | Open (49 rows so far) |
+| C5 | Native Arabic review of every new or changed string. | owner, reviewer | Every row of `docs/agent/ARABIC_REVIEW.md` ticked. | Open (53 rows so far) |
 | C6 | Lite users can read the terms they consent to without JavaScript. | agent | `/lite/privacy` and `/lite/terms` (Stage 3, P1-2); `test/lite.test.js` checks both languages, the filled-in details and the links. | Done |
 
 ## D · Providers and money

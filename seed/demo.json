@@ -261,9 +261,9 @@
     "en": "UNICEF Syria",
     "ar": "اليونيسف سوريا"
    },
-   "abbr": "UNCF",
+   "abbr": "unicef",
    "sector": "aid",
-   "cat": "multinational",
+   "cat": "public",
    "gov": "damascus",
    "about": {
     "en": "UNICEF is the United Nations agency for children.",
@@ -278,7 +278,7 @@
    },
    "abbr": "WFP",
    "sector": "aid",
-   "cat": "multinational",
+   "cat": "public",
    "gov": "damascus",
    "about": {
     "en": "The World Food Programme is the United Nations agency for food assistance.",
@@ -293,7 +293,7 @@
    },
    "abbr": "UNHC",
    "sector": "aid",
-   "cat": "multinational",
+   "cat": "public",
    "gov": "damascus",
    "about": {
     "en": "UNHCR is the United Nations refugee agency.",
@@ -308,7 +308,7 @@
    },
    "abbr": "WHO",
    "sector": "aid",
-   "cat": "multinational",
+   "cat": "public",
    "gov": "damascus",
    "about": {
     "en": "The World Health Organization is the United Nations agency for health.",
@@ -323,7 +323,7 @@
    },
    "abbr": "ICRC",
    "sector": "aid",
-   "cat": "multinational",
+   "cat": "public",
    "gov": "damascus",
    "about": {
     "en": "The International Committee of the Red Cross is a humanitarian organisation based in Geneva.",
@@ -338,7 +338,7 @@
    },
    "abbr": "NRC",
    "sector": "aid",
-   "cat": "multinational",
+   "cat": "public",
    "gov": "damascus",
    "about": {
     "en": "The Norwegian Refugee Council is a humanitarian organisation that works with displaced people.",
@@ -353,7 +353,7 @@
    },
    "abbr": "DRC",
    "sector": "aid",
-   "cat": "multinational",
+   "cat": "public",
    "gov": "damascus",
    "about": {
     "en": "The Danish Refugee Council is a humanitarian organisation that works with displaced people.",
@@ -368,7 +368,7 @@
    },
    "abbr": "MC",
    "sector": "aid",
-   "cat": "multinational",
+   "cat": "public",
    "gov": "idlib",
    "about": {
     "en": "Mercy Corps is an international humanitarian and development organisation.",
@@ -383,7 +383,7 @@
    },
    "abbr": "IRC",
    "sector": "aid",
-   "cat": "multinational",
+   "cat": "public",
    "gov": "idlib",
    "about": {
     "en": "The International Rescue Committee is an international humanitarian organisation.",
@@ -398,7 +398,7 @@
    },
    "abbr": "SC",
    "sector": "aid",
-   "cat": "multinational",
+   "cat": "public",
    "gov": "aleppo",
    "about": {
     "en": "Save the Children is an international organisation that works for children.",
@@ -413,7 +413,7 @@
    },
    "abbr": "OXF",
    "sector": "aid",
-   "cat": "multinational",
+   "cat": "public",
    "gov": "damascus",
    "about": {
     "en": "Oxfam is an international confederation of organisations that work against poverty.",
@@ -428,7 +428,7 @@
    },
    "abbr": "CARE",
    "sector": "aid",
-   "cat": "multinational",
+   "cat": "public",
    "gov": "raqqa",
    "about": {
     "en": "CARE is an international humanitarian organisation that works against poverty.",
@@ -443,7 +443,7 @@
    },
    "abbr": "MSF",
    "sector": "aid",
-   "cat": "multinational",
+   "cat": "public",
    "gov": "idlib",
    "about": {
     "en": "Médecins Sans Frontières is an international medical humanitarian organisation.",
@@ -2270,12 +2270,12 @@
    "needs": {
     "en": [
      "Degree in education, or in an arts or humanities subject",
-     "At least three years in teaching, school supervision or education projects",
+     "At least four years in teaching, school supervision or education projects",
      "Working English for reports and meetings"
     ],
     "ar": [
      "شهادة جامعية في التربية أو في أحد اختصاصات الآداب والعلوم الإنسانية",
-     "خبرة ثلاث سنوات على الأقل في التدريس أو الإشراف التربوي أو مشاريع التعليم",
+     "خبرة أربع سنوات على الأقل في التدريس أو الإشراف التربوي أو مشاريع التعليم",
      "إنكليزية عملية لكتابة التقارير وحضور الاجتماعات"
     ]
    },
@@ -3260,12 +3260,12 @@
    "needs": {
     "en": [
      "Law degree; membership of the bar association is an advantage",
-     "At least three years in legal practice or legal aid, ideally civil status or property",
+     "At least four years in legal practice or legal aid, ideally civil status or property",
      "Working English for reports and case notes"
     ],
     "ar": [
      "إجازة في الحقوق، والانتساب إلى نقابة المحامين ميزة إضافية",
-     "خبرة لا تقل عن ثلاث سنوات في المحاماة أو المساعدة القانونية، ويُفضَّل في الأحوال المدنية أو الملكية",
+     "خبرة لا تقل عن أربع سنوات في المحاماة أو المساعدة القانونية، ويُفضَّل في الأحوال المدنية أو الملكية",
      "إنكليزية عملية لكتابة التقارير وملاحظات الحالات"
     ]
    },
@@ -3482,12 +3482,12 @@
    "needs": {
     "en": [
      "Degree in economics, agricultural economics or agriculture",
-     "At least three years in market development, agribusiness or livelihoods",
+     "At least four years in market development, agribusiness or livelihoods",
      "Working English for reports and meetings"
     ],
     "ar": [
      "إجازة في الاقتصاد أو الاقتصاد الزراعي أو الهندسة الزراعية",
-     "خبرة لا تقل عن ثلاث سنوات في تنمية الأسواق أو الأعمال الزراعية أو سبل العيش",
+     "خبرة لا تقل عن أربع سنوات في تنمية الأسواق أو الأعمال الزراعية أو سبل العيش",
      "إنكليزية عملية للتقارير والاجتماعات"
     ]
    },
@@ -4060,8 +4060,8 @@
    "support": true,
    "openings": 1,
    "summary": {
-    "en": "Keep the books of a field office in Raqqa in order: accurate daily entries, a clean monthly close and records ready for every audit. A full-time role for an accountant with three to seven years of experience who works carefully to written financial procedures and can explain them to colleagues.",
-    "ar": "ضبط حسابات مكتب ميداني في الرقة: قيود يومية دقيقة، وإقفال شهري منظم، وسجلات جاهزة لكل تدقيق. وظيفة بدوام كامل لمحاسب لديه خبرة من ثلاث إلى سبع سنوات، يلتزم بالإجراءات المالية المكتوبة ويستطيع شرحها لزملائه."
+    "en": "Keep the books of a field office in Raqqa in order: accurate daily entries, a clean monthly close and records ready for every audit. A full-time role for an accountant with four to eight years of experience who works carefully to written financial procedures and can explain them to colleagues.",
+    "ar": "ضبط حسابات مكتب ميداني في الرقة: قيود يومية دقيقة، وإقفال شهري منظم، وسجلات جاهزة لكل تدقيق. وظيفة بدوام كامل لمحاسب لديه خبرة من أربع إلى ثماني سنوات، يلتزم بالإجراءات المالية المكتوبة ويستطيع شرحها لزملائه."
    },
    "duties": {
     "en": [
@@ -4080,12 +4080,12 @@
    "needs": {
     "en": [
      "Degree in accounting, economics or business administration",
-     "Three to seven years in accounting, ideally including audits at an NGO or company",
+     "Four to eight years in accounting, ideally including audits at an NGO or company",
      "Working English for financial reports, and strong Excel"
     ],
     "ar": [
      "شهادة في المحاسبة أو الاقتصاد أو إدارة الأعمال",
-     "خبرة من ثلاث إلى سبع سنوات في المحاسبة، ويُفضّل أن تشمل التدقيق لدى منظمة أو شركة",
+     "خبرة من أربع إلى ثماني سنوات في المحاسبة، ويُفضّل أن تشمل التدقيق لدى منظمة أو شركة",
      "إنكليزية عملية لكتابة التقارير المالية، وإتقان جيد لإكسل"
     ]
    },
@@ -4208,8 +4208,8 @@
    "support": false,
    "openings": 1,
    "summary": {
-    "en": "Run a hospital pharmacy in Idlib so that the right medicines are in stock and reach patients safely. A full-time role for a pharmacist with three to seven years of experience, ideally in a hospital, who keeps careful records and works well with doctors and nurses.",
-    "ar": "إدارة صيدلية مستشفى في إدلب لضمان توفر الأدوية المناسبة ووصولها إلى المرضى بأمان. وظيفة بدوام كامل لصيدلاني لديه خبرة من ثلاث إلى سبع سنوات، ويُفضّل في مستشفى، يحرص على دقة السجلات ويتعاون جيداً مع الأطباء والممرضين."
+    "en": "Run a hospital pharmacy in Idlib so that the right medicines are in stock and reach patients safely. A full-time role for a pharmacist with four to eight years of experience, ideally in a hospital, who keeps careful records and works well with doctors and nurses.",
+    "ar": "إدارة صيدلية مستشفى في إدلب لضمان توفر الأدوية المناسبة ووصولها إلى المرضى بأمان. وظيفة بدوام كامل لصيدلاني لديه خبرة من أربع إلى ثماني سنوات، ويُفضّل في مستشفى، يحرص على دقة السجلات ويتعاون جيداً مع الأطباء والممرضين."
    },
    "duties": {
     "en": [
@@ -4228,12 +4228,12 @@
    "needs": {
     "en": [
      "Degree in pharmacy and a licence to practise in Syria",
-     "Three to seven years as a pharmacist, ideally in a hospital",
+     "Four to eight years as a pharmacist, ideally in a hospital",
      "Working English for stock reports and drug information"
     ],
     "ar": [
      "شهادة في الصيدلة وترخيص مزاولة المهنة في سوريا",
-     "خبرة من ثلاث إلى سبع سنوات في الصيدلة، ويُفضّل في مستشفى",
+     "خبرة من أربع إلى ثماني سنوات في الصيدلة، ويُفضّل في مستشفى",
      "إنكليزية عملية لتقارير المخزون والنشرات الدوائية"
     ]
    },
@@ -4540,12 +4540,12 @@
    "needs": {
     "en": [
      "Degree in chemistry or environmental engineering; a master's is an advantage",
-     "Three or more years of work in a water or environmental laboratory",
+     "Four or more years of work in a water or environmental laboratory",
      "Working English for reading papers and writing up results"
     ],
     "ar": [
      "شهادة في الكيمياء أو الهندسة البيئية، ويُعدّ الماجستير ميزة إضافية",
-     "خبرة ثلاث سنوات على الأقل في مختبرات المياه أو البيئة",
+     "خبرة أربع سنوات على الأقل في مختبرات المياه أو البيئة",
      "إنكليزية عملية لقراءة الأبحاث وكتابة النتائج"
     ]
    },
@@ -4953,10 +4953,10 @@
     "en": "Kitchen Assistant: Preparation, Cleaning and Stock",
     "ar": "مساعد مطبخ للتحضير والتنظيف والمخزون"
    },
-   "gov": "aleppo",
+   "gov": "damascus",
    "place": {
-    "en": "Aleppo",
-    "ar": "حلب"
+    "en": "Damascus",
+    "ar": "دمشق"
    },
    "type": "full",
    "level": "entry",
@@ -5092,13 +5092,13 @@
   {
    "company": "Cali Restaurant",
    "title": {
-    "en": "Restaurant Server, Seasonal Seafront Branch",
-    "ar": "نادل في فرع موسمي على الواجهة البحرية"
+    "en": "Restaurant Server, Summer Season",
+    "ar": "نادل لموسم الصيف"
    },
-   "gov": "tartus",
+   "gov": "latakia",
    "place": {
-    "en": "Tartus, on the seafront",
-    "ar": "طرطوس، على الواجهة البحرية"
+    "en": "Latakia, on the corniche",
+    "ar": "اللاذقية، على الكورنيش"
    },
    "type": "full",
    "level": "entry",
@@ -5116,8 +5116,8 @@
    "support": false,
    "openings": 3,
    "summary": {
-    "en": "A full-time seasonal job serving tables at a seafront branch through the summer season. No degree or experience is needed: you will be trained on the menu, table service and hygiene before the season opens.",
-    "ar": "عمل موسمي بدوام كامل في خدمة الطاولات بفرع على الواجهة البحرية خلال موسم الصيف. لا تُشترط شهادة ولا خبرة، وستتدرب على قائمة الطعام وأصول الخدمة والنظافة قبل افتتاح الموسم."
+    "en": "A full-time seasonal job serving tables at the seafront restaurant through the summer season. No degree or experience is needed: you will be trained on the menu, table service and hygiene before the season opens.",
+    "ar": "عمل موسمي بدوام كامل في خدمة الطاولات في المطعم على الواجهة البحرية خلال موسم الصيف. لا تُشترط شهادة ولا خبرة، وستتدرب على قائمة الطعام وأصول الخدمة والنظافة قبل افتتاح الموسم."
    },
    "duties": {
     "en": [
@@ -5157,7 +5157,7 @@
      "بدل مواصلات للورديات المتأخرة"
     ]
    },
-   "tags": "waiter server restaurant seasonal summer seafront hospitality tables نادل جرسون مطعم موسمي صيف طرطوس",
+   "tags": "waiter server restaurant seasonal summer seafront hospitality tables نادل جرسون مطعم موسمي صيف اللاذقية",
    "daysAgo": 6
   },
   {
@@ -5311,10 +5311,10 @@
     "en": "Site Engineer, Residential Building Project",
     "ar": "مهندس موقع في مشروع بناء سكني"
    },
-   "gov": "rifdimashq",
+   "gov": "homs",
    "place": {
-    "en": "Project site in Rural Damascus",
-    "ar": "موقع المشروع في ريف دمشق"
+    "en": "Project site in Homs",
+    "ar": "موقع المشروع في حمص"
    },
    "type": "full",
    "level": "junior",
@@ -5334,11 +5334,11 @@
    ],
    "anyFaculty": false,
    "noDegree": false,
-   "support": true,
+   "support": false,
    "openings": 1,
    "summary": {
-    "en": "Day-to-day site engineering on a residential building project in Rural Damascus. You set out axes and levels, check formwork and reinforcement before each pour, and keep the site diary and progress reports for the project manager.",
-    "ar": "أعمال هندسة الموقع اليومية في مشروع بناء سكني في ريف دمشق. تتولى توقيع المحاور والمناسيب، وفحص القوالب والتسليح قبل كل صبّة، وتدوين يومية الموقع وإعداد تقارير سير العمل لمدير المشروع."
+    "en": "Day-to-day site engineering on a residential building project in Homs. You set out axes and levels, check formwork and reinforcement before each pour, and keep the site diary and progress reports for the project manager.",
+    "ar": "أعمال هندسة الموقع اليومية في مشروع بناء سكني في حمص. تتولى توقيع المحاور والمناسيب، وفحص القوالب والتسليح قبل كل صبّة، وتدوين يومية الموقع وإعداد تقارير سير العمل لمدير المشروع."
    },
    "duties": {
     "en": [
@@ -5368,12 +5368,12 @@
    },
    "provides": {
     "en": [
-     "Daily transport to the site from central Damascus",
+     "Daily transport to the site from central Homs",
      "Safety boots, helmet and high-visibility vest",
      "Close guidance from the project manager"
     ],
     "ar": [
-     "نقل يومي إلى الموقع من وسط دمشق",
+     "نقل يومي إلى الموقع من وسط حمص",
      "حذاء أمان وخوذة وسترة عاكسة",
      "توجيه مباشر من مدير المشروع"
     ]
@@ -5507,12 +5507,12 @@
    "needs": {
     "en": [
      "Degree in economics, civil engineering or a related field",
-     "Three to seven years in livelihoods, early recovery or community projects",
+     "Four to eight years in livelihoods, early recovery or community projects",
      "Working English for reports and meetings"
     ],
     "ar": [
      "شهادة في الاقتصاد أو الهندسة المدنية أو مجال قريب",
-     "خبرة من ثلاث إلى سبع سنوات في سبل العيش أو التعافي المبكر أو المشاريع المجتمعية",
+     "خبرة من أربع إلى ثماني سنوات في سبل العيش أو التعافي المبكر أو المشاريع المجتمعية",
      "إنكليزية عملية لكتابة التقارير وحضور الاجتماعات"
     ]
    },
@@ -5827,10 +5827,10 @@
     "en": "Pharmacist, Neighbourhood Branch",
     "ar": "صيدلاني في فرع داخل حيّ سكني"
    },
-   "gov": "sweida",
+   "gov": "rifdimashq",
    "place": {
-    "en": "As-Suwayda city",
-    "ar": "مدينة السويداء"
+    "en": "Rural Damascus",
+    "ar": "ريف دمشق"
    },
    "type": "full",
    "level": "junior",
@@ -5853,8 +5853,8 @@
    "support": false,
    "openings": 1,
    "summary": {
-    "en": "Run the dispensing counter at a neighbourhood pharmacy branch in As-Suwayda. You check and dispense prescriptions, advise patients on the safe use of medicines and keep stock and records in order.",
-    "ar": "تولّي صرف الأدوية في فرع صيدلية داخل حيّ سكني في السويداء. تتحقق من الوصفات الطبية وتصرفها، وتقدّم للمرضى النصح حول الاستخدام الآمن للأدوية، وتحافظ على انتظام المخزون والسجلات."
+    "en": "Run the dispensing counter at a neighbourhood pharmacy branch in Rural Damascus. You check and dispense prescriptions, advise patients on the safe use of medicines and keep stock and records in order.",
+    "ar": "تولّي صرف الأدوية في فرع صيدلية داخل حيّ سكني في ريف دمشق. تتحقق من الوصفات الطبية وتصرفها، وتقدّم للمرضى النصح حول الاستخدام الآمن للأدوية، وتحافظ على انتظام المخزون والسجلات."
    },
    "duties": {
     "en": [
@@ -5892,7 +5892,7 @@
      "دعم من صيدلاني ذي خبرة خلال الأسابيع الأولى"
     ]
    },
-   "tags": "pharmacist pharmacy dispensing prescriptions medicines community licence sweida صيدلاني صيدلية أدوية وصفات السويداء",
+   "tags": "pharmacist pharmacy dispensing prescriptions medicines community licence damascus صيدلاني صيدلية أدوية وصفات ريف دمشق",
    "daysAgo": 8
   },
   {
@@ -5922,8 +5922,8 @@
    "support": false,
    "openings": 2,
    "summary": {
-    "en": "Load, unload and move pallets with a forklift in a distribution warehouse in Rural Damascus. This is an entry-level role: your forklift driving is checked on the first day and you are trained on the warehouse routines. No degree needed.",
-    "ar": "تحميل المنصّات (الطبالي) وتنزيلها ونقلها بالرافعة الشوكية في مستودع توزيع في ريف دمشق. الوظيفة مناسبة للمبتدئين: تُختبر مهارتك في قيادة الرافعة في اليوم الأول وتتدرّب على إجراءات المستودع. لا تُشترط شهادة جامعية."
+    "en": "Load, unload and move pallets with a forklift in a distribution warehouse in Rural Damascus. This is an entry-level role: you are trained to drive the forklift safely and taught the warehouse routines in your first weeks. No degree needed.",
+    "ar": "تحميل المنصّات (الطبالي) وتنزيلها ونقلها بالرافعة الشوكية في مستودع توزيع في ريف دمشق. الوظيفة مناسبة للمبتدئين: تتدرّب على قيادة الرافعة بأمان وعلى إجراءات المستودع خلال الأسابيع الأولى. لا تُشترط شهادة جامعية."
    },
    "duties": {
     "en": [
@@ -5942,12 +5942,12 @@
    "needs": {
     "en": [
      "No degree needed",
-     "Can drive a forklift; a little experience is enough",
+     "No forklift experience needed: training is given",
      "Follows safety rules and works well in a team"
     ],
     "ar": [
      "لا تُشترط شهادة جامعية",
-     "القدرة على قيادة الرافعة الشوكية، وتكفي خبرة بسيطة",
+     "لا تُشترط خبرة في قيادة الرافعة الشوكية، إذ يُقدَّم التدريب اللازم",
      "الالتزام بقواعد السلامة وحسن العمل ضمن فريق"
     ]
    },
