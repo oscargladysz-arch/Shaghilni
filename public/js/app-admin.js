@@ -54,12 +54,14 @@ ${c.about && (c.about.ar || c.about.en) ? html`<p class="card-p">${L(bi(c.about)
 async function drawJobs() {
   const list = (await api.get("/api/admin/jobs?status=pending")).jobs, b = $("#admBody"); if (!b) return;
   if (!list.length) { put(b, stateHTML("check", t("adEmpty"))); return; }
-  put(b, html`<ul class="alist">${list.map(j => { const x = { ...j, title: bi(j.title), co: bi(j.co), summary: bi(j.summary), duties: biList(j.duties), needs: biList(j.needs), provides: biList(j.provides) };
+  ADM.jobs = list;   // Approve reads which listings carry a fee flag (P2-6)
+  put(b, html`<ul class="alist">${list.map(j => { const fee = (j.flags || []).find(f => f.type === "fee"); const x = { ...j, title: bi(j.title), co: bi(j.co), summary: bi(j.summary), duties: biList(j.duties), needs: biList(j.needs), provides: biList(j.provides) };
     return html`<li class="acard acard--ap"><span class="acard-main">
 <span class="acard-t">${L(x.title)}</span><span class="acard-s">${L(x.co)} · ${j.gov && GOV[j.gov] ? L(GOV[j.gov]) : "—"} · ${x.pay && x.pay[0] ? payText(x).main : "—"}</span>
 <span class="acard-meta">${j.companyStatus !== "verified" ? html`<span class="pill pill--warn">${t("coStatus_" + j.companyStatus)}</span>` : ""}${(j.flags || []).map(f => html`<span class="pill pill--warn">${t(f.type === "contact" ? "adFlagContact" : f.type === "fee" ? "adFlagFee" : "adFlagGender", { x: f.word })}</span>`)}</span>
 <details class="rules"><summary class="rules-sum">${t("hAbout")}</summary><p class="card-p">${L(x.summary)}</p>${[L(bi(j.place)), L(bi(j.contact && j.contact.name)), L(bi(j.contact && j.contact.role)), L(bi(j.contact && j.contact.status)), j.tags].filter(Boolean).length ? html`<p class="card-p"><span class="lbl">${t("hContact")}:</span> ${[L(bi(j.place)), L(bi(j.contact && j.contact.name)), L(bi(j.contact && j.contact.role)), L(bi(j.contact && j.contact.status)), j.tags].filter(Boolean).join(" · ")}</p>` : ""}
 ${[["hDuties", x.duties], ["hNeeds", x.needs], ["hProvides", x.provides]].map(([k, arr]) => (L(arr).length ? html`<p class="lbl">${t(k)}</p><ul class="rules-list">${L(arr).map(s => html`<li>${s}</li>`)}</ul>` : ""))}</details>
+${fee ? html`<label class="tick"><input type="checkbox" id="fee-${j.id}"><span>${t("adFeeChecked", { x: fee.word })}</span></label>` : ""}
 <span class="field"><label class="lbl" for="note-j${j.id}">${t("adNote")}</label><textarea class="inp inp--note" id="note-j${j.id}"></textarea></span>
 <span class="acard-act"><button class="btn btn--primary" type="button" data-act="adm-approve" data-id2="${j.id}"${j.companyStatus !== "verified" ? raw(" disabled") : ""}>${icon("check", 15, 2.4)}${t("adApprove")}</button>
 <button class="btn" type="button" data-act="adm-jreject" data-id2="${j.id}">${t("adReject")}</button></span></span></li>`; })}</ul>`);
@@ -89,7 +91,9 @@ async function admAct(act, el) {
       run(() => api.post(`/api/admin/companies/${id}/verify`, { screened: true, note: note("#note-c" + id) }), "tVerified"); break; }
     case "adm-reject": run(() => api.post(`/api/admin/companies/${id}/reject`, { note: note("#note-c" + id) }), "tSentBack"); break;
     case "adm-suspend": run(() => api.post(`/api/admin/companies/${id}/suspend`, { note: note("#note-c" + id) }), "tSuspended"); break;
-    case "adm-approve": run(() => api.post(`/api/admin/jobs/${id}/approve`, { note: note("#note-j" + id) }).then(loadJobs).then(rescore), "tPublished"); break;
+    case "adm-approve": { const fee = (ADM.jobs || []).some(j => j.id === id && (j.flags || []).some(f => f.type === "fee")), box = $("#fee-" + id);
+      if (fee && (!box || !box.checked)) { toast({ title: t("err_fee_check_required"), ic: "alert" }); if (box) box.focus(); break; }   // the server refuses it too (P2-6)
+      run(() => api.post(`/api/admin/jobs/${id}/approve`, fee ? { feeChecked: true, note: note("#note-j" + id) } : { note: note("#note-j" + id) }).then(loadJobs).then(rescore), "tPublished"); break; }
     case "adm-jreject": run(() => api.post(`/api/admin/jobs/${id}/reject`, { note: note("#note-j" + id) }), "tSentBack"); break;
     case "adm-confirm": { const pg = $("#hp-" + id); run(() => api.post(`/api/admin/applications/${id}/confirm-hire`, { programmeId: pg && pg.value ? Number(pg.value) : null }), "tConfirmed"); break; }
     case "adm-plan-set": case "adm-charge": case "adm-prog-add": billingAct(act, el); break;

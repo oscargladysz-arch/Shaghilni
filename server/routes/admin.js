@@ -83,9 +83,10 @@ export function registerAdmin(r, deps) {
     if (j.status !== "pending") fail(409, "bad_state");
     if (j.c_status !== "verified") fail(409, "company_not_verified");
     const check = checkJob(core, J(j.data) || {}); if (check.fee) fail(422, "fee_requested", check.fee);   // the posting checks run again at approval, whatever reached the queue (D-05)
+    const feeFlag = check.flags.find(f => f.type === "fee"); if (feeFlag && ctx.body.feeChecked !== true) fail(422, "fee_check_required", feeFlag.word);   // fee wording is published only once the reviewer says they read it (P2-6)
     db.run("UPDATE jobs SET status = 'published', published_at = COALESCE(published_at, ?), reviewed_by = ?, review_note = ?, updated_at = ? WHERE id = ?",
       now(), ctx.user.id, String(ctx.body.note || "").slice(0, 1000), now(), j.id);
-    audit(ctx.user.id, "job.approved", "job", j.id, null);
+    audit(ctx.user.id, "job.approved", "job", j.id, feeFlag ? { feeChecked: true, feeWord: feeFlag.word } : null);
     return { ok: true };
   });
   r.post("/api/admin/jobs/:id/reject", admin, ctx => {
