@@ -105,7 +105,7 @@ Brief `<features>` letters → areas: A → 1, 13 · B → 1, 2, 3, 4, 5, 14 · 
 | Job alerts: up to 5 saved searches, duplicate refused, channel app/email/sms, new-match counts, mark seen, delete; owner-scoped | VERIFIED | `server/alerts.js:48-76` (`alert_limit` :61, `alert_exists` :62, audit `alert.created` :66); `server/validate.js:139-143` | diaspora: "job alerts: save a search, count new matches, and get one digest a day by email or text" :89-109; lite :182-189 | `PUT /api/me/alerts/:id` has no test |
 | Alert digest at most about once a day (0.8 day) by email or SMS, up to 10 jobs, Lite links; hourly checker | VERIFIED | `server/alerts.js:19-45`; `server/index.js:15` | diaspora :83-110 | Hourly timer itself untested (entry point) |
 | Alert match rule shared with the board (`alertMatches`) | VERIFIED (Stage 3) | `engine.js:1141-1148`; `server/alerts.js:19-20` | diaspora :96-104; diaspora: "returnees…" | Stage 3: a remote listing matches a governorate alert, as on the board (D-26 fixed); the server side is tested through `core`, the browser side is the same source |
-| Lite jobs tab (search, type chips, governorate, returnees, saved, fit pill, sponsored, 12 per page) | PARTIAL | `server/lite.js:161-190` | lite :83,87,124-126,179-181 | Lite search = whole-phrase substring over title and company only (`lite.js:164,167`) |
+| Lite jobs tab (search, type chips, governorate, returnees, saved, fit pill, sponsored, 12 per page) | PARTIAL | `server/lite.js:162-191` | lite :83,87,124-126,179-181 | Lite search = whole-phrase substring over title and company only (`lite.js:164,167`) |
 | Admin re-approval keeps the original `published_at` (edited listing returns to its old position) | VERIFIED | `server/routes/admin.js:76` `COALESCE` | api: "edits send live listings…" :198-199 | Undocumented behaviour (anti-gaming) |
 
 ## Area 3 · Applying, applications, pipeline, notifications, contact reveal (brief B, D)
@@ -416,10 +416,10 @@ Brief `<features>` letters → areas: A → 1, 13 · B → 1, 2, 3, 4, 5, 14 · 
 | Signed per-browser form token (`lt` cookie, HMAC, timing-safe, Origin/Sec-Fetch-Site refusal) | VERIFIED | `lite.js:104,147,629-630,645-648,654-655` | lite: "lite: a job seeker signs in, builds a profile…" :104-105 | — |
 | In-process handler calls (same guards, validation, limits, audit) | VERIFIED | `lite.js:120-128`; `app.js:59` | lite :116-117,122,131,165 | — |
 | Language (`?lang=` → `ll` cookie → Accept-Language → Arabic) | VERIFIED | `lite.js:631-633,140,142` | lite :74,85-86 | — |
-| Job board (search, type chips, governorate, returnees, saved, fit pill, pay, tiles) | VERIFIED | `lite.js:161-190` | lite :83,87,125-126,179-181 | Stage 3: the governorate filter keeps remote listings and Saved keeps listings past the cap (D-26, D-27 fixed) |
+| Job board (search, type chips, governorate, returnees, saved, fit pill, pay, tiles) | VERIFIED | `lite.js:162-191` | lite :83,87,125-126,179-181 | Stage 3: the governorate filter keeps remote listings and Saved keeps listings past the cap (D-26, D-27 fixed) |
 | Pagination (12/page, clamp 1–50) | PARTIAL | `lite.js:165,171,187` | none | — |
 | Sponsored lift/label in Lite | PARTIAL | `lite.js:169-170,183` | none | Inline hex pill colours |
-| Job page (fields, apply buttons per channel, applied notice, 404) | VERIFIED | `lite.js:191-210` | lite :84; contact :82-83; lite (D-195) | A sample listing shows the full site's `demoNote` in the top card (D-195; before, Lite showed none) |
+| Job page (fields, apply buttons per channel, applied notice, 404) | VERIFIED | `lite.js:192-211` | lite :84; contact :82-83; lite :267 (D-195) | A sample listing shows the full site's `demoNote` in the top card and `demoListing` in the apply card (D-195; before, Lite showed neither) |
 | Quick apply from Lite | VERIFIED | `lite.js:218-225` | lite :121-122 | — |
 | WhatsApp / call / email apply from Lite | PARTIAL | `lite.js:203-206,226-239` | contact :82-83 (buttons only) | Result pages unasserted |
 | Save / unsave | VERIFIED | `lite.js:158,211-217` | lite :124-125 | — |

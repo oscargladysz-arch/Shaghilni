@@ -217,7 +217,7 @@ All Lite POSTs require the signed per-browser token (`lt` cookie + `csrf` field,
 | Method | Path | Guard | File:line | Tests that hit it | Matrix | Audit | Notes |
 |---|---|---|---|---|---|---|---|
 | GET | `/lite` | none; employers redirected to `/lite/hire` | `server/lite.js:602` (jobsPage :161) | lite :72-87,120,125-126,179-181; traffic :75 | — | none | 12 per page; pages 1–50 |
-| GET | `/lite/job/:id` | none; employers redirected | `server/lite.js:602` (jobPage :191) | lite :84; contact :82 | — | none | — |
+| GET | `/lite/job/:id` | none; employers redirected | `server/lite.js:602` (jobPage :192) | lite :84; contact :82; lite :267 (D-195) | — | none | A sample listing shows `demoNote` and, in its apply card, `demoListing` (D-195) |
 | POST | `/lite/job/:id/apply` | seeker with profile; via `POST /api/jobs/:id/apply` | `server/lite.js:602` (applyPost :218) | lite :121 | — | via API `application.created` | WhatsApp/call/email branches untested |
 | POST | `/lite/job/:id/save` | seeker; via `POST`/`DELETE /api/me/saved/:jobId` | `server/lite.js:602` (savePost :211) | lite :124 | — | none | — |
 | GET | `/lite/applications` | seeker (guest → gate; other roles → `/lite`); via `GET /api/me/applications` | `server/lite.js:603` (appsPage :244) | lite :89-90,123 | — | none | — |

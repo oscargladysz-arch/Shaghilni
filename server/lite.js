@@ -197,7 +197,7 @@ ${ctx.user && ctx.user.role === "seeker" ? saveBtn(ctx, j, saved.has(j.id)) : ""
     const list = (key, v) => { const a = (v && (v[lg] && v[lg].length ? v[lg] : v.en && v.en.length ? v.en : v.ar)) || []; return a.length ? `<h2>${esc(tr(lg, key))}</h2><ul class="b" dir="auto">${a.map(x => `<li dir="auto">${esc(x)}</li>`).join("")}</ul>` : ""; };
     const mine = ctx.user && ctx.user.role === "seeker" ? db.get("SELECT status FROM applications WHERE job_id = ? AND user_id = ? AND status != 'withdrawn'", j.id, ctx.user.id) : null;
     const act = mine ? `<p class="fl">${esc(tr(lg, "applied1"))} <a href="/lite/applications">${esc(tr(lg, "seeApps"))}</a></p>`
-      : `<div class="cd" id="apply"><form method="post" action="/lite/job/${j.id}/apply">${hidden(ctx, { channel: "web" })}<button class="bt" type="submit">${esc(tr(lg, "apply"))}</button></form>
+      : `<div class="cd" id="apply">${j.demo ? `<p class="mu">${esc(tr(lg, "demoListing"))}</p>` : ""}<form method="post" action="/lite/job/${j.id}/apply">${hidden(ctx, { channel: "web" })}<button class="bt" type="submit">${esc(tr(lg, "apply"))}</button></form>
 ${j.hasWhatsapp ? `<form method="post" action="/lite/job/${j.id}/apply">${hidden(ctx, { channel: "whatsapp" })}<button class="bt wa" type="submit">${I("brand-whatsapp")} ${esc(tr(lg, "applyWa"))}</button></form>` : ""}
 ${j.applyCall ? `<form method="post" action="/lite/job/${j.id}/apply">${hidden(ctx, { channel: "call" })}<button class="b2" type="submit">${esc(tr(lg, "applyCallBtn"))}</button></form>` : ""}
 ${j.applyEmail ? `<form method="post" action="/lite/job/${j.id}/apply">${hidden(ctx, { channel: "email" })}<button class="b2" type="submit">${esc(tr(lg, "applyEmailBtn"))}</button></form>` : ""}
