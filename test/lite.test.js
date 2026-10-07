@@ -264,14 +264,17 @@ test("lite: remote listings show under every governorate, and a saved listing st
   assert.match((await b.get("/lite?saved=1&lang=en")).text, /Keep me/, "D-27: the saved listing is on the Saved page although it is older than the 500 newest");
 });
 
-test("lite: a sample listing says it is a sample and names the organisation, in English and Arabic, as the full site does; a real employer's listing does not; the page stays within the budget (D-195, owner decision D1)", async () => {
+test("lite: a sample listing says it is a sample and names the organisation, and its apply card says no employer receives the applications, in English and Arabic, as the full site does; a real employer's listing says neither; the page stays within the budget (D-195, owner decision D1)", async () => {
   const S = await start(), admin = await S.login("+12025550199"), { e } = await employer(S, admin, "0955 795 101", "Real Note Co"), b = S.browser();
   const demo = S.db.get("SELECT j.id, c.data FROM jobs j JOIN companies c ON c.id = j.company_id WHERE j.is_demo = 1 AND j.status = 'published' ORDER BY j.id LIMIT 1"), name = JSON.parse(demo.data).name;
-  assert.ok((await b.get(`/lite/job/${demo.id}?lang=en`)).text.includes(`Sample listing for demonstration. ${name.en} has not posted this role on Shaghilni.`), "English, the full site's sentence");
-  assert.ok((await b.get(`/lite/job/${demo.id}?lang=ar`)).text.includes(`إعلان توضيحي لأغراض العرض، ولم تُنشر هذه الوظيفة من قِبل ${name.ar} على شغّلني.`), "Arabic, the full site's sentence");
+  const en = (await b.get(`/lite/job/${demo.id}?lang=en`)).text, ar = (await b.get(`/lite/job/${demo.id}?lang=ar`)).text, card = html => (/<div class="cd" id="apply">[\s\S]*?<\/div>/.exec(html) || [""])[0];
+  assert.ok(en.includes(`Sample listing for demonstration. ${name.en} has not posted this role on Shaghilni.`), "English, the full site's sentence");
+  assert.ok(ar.includes(`إعلان توضيحي لأغراض العرض، ولم تُنشر هذه الوظيفة من قِبل ${name.ar} على شغّلني.`), "Arabic, the full site's sentence");
+  assert.ok(card(en).includes("Demo listing: applications are recorded but no employer receives them."), "the apply card says what the full site's apply sheet says (English)");
+  assert.ok(card(ar).includes("إعلان تجريبي: تُسجَّل الطلبات لكن لا يستلمها أي صاحب عمل."), "and in Arabic");
   const j = (await e.post("/api/employer/jobs", { job: { title: { en: "Real role" }, gov: "homs", type: "full", level: "entry", pay: [1500000, 2000000], langs: ["ar"], summary: { en: "Work with us." } }, submit: true })).body.job;
   assert.equal((await admin.post(`/api/admin/jobs/${j.id}/approve`)).status, 200);
   const real = (await b.get(`/lite/job/${j.id}?lang=en`)).text;
-  assert.ok(real.includes("Real role") && !/Sample listing|إعلان توضيحي/.test(real), "a real employer's listing carries no sample note");
+  assert.ok(real.includes("Real role") && !/Sample listing|إعلان توضيحي|Demo listing/.test(real), "a real employer's listing carries no sample note");
   for (const lg of ["en", "ar"]) { const w = await S.raw(`/lite/job/${demo.id}?lang=${lg}`); assert.ok(w.bytes < 3072, `the sample listing page stays small (${lg}: ${w.bytes} bytes)`); }
 });
