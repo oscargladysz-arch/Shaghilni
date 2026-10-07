@@ -136,7 +136,7 @@ test("posting checks on the server: an explicit fee demand is refused in every b
   assert.equal(own.body.detail, "deposit", "the word that tripped the check is named");
   // the reviewer decides on a flagged one
   const flagged = S.db.get("SELECT id FROM jobs WHERE company_id = ? AND status = 'pending' ORDER BY id LIMIT 1", A.companyId).id;
-  assert.equal((await admin.post(`/api/admin/jobs/${flagged}/approve`, {})).status, 200, "the admin publishes a flagged listing after reading it");
+  assert.equal((await admin.post(`/api/admin/jobs/${flagged}/approve`, { feeChecked: true })).status, 200, "the admin publishes a flagged listing after reading it, and says so (P2-6)");
 });
 
 test("verification gates publishing: a draft, pending or rejected company cannot submit a listing; a suspended company cannot submit, reopen or resubmit its page, and its listings leave the board", async () => {

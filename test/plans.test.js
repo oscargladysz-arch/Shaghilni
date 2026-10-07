@@ -189,3 +189,26 @@ test("admin billing: a company listed under both plan requests and verified comp
   await vm.runInContext("billingAct", ctx)("adm-plan-set", { dataset: data });
   assert.deepEqual(posts.map(p => [p.path, p.data.plan, p.data.months, p.data.amountUsd]), [["/api/admin/companies/7/plan", "enterprise", "12", "2400"]], "the figures typed in the form whose Save was pressed");
 });
+
+test("admin listings: a listing with a fee flag shows a check box, and Approve sends feeChecked only once it is ticked; a listing without one approves as before (P2-6)", async () => {
+  const { readFileSync } = await import("node:fs"), vm = (await import("node:vm")).default;
+  const els = new Map(), body = { innerHTML: "" }, posts = [], toasts = [];
+  const job = (id, flags) => ({ id, status: "pending", companyStatus: "verified", title: { en: `Job ${id}` }, co: { en: "Co" }, gov: "homs", pay: [1800000, 2200000], summary: { en: "Keep the stock records." }, duties: { en: [] }, needs: { en: [] }, provides: { en: ["University tuition fees covered"] }, place: {}, contact: {}, tags: "", flags });
+  const J = [job(5, [{ type: "fee", word: "fees" }]), job(6, [{ type: "contact", word: "+963944000123" }])];
+  const ctx = vm.createContext({ console, S: { lang: "en" }, ADM: {}, toast: x => toasts.push(x), errText: e => String(e), setTimeout: () => 0, busy() {}, loadAdminCounts: async () => {}, renderChrome() {}, renderAdmin() {}, loadJobs: async () => {}, rescore() {},
+    api: { get: async () => ({ jobs: J }), post: async (path, data) => { posts.push({ path, data }); return {}; } },
+    document: { querySelector: s => (s === "#admBody" ? body : els.get(s) || null), querySelectorAll: () => [] } });
+  for (const f of ["lookups.js", "i18n.js", "i18n2.js", "i18n3.js", "i18n4.js", "engine.js", "app-admin.js"]) vm.runInContext(readFileSync(new URL(`../public/js/${f}`, import.meta.url), "utf8"), ctx, { filename: f });
+  await vm.runInContext("drawJobs()", ctx);
+  assert.match(body.innerHTML, /id="fee-5"/, "the fee-flagged listing has the check box");
+  assert.doesNotMatch(body.innerHTML, /id="fee-6"/, "a listing without a fee flag has none");
+  const act = vm.runInContext("admAct", ctx);
+  await act("adm-approve", { dataset: { id2: "5" } });
+  assert.deepEqual(posts, [], "Approve without the tick sends nothing");
+  assert.ok(toasts.some(x => /fee/i.test(x.title)), `the reviewer is told why: ${JSON.stringify(toasts)}`);
+  els.set("#fee-5", { checked: true, focus() {} });
+  await act("adm-approve", { dataset: { id2: "5" } });
+  assert.deepEqual(posts.map(p => [p.path, p.data.feeChecked]), [["/api/admin/jobs/5/approve", true]], "with the tick, Approve says the fee wording was read");
+  await act("adm-approve", { dataset: { id2: "6" } });
+  assert.deepEqual(posts.at(-1), { path: "/api/admin/jobs/6/approve", data: { note: "" } }, "a listing without a fee flag is approved as before");
+});

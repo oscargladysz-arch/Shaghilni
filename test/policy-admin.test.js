@@ -289,3 +289,18 @@ test("policy admin: /api/admin/system reports health figures only: no file path 
   assert.ok(!r.text.includes(ROOT) && !r.text.includes(S.cfg.dbPath) && !/\/home\/|\/tmp\/|backups|\.db"/.test(r.text), `no file path: ${r.text.slice(0, 200)}`);
   assert.ok(Y.requests.lastHour.n >= 2 && Y.requests.lastHour.failed === 0, "the sign-in and this request were counted");
 });
+
+test("policy admin: a listing with a fee flag is approved only when the reviewer confirms they read it (feeChecked: true), and the confirmation is audited; other listings need no confirmation (P2-6)", async () => {
+  const S = await start(), admin = await S.login(ADMIN_PHONE), A = await employerWithLiveJob(S, admin, "0955 910 071", "Review Fee Flag"), e = A.e;
+  const post = async job => { const r = await e.post("/api/employer/jobs", { job, submit: true }); assert.equal(r.status, 200, r.text); return r.body.job.id; };
+  const fee = await post({ ...JOB, provides: { en: ["University tuition fees covered"] } }), contact = await post({ ...JOB, summary: { en: "Call +963944000123 for details." } });
+  for (const body of [{}, { feeChecked: "true" }, { feeChecked: 1 }, { note: "looks fine" }]) {
+    const r = await admin.post(`/api/admin/jobs/${fee}/approve`, body); assert.deepEqual([r.status, r.body.error], [422, "fee_check_required"], `${JSON.stringify(body)} → ${r.text}`);
+  }
+  assert.equal(S.db.get("SELECT status FROM jobs WHERE id = ?", fee).status, "pending", "a refused approval publishes nothing");
+  assert.equal((await admin.post(`/api/admin/jobs/${fee}/approve`, { feeChecked: true })).status, 200, "the reviewer confirms they read the fee wording");
+  const row = S.db.get("SELECT data FROM audit_log WHERE action = 'job.approved' AND entity_id = ? ORDER BY id DESC LIMIT 1", fee);
+  assert.deepEqual(JSON.parse(row.data), { feeChecked: true, feeWord: "fees" }, "the audit log says the fee flag was read, and which word");
+  assert.equal((await admin.post(`/api/admin/jobs/${contact}/approve`, {})).status, 200, "a listing with only a contact flag needs no fee confirmation");
+  assert.equal(S.db.get("SELECT data FROM audit_log WHERE action = 'job.approved' AND entity_id = ? ORDER BY id DESC LIMIT 1", contact).data, null, "and its approval records nothing about fees");
+});
