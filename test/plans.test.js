@@ -199,10 +199,11 @@ test("admin listings: a listing with a fee flag shows a check box, and Approve s
     api: { get: async () => ({ jobs: J }), post: async (path, data) => { posts.push({ path, data }); return {}; } },
     document: { querySelector: s => (s === "#admBody" ? body : els.get(s) || null), querySelectorAll: () => [] } });
   for (const f of ["lookups.js", "i18n.js", "i18n2.js", "i18n3.js", "i18n4.js", "engine.js", "app-admin.js"]) vm.runInContext(readFileSync(new URL(`../public/js/${f}`, import.meta.url), "utf8"), ctx, { filename: f });
+  vm.runInContext("renderAdmin = () => {}; rescore = () => {};", ctx);   // the files' own versions redraw the whole screen; the click's follow-up is not under test
   await vm.runInContext("drawJobs()", ctx);
   assert.match(body.innerHTML, /id="fee-5"/, "the fee-flagged listing has the check box");
   assert.doesNotMatch(body.innerHTML, /id="fee-6"/, "a listing without a fee flag has none");
-  const act = vm.runInContext("admAct", ctx);
+  const act = async (...a) => { await vm.runInContext("admAct", ctx)(...a); await new Promise(r => setImmediate(r)); };   // Approve's request runs after the click returns
   await act("adm-approve", { dataset: { id2: "5" } });
   assert.deepEqual(posts, [], "Approve without the tick sends nothing");
   assert.ok(toasts.some(x => /fee/i.test(x.title)), `the reviewer is told why: ${JSON.stringify(toasts)}`);
