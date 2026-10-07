@@ -329,3 +329,10 @@ test("policy admin: the fee confirmation binds to what the reviewer read: an app
   const id2 = await post("Exam fees covered"); S.db.run("UPDATE jobs SET flags = '[]' WHERE id = ?", id2);   // flags stored under an older word list
   assert.deepEqual((await queue(id2)).flags.filter(f => f.type === "fee"), [{ type: "fee", word: "fees" }], "the queue shows the flags approval will check (D-179)");
 });
+
+test("policy admin: the audit mask hides a phone number however it is written, and keeps a sum of money or a date readable (D-190)", async () => {
+  const { hideNumbers } = await import("../server/validate.js");
+  for (const s of ["You text +963 944 000 123 for pay", "You text 0944/000/123 for pay", "You text 0944–000–123 for pay", "You text 0944—000—123 for pay", "You text 0944_000_123 for pay", "You text 0944·000·123 for pay",
+    "You text ٠٩٤٤٬٠٠٠٬١٢٣ for pay", "You text ۰۹۴۴۰۰۰۱۲۳ for pay", "You text 0944‏000‏123 for pay"]) assert.equal(hideNumbers(s), "You text ••• for pay", s);
+  for (const s of ["Monthly stipend of 250.000 SYP paid", "pay 500 000 SYP", "Stipend 1,500,000 SYP paid monthly", "fee 2026-10-07", "1800000 SYP"]) assert.equal(hideNumbers(s), s, "a sum or a date stays as the reviewer read it");
+});

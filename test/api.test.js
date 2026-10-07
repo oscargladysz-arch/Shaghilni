@@ -392,12 +392,13 @@ test("resume suggestions: أمريكا and بريطانيا with و, ب or ل be
   assert.equal(g("عملت بأمريكا اللاتينية", "عملت في الولايات المتحدة"), false, "Latin America still is not the United States");
 });
 
-test("fit: a listing that names no field of study says so and gives half the field row, with no cap; no fit reads \"Asks for \" with nothing after it, in the sample listings either (D-177)", async () => {
+test("fit: a listing that names no field of study says so and gives the field row 8 of 35, as a listing that needs no degree, with no cap, so it never reads Strong fit for want of evidence (D-193); no fit reads \"Asks for \" with nothing after it, in the sample listings either (D-177)", async () => {
   const { readFileSync } = await import("node:fs"), { loadCore } = await import("../server/core.js"), core = loadCore();
   const me = { v: 1, role: "seeker", name: "Omar Aziz", gov: "aleppo", langs: ["ar", "en"], edu: { status: "bachelor", fac: "business" }, exp: [], skills: [] };
   const job = { title: { en: "Officer" }, gov: "aleppo", type: "full", level: "entry", mode: "onsite", pay: [1800000, 2200000], langs: ["ar"], recruits: [], anyFaculty: false, noDegree: false, summary: { en: "Keep the records." } };
   const fit = core.fitFor(me, job), f = fit.parts.find(p => p.k === "fField");
-  assert.deepEqual([f.state, f.pts, f.key, fit.capped], ["part", 17, "fieldOpen", false], "no field named: neither a match nor a miss");
+  assert.deepEqual([f.state, f.pts, f.key, fit.capped], ["part", 8, "fieldOpen", false], "no field named: neither a match nor a miss");
+  assert.ok(fit.score < 75, `everything else matching, it stays below the Strong tier: ${fit.score}`);
   for (const l of ["en", "ar"]) assert.ok(core.STR[l].fieldOpen && !core.STR[l].fieldOpen.includes("{"), `fieldOpen in ${l}`);
   const named = core.fitFor(me, { ...job, recruits: [["damascus", "petroleum"]] }), g = named.parts.find(p => p.k === "fField");
   assert.deepEqual([g.key, g.state, named.capped], ["fieldMiss", "no", true], "a listing that names another field still says which, and caps the score as before");

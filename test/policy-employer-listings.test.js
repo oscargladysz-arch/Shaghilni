@@ -285,3 +285,25 @@ test("an owner deleting their account closes only the live listings: text no rev
   assert.deepEqual([again.status, again.body.error, st(refusedId)], [422, "fee_requested", "closed"], `Reopen refuses a listing that asks candidates for money: ${again.text}`);
   assert.equal((await S.client().get(`/api/jobs/${flagged}`)).status, 404, "the unreviewed fee wording is not on the board");
 });
+
+test("Reopen publishes a listing only when the last change to its text was reviewed: rows an older deletion closed with an edit awaiting review, a rejected edit or a draft edit go back to draft; an owner's deletion ends a sponsorship (D-188, D-191)", async () => {
+  const S = await start(), { admin, A, recruiter } = await cast(S), e = A.e, st = id => S.db.get("SELECT status FROM jobs WHERE id = ?", id).status;
+  const live = async en => { const j = (await e.post("/api/employer/jobs", { job: titled(en), submit: true })).body.job; assert.equal((await admin.post(`/api/admin/jobs/${j.id}/approve`)).status, 200); return j.id; };
+  const pend = await live("Pending edit"), rej = await live("Rejected edit"), draft = await live("Draft edit"), clean = await live("Closed as approved");
+  assert.equal((await recruiter.put(`/api/employer/jobs/${pend}`, { job: titled("Female secretary wanted"), submit: true })).status, 200);
+  assert.equal((await recruiter.put(`/api/employer/jobs/${rej}`, { job: titled("Work abroad, visa guaranteed"), submit: true })).status, 200);
+  assert.equal((await admin.post(`/api/admin/jobs/${rej}/reject`, { note: "Looks like a visa scam" })).status, 200);
+  assert.equal((await recruiter.put(`/api/employer/jobs/${draft}`, { job: titled("Unreviewed draft edit") })).status, 200);
+  assert.equal((await recruiter.post(`/api/employer/jobs/${clean}/close`)).status, 200);
+  S.db.run(`UPDATE jobs SET status = 'closed' WHERE id IN (${[pend, rej, draft].join(",")})`);   // what an owner's deletion did before D-174: closed every listing, with no audit row
+  for (const id of [pend, rej, draft]) {
+    const r = await recruiter.post(`/api/employer/jobs/${id}/reopen`);
+    assert.deepEqual([r.status, st(id)], [200, "draft"], `text no reviewer approved goes back to draft, not on the board (${id}): ${r.text}`);
+    assert.equal((await S.client().get(`/api/jobs/${id}`)).status, 404);
+  }
+  const back = await recruiter.post(`/api/employer/jobs/${clean}/reopen`);
+  assert.deepEqual([back.status, st(clean)], [200, "published"], "a listing closed as it was approved reopens live, as before");
+  assert.equal((await e.post(`/api/employer/jobs/${A.jobId}/sponsor`, { on: true })).status, 200, "the owner sponsors the live listing");
+  assert.equal((await e.del("/api/me")).status, 200);
+  assert.deepEqual(Object.values(S.db.get("SELECT status, sponsored_until FROM jobs WHERE id = ?", A.jobId)), ["closed", null], "a listing the deletion closes holds no sponsored slot, as with Close (D-29)");
+});

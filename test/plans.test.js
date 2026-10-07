@@ -218,4 +218,5 @@ test("admin listings: a listing with a fee flag shows a check box, and Approve s
   fails.push({ code: "job_changed" }); const before = ctx.redraws;
   await act("adm-approve", { dataset: { id2: "6" } });
   assert.deepEqual([toasts.at(-1).title, ctx.redraws > before], ["job_changed", true], "a listing changed since it was read: the reviewer is told and the queue is drawn again");
+  for (const code of ["bad_state", "company_not_verified"]) { fails.push({ code }); const b = ctx.redraws; await act("adm-approve", { dataset: { id2: "6" } }); assert.ok(ctx.redraws > b, `${code}: a card that is out of date is drawn again (D-192)`); }
 });
