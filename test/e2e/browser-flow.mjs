@@ -112,7 +112,7 @@ try {
   check("profile saved on the server", me.profile && me.profile.name === "لينا حداد", me.profile ? me.profile.exp.length + " experience entries" : "no profile");
   await click(m, '[data-act="onb-finish"][data-then="jobs"]');
   await m.waitForSelector("#rows > li", { visible: true });
-  check("board shows the 18 sample listings that pass the posting checks", (await m.$$eval("#rows > li", x => x.length)) === 18);
+  check("board shows the 68 sample listings that pass the posting checks", (await m.$$eval("#rows > li", x => x.length)) === 68);
   await shot(m, "a5-board");
   await click(m, '[data-act="view"][data-view="alerts"]'); await m.waitForSelector('[data-act="al-save"]', { visible: true, timeout: 8000 });
   await shot(m, "a5b-alerts"); await click(m, '[data-act="al-save"]'); await m.waitForSelector(".al-row", { visible: true, timeout: 8000 });
@@ -208,7 +208,7 @@ try {
   await a.waitForSelector('[data-act="adm-approve"]:not([disabled])', { visible: true, timeout: 8000 });
   await shot(a, "c3-review-queue");
   await click(a, '[data-act="adm-approve"]'); await sleep(700);
-  check("listing is live", (await apiGet(a, "/api/jobs")).jobs.length === 19);
+  check("listing is live", (await apiGet(a, "/api/jobs")).jobs.length === 69);
 
   /* D. Seeker applies by WhatsApp; employer runs the pipeline; admin confirms the hire */
   await m.goto(BASE + "/#/", { waitUntil: "networkidle0" });
