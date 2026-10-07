@@ -419,7 +419,7 @@ Brief `<features>` letters → areas: A → 1, 13 · B → 1, 2, 3, 4, 5, 14 · 
 | Job board (search, type chips, governorate, returnees, saved, fit pill, pay, tiles) | VERIFIED | `lite.js:161-190` | lite :83,87,125-126,179-181 | Stage 3: the governorate filter keeps remote listings and Saved keeps listings past the cap (D-26, D-27 fixed) |
 | Pagination (12/page, clamp 1–50) | PARTIAL | `lite.js:165,171,187` | none | — |
 | Sponsored lift/label in Lite | PARTIAL | `lite.js:169-170,183` | none | Inline hex pill colours |
-| Job page (fields, apply buttons per channel, applied notice, 404) | VERIFIED | `lite.js:191-210` | lite :84; contact :82-83 | — |
+| Job page (fields, apply buttons per channel, applied notice, 404) | VERIFIED | `lite.js:191-210` | lite :84; contact :82-83; lite (D-195) | A sample listing shows the full site's `demoNote` in the top card (D-195; before, Lite showed none) |
 | Quick apply from Lite | VERIFIED | `lite.js:218-225` | lite :121-122 | — |
 | WhatsApp / call / email apply from Lite | PARTIAL | `lite.js:203-206,226-239` | contact :82-83 (buttons only) | Result pages unasserted |
 | Save / unsave | VERIFIED | `lite.js:158,211-217` | lite :124-125 | — |

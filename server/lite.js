@@ -205,7 +205,7 @@ ${ctx.user ? "" : `<p class="mu">${esc(tr(lg, "signinToApply"))}</p>`}</div>`;
     const saved = new Set((M && M.saved) || []);
     return page(ctx, bi(j.title, lg), `<div class="cd"><div class="fx">${tile(j)}<div class="g1"><h1 dir="auto" style="margin:0">${esc(bi(j.title, lg))}</h1><div class="mu">${coLine(j, lg)}${bi(j.place, lg) ? " · " + esc(bi(j.place, lg)) : ""}</div></div>
 ${ctx.user && ctx.user.role === "seeker" ? saveBtn(ctx, j, saved.has(j.id)) : ""}</div>${payText(j, lg) ? `<p style="font-weight:700;font-size:17px;margin:10px 0 0">${esc(payText(j, lg))}</p>` : ""}
-${fit ? `<p><span class="pill">${esc(tr(lg, "match", { n: fit.score }))}</span></p>` : ""}${j.returnees ? `<p><span class="pill">${esc(tr(lg, "returneesTag"))}</span></p>` : ""}${bi(j.summary, lg) ? `<p dir="auto">${esc(bi(j.summary, lg))}</p>` : ""}</div>
+${fit ? `<p><span class="pill">${esc(tr(lg, "match", { n: fit.score }))}</span></p>` : ""}${j.returnees ? `<p><span class="pill">${esc(tr(lg, "returneesTag"))}</span></p>` : ""}${bi(j.summary, lg) ? `<p dir="auto">${esc(bi(j.summary, lg))}</p>` : ""}${j.demo ? `<p class="fl" dir="auto">${esc(tr(lg, "demoNote", { co: bi(j.co, lg) }))}</p>` : ""}</div>
 ${act}${list("duties", j.duties)}${list("needs", j.needs)}${list("provides", j.provides)}<p class="mu">${j.days ? esc(tr(lg, "daysAgo", { n: j.days })) : esc(tr(lg, "today"))}</p>`,
       { tab: "jobs", back: "/lite", head: tr(lg, "jobs"), flash: ctx.flash, error: ctx.error });
   }

@@ -26,7 +26,7 @@ Reproduction scripts named below live in the Stage 0 scratchpad (`/tmp/claude-0/
 | Found by the fifth review of the Stage 4 fixes | 12 | D-146 to D-157: P2 3 · P3 9; 10 fixed, D-151 and D-153 recorded (section below) |
 | Found by the sixth review of the Stage 4 fixes | 6 | D-158 to D-163: P2 4 · P3 2; all fixed (section below) |
 | Found by the seventh review of the Stage 4 fixes | 9 | D-164 to D-172: P2 5 · P3 4 (D-171 and D-172 by the independent checks that closed the loop); 7 fixed, D-164 in part (pinned by the fee corpus test), D-172 recorded (the held-out residue of the word lists); the loop closed with a corpus ratchet test (section below) |
-| Found after the Stage 4 gate (D1 merge; review of P2-6 and the D1 listings; check of its fixes) | 22 | D-173 (P3, resolved by D-178) and D-174 to D-194: P1 1 (D-174) · P2 5 (D-175 to D-178, D-188) · P3 15 (D-179 to D-187 less D-178, D-181 to D-186 from 13 findings; D-189 to D-194); all fixed, D-192 in part (sections "D1 · the 50 sample listings", "Review of P2-6 and the D1 listings", "Check of the review fixes") |
+| Found after the Stage 4 gate (D1 merge; review of P2-6 and the D1 listings; check of its fixes; Codespaces test) | 27 | D-173 (P3, resolved by D-178) and D-174 to D-199: P1 1 (D-174) · P2 6 (D-175 to D-178, D-188, D-195) · P3 19 (D-179 to D-187 less D-178, D-181 to D-186 from 13 findings; D-189 to D-194; D-196 to D-199); all fixed, D-192 in part, D-196 to D-199 recorded (sections "D1 · the 50 sample listings", "Review of P2-6 and the D1 listings", "Check of the review fixes", "Codespaces test of the D1 branch") |
 | Fixed by Stage 4 | 159 | round 1: U-003, U-006, U-012 to U-015, U-018, U-020 to U-023, U-028, U-029, U-031, U-032, U-035, U-037, U-050, U-053 to U-055, U-058; browser flow: D-38, U-061; round 2: U-001, U-009, U-010, U-024, U-030 with D-31, U-038, U-040, U-059, U-062; security re-review: D-39 to D-43, D-45, D-46, D-48 to D-54, D-56; fix review: D-57 to D-63, D-65 to D-85; second fix review: D-86 to D-95, D-97 to D-103, D-105 to D-111; third fix review: D-112 to D-116, D-118 to D-129; fourth fix review: D-130 to D-134, D-136 to D-145; fifth fix review: D-146 to D-150, D-152, D-154 to D-157; sixth fix review: D-158 to D-163; seventh fix review: D-165 to D-171; accessibility: U-056, U-146, U-184 |
 | Fixed by Stage 3 | 33 | D-02, D-04 to D-10, D-12, D-13, D-15 to D-17, D-19 to D-30, D-32; U-007, U-017, U-034, U-041 (page), U-045, U-046, U-048 (Status rows). With Stages 1 and 2, all thirty D-01 to D-30 are closed. The Stage 3 review then fixed six P1/P2 follow-ups inside the same fixes (D-17 live sessions, D-09 on a note, D-30 numbers in the audit log and false positives, audit filters with Arabic-Indic digits, suspend-then-verify) |
 
@@ -944,6 +944,18 @@ Three lenses (the deletion, Reopen, approval and queue fixes; the engine and str
 | D-194 | P3 | **FIXED** | Slips: STATE.md's key count (1,688, now 1,690); `hideNumbers` sat under the job-alert comment; README's per-suite test counts (223); PLAN still had D-173 "recorded"; D-178's "13 UN agencies"; ARABIC_REVIEW row 53 listed place changes only; D-184 claimed a Lite fit measured in a font Lite does not load (six findings merged) | engine, data-docs |
 
 Refuted: a deleted owner's pending listings staying in the queue (intended by D-174 and documented in SECURITY.md); the no-field score outranking "no degree needed" (a recorded choice; changed anyway as D-193). Refuted in part: "from 13 findings" in the summary row (13 raw findings, correct).
+
+## Codespaces test of the D1 branch
+
+A literal run of the owner's Codespaces guide on `d1/sample-listings` (0f72b11): a fresh clone, the guide's command, a stand-in for the Codespaces HTTPS proxy (`*.app.github.dev` host and origin, X-Forwarded headers) and a real browser through every new feature, with a disprove-first refuter (3 agents). The proxy path broke nothing: the origin check runs only when `BASE_URL` is set, and nothing reads Host or X-Forwarded-* without `TRUST_PROXY`. It found five product issues; the refuter confirmed all five.
+
+| # | Sev | Status | Title | Lens |
+|---|---|---|---|---|
+| D-195 | P2 | **FIXED** (`server/lite.js`: the listing page shows `demoNote` in its top card; test lite "a sample listing says it is a sample…") | Lite's listing page showed the 68 sample listings under real organisations' names with no sample note, while the full site shows `demoNote` on each (`app.js:273`): the safeguard of owner decision D1 was missing on Lite. The same sentence, so no new string; all 136 sample listing pages measured within the budget (largest 1,983 B of 3,072) | codespaces run |
+| D-196 | P3 | Recorded | The demo companies' own listings (Yasmin Trading, Qasioun Advisory) say "Sample listing for demonstration. Yasmin Trading has not posted this role on Shaghilni" while one is signed in as that company and sees them as Live | codespaces run |
+| D-197 | P3 | Recorded | After approval the employer's own card still shows "A fee word to check (who pays?): “fees”" next to Live (`app-employer.js:49` draws the first flag whatever the status) | codespaces run |
+| D-198 | P3 | Recorded | After Leave in the demo bar, a "Sign in to continue / Try again" panel and a 401 console error sit behind the welcome overlay | codespaces run |
+| D-199 | P3 | Recorded | Opening a listing by its address while a tab filter excludes it, then switching language, shows a different listing while the address keeps `#/job/N` | codespaces run |
 
 ## Merged duplicates
 
