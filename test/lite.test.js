@@ -209,7 +209,8 @@ test("lite: people abroad can say where they live, filter for returnees, and sav
   const uid = S.db.get("SELECT user_id FROM profiles ORDER BY rowid DESC LIMIT 1").user_id, prof = JSON.parse(S.db.get("SELECT data FROM profiles WHERE user_id = ?", uid).data);
   assert.deepEqual([prof.gov, prof.country], ["abroad", "de"]);
   const ret = await b.get("/lite?returnees=1"); assert.match(ret.text, /aria-current="true">(For returnees|للعائدين)</);
-  const all = (await b.get("/lite")).text.match(/href="\/lite\/job\/\d+"/g).length, only = (ret.text.match(/href="\/lite\/job\/\d+"/g) || []).length;
+  const count = async q => { let n = 0; for (let p = 1, k = 1; k && p <= 50; p++) n += k = ((await b.get(`/lite?${q}page=${p}`)).text.match(/href="\/lite\/job\/\d+"/g) || []).length; return n; };   // every page: the first holds 12 either way once both lists are longer
+  const all = await count(""), only = await count("returnees=1&");
   assert.ok(only > 0 && only < all, `the filter narrows the list (${only} of ${all})`);
   const saved = await b.post("/lite/alerts", { csrf: tok, q: "", gov: "damascus", type: "", returnees: "1" });
   assert.match(saved.location, /^\/lite\?gov=damascus&returnees=1&done=alerted$/);
