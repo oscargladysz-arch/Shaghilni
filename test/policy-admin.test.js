@@ -299,8 +299,8 @@ test("policy admin: a listing with a fee flag is approved only when the reviewer
   }
   assert.equal(S.db.get("SELECT status FROM jobs WHERE id = ?", fee).status, "pending", "a refused approval publishes nothing");
   assert.equal((await admin.post(`/api/admin/jobs/${fee}/approve`, { feeChecked: true })).status, 200, "the reviewer confirms they read the fee wording");
-  const row = S.db.get("SELECT data FROM audit_log WHERE action = 'job.approved' AND entity_id = ? ORDER BY id DESC LIMIT 1", fee);
+  const row = S.db.get("SELECT data FROM audit WHERE action = 'job.approved' AND entity_id = ? ORDER BY id DESC LIMIT 1", fee);
   assert.deepEqual(JSON.parse(row.data), { feeChecked: true, feeWord: "fees" }, "the audit log says the fee flag was read, and which word");
   assert.equal((await admin.post(`/api/admin/jobs/${contact}/approve`, {})).status, 200, "a listing with only a contact flag needs no fee confirmation");
-  assert.equal(S.db.get("SELECT data FROM audit_log WHERE action = 'job.approved' AND entity_id = ? ORDER BY id DESC LIMIT 1", contact).data, null, "and its approval records nothing about fees");
+  assert.equal(S.db.get("SELECT data FROM audit WHERE action = 'job.approved' AND entity_id = ? ORDER BY id DESC LIMIT 1", contact).data, null, "and its approval records nothing about fees");
 });

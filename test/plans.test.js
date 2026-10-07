@@ -210,5 +210,5 @@ test("admin listings: a listing with a fee flag shows a check box, and Approve s
   await act("adm-approve", { dataset: { id2: "5" } });
   assert.deepEqual(posts.map(p => [p.path, p.data.feeChecked]), [["/api/admin/jobs/5/approve", true]], "with the tick, Approve says the fee wording was read");
   await act("adm-approve", { dataset: { id2: "6" } });
-  assert.deepEqual(posts.at(-1), { path: "/api/admin/jobs/6/approve", data: { note: "" } }, "a listing without a fee flag is approved as before");
+  assert.deepEqual(JSON.parse(JSON.stringify(posts.at(-1))), { path: "/api/admin/jobs/6/approve", data: { note: "" } }, "a listing without a fee flag is approved as before");   // the post was built in the sandbox's realm
 });
