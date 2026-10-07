@@ -55,7 +55,7 @@ const JOB = { title: { en: "Junior accountant", ar: "محاسب مبتدئ" }, g
 
 let seeker, employer, admin, employerJobId, seekerAppId;
 
-test("seed: the 50 sample listings added for D1 pass the posting checks with no flag at all, use real lookup keys, match English and Arabic item for item, name no contact person, and describe the role without money words (D1)", async () => {
+test("seed: the 50 sample listings added for D1 pass the posting checks with no flag at all, use real lookup keys, match English and Arabic item for item (each item in its own language), name no contact person, and keep fee, price and cash words out of the text (pay has its own field; a benefit such as a stipend may be named) (D1)", async () => {
   const { readFileSync } = await import("node:fs"), { loadCore } = await import("../server/core.js"), { sanitizeJob, checkJob } = await import("../server/validate.js"), core = loadCore();
   const seed = JSON.parse(readFileSync(new URL("../seed/demo.json", import.meta.url), "utf8")), keys = new Set(seed.companies.map(c => c.key)), added = seed.jobs.slice(19);
   assert.equal(added.length, 50, "50 listings after the original 19");
@@ -67,10 +67,11 @@ test("seed: the 50 sample listings added for D1 pass the posting checks with no 
     for (const k of ["gov", "type", "level", "mode"]) assert.equal(s[k], data[k], `${name}: ${k} is a real lookup key`);
     assert.deepEqual(s.recruits, data.recruits || [], `${name}: every university and faculty is a real key`);
     assert.ok(!("contact" in j), `${name}: no invented contact person`);
-    for (const k of ["title", "summary", "place"]) assert.ok(data[k].en && data[k].ar, `${name}: ${k} in both languages`);
-    for (const k of ["duties", "needs", "provides"]) assert.ok(data[k].en.length >= 2 && data[k].en.length === data[k].ar.length, `${name}: ${k} item for item in both languages`);
+    const isAr = x => typeof x === "string" && /[\u0621-\u064A]/.test(x), isEn = x => typeof x === "string" && /[A-Za-z]/.test(x) && !/[\u0621-\u064A]/.test(x);   // each item written in its own language (D-187)
+    for (const k of ["title", "summary", "place"]) assert.ok(isEn(data[k].en) && isAr(data[k].ar), `${name}: ${k} in both languages`);
+    for (const k of ["duties", "needs", "provides"]) assert.ok(data[k].en.length >= 2 && data[k].en.length === data[k].ar.length && data[k].en.every(isEn) && data[k].ar.every(isAr), `${name}: ${k} item for item in both languages`);
     const text = JSON.stringify([data.title, data.summary, data.duties, data.needs, data.provides, data.place, data.tags]);
-    assert.doesNotMatch(text, /\b(?:pay|paid|payment|fees?|deposit|costs?|price|syp|usd)\b|[$€]|دفع|رسوم|مبلغ|تسديد|سداد|تكاليف|تكلفة|مصاريف|ليرة|دولار/i, `${name}: the role, not money (pay has its own field)`);
+    assert.doesNotMatch(text, /\b(?:pay|paid|payment|fees?|deposit|costs?|price|syp|usd|cash)\b|[$€]|دفع|رسوم|مبلغ|تسديد|سداد|تكاليف|تكلفة|مصاريف|ليرة|دولار|نقد/i, `${name}: the role, not money (pay has its own field)`);
   }
 });
 
@@ -389,4 +390,17 @@ test("resume suggestions: أمريكا and بريطانيا with و, ب or ل be
   for (const [orig, sug] of [["عملت مع زبائن في سوريا وأمريكا", "عملت مع زبائن في سوريا والولايات المتحدة"], ["عملت بأمريكا لمدة سنتين", "عملت في الولايات المتحدة لمدة سنتين"], ["سافرت لأمريكا للعمل", "سافرت إلى الولايات المتحدة للعمل"], ["عملت ببريطانيا", "عملت في المملكة المتحدة"]])
     assert.equal(g(orig, sug), true, `the same country: ${sug}`);
   assert.equal(g("عملت بأمريكا اللاتينية", "عملت في الولايات المتحدة"), false, "Latin America still is not the United States");
+});
+
+test("fit: a listing that names no field of study says so and gives half the field row, with no cap; no fit reads \"Asks for \" with nothing after it, in the sample listings either (D-177)", async () => {
+  const { readFileSync } = await import("node:fs"), { loadCore } = await import("../server/core.js"), core = loadCore();
+  const me = { v: 1, role: "seeker", name: "Omar Aziz", gov: "aleppo", langs: ["ar", "en"], edu: { status: "bachelor", fac: "business" }, exp: [], skills: [] };
+  const job = { title: { en: "Officer" }, gov: "aleppo", type: "full", level: "entry", mode: "onsite", pay: [1800000, 2200000], langs: ["ar"], recruits: [], anyFaculty: false, noDegree: false, summary: { en: "Keep the records." } };
+  const fit = core.fitFor(me, job), f = fit.parts.find(p => p.k === "fField");
+  assert.deepEqual([f.state, f.pts, f.key, fit.capped], ["part", 17, "fieldOpen", false], "no field named: neither a match nor a miss");
+  for (const l of ["en", "ar"]) assert.ok(core.STR[l].fieldOpen && !core.STR[l].fieldOpen.includes("{"), `fieldOpen in ${l}`);
+  const named = core.fitFor(me, { ...job, recruits: [["damascus", "petroleum"]] }), g = named.parts.find(p => p.k === "fField");
+  assert.deepEqual([g.key, g.state, named.capped], ["fieldMiss", "no", true], "a listing that names another field still says which, and caps the score as before");
+  const seed = JSON.parse(readFileSync(new URL("../seed/demo.json", import.meta.url), "utf8"));
+  for (const j of seed.jobs) { const p = core.fitFor(me, j).parts.find(x => x.k === "fField"); for (const l of ["en", "ar"]) assert.notEqual(core.fill(core.STR[l][p.key], p.vars || {}).trim(), core.fill(core.STR[l].fieldMiss, { fac: "" }).trim(), `${j.title.en} (${l})`); }
 });

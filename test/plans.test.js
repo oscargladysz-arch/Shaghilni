@@ -192,24 +192,30 @@ test("admin billing: a company listed under both plan requests and verified comp
 
 test("admin listings: a listing with a fee flag shows a check box, and Approve sends feeChecked only once it is ticked; a listing without one approves as before (P2-6)", async () => {
   const { readFileSync } = await import("node:fs"), vm = (await import("node:vm")).default;
-  const els = new Map(), body = { innerHTML: "" }, posts = [], toasts = [];
-  const job = (id, flags) => ({ id, status: "pending", companyStatus: "verified", title: { en: `Job ${id}` }, co: { en: "Co" }, gov: "homs", pay: [1800000, 2200000], summary: { en: "Keep the stock records." }, duties: { en: [] }, needs: { en: [] }, provides: { en: ["University tuition fees covered"] }, place: {}, contact: {}, tags: "", flags });
+  const els = new Map(), body = { innerHTML: "" }, posts = [], toasts = [], fails = [], focused = [];
+  const job = (id, flags) => ({ id, submittedAt: id * 1000, status: "pending", companyStatus: "verified", title: { en: `Job ${id}` }, co: { en: "Co" }, gov: "homs", pay: [1800000, 2200000], summary: { en: "Keep the stock records." }, duties: { en: [] }, needs: { en: [] }, provides: { en: ["University tuition fees covered"] }, place: {}, contact: {}, tags: "", flags });
   const J = [job(5, [{ type: "fee", word: "fees" }]), job(6, [{ type: "contact", word: "+963944000123" }])];
-  const ctx = vm.createContext({ console, S: { lang: "en" }, ADM: {}, toast: x => toasts.push(x), errText: e => String(e), setTimeout: () => 0, busy() {}, loadAdminCounts: async () => {}, renderChrome() {}, renderAdmin() {}, loadJobs: async () => {}, rescore() {},
-    api: { get: async () => ({ jobs: J }), post: async (path, data) => { posts.push({ path, data }); return {}; } },
+  const ctx = vm.createContext({ console, S: { lang: "en" }, ADM: {}, toast: x => toasts.push(x), errText: e => (e && e.code) || String(e), setTimeout: () => 0, busy() {}, loadAdminCounts: async () => {}, renderChrome() {}, renderAdmin() {}, loadJobs: async () => {}, rescore() {},
+    api: { get: async () => ({ jobs: J }), post: async (path, data) => { posts.push({ path, data }); if (fails.length) throw fails.shift(); return {}; } },
     document: { querySelector: s => (s === "#admBody" ? body : els.get(s) || null), querySelectorAll: () => [] } });
   for (const f of ["lookups.js", "i18n.js", "i18n2.js", "i18n3.js", "i18n4.js", "engine.js", "app-admin.js"]) vm.runInContext(readFileSync(new URL(`../public/js/${f}`, import.meta.url), "utf8"), ctx, { filename: f });
-  vm.runInContext("renderAdmin = () => {}; rescore = () => {};", ctx);   // the files' own versions redraw the whole screen; the click's follow-up is not under test
+  ctx.redraws = 0; vm.runInContext("renderAdmin = () => { redraws++; }; rescore = () => {};", ctx);   // the files' own versions redraw the whole screen; the click's follow-up is not under test
   await vm.runInContext("drawJobs()", ctx);
   assert.match(body.innerHTML, /id="fee-5"/, "the fee-flagged listing has the check box");
   assert.doesNotMatch(body.innerHTML, /id="fee-6"/, "a listing without a fee flag has none");
   const act = async (...a) => { await vm.runInContext("admAct", ctx)(...a); await new Promise(r => setImmediate(r)); };   // Approve's request runs after the click returns
   await act("adm-approve", { dataset: { id2: "5" } });
   assert.deepEqual(posts, [], "Approve without the tick sends nothing");
-  assert.ok(toasts.some(x => /fee/i.test(x.title)), `the reviewer is told why: ${JSON.stringify(toasts)}`);
-  els.set("#fee-5", { checked: true, focus() {} });
+  assert.equal(toasts[0].title, vm.runInContext("STR.en.err_fee_check_required", ctx), "the reviewer is told why");
+  els.set("#fee-5", { checked: false, focus() { focused.push(5); } });
   await act("adm-approve", { dataset: { id2: "5" } });
-  assert.deepEqual(posts.map(p => [p.path, p.data.feeChecked]), [["/api/admin/jobs/5/approve", true]], "with the tick, Approve says the fee wording was read");
+  assert.deepEqual([posts.length, focused], [0, [5]], "an unticked box sends nothing and takes the focus");
+  els.set("#fee-5", { checked: true, focus() {} }); els.set("#note-j5", { value: " read twice " });
+  await act("adm-approve", { dataset: { id2: "5" } });
+  assert.deepEqual(JSON.parse(JSON.stringify(posts)), [{ path: "/api/admin/jobs/5/approve", data: { feeChecked: true, feeWord: "fees", submittedAt: 5000, note: "read twice" } }], "with the tick, Approve names the word it read and the version it read, with the note (D-175)");
   await act("adm-approve", { dataset: { id2: "6" } });
-  assert.deepEqual(JSON.parse(JSON.stringify(posts.at(-1))), { path: "/api/admin/jobs/6/approve", data: { note: "" } }, "a listing without a fee flag is approved as before");   // the post was built in the sandbox's realm
+  assert.deepEqual(JSON.parse(JSON.stringify(posts.at(-1))), { path: "/api/admin/jobs/6/approve", data: { submittedAt: 6000, note: "" } }, "a listing without a fee flag is approved as before, for the version read");   // the post was built in the sandbox's realm
+  fails.push({ code: "job_changed" }); const before = ctx.redraws;
+  await act("adm-approve", { dataset: { id2: "6" } });
+  assert.deepEqual([toasts.at(-1).title, ctx.redraws > before], ["job_changed", true], "a listing changed since it was read: the reviewer is told and the queue is drawn again");
 });

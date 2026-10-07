@@ -294,13 +294,38 @@ test("policy admin: a listing with a fee flag is approved only when the reviewer
   const S = await start(), admin = await S.login(ADMIN_PHONE), A = await employerWithLiveJob(S, admin, "0955 910 071", "Review Fee Flag"), e = A.e;
   const post = async job => { const r = await e.post("/api/employer/jobs", { job, submit: true }); assert.equal(r.status, 200, r.text); return r.body.job.id; };
   const fee = await post({ ...JOB, provides: { en: ["University tuition fees covered"] } }), contact = await post({ ...JOB, summary: { en: "Call +963944000123 for details." } });
-  for (const body of [{}, { feeChecked: "true" }, { feeChecked: 1 }, { note: "looks fine" }]) {
+  for (const body of [{}, { feeChecked: "true" }, { feeChecked: 1 }, { note: "looks fine" }, { feeChecked: true }, { feeChecked: true, feeWord: "tuition" }]) {   // the tick names the word it confirms (D-175)
     const r = await admin.post(`/api/admin/jobs/${fee}/approve`, body); assert.deepEqual([r.status, r.body.error], [422, "fee_check_required"], `${JSON.stringify(body)} → ${r.text}`);
   }
   assert.equal(S.db.get("SELECT status FROM jobs WHERE id = ?", fee).status, "pending", "a refused approval publishes nothing");
-  assert.equal((await admin.post(`/api/admin/jobs/${fee}/approve`, { feeChecked: true })).status, 200, "the reviewer confirms they read the fee wording");
+  assert.equal((await admin.post(`/api/admin/jobs/${fee}/approve`, { feeChecked: true, feeWord: "fees" })).status, 200, "the reviewer confirms they read the fee wording");
   const row = S.db.get("SELECT data FROM audit WHERE action = 'job.approved' AND entity_id = ? ORDER BY id DESC LIMIT 1", fee);
   assert.deepEqual(JSON.parse(row.data), { feeChecked: true, feeWord: "fees" }, "the audit log says the fee flag was read, and which word");
   assert.equal((await admin.post(`/api/admin/jobs/${contact}/approve`, {})).status, 200, "a listing with only a contact flag needs no fee confirmation");
   assert.equal(S.db.get("SELECT data FROM audit WHERE action = 'job.approved' AND entity_id = ? ORDER BY id DESC LIMIT 1", contact).data, null, "and its approval records nothing about fees");
+});
+
+test("policy admin: the fee confirmation binds to what the reviewer read: an approval of an older version (submittedAt) is 409 job_changed and one naming another word is 422; the queue shows the flags approval checks; the audit rows hold no phone number (D-175, D-176, D-179)", async () => {
+  const S = await start(), admin = await S.login(ADMIN_PHONE), A = await employerWithLiveJob(S, admin, "0955 910 072", "Review Stale Tick"), e = A.e;
+  const post = async provides => { const r = await e.post("/api/employer/jobs", { job: { ...JOB, provides: { en: [provides] } }, submit: true }); assert.equal(r.status, 200, r.text); return r.body.job.id; };
+  const queue = async id => (await admin.get("/api/admin/jobs")).body.jobs.find(j => j.id === id);
+  const id = await post("University tuition fees covered"); S.db.run("UPDATE jobs SET submitted_at = submitted_at - 60000 WHERE id = ?", id);   // submitted a minute ago
+  const seen = await queue(id);
+  assert.deepEqual(seen.flags.filter(f => f.type === "fee"), [{ type: "fee", word: "fees" }], "the reviewer reads the fee flag");
+  assert.equal((await e.put(`/api/employer/jobs/${id}`, { job: { ...JOB, provides: { en: ["You text +963 944 000 123 for pay"] } }, submit: true })).status, 200, "meanwhile the employer edits and resubmits");
+  const stale = await admin.post(`/api/admin/jobs/${id}/approve`, { feeChecked: true, feeWord: "fees", submittedAt: seen.submittedAt });
+  assert.deepEqual([stale.status, stale.body.error], [409, "job_changed"], `the tick was for the version the reviewer read: ${stale.text}`);
+  const other = await admin.post(`/api/admin/jobs/${id}/approve`, { feeChecked: true, feeWord: "fees" });
+  assert.deepEqual([other.status, other.body.error], [422, "fee_check_required"], `a tick naming another word is no confirmation: ${other.text}`);
+  assert.equal(S.db.get("SELECT status FROM jobs WHERE id = ?", id).status, "pending", "nothing was published");
+  const now = await queue(id), fee = now.flags.find(f => f.type === "fee");
+  assert.ok(fee && now.submittedAt > seen.submittedAt, "the redrawn queue shows the new version and its flag");
+  const ok = await admin.post(`/api/admin/jobs/${id}/approve`, { feeChecked: true, feeWord: fee.word, submittedAt: now.submittedAt });
+  assert.equal(ok.status, 200, ok.text);
+  const rows = S.db.all("SELECT action, data FROM audit WHERE entity = 'job' AND entity_id = ? AND action IN ('job.submitted', 'job.approved') ORDER BY id", id);
+  assert.deepEqual(rows.map(x => x.action), ["job.submitted", "job.submitted", "job.approved"]);
+  for (const x of rows) assert.doesNotMatch(x.data, /(?:[\d٠-٩۰-۹][\s\-().]*){7}/, `R12: no phone number in ${x.action}: ${x.data}`);
+  assert.match(JSON.parse(rows[2].data).feeWord, /•••/, "the number in the flagged words is masked, the words kept");
+  const id2 = await post("Exam fees covered"); S.db.run("UPDATE jobs SET flags = '[]' WHERE id = ?", id2);   // flags stored under an older word list
+  assert.deepEqual((await queue(id2)).flags.filter(f => f.type === "fee"), [{ type: "fee", word: "fees" }], "the queue shows the flags approval will check (D-179)");
 });

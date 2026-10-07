@@ -136,7 +136,7 @@ test("posting checks on the server: an explicit fee demand is refused in every b
   assert.equal(own.body.detail, "deposit", "the word that tripped the check is named");
   // the reviewer decides on a flagged one
   const flagged = S.db.get("SELECT id FROM jobs WHERE company_id = ? AND status = 'pending' ORDER BY id LIMIT 1", A.companyId).id;
-  assert.equal((await admin.post(`/api/admin/jobs/${flagged}/approve`, { feeChecked: true })).status, 200, "the admin publishes a flagged listing after reading it, and says so (P2-6)");
+  assert.equal((await admin.post(`/api/admin/jobs/${flagged}/approve`, { feeChecked: true, feeWord: "deposit" })).status, 200, "the admin publishes a flagged listing after reading it, and says so (P2-6)");
 });
 
 test("verification gates publishing: a draft, pending or rejected company cannot submit a listing; a suspended company cannot submit, reopen or resubmit its page, and its listings leave the board", async () => {
@@ -263,4 +263,25 @@ test("applicants: the employer sees the snapshot sent, the account phone and the
   assert.ok(!JSON.stringify(a).includes("after@policy.example") && !JSON.stringify(a).includes("Rana After"), "nothing typed after applying reaches the employer");
   assert.equal((await s.post(`/api/me/applications/${a.id}/withdraw`)).status, 200);
   assert.deepEqual((await e.get(`/api/employer/jobs/${A.jobId}/applications`)).body.applications, [], "a withdrawn application leaves the employer's list");
+});
+
+test("an owner deleting their account closes only the live listings: text no reviewer approved keeps its state, so the team cannot put it on the board with Reopen; Reopen runs the fee check again (D-174)", async () => {
+  const S = await start(), { admin, A, recruiter } = await cast(S), e = A.e, st = id => S.db.get("SELECT status FROM jobs WHERE id = ?", id).status;
+  const live = async en => { const j = (await e.post("/api/employer/jobs", { job: titled(en), submit: true })).body.job; assert.equal((await admin.post(`/api/admin/jobs/${j.id}/approve`)).status, 200); return j.id; };
+  const flagged = await live("Flagged edit"), refusedId = await live("Refused edit"), rejected = await live("Rejected edit");
+  assert.equal((await recruiter.put(`/api/employer/jobs/${flagged}`, { job: { ...titled("Flagged edit"), provides: { en: ["Medical test 50,000 SYP"] } }, submit: true })).status, 200, "an edit with a fee flag waits for review");
+  const r = await recruiter.put(`/api/employer/jobs/${refusedId}`, { job: { ...titled("Refused edit"), needs: { en: ["Candidates must pay a registration fee of 50,000 SYP"] } }, submit: true });
+  assert.equal(r.body.error, "fee_requested", `a fee demand is refused and stays a draft: ${r.text}`);
+  assert.equal((await recruiter.put(`/api/employer/jobs/${rejected}`, { job: { ...titled("Rejected edit"), provides: { en: ["Medical test 50,000 SYP"] } }, submit: true })).status, 200);
+  assert.equal((await admin.post(`/api/admin/jobs/${rejected}/reject`, { note: "Fee wording" })).status, 200, "the reviewer rejects that edit");
+  assert.deepEqual([st(A.jobId), st(flagged), st(refusedId), st(rejected)], ["published", "pending", "draft", "rejected"]);
+  assert.equal((await e.del("/api/me")).status, 200, "the owner deletes their account");
+  assert.deepEqual([st(A.jobId), st(flagged), st(refusedId), st(rejected)], ["closed", "pending", "draft", "rejected"], "only the live listing is closed; the others keep a state that still needs a reviewer");
+  assert.equal((await admin.post(`/api/admin/companies/${A.companyId}/verify`, { screened: true })).status, 200, "the Shaghilni team lifts the suspension");
+  for (const id of [flagged, refusedId, rejected]) assert.equal((await recruiter.post(`/api/employer/jobs/${id}/reopen`)).body.error, "bad_state", `Reopen cannot publish text no reviewer approved (${id})`);
+  assert.equal((await recruiter.post(`/api/employer/jobs/${A.jobId}/reopen`)).status, 200, "the listing that was live reopens as before");
+  S.db.run("UPDATE jobs SET status = 'closed' WHERE id = ?", refusedId);   // a row a deletion closed before this fix
+  const again = await recruiter.post(`/api/employer/jobs/${refusedId}/reopen`);
+  assert.deepEqual([again.status, again.body.error, st(refusedId)], [422, "fee_requested", "closed"], `Reopen refuses a listing that asks candidates for money: ${again.text}`);
+  assert.equal((await S.client().get(`/api/jobs/${flagged}`)).status, 404, "the unreviewed fee wording is not on the board");
 });
