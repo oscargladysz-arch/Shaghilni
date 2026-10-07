@@ -254,6 +254,231 @@
     "en": "Refrigerated freight between Damascus and the coast.",
     "ar": "شحن مبرّد بين دمشق والساحل."
    }
+  },
+  {
+   "key": "UNICEF Syria",
+   "name": {
+    "en": "UNICEF Syria",
+    "ar": "اليونيسف سوريا"
+   },
+   "abbr": "UNCF",
+   "sector": "aid",
+   "cat": "multinational",
+   "gov": "damascus",
+   "about": {
+    "en": "UNICEF is the United Nations agency for children.",
+    "ar": "اليونيسف هي وكالة الأمم المتحدة المعنية بالأطفال."
+   }
+  },
+  {
+   "key": "WFP Syria",
+   "name": {
+    "en": "WFP Syria",
+    "ar": "برنامج الأغذية العالمي سوريا"
+   },
+   "abbr": "WFP",
+   "sector": "aid",
+   "cat": "multinational",
+   "gov": "damascus",
+   "about": {
+    "en": "The World Food Programme is the United Nations agency for food assistance.",
+    "ar": "برنامج الأغذية العالمي هو وكالة الأمم المتحدة للمساعدات الغذائية."
+   }
+  },
+  {
+   "key": "UNHCR Syria",
+   "name": {
+    "en": "UNHCR Syria",
+    "ar": "المفوضية السامية لشؤون اللاجئين سوريا"
+   },
+   "abbr": "UNHC",
+   "sector": "aid",
+   "cat": "multinational",
+   "gov": "damascus",
+   "about": {
+    "en": "UNHCR is the United Nations refugee agency.",
+    "ar": "المفوضية هي وكالة الأمم المتحدة لشؤون اللاجئين."
+   }
+  },
+  {
+   "key": "WHO Syria",
+   "name": {
+    "en": "WHO Syria",
+    "ar": "منظمة الصحة العالمية سوريا"
+   },
+   "abbr": "WHO",
+   "sector": "aid",
+   "cat": "multinational",
+   "gov": "damascus",
+   "about": {
+    "en": "The World Health Organization is the United Nations agency for health.",
+    "ar": "منظمة الصحة العالمية هي وكالة الأمم المتحدة المعنية بالصحة."
+   }
+  },
+  {
+   "key": "ICRC Syria",
+   "name": {
+    "en": "ICRC Syria",
+    "ar": "اللجنة الدولية للصليب الأحمر سوريا"
+   },
+   "abbr": "ICRC",
+   "sector": "aid",
+   "cat": "multinational",
+   "gov": "damascus",
+   "about": {
+    "en": "The International Committee of the Red Cross is a humanitarian organisation based in Geneva.",
+    "ar": "اللجنة الدولية للصليب الأحمر منظمة إنسانية مقرها جنيف."
+   }
+  },
+  {
+   "key": "Norwegian Refugee Council",
+   "name": {
+    "en": "Norwegian Refugee Council",
+    "ar": "المجلس النرويجي للاجئين"
+   },
+   "abbr": "NRC",
+   "sector": "aid",
+   "cat": "multinational",
+   "gov": "damascus",
+   "about": {
+    "en": "The Norwegian Refugee Council is a humanitarian organisation that works with displaced people.",
+    "ar": "المجلس النرويجي للاجئين منظمة إنسانية تعمل مع النازحين."
+   }
+  },
+  {
+   "key": "Danish Refugee Council",
+   "name": {
+    "en": "Danish Refugee Council",
+    "ar": "المجلس الدنماركي للاجئين"
+   },
+   "abbr": "DRC",
+   "sector": "aid",
+   "cat": "multinational",
+   "gov": "damascus",
+   "about": {
+    "en": "The Danish Refugee Council is a humanitarian organisation that works with displaced people.",
+    "ar": "المجلس الدنماركي للاجئين منظمة إنسانية تعمل مع النازحين."
+   }
+  },
+  {
+   "key": "Mercy Corps",
+   "name": {
+    "en": "Mercy Corps",
+    "ar": "ميرسي كوربس"
+   },
+   "abbr": "MC",
+   "sector": "aid",
+   "cat": "multinational",
+   "gov": "idlib",
+   "about": {
+    "en": "Mercy Corps is an international humanitarian and development organisation.",
+    "ar": "ميرسي كوربس منظمة دولية للعمل الإنساني والتنموي."
+   }
+  },
+  {
+   "key": "International Rescue Committee",
+   "name": {
+    "en": "International Rescue Committee",
+    "ar": "لجنة الإنقاذ الدولية"
+   },
+   "abbr": "IRC",
+   "sector": "aid",
+   "cat": "multinational",
+   "gov": "idlib",
+   "about": {
+    "en": "The International Rescue Committee is an international humanitarian organisation.",
+    "ar": "لجنة الإنقاذ الدولية منظمة إنسانية دولية."
+   }
+  },
+  {
+   "key": "Save the Children",
+   "name": {
+    "en": "Save the Children",
+    "ar": "منظمة إنقاذ الطفل"
+   },
+   "abbr": "SC",
+   "sector": "aid",
+   "cat": "multinational",
+   "gov": "aleppo",
+   "about": {
+    "en": "Save the Children is an international organisation that works for children.",
+    "ar": "منظمة إنقاذ الطفل منظمة دولية تعمل من أجل الأطفال."
+   }
+  },
+  {
+   "key": "Oxfam",
+   "name": {
+    "en": "Oxfam",
+    "ar": "أوكسفام"
+   },
+   "abbr": "OXF",
+   "sector": "aid",
+   "cat": "multinational",
+   "gov": "damascus",
+   "about": {
+    "en": "Oxfam is an international confederation of organisations that work against poverty.",
+    "ar": "أوكسفام اتحاد دولي لمنظمات تعمل لمكافحة الفقر."
+   }
+  },
+  {
+   "key": "CARE International",
+   "name": {
+    "en": "CARE International",
+    "ar": "كير الدولية"
+   },
+   "abbr": "CARE",
+   "sector": "aid",
+   "cat": "multinational",
+   "gov": "raqqa",
+   "about": {
+    "en": "CARE is an international humanitarian organisation that works against poverty.",
+    "ar": "كير منظمة إنسانية دولية تعمل لمكافحة الفقر."
+   }
+  },
+  {
+   "key": "Médecins Sans Frontières",
+   "name": {
+    "en": "Médecins Sans Frontières",
+    "ar": "أطباء بلا حدود"
+   },
+   "abbr": "MSF",
+   "sector": "aid",
+   "cat": "multinational",
+   "gov": "idlib",
+   "about": {
+    "en": "Médecins Sans Frontières is an international medical humanitarian organisation.",
+    "ar": "أطباء بلا حدود منظمة إنسانية طبية دولية."
+   }
+  },
+  {
+   "key": "Damascus University",
+   "name": {
+    "en": "Damascus University",
+    "ar": "جامعة دمشق"
+   },
+   "abbr": "DU",
+   "sector": "edu",
+   "cat": "public",
+   "gov": "damascus",
+   "about": {
+    "en": "Damascus University is a public university in Damascus.",
+    "ar": "جامعة دمشق جامعة حكومية في دمشق."
+   }
+  },
+  {
+   "key": "University of Aleppo",
+   "name": {
+    "en": "University of Aleppo",
+    "ar": "جامعة حلب"
+   },
+   "abbr": "UOA",
+   "sector": "edu",
+   "cat": "public",
+   "gov": "aleppo",
+   "about": {
+    "en": "The University of Aleppo is a public university in Aleppo.",
+    "ar": "جامعة حلب جامعة حكومية في حلب."
+   }
   }
  ],
  "jobs": [
@@ -1991,6 +2216,3753 @@
    },
    "tags": "driver truck lorry logistics transport freight سائق شاحنة نقل شحن",
    "daysAgo": 1
+  },
+  {
+   "company": "UNICEF Syria",
+   "title": {
+    "en": "Education Officer, Catch-up and Remedial Classes",
+    "ar": "مسؤول تعليم لصفوف التعليم التعويضي ودروس التقوية"
+   },
+   "gov": "aleppo",
+   "place": {
+    "en": "Aleppo, with regular visits to public schools",
+    "ar": "حلب، مع زيارات منتظمة إلى المدارس الحكومية"
+   },
+   "type": "contract",
+   "level": "mid",
+   "mode": "onsite",
+   "pay": [
+    210000,
+    270000
+   ],
+   "langs": [
+    "ar",
+    "en"
+   ],
+   "recruits": [
+    [
+     "aleppo",
+     "arts"
+    ]
+   ],
+   "anyFaculty": false,
+   "noDegree": false,
+   "support": false,
+   "openings": 1,
+   "summary": {
+    "en": "Plan catch-up and remedial classes in public schools in Aleppo and follow how they run, for children who have fallen behind or been out of school. You will work with head teachers and teachers and spend most of your time in classrooms, not behind a desk.",
+    "ar": "تخطيط صفوف التعليم التعويضي ودروس التقوية في المدارس الحكومية بحلب ومتابعة تنفيذها، للأطفال المتأخرين دراسياً أو المنقطعين عن المدرسة. يعمل شاغل الوظيفة مع مديري المدارس والمعلمين، ويقضي معظم وقته في الصفوف لا خلف المكتب."
+   },
+   "duties": {
+    "en": [
+     "Plan catch-up and remedial classes with head teachers and place each pupil at the right level",
+     "Visit classes every week, observe teaching and give teachers practical advice",
+     "Run short training sessions for teachers on active learning and assessing pupils",
+     "Keep attendance and learning-progress records and write a monthly summary in English"
+    ],
+    "ar": [
+     "تخطيط صفوف التعليم التعويضي ودروس التقوية مع مديري المدارس وتوزيع كل تلميذ حسب مستواه",
+     "زيارة الصفوف أسبوعياً ومراقبة التدريس وتقديم نصائح عملية للمعلمين",
+     "تنفيذ جلسات تدريبية قصيرة للمعلمين حول التعلّم النشط وتقييم التلاميذ",
+     "تنظيم سجلات الحضور وتقدّم التعلّم وكتابة ملخص شهري باللغة الإنكليزية"
+    ]
+   },
+   "needs": {
+    "en": [
+     "Degree in education, or in an arts or humanities subject",
+     "At least three years in teaching, school supervision or education projects",
+     "Working English for reports and meetings"
+    ],
+    "ar": [
+     "شهادة جامعية في التربية أو في أحد اختصاصات الآداب والعلوم الإنسانية",
+     "خبرة ثلاث سنوات على الأقل في التدريس أو الإشراف التربوي أو مشاريع التعليم",
+     "إنكليزية عملية لكتابة التقارير وحضور الاجتماعات"
+    ]
+   },
+   "provides": {
+    "en": [
+     "Transport allowance for school visits",
+     "Health insurance for the length of the contract",
+     "Training in child protection and inclusive education"
+    ],
+    "ar": [
+     "بدل مواصلات للزيارات المدرسية",
+     "تأمين صحي طوال مدة العقد",
+     "تدريب على حماية الطفل والتعليم الدامج"
+    ]
+   },
+   "tags": "education teaching remedial classes schools children supervision officer تعليم تعويضي تقوية مدارس معلمين أطفال",
+   "daysAgo": 2
+  },
+  {
+   "company": "UNICEF Syria",
+   "title": {
+    "en": "Assistant Water and Sanitation Engineer, Schools and Communities",
+    "ar": "مهندس مساعد للمياه والصرف الصحي في المدارس والتجمعات السكانية"
+   },
+   "gov": "homs",
+   "place": {
+    "en": "Homs, with field visits across the governorate",
+    "ar": "حمص، مع زيارات ميدانية في أنحاء المحافظة"
+   },
+   "type": "full",
+   "level": "junior",
+   "mode": "onsite",
+   "pay": [
+    140000,
+    180000
+   ],
+   "langs": [
+    "ar",
+    "en"
+   ],
+   "recruits": [
+    [
+     "homs",
+     "civil"
+    ],
+    [
+     "homs",
+     "environmental"
+    ]
+   ],
+   "anyFaculty": false,
+   "noDegree": false,
+   "support": false,
+   "openings": 1,
+   "summary": {
+    "en": "Help design, supervise and check repairs to water points, tanks and toilets in schools and communities in Homs. A full-time field role for an engineer with one to three years on site who wants to grow in water and sanitation work.",
+    "ar": "المساهمة في تصميم أعمال إصلاح نقاط المياه والخزانات ودورات المياه في المدارس والتجمعات السكانية بحمص، والإشراف عليها ومراجعتها. وظيفة ميدانية بدوام كامل لمهندس لديه خبرة من سنة إلى ثلاث سنوات في المواقع، ويرغب في التطور في مجال المياه والصرف الصحي."
+   },
+   "duties": {
+    "en": [
+     "Survey water points and sanitation facilities and prepare bills of quantities",
+     "Supervise contractors on site and check work against drawings and specifications",
+     "Test water quality with field kits and record the results",
+     "Write site visit reports in English with photos and measurements"
+    ],
+    "ar": [
+     "إجراء مسح لنقاط المياه ومرافق الصرف الصحي وإعداد جداول الكميات",
+     "الإشراف على المقاولين في المواقع ومطابقة الأعمال مع المخططات والمواصفات",
+     "فحص جودة المياه بأدوات الفحص الميداني وتسجيل النتائج",
+     "كتابة تقارير الزيارات الميدانية بالإنكليزية مرفقة بالصور والقياسات"
+    ]
+   },
+   "needs": {
+    "en": [
+     "Degree in civil or environmental engineering",
+     "One to three years on construction or water projects",
+     "Working English for reports, and basic AutoCAD"
+    ],
+    "ar": [
+     "شهادة في الهندسة المدنية أو الهندسة البيئية",
+     "خبرة من سنة إلى ثلاث سنوات في مشاريع إنشائية أو مشاريع مياه",
+     "إنكليزية عملية لكتابة التقارير، ومعرفة أساسية ببرنامج أوتوكاد"
+    ]
+   },
+   "provides": {
+    "en": [
+     "Transport provided for site visits",
+     "Health insurance",
+     "Training in water quality and safe site practice"
+    ],
+    "ar": [
+     "توفير وسيلة نقل للزيارات الميدانية",
+     "تأمين صحي",
+     "تدريب على جودة المياه والسلامة في مواقع العمل"
+    ]
+   },
+   "tags": "engineer water sanitation wash civil environmental construction supervision field مهندس مياه صرف صحي مدني بيئي",
+   "daysAgo": 6
+  },
+  {
+   "company": "UNICEF Syria",
+   "title": {
+    "en": "Communication Intern, Arabic and English Stories",
+    "ar": "متدرب في التواصل لكتابة القصص بالعربية والإنكليزية"
+   },
+   "gov": "damascus",
+   "place": {
+    "en": "Damascus, with some days from home",
+    "ar": "دمشق، مع بعض أيام العمل من المنزل"
+   },
+   "type": "intern",
+   "level": "student",
+   "mode": "hybrid",
+   "pay": [
+    15000,
+    15000
+   ],
+   "langs": [
+    "ar",
+    "en"
+   ],
+   "recruits": [
+    [
+     "damascus",
+     "media"
+    ]
+   ],
+   "anyFaculty": false,
+   "noDegree": false,
+   "support": false,
+   "openings": 2,
+   "summary": {
+    "en": "Write short human stories, photo captions and posts in Arabic and English drawn from field work, guided by the communication team. Designed for media and journalism students who want to build a portfolio, with some days in the office and some from home.",
+    "ar": "كتابة قصص إنسانية قصيرة وتعليقات للصور ومنشورات بالعربية والإنكليزية انطلاقاً من العمل الميداني، بإشراف فريق التواصل. التدريب موجّه لطلاب الإعلام والصحافة الراغبين في بناء ملف أعمال، ويجمع بين أيام في المكتب وأيام من المنزل."
+   },
+   "duties": {
+    "en": [
+     "Interview colleagues and community members, with their consent, and draft short stories",
+     "Write photo captions and social media posts in Arabic and English",
+     "Translate and proofread short texts between Arabic and English",
+     "Keep the photo and story archive tidy and labelled"
+    ],
+    "ar": [
+     "إجراء مقابلات مع الزملاء وأفراد المجتمع بعد أخذ موافقتهم، وكتابة مسودات لقصص قصيرة",
+     "كتابة تعليقات للصور ومنشورات لوسائل التواصل الاجتماعي بالعربية والإنكليزية",
+     "ترجمة نصوص قصيرة بين العربية والإنكليزية وتدقيقها",
+     "تنظيم أرشيف الصور والقصص وتصنيفه"
+    ]
+   },
+   "needs": {
+    "en": [
+     "Current student in media or journalism",
+     "Clear writing in Arabic and working English",
+     "Two short writing samples with your application"
+    ],
+    "ar": [
+     "طالب حالياً في الإعلام أو الصحافة",
+     "كتابة واضحة بالعربية وإنكليزية عملية",
+     "نموذجان قصيران من كتاباتك مع طلب التقديم"
+    ]
+   },
+   "provides": {
+    "en": [
+     "A monthly stipend",
+     "Weekly comments on your writing from an editor",
+     "Internship certificate on completion"
+    ],
+    "ar": [
+     "مكافأة شهرية",
+     "ملاحظات أسبوعية على كتاباتك من محرر",
+     "شهادة تدريب عند الانتهاء"
+    ]
+   },
+   "tags": "communication media journalism writing stories translation intern internship إعلام صحافة كتابة قصص ترجمة تدريب",
+   "daysAgo": 1
+  },
+  {
+   "company": "WFP Syria",
+   "title": {
+    "en": "Field Monitor, Distribution Points",
+    "ar": "مراقب ميداني لنقاط التوزيع"
+   },
+   "gov": "deirezzor",
+   "place": {
+    "en": "Field locations across Deir ez-Zor",
+    "ar": "مواقع ميدانية في أنحاء محافظة دير الزور"
+   },
+   "type": "full",
+   "level": "entry",
+   "mode": "onsite",
+   "pay": [
+    95000,
+    120000
+   ],
+   "langs": [
+    "ar"
+   ],
+   "recruits": [],
+   "anyFaculty": false,
+   "noDegree": false,
+   "support": false,
+   "openings": 3,
+   "summary": {
+    "en": "Visit distribution points across Deir ez-Zor, check that distributions run fairly and safely, and interview families about the help they received. An entry-level field role that starts with training; most days are spent travelling between sites.",
+    "ar": "زيارة نقاط التوزيع في أنحاء محافظة دير الزور، والتأكد من سير التوزيع بعدالة وأمان، وإجراء مقابلات مع الأسر حول المساعدات التي استلمتها. وظيفة ميدانية للمبتدئين تبدأ بالتدريب، ويقضي شاغلها معظم الأيام في التنقل بين المواقع."
+   },
+   "duties": {
+    "en": [
+     "Observe distributions using a set checklist on a tablet",
+     "Interview families at home or on site with a short questionnaire",
+     "Report problems such as long queues or missing items on the same day",
+     "Treat every family with respect and keep their answers confidential"
+    ],
+    "ar": [
+     "مراقبة عمليات التوزيع وفق قائمة تحقق محددة على جهاز لوحي",
+     "إجراء مقابلات مع الأسر في منازلها أو في الموقع باستخدام استبيان قصير",
+     "الإبلاغ في اليوم نفسه عن المشكلات مثل الطوابير الطويلة أو نقص المواد",
+     "التعامل مع كل أسرة باحترام والحفاظ على سرية إجاباتها"
+    ]
+   },
+   "needs": {
+    "en": [
+     "University degree in any subject",
+     "Good knowledge of Deir ez-Zor and its communities",
+     "Able to travel daily to field sites and use a tablet"
+    ],
+    "ar": [
+     "شهادة جامعية في أي اختصاص",
+     "معرفة جيدة بمحافظة دير الزور ومجتمعاتها",
+     "القدرة على التنقل اليومي إلى المواقع الميدانية واستخدام الجهاز اللوحي"
+    ]
+   },
+   "provides": {
+    "en": [
+     "Full training on monitoring tools and interview skills",
+     "Transport to and from field sites",
+     "Health insurance"
+    ],
+    "ar": [
+     "تدريب كامل على أدوات الرصد ومهارات إجراء المقابلات",
+     "توفير وسيلة نقل من المواقع الميدانية وإليها",
+     "تأمين صحي"
+    ]
+   },
+   "tags": "monitoring field monitor distribution survey interviews families entry رصد ميداني توزيع مقابلات أسر استبيان",
+   "daysAgo": 4
+  },
+  {
+   "company": "WFP Syria",
+   "title": {
+    "en": "Logistics Assistant, Food Warehouse",
+    "ar": "مساعد لوجستي في مستودع للمواد الغذائية"
+   },
+   "gov": "hasakah",
+   "place": {
+    "en": "Hasakah",
+    "ar": "الحسكة"
+   },
+   "type": "contract",
+   "level": "junior",
+   "mode": "onsite",
+   "pay": [
+    100000,
+    130000
+   ],
+   "langs": [
+    "ar",
+    "ku"
+   ],
+   "recruits": [
+    [
+     "furat",
+     "industrial"
+    ]
+   ],
+   "anyFaculty": false,
+   "noDegree": false,
+   "support": false,
+   "openings": 1,
+   "summary": {
+    "en": "Help run a food warehouse in Hasakah day to day: receive deliveries, keep stock records accurate and prepare loads for dispatch. A fixed-term contract for someone with one to three years in a warehouse or stores role.",
+    "ar": "المساهمة في تسيير العمل اليومي في مستودع للمواد الغذائية في الحسكة: استلام الشحنات، والحفاظ على دقة سجلات المخزون، وتجهيز الحمولات للشحن. عقد محدد المدة لمن لديه خبرة من سنة إلى ثلاث سنوات في المستودعات أو المخازن."
+   },
+   "duties": {
+    "en": [
+     "Receive deliveries, count and inspect goods, and sign the receiving notes",
+     "Keep stock cards and the stock spreadsheet up to date every day",
+     "Prepare and load outgoing shipments against approved waybills",
+     "Check shelf life, storage conditions and pest control"
+    ],
+    "ar": [
+     "استلام الشحنات وعدّ البضائع وفحصها وتوقيع إشعارات الاستلام",
+     "تحديث بطاقات المخزون وجدول المخزون الإلكتروني يومياً",
+     "تجهيز الشحنات الصادرة وتحميلها وفق بوالص الشحن المعتمدة",
+     "مراقبة الصلاحية وظروف التخزين ومكافحة الآفات"
+    ]
+   },
+   "needs": {
+    "en": [
+     "Degree or diploma in industrial engineering, logistics or business",
+     "One to three years in a warehouse, stores or supply role",
+     "Working Kurdish as well as Arabic, and good Excel"
+    ],
+    "ar": [
+     "شهادة جامعية أو دبلوم في الهندسة الصناعية أو اللوجستيات أو إدارة الأعمال",
+     "خبرة من سنة إلى ثلاث سنوات في المستودعات أو المخازن أو الإمداد",
+     "كردية عملية إلى جانب العربية، ومعرفة جيدة ببرنامج إكسل"
+    ]
+   },
+   "provides": {
+    "en": [
+     "Training in warehouse management and food safety",
+     "Health insurance for the length of the contract"
+    ],
+    "ar": [
+     "تدريب على إدارة المستودعات وسلامة الغذاء",
+     "تأمين صحي طوال مدة العقد"
+    ]
+   },
+   "tags": "logistics warehouse stock inventory dispatch supply storekeeper kurdish لوجستيات مستودع مخزون مخازن إمداد شحن",
+   "daysAgo": 9
+  },
+  {
+   "company": "WFP Syria",
+   "title": {
+    "en": "Data Analyst, Monitoring Dashboards and Survey Data",
+    "ar": "محلل بيانات للوحات المتابعة وبيانات المسوح"
+   },
+   "gov": "damascus",
+   "place": {
+    "en": "Damascus, with some days from home",
+    "ar": "دمشق، مع بعض أيام العمل من المنزل"
+   },
+   "type": "full",
+   "level": "mid",
+   "mode": "hybrid",
+   "pay": [
+    220000,
+    290000
+   ],
+   "langs": [
+    "ar",
+    "en"
+   ],
+   "recruits": [
+    [
+     "damascus",
+     "informatics"
+    ],
+    [
+     "hiast",
+     "informatics"
+    ]
+   ],
+   "anyFaculty": false,
+   "noDegree": false,
+   "support": false,
+   "openings": 1,
+   "summary": {
+    "en": "Turn field survey data into clean datasets and clear dashboards that managers use to make decisions. A full-time hybrid role in Damascus for an analyst with several years of hands-on work in data cleaning, analysis and visualisation.",
+    "ar": "تحويل بيانات المسوح الميدانية إلى مجموعات بيانات منقّحة ولوحات معلومات واضحة يعتمد عليها المديرون في اتخاذ القرار. وظيفة بدوام كامل بنظام عمل مختلط في دمشق، لمحلل يملك خبرة عملية لعدة سنوات في تنظيف البيانات وتحليلها وعرضها."
+   },
+   "duties": {
+    "en": [
+     "Clean, check and merge survey data from mobile data collection tools",
+     "Build and maintain dashboards in Power BI or a similar tool",
+     "Write short analysis notes in English for programme managers",
+     "Document data processes and train field teams on data quality"
+    ],
+    "ar": [
+     "تنظيف بيانات المسوح المجمّعة عبر أدوات الجمع بالهاتف المحمول وتدقيقها ودمجها",
+     "بناء لوحات المعلومات وصيانتها باستخدام Power BI أو أداة مماثلة",
+     "كتابة ملاحظات تحليلية قصيرة بالإنكليزية لمديري البرامج",
+     "توثيق إجراءات العمل على البيانات وتدريب الفرق الميدانية على جودة البيانات"
+    ]
+   },
+   "needs": {
+    "en": [
+     "Degree in informatics, statistics or a related field",
+     "Four years or more in data analysis, with Excel and SQL, R or Python",
+     "Working English for written analysis"
+    ],
+    "ar": [
+     "شهادة في المعلوماتية أو الإحصاء أو اختصاص قريب",
+     "خبرة أربع سنوات أو أكثر في تحليل البيانات، مع إتقان إكسل وSQL أو R أو بايثون",
+     "إنكليزية عملية لكتابة التحليلات"
+    ]
+   },
+   "provides": {
+    "en": [
+     "Hybrid schedule, with some days from home",
+     "Health insurance",
+     "Online training in data tools"
+    ],
+    "ar": [
+     "نظام عمل مختلط مع بعض الأيام من المنزل",
+     "تأمين صحي",
+     "دورات تدريبية عبر الإنترنت في أدوات البيانات"
+    ]
+   },
+   "tags": "data analyst dashboards powerbi excel sql python surveys monitoring بيانات محلل تحليل لوحات إحصاء مسوح",
+   "daysAgo": 3
+  },
+  {
+   "company": "UNHCR Syria",
+   "title": {
+    "en": "Protection Assistant, Community Centre",
+    "ar": "مساعد حماية في مركز مجتمعي"
+   },
+   "gov": "rifdimashq",
+   "place": {
+    "en": "A community centre in Rural Damascus",
+    "ar": "مركز مجتمعي في ريف دمشق"
+   },
+   "type": "contract",
+   "level": "entry",
+   "mode": "onsite",
+   "pay": [
+    90000,
+    115000
+   ],
+   "langs": [
+    "ar"
+   ],
+   "recruits": [
+    [
+     "damascus",
+     "arts"
+    ]
+   ],
+   "anyFaculty": false,
+   "noDegree": false,
+   "support": false,
+   "openings": 2,
+   "summary": {
+    "en": "Be the first person families meet at a community centre in Rural Damascus: listen, record their needs and refer them to the right services. An entry-level contract with training, for someone calm, discreet and at ease with people facing hard times.",
+    "ar": "يكون شاغل الوظيفة أول من تلتقيه الأسر في مركز مجتمعي بريف دمشق، فيستمع إليها ويسجّل احتياجاتها ويحيلها إلى الخدمات المناسبة. عقد للمبتدئين مع تدريب، لشخص هادئ وكتوم يتعامل بارتياح مع من يمرّون بظروف صعبة."
+   },
+   "duties": {
+    "en": [
+     "Welcome visitors, listen to them and fill in intake forms accurately",
+     "Refer people to legal, health, psychosocial or other services and follow up",
+     "Keep case files confidential and up to date",
+     "Help run awareness sessions at the centre"
+    ],
+    "ar": [
+     "استقبال المراجعين والاستماع إليهم وتعبئة استمارات الاستقبال بدقة",
+     "إحالة الأشخاص إلى الخدمات القانونية أو الصحية أو خدمات الدعم النفسي الاجتماعي أو غيرها ومتابعة الإحالات",
+     "الحفاظ على سرية ملفات الحالات وتحديثها باستمرار",
+     "المساعدة في تنظيم جلسات التوعية في المركز"
+    ]
+   },
+   "needs": {
+    "en": [
+     "University degree in humanities, social work, law or a related field",
+     "No previous experience needed; community volunteering is a plus",
+     "Patient, respectful and able to keep information confidential"
+    ],
+    "ar": [
+     "شهادة جامعية في العلوم الإنسانية أو العمل الاجتماعي أو الحقوق أو اختصاص قريب",
+     "لا تُشترط خبرة سابقة، ويُعدّ التطوع في العمل المجتمعي ميزة إضافية",
+     "الصبر واحترام الآخرين والقدرة على الحفاظ على سرية المعلومات"
+    ]
+   },
+   "provides": {
+    "en": [
+     "Training in protection principles, safe referrals and case intake",
+     "Regular supervision and support from experienced colleagues",
+     "Transport allowance"
+    ],
+    "ar": [
+     "تدريب على مبادئ الحماية والإحالة الآمنة واستقبال الحالات",
+     "إشراف ودعم منتظمان من زملاء ذوي خبرة",
+     "بدل مواصلات"
+    ]
+   },
+   "tags": "protection community centre case intake referrals social work assistant حماية مركز مجتمعي إحالة حالات دعم",
+   "daysAgo": 5
+  },
+  {
+   "company": "UNHCR Syria",
+   "title": {
+    "en": "Shelter Engineer, Light Repairs to Damaged Homes",
+    "ar": "مهندس مأوى لأعمال الإصلاح الخفيف في المنازل المتضررة"
+   },
+   "gov": "homs",
+   "place": {
+    "en": "Homs, with field visits across the governorate",
+    "ar": "حمص، مع زيارات ميدانية في أنحاء المحافظة"
+   },
+   "type": "full",
+   "level": "junior",
+   "mode": "onsite",
+   "pay": [
+    150000,
+    190000
+   ],
+   "langs": [
+    "ar",
+    "en"
+   ],
+   "recruits": [
+    [
+     "homs",
+     "civil"
+    ]
+   ],
+   "anyFaculty": false,
+   "noDegree": false,
+   "support": false,
+   "openings": 1,
+   "summary": {
+    "en": "Assess damaged homes in and around Homs, plan light repairs to doors, windows, roofs and plumbing, and supervise contractors until families can live in them safely. A full-time field role for a civil engineer with one to three years of site experience.",
+    "ar": "تقييم المنازل المتضررة في حمص ومحيطها، وإعداد خطط الإصلاح الخفيف للأبواب والنوافذ والأسقف والتمديدات الصحية، والإشراف على المقاولين حتى تصبح صالحة لسكن الأسر بأمان. وظيفة ميدانية بدوام كامل لمهندس مدني لديه خبرة من سنة إلى ثلاث سنوات في المواقع."
+   },
+   "duties": {
+    "en": [
+     "Inspect damaged homes and confirm they are structurally safe for light repairs",
+     "Prepare bills of quantities and simple repair drawings",
+     "Supervise contractors and accept completed work against specifications",
+     "Write site reports in English and keep the case database up to date"
+    ],
+    "ar": [
+     "الكشف على المنازل المتضررة والتأكد من سلامتها الإنشائية لأعمال الإصلاح الخفيف",
+     "إعداد جداول الكميات ومخططات إصلاح بسيطة",
+     "الإشراف على المقاولين واستلام الأعمال المنجزة وفق المواصفات",
+     "كتابة تقارير المواقع بالإنكليزية وتحديث قاعدة بيانات الحالات"
+    ]
+   },
+   "needs": {
+    "en": [
+     "Degree in civil engineering",
+     "One to three years of site supervision or building repair work",
+     "Working English for reports, and good AutoCAD"
+    ],
+    "ar": [
+     "شهادة في الهندسة المدنية",
+     "خبرة من سنة إلى ثلاث سنوات في الإشراف على المواقع أو ترميم المباني",
+     "إنكليزية عملية لكتابة التقارير، وإتقان برنامج أوتوكاد"
+    ]
+   },
+   "provides": {
+    "en": [
+     "Transport provided for site visits",
+     "Health insurance",
+     "Training in shelter standards and site safety"
+    ],
+    "ar": [
+     "توفير وسيلة نقل للزيارات الميدانية",
+     "تأمين صحي",
+     "تدريب على معايير المأوى والسلامة في المواقع"
+    ]
+   },
+   "tags": "shelter engineer civil repairs housing construction supervision field مأوى مهندس مدني ترميم إصلاح منازل",
+   "daysAgo": 12
+  },
+  {
+   "company": "WHO Syria",
+   "title": {
+    "en": "Public Health Officer, Disease Surveillance and Outbreak Response",
+    "ar": "مسؤول صحة عامة لترصد الأمراض والاستجابة للفاشيات"
+   },
+   "gov": "aleppo",
+   "place": {
+    "en": "Aleppo, with field visits across the governorate",
+    "ar": "حلب، مع زيارات ميدانية في أنحاء المحافظة"
+   },
+   "type": "contract",
+   "level": "mid",
+   "mode": "onsite",
+   "pay": [
+    230000,
+    300000
+   ],
+   "langs": [
+    "ar",
+    "en"
+   ],
+   "recruits": [
+    [
+     "aleppo",
+     "publichealth"
+    ]
+   ],
+   "anyFaculty": false,
+   "noDegree": false,
+   "support": false,
+   "openings": 1,
+   "summary": {
+    "en": "Follow disease surveillance data from health facilities in Aleppo, spot unusual signals early and help coordinate the response when an outbreak is suspected. A fixed-term contract for a public health professional with several years in surveillance or epidemiology.",
+    "ar": "متابعة بيانات ترصد الأمراض الواردة من المرافق الصحية في حلب، واكتشاف المؤشرات غير المعتادة مبكراً، والمساهمة في تنسيق الاستجابة عند الاشتباه بفاشية. عقد محدد المدة لمختص في الصحة العامة لديه خبرة عدة سنوات في الترصد أو علم الوبائيات."
+   },
+   "duties": {
+    "en": [
+     "Review weekly surveillance reports and follow up sites that report late or not at all",
+     "Investigate alerts with local health teams and support sample collection",
+     "Train health workers on case definitions and reporting",
+     "Write situation updates in English during outbreak response"
+    ],
+    "ar": [
+     "مراجعة تقارير الترصد الأسبوعية ومتابعة المواقع المتأخرة أو المنقطعة عن الإبلاغ",
+     "التحقق من الإنذارات مع فرق الصحة المحلية ودعم جمع العينات",
+     "تدريب العاملين الصحيين على تعريفات الحالات وآليات الإبلاغ",
+     "كتابة تحديثات عن الوضع بالإنكليزية خلال الاستجابة للفاشيات"
+    ]
+   },
+   "needs": {
+    "en": [
+     "Degree in public health, medicine or a related health field",
+     "At least four years in surveillance, epidemiology or outbreak response",
+     "Working English for reports and technical meetings"
+    ],
+    "ar": [
+     "شهادة في الصحة العامة أو الطب أو اختصاص صحي قريب",
+     "خبرة أربع سنوات على الأقل في الترصد أو علم الوبائيات أو الاستجابة للفاشيات",
+     "إنكليزية عملية لكتابة التقارير وحضور الاجتماعات الفنية"
+    ]
+   },
+   "provides": {
+    "en": [
+     "Health insurance for the length of the contract",
+     "Transport provided for field visits and investigations",
+     "Training in outbreak investigation and data tools"
+    ],
+    "ar": [
+     "تأمين صحي طوال مدة العقد",
+     "توفير وسيلة نقل للزيارات الميدانية وأعمال التقصي",
+     "تدريب على تقصي الفاشيات وأدوات البيانات"
+    ]
+   },
+   "tags": "public health surveillance epidemiology outbreak response disease officer صحة عامة ترصد وبائيات فاشيات أمراض",
+   "daysAgo": 7
+  },
+  {
+   "company": "WHO Syria",
+   "title": {
+    "en": "Health Information Intern, Surveillance Data",
+    "ar": "متدرب في المعلومات الصحية لبيانات الترصد"
+   },
+   "gov": "damascus",
+   "place": {
+    "en": "Damascus",
+    "ar": "دمشق"
+   },
+   "type": "intern",
+   "level": "student",
+   "mode": "onsite",
+   "pay": [
+    18000,
+    18000
+   ],
+   "langs": [
+    "ar",
+    "en"
+   ],
+   "recruits": [
+    [
+     "damascus",
+     "publichealth"
+    ],
+    [
+     "damascus",
+     "informatics"
+    ]
+   ],
+   "anyFaculty": false,
+   "noDegree": false,
+   "support": false,
+   "openings": 2,
+   "summary": {
+    "en": "Enter and check disease surveillance data, find gaps and errors, and help prepare simple weekly tables. An onsite internship in Damascus for public health or informatics students who want practical experience with real health data.",
+    "ar": "إدخال بيانات ترصد الأمراض والتحقق منها، واكتشاف النواقص والأخطاء، والمساعدة في إعداد جداول أسبوعية بسيطة. تدريب حضوري في دمشق لطلاب الصحة العامة أو المعلوماتية الراغبين في اكتساب خبرة عملية مع بيانات صحية حقيقية."
+   },
+   "duties": {
+    "en": [
+     "Enter weekly surveillance reports into the database accurately",
+     "Run quality checks for duplicates, missing fields and impossible values",
+     "Help prepare weekly summary tables and charts",
+     "Keep a log of data issues and how each one was fixed"
+    ],
+    "ar": [
+     "إدخال تقارير الترصد الأسبوعية في قاعدة البيانات بدقة",
+     "إجراء فحوص الجودة لاكتشاف التكرار والحقول الناقصة والقيم غير المنطقية",
+     "المساعدة في إعداد جداول ومخططات بيانية أسبوعية موجزة",
+     "تدوين مشكلات البيانات وطريقة معالجة كل منها في سجل خاص"
+    ]
+   },
+   "needs": {
+    "en": [
+     "Current student in public health or informatics",
+     "Careful with detail and good with Excel",
+     "Working English to read data forms and guidelines"
+    ],
+    "ar": [
+     "طالب حالياً في الصحة العامة أو المعلوماتية",
+     "دقة في التفاصيل ومعرفة جيدة ببرنامج إكسل",
+     "إنكليزية عملية لقراءة استمارات البيانات والأدلة الإرشادية"
+    ]
+   },
+   "provides": {
+    "en": [
+     "A monthly stipend",
+     "Supervision by an experienced surveillance officer",
+     "Internship certificate on completion"
+    ],
+    "ar": [
+     "مكافأة شهرية",
+     "إشراف من مسؤول ترصد ذي خبرة",
+     "شهادة تدريب عند الانتهاء"
+    ]
+   },
+   "tags": "health information data entry surveillance quality intern internship excel معلومات صحية بيانات ترصد تدريب إدخال",
+   "daysAgo": 2
+  },
+  {
+   "company": "ICRC Syria",
+   "title": {
+    "en": "Water and habitat technician, pumping stations and generators",
+    "ar": "فني مياه وسكن لمحطات الضخ والمولدات"
+   },
+   "gov": "hama",
+   "place": {
+    "en": "Hama and field locations across Hama governorate",
+    "ar": "حماة ومواقع ميدانية في أنحاء محافظة حماة"
+   },
+   "type": "full",
+   "level": "junior",
+   "mode": "onsite",
+   "pay": [
+    120000,
+    150000
+   ],
+   "langs": [
+    "ar"
+   ],
+   "recruits": [
+    [
+     "hama",
+     "mechanical"
+    ],
+    [
+     "hama",
+     "electrical"
+    ]
+   ],
+   "anyFaculty": false,
+   "noDegree": false,
+   "support": false,
+   "openings": 1,
+   "summary": {
+    "en": "Keep water pumping stations and their generators running across Hama governorate. You will carry out routine maintenance, find and fix breakdowns, and work alongside station operators so that water keeps reaching the communities they serve.",
+    "ar": "الحفاظ على استمرار عمل محطات ضخ المياه ومولداتها في أنحاء محافظة حماة. تتولى الصيانة الدورية وتشخيص الأعطال وإصلاحها، وتعمل إلى جانب مشغّلي المحطات كي يستمر وصول المياه إلى السكان الذين تخدمهم."
+   },
+   "duties": {
+    "en": [
+     "Carry out scheduled maintenance on pumps, motors and diesel generators",
+     "Diagnose electrical and mechanical faults and repair them on site",
+     "Keep maintenance logs and report spare-part needs to the supervising engineer",
+     "Train station operators in safe daily checks and basic upkeep"
+    ],
+    "ar": [
+     "تنفيذ الصيانة المجدولة للمضخات والمحركات ومولدات الديزل",
+     "تشخيص الأعطال الكهربائية والميكانيكية وإصلاحها في الموقع",
+     "تدوين سجلات الصيانة ورفع احتياجات قطع الغيار إلى المهندس المشرف",
+     "تدريب مشغّلي المحطات على الفحوص اليومية الآمنة والصيانة الأساسية"
+    ]
+   },
+   "needs": {
+    "en": [
+     "Diploma or degree in mechanical or electrical engineering",
+     "One to three years maintaining pumps, motors or generators",
+     "Able to travel daily between stations across the governorate"
+    ],
+    "ar": [
+     "دبلوم أو إجازة في الهندسة الميكانيكية أو الكهربائية",
+     "خبرة من سنة إلى ثلاث سنوات في صيانة المضخات أو المحركات أو المولدات",
+     "القدرة على التنقل يومياً بين المحطات في أنحاء المحافظة"
+    ]
+   },
+   "provides": {
+    "en": [
+     "Field transport between stations",
+     "Tools and personal protective equipment",
+     "Technical training on pumping and power systems"
+    ],
+    "ar": [
+     "النقل الميداني بين المحطات",
+     "أدوات العمل ومعدات الوقاية الشخصية",
+     "تدريب فني على أنظمة الضخ والطاقة"
+    ]
+   },
+   "tags": "water habitat technician pumps generators maintenance electrical mechanical مياه مضخات مولدات صيانة كهرباء",
+   "daysAgo": 10
+  },
+  {
+   "company": "ICRC Syria",
+   "title": {
+    "en": "Field interpreter, Arabic, English and French",
+    "ar": "مترجم ميداني للعربية والإنكليزية والفرنسية"
+   },
+   "gov": "tartus",
+   "place": {
+    "en": "Tartus and field locations across Tartus governorate",
+    "ar": "طرطوس ومواقع ميدانية في أنحاء محافظة طرطوس"
+   },
+   "type": "full",
+   "level": "entry",
+   "mode": "onsite",
+   "pay": [
+    85000,
+    105000
+   ],
+   "langs": [
+    "ar",
+    "en",
+    "fr"
+   ],
+   "recruits": [],
+   "anyFaculty": false,
+   "noDegree": false,
+   "support": false,
+   "openings": 1,
+   "summary": {
+    "en": "Interpret between Arabic, English and French during field visits, meetings and interviews. An entry-level role for a recent graduate with strong language skills who is happy to spend most days out in the field rather than at a desk.",
+    "ar": "ترجمة شفهية بين العربية والإنكليزية والفرنسية خلال الزيارات الميدانية والاجتماعات والمقابلات. وظيفة للمبتدئين تناسب خريجاً حديثاً يتقن اللغات ويرغب في قضاء معظم أيامه في الميدان لا في المكتب."
+   },
+   "duties": {
+    "en": [
+     "Interpret accurately during field visits, meetings and interviews",
+     "Translate short letters, notes and reports between the three languages",
+     "Keep a shared glossary of technical and humanitarian terms up to date",
+     "Treat everything heard during the work as confidential"
+    ],
+    "ar": [
+     "الترجمة الشفهية الدقيقة خلال الزيارات الميدانية والاجتماعات والمقابلات",
+     "ترجمة الرسائل والملاحظات والتقارير القصيرة بين اللغات الثلاث",
+     "تحديث مسرد مشترك للمصطلحات الفنية والإنسانية",
+     "الحفاظ على سرية كل ما يُتداول أثناء العمل"
+    ]
+   },
+   "needs": {
+    "en": [
+     "Degree in translation, English or French literature, or a related field",
+     "Fluent working English and French, spoken and written",
+     "No prior experience needed; able to travel within the governorate"
+    ],
+    "ar": [
+     "إجازة في الترجمة أو الأدب الإنكليزي أو الفرنسي أو اختصاص قريب",
+     "إتقان الإنكليزية والفرنسية في العمل، تحدثاً وكتابة",
+     "لا تُشترط خبرة سابقة، مع القدرة على التنقل داخل المحافظة"
+    ]
+   },
+   "provides": {
+    "en": [
+     "On-the-job coaching in interpreting and terminology",
+     "Transport for all field visits",
+     "Health insurance"
+    ],
+    "ar": [
+     "تدريب عملي أثناء العمل على الترجمة الشفهية والمصطلحات",
+     "النقل إلى جميع الزيارات الميدانية",
+     "تأمين صحي"
+    ]
+   },
+   "tags": "interpreter translator translation english french arabic field languages مترجم ترجمة إنكليزي فرنسي لغات",
+   "daysAgo": 8
+  },
+  {
+   "company": "Norwegian Refugee Council",
+   "title": {
+    "en": "Education programme assistant, catch-up classes",
+    "ar": "مساعد برنامج تعليمي لصفوف التعليم التعويضي"
+   },
+   "gov": "daraa",
+   "place": {
+    "en": "Field locations across Daraa governorate",
+    "ar": "مواقع ميدانية في أنحاء محافظة درعا"
+   },
+   "type": "contract",
+   "level": "junior",
+   "mode": "onsite",
+   "pay": [
+    80000,
+    105000
+   ],
+   "langs": [
+    "ar"
+   ],
+   "recruits": [],
+   "anyFaculty": false,
+   "noDegree": false,
+   "support": false,
+   "openings": 2,
+   "summary": {
+    "en": "Run catch-up classes that help out-of-school children return to learning and rejoin formal school. Two openings on a fixed-term contract, working closely with facilitators, parents and local schools.",
+    "ar": "تنظيم صفوف التعليم التعويضي لمساعدة الأطفال المنقطعين عن الدراسة على العودة إلى التعلم والالتحاق بالمدرسة من جديد. يتوفر شاغران بعقد محدد المدة، مع العمل عن قرب مع الميسّرين والأهالي والمدارس المحلية."
+   },
+   "duties": {
+    "en": [
+     "Organise class timetables, attendance and learning materials",
+     "Support facilitators in reading, writing and arithmetic sessions",
+     "Follow up with families when a child stops attending",
+     "Track each child's progress and prepare their return to formal school"
+    ],
+    "ar": [
+     "تنظيم جداول الصفوف ومتابعة الحضور وتجهيز المواد التعليمية",
+     "مساندة الميسّرين في حصص القراءة والكتابة والحساب",
+     "التواصل مع الأسر عند انقطاع أي طفل عن الحضور",
+     "متابعة تقدم كل طفل والتحضير لعودته إلى المدرسة النظامية"
+    ]
+   },
+   "needs": {
+    "en": [
+     "Degree in education, Arabic, mathematics or a related field",
+     "One to three years teaching or working with children",
+     "Patient and clear when talking with children and parents"
+    ],
+    "ar": [
+     "إجازة في التربية أو اللغة العربية أو الرياضيات أو اختصاص قريب",
+     "خبرة من سنة إلى ثلاث سنوات في التدريس أو العمل مع الأطفال",
+     "الصبر والقدرة على التواصل بوضوح مع الأطفال والأهالي"
+    ]
+   },
+   "provides": {
+    "en": [
+     "Training in child-centred teaching and child safeguarding",
+     "Transport to class locations"
+    ],
+    "ar": [
+     "تدريب على أساليب التعليم المتمحورة حول الطفل وعلى حماية الطفل",
+     "النقل إلى أماكن الصفوف"
+    ]
+   },
+   "tags": "education teaching children catch-up classes literacy numeracy school تعليم أطفال تعويضي تدريس مدرسة",
+   "daysAgo": 3
+  },
+  {
+   "company": "Norwegian Refugee Council",
+   "title": {
+    "en": "Legal aid officer, civil and property documentation",
+    "ar": "مسؤول مساعدة قانونية للوثائق المدنية ووثائق الملكية"
+   },
+   "gov": "aleppo",
+   "place": {
+    "en": "Aleppo, with field visits across the governorate",
+    "ar": "حلب، مع زيارات ميدانية في أنحاء المحافظة"
+   },
+   "type": "full",
+   "level": "mid",
+   "mode": "onsite",
+   "pay": [
+    170000,
+    220000
+   ],
+   "langs": [
+    "ar",
+    "en"
+   ],
+   "recruits": [],
+   "anyFaculty": false,
+   "noDegree": false,
+   "support": false,
+   "openings": 1,
+   "summary": {
+    "en": "Help families obtain or restore civil documents such as birth, marriage and family records, and prove their housing, land and property rights. You will give legal counselling, follow cases through the relevant offices and courts, and keep case files accurate and confidential.",
+    "ar": "مساعدة الأسر في استخراج الوثائق المدنية أو استعادتها، مثل قيود الولادة والزواج ودفاتر العائلة، وفي إثبات حقوقها في السكن والأرض والملكية. تقدّم الاستشارة القانونية وتتابع القضايا لدى الدوائر والمحاكم المختصة، وتحافظ على دقة ملفات الحالات وسريتها."
+   },
+   "duties": {
+    "en": [
+     "Give legal counselling to families on civil and property documents",
+     "Follow cases through civil registries, courts and land registry offices",
+     "Run community information sessions on documentation rights",
+     "Keep case files confidential and write short case reports in English"
+    ],
+    "ar": [
+     "تقديم الاستشارة القانونية للأسر حول الوثائق المدنية ووثائق الملكية",
+     "متابعة القضايا لدى دوائر السجل المدني والمحاكم ومديريات المصالح العقارية",
+     "تنظيم جلسات توعية مجتمعية حول الحقوق المتعلقة بالوثائق",
+     "الحفاظ على سرية ملفات الحالات وكتابة تقارير موجزة عنها بالإنكليزية"
+    ]
+   },
+   "needs": {
+    "en": [
+     "Law degree; membership of the bar association is an advantage",
+     "At least three years in legal practice or legal aid, ideally civil status or property",
+     "Working English for reports and case notes"
+    ],
+    "ar": [
+     "إجازة في الحقوق، والانتساب إلى نقابة المحامين ميزة إضافية",
+     "خبرة لا تقل عن ثلاث سنوات في المحاماة أو المساعدة القانونية، ويُفضَّل في الأحوال المدنية أو الملكية",
+     "إنكليزية عملية لكتابة التقارير وملاحظات الحالات"
+    ]
+   },
+   "provides": {
+    "en": [
+     "Training in housing, land and property law and practice",
+     "Transport for field visits and court follow-up",
+     "Health insurance"
+    ],
+    "ar": [
+     "تدريب على قوانين السكن والأرض والملكية وتطبيقها",
+     "النقل للزيارات الميدانية ومتابعة القضايا في المحاكم",
+     "تأمين صحي"
+    ]
+   },
+   "tags": "legal aid lawyer law documentation property civil counselling قانون محامي حقوق وثائق ملكية استشارة",
+   "daysAgo": 14
+  },
+  {
+   "company": "Danish Refugee Council",
+   "title": {
+    "en": "Livelihoods assistant, small business start-up support",
+    "ar": "مساعد سبل عيش لدعم إطلاق المشاريع الصغيرة"
+   },
+   "gov": "raqqa",
+   "place": {
+    "en": "Raqqa and field locations across Raqqa governorate",
+    "ar": "الرقة ومواقع ميدانية في أنحاء محافظة الرقة"
+   },
+   "type": "contract",
+   "level": "entry",
+   "mode": "onsite",
+   "pay": [
+    75000,
+    95000
+   ],
+   "langs": [
+    "ar"
+   ],
+   "recruits": [
+    [
+     "furat",
+     "economics"
+    ]
+   ],
+   "anyFaculty": false,
+   "noDegree": false,
+   "support": false,
+   "openings": 1,
+   "summary": {
+    "en": "Support people starting small businesses through start-up grants, business skills training and follow-up visits. An entry-level contract suited to a recent graduate in economics or business who wants hands-on field experience.",
+    "ar": "دعم الراغبين في بدء مشاريع صغيرة من خلال منحٍ لإطلاق المشاريع والتدريب على مهارات إدارة الأعمال وزيارات المتابعة. عقد للمبتدئين يناسب خريجاً حديثاً في الاقتصاد أو إدارة الأعمال يرغب في اكتساب خبرة ميدانية مباشرة."
+   },
+   "duties": {
+    "en": [
+     "Help participants write simple business plans",
+     "Organise business skills training sessions and track attendance",
+     "Visit businesses after start-up and record how they are doing",
+     "Keep participant records accurate and up to date"
+    ],
+    "ar": [
+     "مساعدة المشاركين في إعداد خطط عمل بسيطة",
+     "تنظيم جلسات التدريب على مهارات إدارة الأعمال ومتابعة الحضور",
+     "زيارة المشاريع بعد انطلاقها وتوثيق سير عملها",
+     "الحفاظ على دقة سجلات المشاركين وتحديثها"
+    ]
+   },
+   "needs": {
+    "en": [
+     "Degree in economics, business administration or a related field",
+     "No prior experience needed; comfortable with spreadsheets",
+     "At ease meeting people and travelling to villages around Raqqa"
+    ],
+    "ar": [
+     "إجازة في الاقتصاد أو إدارة الأعمال أو اختصاص قريب",
+     "لا تُشترط خبرة سابقة، مع إلمام جيد بجداول البيانات",
+     "سهولة التواصل مع الناس والقدرة على التنقل إلى القرى المحيطة بالرقة"
+    ]
+   },
+   "provides": {
+    "en": [
+     "Field transport and a work phone",
+     "Training in market assessment and business coaching"
+    ],
+    "ar": [
+     "النقل الميداني وهاتف للعمل",
+     "تدريب على تقييم الأسواق وتوجيه أصحاب المشاريع"
+    ]
+   },
+   "tags": "livelihoods small business grants training economics entrepreneurship field مشاريع صغيرة اقتصاد تدريب سبل عيش",
+   "daysAgo": 6
+  },
+  {
+   "company": "Danish Refugee Council",
+   "title": {
+    "en": "Explosive ordnance risk education facilitator",
+    "ar": "ميسّر توعية بمخاطر الذخائر المتفجرة"
+   },
+   "gov": "idlib",
+   "place": {
+    "en": "Field locations across Idlib governorate",
+    "ar": "مواقع ميدانية في أنحاء محافظة إدلب"
+   },
+   "type": "full",
+   "level": "junior",
+   "mode": "onsite",
+   "pay": [
+    90000,
+    110000
+   ],
+   "langs": [
+    "ar"
+   ],
+   "recruits": [],
+   "anyFaculty": false,
+   "noDegree": false,
+   "support": false,
+   "openings": 2,
+   "summary": {
+    "en": "Lead risk education sessions in schools and communities so that children and adults can recognise explosive ordnance, keep away from it and report it safely. Two openings for facilitators who are confident speaking to groups of all ages.",
+    "ar": "تقديم جلسات توعية بالمخاطر في المدارس والمجتمعات المحلية لمساعدة الأطفال والكبار على التعرف إلى الذخائر المتفجرة والابتعاد عنها والإبلاغ عنها بأمان. يتوفر شاغران لميسّرين واثقين من التحدث أمام مجموعات من مختلف الأعمار."
+   },
+   "duties": {
+    "en": [
+     "Deliver risk education sessions in schools, camps and community centres",
+     "Adapt messages and materials for children, parents and farmers",
+     "Record reports of suspected items and pass them to the survey team",
+     "Keep attendance records and write short session reports"
+    ],
+    "ar": [
+     "تقديم جلسات التوعية بالمخاطر في المدارس والمخيمات والمراكز المجتمعية",
+     "تكييف الرسائل والمواد التوعوية بما يناسب الأطفال والأهالي والمزارعين",
+     "تسجيل البلاغات عن الأجسام المشبوهة وإحالتها إلى فريق المسح",
+     "توثيق الحضور وكتابة تقارير موجزة عن الجلسات"
+    ]
+   },
+   "needs": {
+    "en": [
+     "Degree in education, social sciences or a related field",
+     "One to three years facilitating sessions, teaching or doing awareness work",
+     "Follows strict safety rules and can travel daily across the governorate"
+    ],
+    "ar": [
+     "إجازة في التربية أو العلوم الاجتماعية أو اختصاص قريب",
+     "خبرة من سنة إلى ثلاث سنوات في تيسير الجلسات أو التدريس أو أعمال التوعية",
+     "الالتزام الصارم بقواعد السلامة والقدرة على التنقل يومياً في أنحاء المحافظة"
+    ]
+   },
+   "provides": {
+    "en": [
+     "Certified training in explosive ordnance risk education",
+     "Field transport and safety equipment",
+     "Health insurance"
+    ],
+    "ar": [
+     "تدريب معتمد على التوعية بمخاطر الذخائر المتفجرة",
+     "النقل الميداني ومعدات السلامة",
+     "تأمين صحي"
+    ]
+   },
+   "tags": "explosive ordnance risk education facilitator safety awareness schools ذخائر توعية مخاطر سلامة ميسر مدارس",
+   "daysAgo": 11
+  },
+  {
+   "company": "Mercy Corps",
+   "title": {
+    "en": "Market systems officer, agriculture",
+    "ar": "مسؤول أنظمة السوق في القطاع الزراعي"
+   },
+   "gov": "idlib",
+   "place": {
+    "en": "Field locations across Idlib governorate",
+    "ar": "مواقع ميدانية في أنحاء محافظة إدلب"
+   },
+   "type": "full",
+   "level": "mid",
+   "mode": "onsite",
+   "pay": [
+    180000,
+    230000
+   ],
+   "langs": [
+    "ar",
+    "en"
+   ],
+   "recruits": [
+    [
+     "aleppo",
+     "economics"
+    ]
+   ],
+   "anyFaculty": false,
+   "noDegree": false,
+   "support": false,
+   "openings": 1,
+   "summary": {
+    "en": "Work with farmers, input suppliers and traders to make agricultural markets in Idlib work better for small producers. You will analyse where supply chains break down, design practical fixes with local businesses and follow them through.",
+    "ar": "العمل مع المزارعين وموردي مستلزمات الإنتاج والتجار لتحسين أداء الأسواق الزراعية في إدلب لصالح صغار المنتجين. تتولى تحليل مواطن الخلل في سلاسل التوريد، وتصميم حلول عملية مع الشركات المحلية ومتابعة تنفيذها."
+   },
+   "duties": {
+    "en": [
+     "Analyse agricultural value chains and find where they break down",
+     "Build working partnerships with input suppliers, traders and farmer groups",
+     "Design market activities with local businesses and monitor their progress",
+     "Write market analysis and progress reports in English"
+    ],
+    "ar": [
+     "تحليل سلاسل القيمة الزراعية وتحديد مواطن الخلل فيها",
+     "بناء شراكات عمل مع موردي مستلزمات الإنتاج والتجار وتجمعات المزارعين",
+     "تصميم الأنشطة السوقية مع الشركات المحلية ومتابعة سيرها",
+     "كتابة تحليلات السوق وتقارير سير العمل بالإنكليزية"
+    ]
+   },
+   "needs": {
+    "en": [
+     "Degree in economics, agricultural economics or agriculture",
+     "At least three years in market development, agribusiness or livelihoods",
+     "Working English for reports and meetings"
+    ],
+    "ar": [
+     "إجازة في الاقتصاد أو الاقتصاد الزراعي أو الهندسة الزراعية",
+     "خبرة لا تقل عن ثلاث سنوات في تنمية الأسواق أو الأعمال الزراعية أو سبل العيش",
+     "إنكليزية عملية للتقارير والاجتماعات"
+    ]
+   },
+   "provides": {
+    "en": [
+     "Field transport across the governorate",
+     "Training in market systems development",
+     "Health insurance"
+    ],
+    "ar": [
+     "النقل الميداني في أنحاء المحافظة",
+     "تدريب على تطوير أنظمة السوق",
+     "تأمين صحي"
+    ]
+   },
+   "tags": "market systems agriculture farmers value chain economics agribusiness أسواق زراعة مزارعين اقتصاد سلاسل قيمة",
+   "daysAgo": 4
+  },
+  {
+   "company": "Mercy Corps",
+   "title": {
+    "en": "Community mobiliser, part-time",
+    "ar": "عامل تعبئة مجتمعية بدوام جزئي"
+   },
+   "gov": "hasakah",
+   "place": {
+    "en": "Hasakah city neighbourhoods",
+    "ar": "أحياء مدينة الحسكة"
+   },
+   "type": "part",
+   "level": "entry",
+   "mode": "onsite",
+   "pay": [
+    35000,
+    45000
+   ],
+   "langs": [
+    "ar",
+    "ku"
+   ],
+   "recruits": [],
+   "anyFaculty": false,
+   "noDegree": true,
+   "support": false,
+   "openings": 2,
+   "summary": {
+    "en": "Bring residents together for regular neighbourhood meetings where they discuss local needs and take part in activities. Two part-time openings for people who know their neighbourhood well; no degree or previous experience needed.",
+    "ar": "جمع سكان الأحياء في لقاءات دورية يناقشون فيها احتياجاتهم المحلية ويشاركون في الأنشطة. يتوفر شاغران بدوام جزئي لمن يعرف حيّه جيداً، ولا تُشترط شهادة جامعية أو خبرة سابقة."
+   },
+   "duties": {
+    "en": [
+     "Organise neighbourhood meetings and invite residents door to door",
+     "Share clear information about activities in Arabic and Kurdish",
+     "Note residents' questions and concerns and pass them on to the team"
+    ],
+    "ar": [
+     "تنظيم اللقاءات في الأحياء ودعوة السكان من باب إلى باب",
+     "نقل معلومات واضحة عن الأنشطة بالعربية والكردية",
+     "تدوين أسئلة السكان وملاحظاتهم وإيصالها إلى الفريق"
+    ]
+   },
+   "needs": {
+    "en": [
+     "No degree needed; able to read and write Arabic",
+     "Working Kurdish for conversations with residents",
+     "Known and trusted in your neighbourhood, and good with people"
+    ],
+    "ar": [
+     "لا تُشترط شهادة، مع إجادة القراءة والكتابة بالعربية",
+     "كردية عملية للتحدث مع السكان",
+     "معرفة جيدة بالحي وثقة سكانه، ومهارة في التعامل مع الناس"
+    ]
+   },
+   "provides": {
+    "en": [
+     "Flexible part-time hours",
+     "Training in community engagement and running meetings",
+     "Transport allowance"
+    ],
+    "ar": [
+     "ساعات عمل جزئية مرنة",
+     "تدريب على المشاركة المجتمعية وإدارة اللقاءات",
+     "بدل مواصلات"
+    ]
+   },
+   "tags": "community mobiliser outreach neighbourhood meetings part-time kurdish engagement تعبئة مجتمعية أحياء دوام جزئي كردي",
+   "daysAgo": 2
+  },
+  {
+   "company": "International Rescue Committee",
+   "title": {
+    "en": "Nurse, primary health care clinic",
+    "ar": "ممرض في عيادة رعاية صحية أولية"
+   },
+   "gov": "idlib",
+   "place": {
+    "en": "A primary health care clinic in Idlib governorate",
+    "ar": "عيادة رعاية صحية أولية في محافظة إدلب"
+   },
+   "type": "full",
+   "level": "junior",
+   "mode": "onsite",
+   "pay": [
+    110000,
+    140000
+   ],
+   "langs": [
+    "ar"
+   ],
+   "recruits": [
+    [
+     "aleppo",
+     "nursing"
+    ]
+   ],
+   "anyFaculty": false,
+   "noDegree": false,
+   "support": false,
+   "openings": 2,
+   "summary": {
+    "en": "Provide day-to-day nursing care at a primary health care clinic: triage, vaccinations, wound care and health education for patients and their families. Two openings for nurses with one to three years of clinical experience.",
+    "ar": "تقديم الرعاية التمريضية اليومية في عيادة رعاية صحية أولية: فرز المرضى والتلقيح والعناية بالجروح والتثقيف الصحي للمرضى وأسرهم. يتوفر شاغران لممرضين لديهم خبرة سريرية من سنة إلى ثلاث سنوات."
+   },
+   "duties": {
+    "en": [
+     "Triage patients and take vital signs",
+     "Give vaccinations and injections, and dress wounds",
+     "Keep patient records and the medicine stock up to date",
+     "Run short health education sessions in the waiting area"
+    ],
+    "ar": [
+     "فرز المرضى وقياس العلامات الحيوية",
+     "إعطاء اللقاحات والحقن وتضميد الجروح",
+     "تحديث سجلات المرضى ومتابعة مخزون الأدوية",
+     "تقديم جلسات تثقيف صحي قصيرة في قاعة الانتظار"
+    ]
+   },
+   "needs": {
+    "en": [
+     "Nursing degree or diploma, with a valid licence to practise",
+     "One to three years of clinical nursing experience",
+     "Calm under pressure and respectful with every patient"
+    ],
+    "ar": [
+     "إجازة أو دبلوم في التمريض مع ترخيص ساري المفعول لمزاولة المهنة",
+     "خبرة سريرية في التمريض من سنة إلى ثلاث سنوات",
+     "الهدوء تحت الضغط واحترام جميع المرضى"
+    ]
+   },
+   "provides": {
+    "en": [
+     "Clinical training and supervision",
+     "Transport to the clinic",
+     "Health insurance"
+    ],
+    "ar": [
+     "تدريب سريري وإشراف مهني",
+     "النقل إلى العيادة",
+     "تأمين صحي"
+    ]
+   },
+   "tags": "nurse nursing clinic primary health care vaccination triage تمريض ممرض عيادة صحة رعاية لقاح",
+   "daysAgo": 1
+  },
+  {
+   "company": "International Rescue Committee",
+   "title": {
+    "en": "Child protection caseworker",
+    "ar": "عامل حالات في حماية الطفل"
+   },
+   "gov": "raqqa",
+   "place": {
+    "en": "Raqqa and field locations across Raqqa governorate",
+    "ar": "الرقة ومواقع ميدانية في أنحاء محافظة الرقة"
+   },
+   "type": "contract",
+   "level": "junior",
+   "mode": "onsite",
+   "pay": [
+    95000,
+    120000
+   ],
+   "langs": [
+    "ar"
+   ],
+   "recruits": [],
+   "anyFaculty": false,
+   "noDegree": false,
+   "support": false,
+   "openings": 1,
+   "summary": {
+    "en": "Follow up on children at risk and their families: assess each case, agree a support plan and refer children to the services they need. A fixed-term contract for a caseworker with one to three years in child protection or social work.",
+    "ar": "متابعة الأطفال المعرضين للخطر وأسرهم: تقييم كل حالة، والاتفاق على خطة دعم، وإحالة الأطفال إلى الخدمات التي يحتاجونها. عقد محدد المدة لعامل حالات لديه خبرة من سنة إلى ثلاث سنوات في حماية الطفل أو العمل الاجتماعي."
+   },
+   "duties": {
+    "en": [
+     "Assess children at risk through home visits and interviews",
+     "Agree case plans with children and caregivers, and follow them through",
+     "Refer children to health, education and psychosocial services",
+     "Keep case files confidential and up to date"
+    ],
+    "ar": [
+     "تقييم أوضاع الأطفال المعرضين للخطر من خلال الزيارات المنزلية والمقابلات",
+     "وضع خطط الحالات بالاتفاق مع الأطفال ومقدمي الرعاية ومتابعة تنفيذها",
+     "إحالة الأطفال إلى خدمات الصحة والتعليم والدعم النفسي الاجتماعي",
+     "الحفاظ على سرية ملفات الحالات وتحديثها باستمرار"
+    ]
+   },
+   "needs": {
+    "en": [
+     "Degree in social work, psychology, sociology or a related field",
+     "One to three years in case management, child protection or social work",
+     "Sound judgement, discretion and patience with children"
+    ],
+    "ar": [
+     "إجازة في العمل الاجتماعي أو علم النفس أو علم الاجتماع أو اختصاص قريب",
+     "خبرة من سنة إلى ثلاث سنوات في إدارة الحالات أو حماية الطفل أو العمل الاجتماعي",
+     "حسن التقدير والكتمان والصبر في التعامل مع الأطفال"
+    ]
+   },
+   "provides": {
+    "en": [
+     "Regular supervision and training in case management",
+     "Psychosocial support for staff",
+     "Field transport for home visits"
+    ],
+    "ar": [
+     "إشراف منتظم وتدريب على إدارة الحالات",
+     "دعم نفسي اجتماعي لفريق العمل",
+     "النقل الميداني للزيارات المنزلية"
+    ]
+   },
+   "tags": "child protection caseworker case management social work psychosocial حماية الطفل أطفال حالات عمل اجتماعي",
+   "daysAgo": 15
+  },
+  {
+   "company": "Save the Children",
+   "title": {
+    "en": "Early Childhood Education Facilitator, Community Learning Spaces",
+    "ar": "ميسّر تعليم الطفولة المبكرة في مساحات التعلّم المجتمعية"
+   },
+   "gov": "aleppo",
+   "place": {
+    "en": "Aleppo, in community learning spaces across the city",
+    "ar": "حلب، في مساحات التعلّم المجتمعية ضمن المدينة"
+   },
+   "type": "contract",
+   "level": "entry",
+   "mode": "onsite",
+   "pay": [
+    70000,
+    90000
+   ],
+   "langs": [
+    "ar"
+   ],
+   "recruits": [],
+   "anyFaculty": false,
+   "noDegree": false,
+   "support": false,
+   "openings": 3,
+   "summary": {
+    "en": "Lead daily play-based learning sessions for children aged three to six in community learning spaces in Aleppo. A contract role for someone starting out who enjoys working with small children and their parents, with training and steady support from a supervisor.",
+    "ar": "تيسير جلسات تعلّم يومية قائمة على اللعب للأطفال من عمر ثلاث إلى ست سنوات في مساحات التعلّم المجتمعية بحلب. وظيفة بعقد محدد المدة لمن هو في بداية مسيرته المهنية ويحب العمل مع الأطفال الصغار وأهاليهم، مع تدريب ومتابعة مستمرة من مشرف تربوي."
+   },
+   "duties": {
+    "en": [
+     "Prepare and lead daily sessions in early reading, numbers and play for small groups of children",
+     "Set up a safe, welcoming learning space and keep learning materials in good order",
+     "Follow each child's progress and fill in simple progress records every week",
+     "Meet parents regularly to share progress and suggest learning activities for home"
+    ],
+    "ar": [
+     "إعداد جلسات يومية وتيسيرها لمجموعات صغيرة من الأطفال في مبادئ القراءة والحساب واللعب",
+     "تهيئة مساحة تعلّم آمنة ومرحّبة والحفاظ على المواد التعليمية مرتبة وبحالة جيدة",
+     "متابعة تقدّم كل طفل وتعبئة سجلات تقدّم بسيطة أسبوعياً",
+     "لقاء الأهالي بانتظام لإطلاعهم على تقدّم أطفالهم واقتراح أنشطة تعلّم في المنزل"
+    ]
+   },
+   "needs": {
+    "en": [
+     "Degree or diploma in kindergarten teaching, class teaching or psychology",
+     "Little or no work experience needed; volunteering with children is a plus",
+     "Patient, organised and at ease with groups of small children and their parents"
+    ],
+    "ar": [
+     "شهادة جامعية أو دبلوم في رياض الأطفال أو معلم الصف أو علم النفس",
+     "لا تُشترط خبرة سابقة، ويُعدّ التطوع مع الأطفال ميزة إضافية",
+     "الصبر وحسن التنظيم والقدرة على التعامل مع مجموعات من الأطفال الصغار وأهاليهم"
+    ]
+   },
+   "provides": {
+    "en": [
+     "Induction training in early learning and child protection",
+     "Learning materials and ready session plans",
+     "Regular coaching from an education supervisor"
+    ],
+    "ar": [
+     "تدريب تعريفي على التعلّم المبكر وحماية الطفل",
+     "توفير المواد التعليمية وخطط جلسات جاهزة",
+     "إرشاد منتظم من مشرف تربوي"
+    ]
+   },
+   "tags": "early childhood education facilitator kindergarten children play learning teacher تعليم طفولة مبكرة ميسر أطفال رياض",
+   "daysAgo": 5
+  },
+  {
+   "company": "Save the Children",
+   "title": {
+    "en": "Monitoring and Evaluation Intern, Surveys and Reports",
+    "ar": "متدرب في المتابعة والتقييم لدعم المسوحات والتقارير"
+   },
+   "gov": "hama",
+   "place": {
+    "en": "Hama, office-based with occasional field visits",
+    "ar": "حماة، عمل مكتبي مع زيارات ميدانية من حين لآخر"
+   },
+   "type": "intern",
+   "level": "student",
+   "mode": "onsite",
+   "pay": [
+    12000,
+    12000
+   ],
+   "langs": [
+    "ar",
+    "en"
+   ],
+   "recruits": [
+    [
+     "hama",
+     "economics"
+    ]
+   ],
+   "anyFaculty": false,
+   "noDegree": false,
+   "support": false,
+   "openings": 2,
+   "summary": {
+    "en": "An internship in Hama for students who want to see how projects are measured: you will help plan surveys, enter and clean data, and draft short reports. Suited to economics or statistics students who like numbers and want hands-on practice beside a monitoring team.",
+    "ar": "تدريب في حماة للطلاب الراغبين في التعرّف على طريقة قياس نتائج المشاريع، يشمل المساعدة في التخطيط للمسوحات وإدخال البيانات وتنقيتها وصياغة تقارير قصيرة. مناسب لطلاب الاقتصاد أو الإحصاء ممن يحبون التعامل مع الأرقام ويرغبون في ممارسة عملية إلى جانب فريق المتابعة والتقييم."
+   },
+   "duties": {
+    "en": [
+     "Help prepare survey questionnaires and try them out with the field team",
+     "Enter survey data, check it for errors and keep the database tidy",
+     "Build simple tables and charts in Excel for monthly reports",
+     "Draft short summaries of findings in Arabic and English"
+    ],
+    "ar": [
+     "المساعدة في إعداد استبيانات المسوحات وتجربتها مع الفريق الميداني",
+     "إدخال بيانات المسوحات والتحقق من خلوّها من الأخطاء والحفاظ على تنظيم قاعدة البيانات",
+     "إعداد جداول ومخططات بيانية بسيطة على إكسل للتقارير الشهرية",
+     "صياغة ملخصات قصيرة للنتائج بالعربية والإنكليزية"
+    ]
+   },
+   "needs": {
+    "en": [
+     "Currently studying economics, statistics or a related subject, in third year or above",
+     "Good Excel skills and care with numbers",
+     "Working English for reading forms and writing short notes"
+    ],
+    "ar": [
+     "طالب حالياً في الاقتصاد أو الإحصاء أو اختصاص قريب، في السنة الثالثة أو ما بعدها",
+     "إتقان جيد لبرنامج إكسل ودقة في التعامل مع الأرقام",
+     "إنكليزية عملية لقراءة الاستمارات وكتابة ملاحظات قصيرة"
+    ]
+   },
+   "provides": {
+    "en": [
+     "A monthly stipend for the length of the internship",
+     "Training in survey design and data cleaning",
+     "A certificate of internship at the end"
+    ],
+    "ar": [
+     "مكافأة شهرية طوال مدة التدريب",
+     "تدريب على تصميم المسوحات وتنقية البيانات",
+     "شهادة إتمام تدريب في نهاية المدة"
+    ]
+   },
+   "tags": "monitoring evaluation intern internship survey data excel reports economics متابعة تقييم تدريب مسح بيانات تقارير",
+   "daysAgo": 7
+  },
+  {
+   "company": "Oxfam",
+   "title": {
+    "en": "Water and Sanitation Engineer, Network Repairs and Water Quality",
+    "ar": "مهندس مياه وصرف صحي لإصلاح الشبكات ومراقبة جودة المياه"
+   },
+   "gov": "daraa",
+   "place": {
+    "en": "Daraa, with field work across the governorate",
+    "ar": "درعا، مع عمل ميداني في أنحاء المحافظة"
+   },
+   "type": "full",
+   "level": "junior",
+   "mode": "onsite",
+   "pay": [
+    140000,
+    175000
+   ],
+   "langs": [
+    "ar",
+    "en"
+   ],
+   "recruits": [
+    [
+     "damascus",
+     "civil"
+    ],
+    [
+     "damascus",
+     "environmental"
+    ]
+   ],
+   "anyFaculty": false,
+   "noDegree": false,
+   "support": false,
+   "openings": 1,
+   "summary": {
+    "en": "Plan and supervise repairs to water networks, pumping stations and sewer lines in Daraa, and keep water quality under regular watch. A full-time field role for a civil or environmental engineer with one to three years of site experience.",
+    "ar": "التخطيط لأعمال إصلاح شبكات المياه ومحطات الضخ وخطوط الصرف الصحي في درعا والإشراف عليها، ومراقبة جودة المياه بشكل دوري. وظيفة ميدانية بدوام كامل لمهندس مدني أو بيئي لديه خبرة من سنة إلى ثلاث سنوات في المواقع."
+   },
+   "duties": {
+    "en": [
+     "Assess damaged network sections and prepare drawings and bills of quantities",
+     "Supervise contractors on site and sign off work against the specifications",
+     "Take water samples, run field tests and follow up any contamination",
+     "Write weekly progress reports in English with photos and measurements"
+    ],
+    "ar": [
+     "تقييم الأجزاء المتضررة من الشبكة وإعداد المخططات وجداول الكميات",
+     "الإشراف على المقاولين في المواقع واستلام الأعمال وفق المواصفات",
+     "أخذ عينات المياه وإجراء الفحوص الميدانية ومتابعة أي حالة تلوث",
+     "كتابة تقارير تقدّم أسبوعية بالإنكليزية مرفقة بالصور والقياسات"
+    ]
+   },
+   "needs": {
+    "en": [
+     "Degree in civil or environmental engineering",
+     "One to three years on water, sewer or construction projects",
+     "Working English for reports, and confident use of AutoCAD"
+    ],
+    "ar": [
+     "شهادة في الهندسة المدنية أو الهندسة البيئية",
+     "خبرة من سنة إلى ثلاث سنوات في مشاريع المياه أو الصرف الصحي أو الإنشاءات",
+     "إنكليزية عملية لكتابة التقارير، وإتقان برنامج أوتوكاد"
+    ]
+   },
+   "provides": {
+    "en": [
+     "Transport provided for field work",
+     "Health insurance",
+     "Training in water quality testing and site safety"
+    ],
+    "ar": [
+     "توفير وسيلة نقل للعمل الميداني",
+     "تأمين صحي",
+     "تدريب على فحص جودة المياه والسلامة في المواقع"
+    ]
+   },
+   "tags": "engineer water sanitation wash network pipes civil environmental quality مهندس مياه صرف صحي شبكات جودة",
+   "daysAgo": 9
+  },
+  {
+   "company": "Oxfam",
+   "title": {
+    "en": "Assistance Programme Assistant, Registration and Follow-up",
+    "ar": "مساعد في برنامج المساعدات للتسجيل والمتابعة"
+   },
+   "gov": "sweida",
+   "place": {
+    "en": "As-Suwayda, with visits to communities across the governorate",
+    "ar": "السويداء، مع زيارات إلى التجمعات السكانية في أنحاء المحافظة"
+   },
+   "type": "contract",
+   "level": "entry",
+   "mode": "onsite",
+   "pay": [
+    80000,
+    100000
+   ],
+   "langs": [
+    "ar"
+   ],
+   "recruits": [],
+   "anyFaculty": false,
+   "noDegree": false,
+   "support": false,
+   "openings": 1,
+   "summary": {
+    "en": "Register families for an assistance programme in As-Suwayda, keep distribution lists accurate and call families afterwards to hear how the support went. A contract role for someone near the start of their career who is careful with data and good at talking with people.",
+    "ar": "تسجيل الأسر في برنامج المساعدات في السويداء، والحفاظ على دقة قوائم التوزيع، والتواصل هاتفياً مع الأسر بعد ذلك للاطلاع على تجربتها مع الدعم. وظيفة بعقد محدد المدة لمن هو في بداية مسيرته المهنية، يتعامل مع البيانات بدقة ويُحسن التحدث مع الناس."
+   },
+   "duties": {
+    "en": [
+     "Register households at registration points and check their documents",
+     "Enter registration data and keep distribution lists accurate and up to date",
+     "Make follow-up calls to families and record their feedback and complaints",
+     "Help organise distribution days and guide families on the day"
+    ],
+    "ar": [
+     "تسجيل الأسر في نقاط التسجيل والتحقق من وثائقها",
+     "إدخال بيانات التسجيل والحفاظ على قوائم التوزيع دقيقة ومحدّثة",
+     "إجراء اتصالات متابعة مع الأسر وتسجيل ملاحظاتها وشكاواها",
+     "المساعدة في تنظيم أيام التوزيع وإرشاد الأسر خلالها"
+    ]
+   },
+   "needs": {
+    "en": [
+     "Degree or diploma in social sciences, business or a related subject",
+     "Little or no work experience needed; good basic computer and Excel skills",
+     "A clear, respectful manner on the phone and in person, and care with personal data"
+    ],
+    "ar": [
+     "شهادة جامعية أو دبلوم في العلوم الاجتماعية أو إدارة الأعمال أو اختصاص قريب",
+     "لا تُشترط خبرة سابقة، مع مهارات أساسية جيدة في الحاسوب وإكسل",
+     "أسلوب واضح ولبق هاتفياً ووجهاً لوجه، والحرص على سرية البيانات الشخصية"
+    ]
+   },
+   "provides": {
+    "en": [
+     "Training in data protection and handling complaints",
+     "Transport provided on registration and distribution days",
+     "Health insurance for the length of the contract"
+    ],
+    "ar": [
+     "تدريب على حماية البيانات والتعامل مع الشكاوى",
+     "توفير المواصلات في أيام التسجيل والتوزيع",
+     "تأمين صحي طوال مدة العقد"
+    ]
+   },
+   "tags": "assistance registration distribution lists data calls humanitarian assistant مساعدات تسجيل توزيع بيانات متابعة إنساني",
+   "daysAgo": 3
+  },
+  {
+   "company": "CARE International",
+   "title": {
+    "en": "Finance Officer, Field Office",
+    "ar": "مسؤول مالي في مكتب ميداني"
+   },
+   "gov": "raqqa",
+   "place": {
+    "en": "Raqqa",
+    "ar": "الرقة"
+   },
+   "type": "full",
+   "level": "mid",
+   "mode": "onsite",
+   "pay": [
+    180000,
+    230000
+   ],
+   "langs": [
+    "ar",
+    "en"
+   ],
+   "recruits": [
+    [
+     "furat",
+     "economics"
+    ],
+    [
+     "aleppo",
+     "business"
+    ]
+   ],
+   "anyFaculty": false,
+   "noDegree": false,
+   "support": true,
+   "openings": 1,
+   "summary": {
+    "en": "Keep the books of a field office in Raqqa in order: accurate daily entries, a clean monthly close and records ready for every audit. A full-time role for an accountant with three to seven years of experience who works carefully to written financial procedures and can explain them to colleagues.",
+    "ar": "ضبط حسابات مكتب ميداني في الرقة: قيود يومية دقيقة، وإقفال شهري منظم، وسجلات جاهزة لكل تدقيق. وظيفة بدوام كامل لمحاسب لديه خبرة من ثلاث إلى سبع سنوات، يلتزم بالإجراءات المالية المكتوبة ويستطيع شرحها لزملائه."
+   },
+   "duties": {
+    "en": [
+     "Record daily transactions in the accounting system and file supporting documents",
+     "Prepare monthly bank reconciliations and close the books on time",
+     "Track spending against the office budget and flag variances early",
+     "Prepare files for internal and external audits and follow up on findings"
+    ],
+    "ar": [
+     "تسجيل العمليات اليومية في النظام المحاسبي وحفظ المستندات الثبوتية",
+     "إعداد المطابقات المصرفية الشهرية وإقفال الحسابات في موعدها",
+     "متابعة الصرف مقارنة بموازنة المكتب والتنبيه المبكر إلى أي انحراف",
+     "تجهيز الملفات للتدقيق الداخلي والخارجي ومتابعة ملاحظاته"
+    ]
+   },
+   "needs": {
+    "en": [
+     "Degree in accounting, economics or business administration",
+     "Three to seven years in accounting, ideally including audits at an NGO or company",
+     "Working English for financial reports, and strong Excel"
+    ],
+    "ar": [
+     "شهادة في المحاسبة أو الاقتصاد أو إدارة الأعمال",
+     "خبرة من ثلاث إلى سبع سنوات في المحاسبة، ويُفضّل أن تشمل التدقيق لدى منظمة أو شركة",
+     "إنكليزية عملية لكتابة التقارير المالية، وإتقان جيد لإكسل"
+    ]
+   },
+   "provides": {
+    "en": [
+     "Accommodation and travel to Raqqa for someone moving from another governorate",
+     "Health insurance",
+     "Training on the accounting system and financial procedures"
+    ],
+    "ar": [
+     "تأمين السكن والسفر إلى الرقة لمن ينتقل من محافظة أخرى",
+     "تأمين صحي",
+     "تدريب على النظام المحاسبي والإجراءات المالية"
+    ]
+   },
+   "tags": "finance accounting accountant bookkeeping audit reconciliation budget officer مالية محاسبة محاسب تدقيق موازنة",
+   "daysAgo": 13
+  },
+  {
+   "company": "CARE International",
+   "title": {
+    "en": "Agriculture Field Assistant, Seeds, Irrigation and Farmer Training",
+    "ar": "مساعد ميداني زراعي لدعم المزارعين بالبذار والري والتدريب"
+   },
+   "gov": "quneitra",
+   "place": {
+    "en": "Field locations across Quneitra governorate",
+    "ar": "مواقع ميدانية في أنحاء محافظة القنيطرة"
+   },
+   "type": "contract",
+   "level": "entry",
+   "mode": "onsite",
+   "pay": [
+    70000,
+    90000
+   ],
+   "langs": [
+    "ar"
+   ],
+   "recruits": [],
+   "anyFaculty": false,
+   "noDegree": false,
+   "support": false,
+   "openings": 2,
+   "summary": {
+    "en": "Visit farms across Quneitra to help farmers plant, water and look after their crops, and help run practical training days in the fields. A contract role for an agriculture graduate near the start of their career who is happy to spend most days outdoors.",
+    "ar": "زيارة المزارع في أنحاء القنيطرة لمساعدة المزارعين في الزراعة والري والعناية بمحاصيلهم، والمساهمة في تنظيم أيام تدريب عملية في الحقول. وظيفة بعقد محدد المدة لخريج زراعة في بداية مسيرته المهنية، ولا يمانع قضاء معظم أيام الأسبوع في الحقول."
+   },
+   "duties": {
+    "en": [
+     "Help register farmers and hand out seeds, tools and irrigation kits",
+     "Visit fields regularly to check germination, irrigation and crop health",
+     "Help run hands-on training on water-saving irrigation and good farming practice",
+     "Record visits and farmer feedback on a phone or tablet form"
+    ],
+    "ar": [
+     "المساعدة في تسجيل المزارعين وتوزيع البذار والأدوات ومستلزمات الري",
+     "زيارة الحقول بانتظام لمتابعة الإنبات والري وصحة المحاصيل",
+     "المساعدة في تنفيذ تدريبات عملية على الري الموفّر للمياه والممارسات الزراعية الجيدة",
+     "تسجيل الزيارات وملاحظات المزارعين على استمارة إلكترونية عبر الهاتف أو الجهاز اللوحي"
+    ]
+   },
+   "needs": {
+    "en": [
+     "Degree or institute diploma in agriculture",
+     "Little or no work experience needed; a farming background helps",
+     "At ease with daily field travel and long days outdoors"
+    ],
+    "ar": [
+     "شهادة جامعية أو دبلوم معهد في الزراعة",
+     "لا تُشترط خبرة سابقة، والإلمام بالعمل الزراعي ميزة إضافية",
+     "القدرة على التنقل الميداني اليومي والعمل لساعات طويلة في الهواء الطلق"
+    ]
+   },
+   "provides": {
+    "en": [
+     "Transport provided for field visits",
+     "Training in irrigation methods and working with farmers",
+     "Sun protection and field safety gear"
+    ],
+    "ar": [
+     "توفير وسيلة نقل للزيارات الميدانية",
+     "تدريب على أساليب الري والعمل مع المزارعين",
+     "معدات الوقاية من الشمس والسلامة الميدانية"
+    ]
+   },
+   "tags": "agriculture farming farmers seeds irrigation crops field assistant زراعة مزارعين ري بذار محاصيل",
+   "daysAgo": 8
+  },
+  {
+   "company": "Médecins Sans Frontières",
+   "title": {
+    "en": "Hospital Pharmacist, Medicine Stock and Dispensing",
+    "ar": "صيدلاني مستشفى لإدارة مخزون الأدوية وصرفها"
+   },
+   "gov": "idlib",
+   "place": {
+    "en": "Idlib, hospital-based",
+    "ar": "إدلب، العمل داخل المستشفى"
+   },
+   "type": "full",
+   "level": "mid",
+   "mode": "onsite",
+   "pay": [
+    170000,
+    210000
+   ],
+   "langs": [
+    "ar",
+    "en"
+   ],
+   "recruits": [
+    [
+     "aleppo",
+     "pharmacy"
+    ]
+   ],
+   "anyFaculty": false,
+   "noDegree": false,
+   "support": false,
+   "openings": 1,
+   "summary": {
+    "en": "Run a hospital pharmacy in Idlib so that the right medicines are in stock and reach patients safely. A full-time role for a pharmacist with three to seven years of experience, ideally in a hospital, who keeps careful records and works well with doctors and nurses.",
+    "ar": "إدارة صيدلية مستشفى في إدلب لضمان توفر الأدوية المناسبة ووصولها إلى المرضى بأمان. وظيفة بدوام كامل لصيدلاني لديه خبرة من ثلاث إلى سبع سنوات، ويُفضّل في مستشفى، يحرص على دقة السجلات ويتعاون جيداً مع الأطباء والممرضين."
+   },
+   "duties": {
+    "en": [
+     "Manage medicine stock: ordering, receiving, storage and expiry checks",
+     "Dispense medicines to wards and patients and check prescriptions for errors",
+     "Keep cold chain and controlled-drug records up to date",
+     "Write monthly consumption reports in English and train pharmacy assistants"
+    ],
+    "ar": [
+     "إدارة مخزون الأدوية من طلب واستلام وتخزين ومراقبة تواريخ الصلاحية",
+     "صرف الأدوية للأقسام والمرضى ومراجعة الوصفات الطبية لتجنّب الأخطاء",
+     "متابعة سلسلة التبريد وتحديث سجلات الأدوية الخاضعة للرقابة",
+     "كتابة تقارير الاستهلاك الشهرية بالإنكليزية وتدريب مساعدي الصيدلة"
+    ]
+   },
+   "needs": {
+    "en": [
+     "Degree in pharmacy and a licence to practise in Syria",
+     "Three to seven years as a pharmacist, ideally in a hospital",
+     "Working English for stock reports and drug information"
+    ],
+    "ar": [
+     "شهادة في الصيدلة وترخيص مزاولة المهنة في سوريا",
+     "خبرة من ثلاث إلى سبع سنوات في الصيدلة، ويُفضّل في مستشفى",
+     "إنكليزية عملية لتقارير المخزون والنشرات الدوائية"
+    ]
+   },
+   "provides": {
+    "en": [
+     "Health insurance",
+     "Training in pharmacy stock management and rational drug use",
+     "Continuing education sessions with the medical team"
+    ],
+    "ar": [
+     "تأمين صحي",
+     "تدريب على إدارة مخزون الصيدلية والاستخدام الرشيد للأدوية",
+     "جلسات تعليم مستمر مع الفريق الطبي"
+    ]
+   },
+   "tags": "pharmacist pharmacy hospital medicines stock dispensing health صيدلاني صيدلية مستشفى أدوية مخزون",
+   "daysAgo": 6
+  },
+  {
+   "company": "Médecins Sans Frontières",
+   "title": {
+    "en": "Laboratory Technician, Hospital Laboratory",
+    "ar": "فني مخبر في مستشفى"
+   },
+   "gov": "hasakah",
+   "place": {
+    "en": "Al-Hasakah, hospital-based",
+    "ar": "الحسكة، العمل داخل المستشفى"
+   },
+   "type": "full",
+   "level": "junior",
+   "mode": "onsite",
+   "pay": [
+    100000,
+    130000
+   ],
+   "langs": [
+    "ar",
+    "ku"
+   ],
+   "recruits": [
+    [
+     "furat",
+     "biology"
+    ],
+    [
+     "furat",
+     "chemistry"
+    ]
+   ],
+   "anyFaculty": false,
+   "noDegree": false,
+   "support": false,
+   "openings": 1,
+   "summary": {
+    "en": "Run routine blood, urine and other tests in a hospital laboratory in Al-Hasakah, and get accurate results to the wards on time. A full-time role for a lab technician with one to three years of experience who follows quality and safety procedures closely.",
+    "ar": "إجراء التحاليل الروتينية للدم والبول وغيرها في مخبر مستشفى بالحسكة، وتسليم نتائج دقيقة إلى الأقسام في الوقت المحدد. وظيفة بدوام كامل لفني مخبر لديه خبرة من سنة إلى ثلاث سنوات، يلتزم بدقة بإجراءات الجودة والسلامة."
+   },
+   "duties": {
+    "en": [
+     "Collect and receive samples, label them and log them in the lab register",
+     "Run blood counts, biochemistry and rapid tests to standard procedures",
+     "Run daily quality controls and look after laboratory equipment",
+     "Explain sample instructions to patients in Arabic or Kurdish"
+    ],
+    "ar": [
+     "سحب العينات واستلامها ووضع البطاقات التعريفية عليها وتسجيلها في سجل المخبر",
+     "إجراء تعداد الدم وتحاليل الكيمياء الحيوية والاختبارات السريعة وفق الإجراءات المعتمدة",
+     "تنفيذ ضبط الجودة اليومي والعناية بأجهزة المخبر",
+     "شرح تعليمات أخذ العينات للمرضى بالعربية أو الكردية"
+    ]
+   },
+   "needs": {
+    "en": [
+     "Degree in biology or chemistry, or a diploma in medical laboratory work",
+     "One to three years in a hospital or clinic laboratory",
+     "Working Kurdish for talking with patients"
+    ],
+    "ar": [
+     "شهادة في علم الأحياء أو الكيمياء، أو دبلوم في التحاليل المخبرية",
+     "خبرة من سنة إلى ثلاث سنوات في مخبر مستشفى أو عيادة",
+     "إتقان عملي للغة الكردية للتواصل مع المرضى"
+    ]
+   },
+   "provides": {
+    "en": [
+     "Health insurance",
+     "Training in laboratory quality control and biosafety",
+     "Protective equipment and the vaccinations laboratory work requires"
+    ],
+    "ar": [
+     "تأمين صحي",
+     "تدريب على ضبط الجودة المخبرية والسلامة الحيوية",
+     "معدات الوقاية الشخصية واللقاحات اللازمة للعمل المخبري"
+    ]
+   },
+   "tags": "laboratory lab technician hospital tests samples biology chemistry مخبر فني تحاليل مستشفى عينات",
+   "daysAgo": 10
+  },
+  {
+   "company": "Damascus University",
+   "title": {
+    "en": "Part-time Teaching Assistant, English Language Lab",
+    "ar": "مساعد تدريس بدوام جزئي في مخبر اللغة الإنكليزية"
+   },
+   "gov": "damascus",
+   "place": {
+    "en": "Damascus",
+    "ar": "دمشق"
+   },
+   "type": "part",
+   "level": "junior",
+   "mode": "onsite",
+   "pay": [
+    25000,
+    32000
+   ],
+   "langs": [
+    "ar",
+    "en"
+   ],
+   "recruits": [],
+   "anyFaculty": false,
+   "noDegree": false,
+   "support": false,
+   "openings": 2,
+   "summary": {
+    "en": "Support English lessons in a language lab in Damascus by running listening and speaking practice with small groups of students. A part-time role for an English graduate with one to three years of teaching or tutoring experience.",
+    "ar": "دعم دروس اللغة الإنكليزية في مخبر لغة بدمشق من خلال تنفيذ تمارين الاستماع والمحادثة مع مجموعات صغيرة من الطلاب. وظيفة بدوام جزئي لخريج لغة إنكليزية لديه خبرة من سنة إلى ثلاث سنوات في التدريس أو الدروس الخصوصية."
+   },
+   "duties": {
+    "en": [
+     "Run listening and speaking sessions with small groups in the lab",
+     "Prepare audio material and worksheets with the course teacher",
+     "Set up lab equipment before sessions and help students with the software",
+     "Mark short exercises and keep attendance records"
+    ],
+    "ar": [
+     "تنفيذ جلسات الاستماع والمحادثة مع مجموعات صغيرة في المخبر",
+     "إعداد المواد الصوتية وأوراق العمل بالتنسيق مع مدرّس المقرر",
+     "تجهيز أجهزة المخبر قبل الجلسات ومساعدة الطلاب في استخدام البرامج",
+     "تصحيح التمارين القصيرة ومتابعة سجلات الحضور"
+    ]
+   },
+   "needs": {
+    "en": [
+     "Degree in English language and literature, or in translation",
+     "One to three years of teaching or tutoring English",
+     "Fluent spoken and written English, with clear pronunciation"
+    ],
+    "ar": [
+     "شهادة في اللغة الإنكليزية وآدابها أو في الترجمة",
+     "خبرة من سنة إلى ثلاث سنوات في تدريس اللغة الإنكليزية أو إعطاء الدروس الخصوصية",
+     "إتقان الإنكليزية محادثة وكتابة، مع نطق واضح"
+    ]
+   },
+   "provides": {
+    "en": [
+     "Fixed weekly hours that leave room for study or other work",
+     "Training in lab software and language-teaching methods"
+    ],
+    "ar": [
+     "ساعات أسبوعية ثابتة تتيح الوقت للدراسة أو لعمل آخر",
+     "تدريب على برامج المخبر وطرائق تعليم اللغات"
+    ]
+   },
+   "tags": "english teaching assistant language lab tutor listening speaking تدريس إنكليزية لغة مخبر مساعد محادثة",
+   "daysAgo": 4
+  },
+  {
+   "company": "Damascus University",
+   "title": {
+    "en": "Library Digitisation Intern, Scanning and Cataloguing Theses",
+    "ar": "متدرب في رقمنة المكتبة لمسح الرسائل الجامعية وفهرستها"
+   },
+   "gov": "damascus",
+   "place": {
+    "en": "Damascus",
+    "ar": "دمشق"
+   },
+   "type": "intern",
+   "level": "student",
+   "mode": "onsite",
+   "pay": [
+    9000,
+    9000
+   ],
+   "langs": [
+    "ar"
+   ],
+   "recruits": [
+    [
+     "damascus",
+     "informatics"
+    ],
+    [
+     "damascus",
+     "arts"
+    ]
+   ],
+   "anyFaculty": false,
+   "noDegree": false,
+   "support": false,
+   "openings": 4,
+   "summary": {
+    "en": "Help turn printed theses into searchable digital copies in a university library in Damascus by scanning pages, checking image quality and entering catalogue details. An internship for current students of informatics, library studies or the humanities who are careful and patient with detail.",
+    "ar": "المساعدة في تحويل الرسائل الجامعية المطبوعة إلى نسخ رقمية قابلة للبحث في مكتبة جامعية بدمشق، من خلال المسح الضوئي للصفحات وفحص جودة الصور وإدخال بيانات الفهرسة. تدريب للطلاب الحاليين في المعلوماتية أو علم المكتبات أو العلوم الإنسانية ممن يتحلّون بالدقة والصبر."
+   },
+   "duties": {
+    "en": [
+     "Scan printed theses page by page and check every image for clarity",
+     "Enter title, author, subject and keywords into the catalogue",
+     "Name and file digital copies following the agreed naming rules",
+     "Handle fragile copies with care and return them to the shelves in order"
+    ],
+    "ar": [
+     "المسح الضوئي للرسائل المطبوعة صفحة صفحة والتحقق من وضوح كل صورة",
+     "إدخال العنوان والمؤلف والموضوع والكلمات المفتاحية في الفهرس",
+     "تسمية النسخ الرقمية وحفظها وفق قواعد التسمية المعتمدة",
+     "التعامل بعناية مع النسخ الهشة وإعادتها إلى الرفوف بالترتيب"
+    ]
+   },
+   "needs": {
+    "en": [
+     "Currently studying informatics engineering, library science or an arts subject",
+     "Good computer skills and accurate Arabic typing",
+     "Patience and care with detail in repetitive work"
+    ],
+    "ar": [
+     "طالب حالياً في الهندسة المعلوماتية أو علم المكتبات أو أحد اختصاصات الآداب",
+     "مهارات جيدة في الحاسوب وطباعة دقيقة باللغة العربية",
+     "الصبر والدقة في الأعمال المتكررة"
+    ]
+   },
+   "provides": {
+    "en": [
+     "A monthly stipend for the length of the internship",
+     "Flexible shifts around your lecture timetable",
+     "A certificate of internship and training in digital cataloguing"
+    ],
+    "ar": [
+     "مكافأة شهرية طوال مدة التدريب",
+     "أوقات دوام مرنة تتناسب مع جدول محاضراتك",
+     "شهادة تدريب وتأهيل في الفهرسة الرقمية"
+    ]
+   },
+   "tags": "library digitisation scanning cataloguing theses archive intern internship مكتبة رقمنة فهرسة مسح رسائل تدريب",
+   "daysAgo": 2
+  },
+  {
+   "company": "University of Aleppo",
+   "title": {
+    "en": "Research Assistant, Groundwater Quality Study",
+    "ar": "مساعد بحث في دراسة جودة المياه الجوفية"
+   },
+   "gov": "aleppo",
+   "place": {
+    "en": "Aleppo, with field sampling visits in the governorate",
+    "ar": "حلب، مع زيارات ميدانية لأخذ العينات في المحافظة"
+   },
+   "type": "contract",
+   "level": "mid",
+   "mode": "onsite",
+   "pay": [
+    60000,
+    80000
+   ],
+   "langs": [
+    "ar",
+    "en"
+   ],
+   "recruits": [
+    [
+     "aleppo",
+     "chemistry"
+    ],
+    [
+     "aleppo",
+     "environmental"
+    ]
+   ],
+   "anyFaculty": false,
+   "noDegree": false,
+   "support": false,
+   "openings": 1,
+   "summary": {
+    "en": "A fixed-term research post on a study of groundwater quality, combining well sampling in the field with laboratory analysis. You will run the sampling plan, keep the data clean and help write up the findings with the study's lead researchers.",
+    "ar": "وظيفة بحثية بعقد محدد المدة ضمن دراسة لجودة المياه الجوفية، تجمع بين أخذ العينات من الآبار ميدانياً وتحليلها في المختبر. ستتولى تنفيذ خطة أخذ العينات وضبط جودة البيانات، وتشارك في صياغة النتائج مع الباحثين المسؤولين عن الدراسة."
+   },
+   "duties": {
+    "en": [
+     "Plan and carry out sampling rounds at wells and springs, following chain-of-custody rules",
+     "Run lab tests for nitrates, salinity, hardness and heavy metals, with quality controls",
+     "Keep the study database in order and map results by location",
+     "Draft method sections and data tables for the study's reports in Arabic and English"
+    ],
+    "ar": [
+     "تخطيط جولات أخذ العينات من الآبار والينابيع وتنفيذها وفق قواعد سلسلة حفظ العينات",
+     "إجراء التحاليل المخبرية للنترات والملوحة والقساوة والمعادن الثقيلة مع ضوابط الجودة",
+     "تنظيم قاعدة بيانات الدراسة وإسقاط النتائج على الخرائط حسب الموقع",
+     "إعداد مسودات فصول المنهجية وجداول البيانات لتقارير الدراسة بالعربية والإنكليزية"
+    ]
+   },
+   "needs": {
+    "en": [
+     "Degree in chemistry or environmental engineering; a master's is an advantage",
+     "Three or more years of work in a water or environmental laboratory",
+     "Working English for reading papers and writing up results"
+    ],
+    "ar": [
+     "شهادة في الكيمياء أو الهندسة البيئية، ويُعدّ الماجستير ميزة إضافية",
+     "خبرة ثلاث سنوات على الأقل في مختبرات المياه أو البيئة",
+     "إنكليزية عملية لقراءة الأبحاث وكتابة النتائج"
+    ]
+   },
+   "provides": {
+    "en": [
+     "A fixed-term contract for the length of the study",
+     "Transport to field sampling sites",
+     "Your name on the study's technical outputs where your work contributes"
+    ],
+    "ar": [
+     "عقد محدد المدة طوال فترة الدراسة",
+     "وسيلة نقل إلى مواقع أخذ العينات الميدانية",
+     "إدراج اسمك في المخرجات الفنية للدراسة بحسب مساهمتك"
+    ]
+   },
+   "tags": "research assistant groundwater water quality chemistry environmental laboratory sampling contract بحث مياه جوفية كيمياء مختبر بيئة",
+   "daysAgo": 11
+  },
+  {
+   "company": "University of Aleppo",
+   "title": {
+    "en": "IT Helpdesk Intern, Faculty Computer Labs",
+    "ar": "متدرب دعم فني في مخابر الحاسوب بالكليات"
+   },
+   "gov": "aleppo",
+   "place": {
+    "en": "Aleppo, on the university campus",
+    "ar": "حلب، في الحرم الجامعي"
+   },
+   "type": "intern",
+   "level": "student",
+   "mode": "onsite",
+   "pay": [
+    8000,
+    8000
+   ],
+   "langs": [
+    "ar"
+   ],
+   "recruits": [
+    [
+     "aleppo",
+     "informatics"
+    ]
+   ],
+   "anyFaculty": false,
+   "noDegree": false,
+   "support": false,
+   "openings": 3,
+   "summary": {
+    "en": "An internship for informatics students who want hands-on support work, keeping faculty computer labs ready for practical classes. You will fix everyday hardware and software faults, prepare machines for each session and log every request until it is closed.",
+    "ar": "تدريب لطلاب المعلوماتية الراغبين في اكتساب خبرة عملية في الدعم الفني، يتضمن الحفاظ على جاهزية مخابر الحاسوب في الكليات للجلسات العملية. ستعالج الأعطال اليومية في الأجهزة والبرمجيات، وتجهّز الحواسيب لكل جلسة، وتسجّل كل طلب حتى إغلاقه."
+   },
+   "duties": {
+    "en": [
+     "Answer help requests from lab supervisors and students and fix common faults",
+     "Install and update the software each practical session needs",
+     "Check network points, printers and projectors before classes",
+     "Record each request and its fix in the helpdesk log"
+    ],
+    "ar": [
+     "الرد على طلبات المساعدة من مشرفي المخابر والطلاب وإصلاح الأعطال الشائعة",
+     "تثبيت البرمجيات التي تحتاجها كل جلسة عملية وتحديثها",
+     "فحص نقاط الشبكة والطابعات وأجهزة العرض قبل المحاضرات",
+     "توثيق كل طلب وطريقة حله في سجل الدعم الفني"
+    ]
+   },
+   "needs": {
+    "en": [
+     "Currently studying informatics or computer engineering, third year or above",
+     "Comfortable with Windows, basic networking and assembling hardware",
+     "Patient and clear when explaining a fix to non-technical users"
+    ],
+    "ar": [
+     "طالب حالياً في المعلوماتية أو هندسة الحاسوب، من السنة الثالثة فما فوق",
+     "إلمام بنظام ويندوز وأساسيات الشبكات وتجميع قطع الحاسوب",
+     "الصبر والوضوح في شرح الحلول لغير المختصين"
+    ]
+   },
+   "provides": {
+    "en": [
+     "A monthly stipend",
+     "Hours arranged around your lecture timetable",
+     "A training certificate at the end of the internship"
+    ],
+    "ar": [
+     "مكافأة شهرية",
+     "ساعات عمل تُنظَّم بما يتناسب مع جدول محاضراتك",
+     "شهادة تدريب في نهاية فترة التدريب"
+    ]
+   },
+   "tags": "helpdesk support intern internship computer labs networking hardware student informatics دعم فني تدريب حاسوب مخابر معلوماتية",
+   "daysAgo": 1
+  },
+  {
+   "company": "Deloitte",
+   "title": {
+    "en": "Trainee Audit Associate, Financial Audits",
+    "ar": "مدقق حسابات متدرب في التدقيق المالي"
+   },
+   "gov": "damascus",
+   "place": {
+    "en": "Damascus, with visits to client offices",
+    "ar": "دمشق، مع زيارات إلى مكاتب العملاء"
+   },
+   "type": "full",
+   "level": "entry",
+   "mode": "hybrid",
+   "pay": [
+    90000,
+    120000
+   ],
+   "langs": [
+    "ar",
+    "en"
+   ],
+   "recruits": [
+    [
+     "damascus",
+     "economics"
+    ],
+    [
+     "damascus",
+     "business"
+    ]
+   ],
+   "anyFaculty": false,
+   "noDegree": false,
+   "support": false,
+   "openings": 2,
+   "summary": {
+    "en": "A full-time starting role for graduates who want to train as financial auditors. You will join audit teams reviewing the financial statements of local companies, testing records and documenting each step, and split your week between the office, client sites and home.",
+    "ar": "وظيفة بدوام كامل للخريجين الجدد الراغبين في التدرّب على مهنة التدقيق المالي. ستنضم إلى فرق تدقيق تراجع القوائم المالية لشركات محلية، فتفحص السجلات وتوثّق كل خطوة، ويتوزع أسبوعك بين المكتب ومواقع العملاء والعمل من المنزل."
+   },
+   "duties": {
+    "en": [
+     "Test balances and entries against invoices, contracts and bank statements",
+     "Count inventory and confirm fixed assets during client visits",
+     "Prepare working papers that a senior auditor can review and sign off",
+     "Draft findings for the audit team in Arabic and English"
+    ],
+    "ar": [
+     "مطابقة الأرصدة والقيود مع الفواتير والعقود وكشوف الحسابات المصرفية",
+     "جرد المخزون والتحقق من الأصول الثابتة خلال زيارات العملاء",
+     "إعداد أوراق العمل بصورة تتيح للمدقق الأقدم مراجعتها واعتمادها",
+     "صياغة الملاحظات لفريق التدقيق بالعربية والإنكليزية"
+    ]
+   },
+   "needs": {
+    "en": [
+     "Degree in accounting, economics or business administration",
+     "No previous experience needed, with a sound grasp of accounting standards",
+     "Working English for audit files and client correspondence"
+    ],
+    "ar": [
+     "شهادة في المحاسبة أو الاقتصاد أو إدارة الأعمال",
+     "لا تُشترط خبرة سابقة، مع فهم جيد لمعايير المحاسبة",
+     "إنكليزية عملية لملفات التدقيق ومراسلات العملاء"
+    ]
+   },
+   "provides": {
+    "en": [
+     "Structured on-the-job training in audit methods",
+     "A hybrid week that mixes office, client and home days",
+     "Health insurance"
+    ],
+    "ar": [
+     "تدريب منظم على أساليب التدقيق أثناء العمل",
+     "أسبوع عمل مختلط يجمع بين المكتب ومواقع العملاء والعمل من المنزل",
+     "تأمين صحي"
+    ]
+   },
+   "tags": "audit auditor accounting trainee finance graduate entry hybrid تدقيق محاسبة مدقق حسابات خريجين",
+   "daysAgo": 5
+  },
+  {
+   "company": "Deloitte",
+   "title": {
+    "en": "Tax Research Analyst (Remote)",
+    "ar": "محلل أبحاث ضريبية (عن بُعد)"
+   },
+   "gov": "remote",
+   "place": {
+    "en": "Remote, from anywhere in Syria",
+    "ar": "عن بُعد، من أي مكان في سوريا"
+   },
+   "type": "contract",
+   "level": "junior",
+   "mode": "remote",
+   "pay": [
+    120000,
+    150000
+   ],
+   "langs": [
+    "ar",
+    "en"
+   ],
+   "recruits": [
+    [
+     "svu",
+     "business"
+    ]
+   ],
+   "anyFaculty": false,
+   "noDegree": false,
+   "support": false,
+   "openings": 1,
+   "summary": {
+    "en": "A remote contract for an analyst with one to three years in tax or accounting to research tax legislation and rulings. You will follow changes to Syrian tax rules, compare how they apply in typical cases and write short, sourced research notes in Arabic and English.",
+    "ar": "عقد عمل عن بُعد لمحلل لديه خبرة من سنة إلى ثلاث سنوات في الضرائب أو المحاسبة، للبحث في التشريعات والقرارات الضريبية. ستتابع التعديلات على الأنظمة الضريبية السورية، وتقارن تطبيقها على حالات نموذجية، وتكتب مذكرات بحثية قصيرة موثّقة المصادر بالعربية والإنكليزية."
+   },
+   "duties": {
+    "en": [
+     "Track new tax laws, circulars and rulings and summarise what changed",
+     "Write sourced research notes on specific tax questions",
+     "Compare how a rule applies across typical business cases",
+     "Keep an organised index of notes that the team can search"
+    ],
+    "ar": [
+     "متابعة القوانين والتعاميم والقرارات الضريبية الجديدة وتلخيص ما تغيّر فيها",
+     "كتابة مذكرات بحثية موثّقة المصادر حول مسائل ضريبية محددة",
+     "مقارنة تطبيق القاعدة الضريبية على حالات أعمال نموذجية",
+     "الحفاظ على فهرس منظم للمذكرات يسهل على الفريق البحث فيه"
+    ]
+   },
+   "needs": {
+    "en": [
+     "Degree in accounting, business, law or economics, with one to three years in tax or audit",
+     "Working English for reading sources and writing notes",
+     "A laptop and a steady internet connection for remote work"
+    ],
+    "ar": [
+     "شهادة في المحاسبة أو إدارة الأعمال أو الحقوق أو الاقتصاد، مع خبرة من سنة إلى ثلاث سنوات في الضرائب أو التدقيق",
+     "إنكليزية عملية لقراءة المصادر وكتابة المذكرات",
+     "حاسوب محمول واتصال إنترنت مستقر للعمل عن بُعد"
+    ]
+   },
+   "provides": {
+    "en": [
+     "Fully remote, with flexible hours within agreed deadlines",
+     "Review of each note by a senior tax adviser",
+     "A fixed-term contract that sets out the hours and deliverables"
+    ],
+    "ar": [
+     "عمل عن بُعد بالكامل بساعات مرنة ضمن مواعيد تسليم متفق عليها",
+     "مراجعة مستشار ضرائب أقدم لكل مذكرة",
+     "عقد محدد المدة يوضح ساعات العمل والمهام المطلوبة"
+    ]
+   },
+   "tags": "tax research analyst remote contract accounting law notes ضرائب تحليل بحث عن بعد محاسبة",
+   "daysAgo": 8
+  },
+  {
+   "company": "Al Jazeera",
+   "title": {
+    "en": "Video Editor, News Packages",
+    "ar": "محرر فيديو (مونتاج) للتقارير الإخبارية"
+   },
+   "gov": "damascus",
+   "place": {
+    "en": "Damascus",
+    "ar": "دمشق"
+   },
+   "type": "contract",
+   "level": "junior",
+   "mode": "onsite",
+   "pay": [
+    110000,
+    150000
+   ],
+   "langs": [
+    "ar",
+    "en"
+   ],
+   "recruits": [
+    [
+     "damascus",
+     "media"
+    ]
+   ],
+   "anyFaculty": false,
+   "noDegree": false,
+   "support": false,
+   "openings": 1,
+   "summary": {
+    "en": "A contract for a video editor with one to three years in news to cut daily packages to tight deadlines. You will shape raw footage, interviews and graphics into clear, accurate reports, working closely with correspondents and producers.",
+    "ar": "عقد لمحرر فيديو لديه خبرة من سنة إلى ثلاث سنوات في الأخبار، لمونتاج التقارير اليومية ضمن مواعيد تسليم ضيقة. ستحوّل اللقطات الخام والمقابلات والغرافيك إلى تقارير واضحة ودقيقة، بالتعاون الوثيق مع المراسلين والمنتجين."
+   },
+   "duties": {
+    "en": [
+     "Cut news packages of two to three minutes from raw footage and interviews",
+     "Sync voice-over, add captions and lower thirds, and balance the audio",
+     "Check footage for accuracy and editorial standards before broadcast",
+     "Archive projects and source files with clear naming"
+    ],
+    "ar": [
+     "مونتاج تقارير إخبارية مدتها من دقيقتين إلى ثلاث دقائق من اللقطات الخام والمقابلات",
+     "مزامنة التعليق الصوتي وإضافة النصوص والعناوين السفلية وضبط مستويات الصوت",
+     "التحقق من دقة اللقطات وتوافقها مع المعايير التحريرية قبل البث",
+     "أرشفة المشاريع والملفات المصدرية بتسمية واضحة"
+    ]
+   },
+   "needs": {
+    "en": [
+     "Degree in media or a related field, with one to three years editing news video",
+     "Confident in Premiere Pro or Avid, with a showreel of news work",
+     "Working English for agency footage, scripts and shot lists"
+    ],
+    "ar": [
+     "شهادة في الإعلام أو مجال قريب، مع خبرة من سنة إلى ثلاث سنوات في مونتاج الأخبار",
+     "إتقان برنامج Premiere Pro أو Avid، مع نماذج من أعمال إخبارية سابقة",
+     "إنكليزية عملية للتعامل مع مواد الوكالات والنصوص وقوائم اللقطات"
+    ]
+   },
+   "provides": {
+    "en": [
+     "A shift rota published in advance",
+     "An editing workstation with current software",
+     "Health insurance for the length of the contract"
+    ],
+    "ar": [
+     "جدول مناوبات يُعلن مسبقاً",
+     "محطة مونتاج مجهزة ببرمجيات حديثة",
+     "تأمين صحي طوال مدة العقد"
+    ]
+   },
+   "tags": "video editor editing news broadcast montage premiere avid journalism media مونتاج فيديو أخبار إعلام مونتير",
+   "daysAgo": 3
+  },
+  {
+   "company": "Al Jazeera",
+   "title": {
+    "en": "Arabic Subtitler for Documentaries (Part-time, Remote)",
+    "ar": "مترجم ترجمة مرئية للأفلام الوثائقية (دوام جزئي، عن بُعد)"
+   },
+   "gov": "remote",
+   "place": {
+    "en": "Remote, from anywhere in Syria",
+    "ar": "عن بُعد، من أي مكان في سوريا"
+   },
+   "type": "part",
+   "level": "junior",
+   "mode": "remote",
+   "pay": [
+    40000,
+    55000
+   ],
+   "langs": [
+    "ar",
+    "en"
+   ],
+   "recruits": [],
+   "anyFaculty": false,
+   "noDegree": false,
+   "support": false,
+   "openings": 2,
+   "summary": {
+    "en": "Part-time, remote work translating documentaries into Arabic subtitles and timing them to the picture, mostly from English. You will write subtitles that read naturally, fit the screen and keep the meaning of the original, working to agreed weekly deadlines.",
+    "ar": "عمل بدوام جزئي عن بُعد في ترجمة الأفلام الوثائقية إلى العربية، ومعظمها من الإنكليزية، وضبط توقيت الترجمة مع الصورة. ستكتب ترجمة سلسة تناسب مساحة الشاشة وتحافظ على معنى النص الأصلي، ضمن مواعيد تسليم أسبوعية متفق عليها."
+   },
+   "duties": {
+    "en": [
+     "Translate documentary scripts and transcripts from English into Arabic",
+     "Time subtitles to the picture within reading-speed limits",
+     "Check names, terms and on-screen text against a style guide",
+     "Revise files after the editor's feedback"
+    ],
+    "ar": [
+     "ترجمة نصوص الأفلام الوثائقية وتفريغاتها من الإنكليزية إلى العربية",
+     "ضبط توقيت الترجمة مع الصورة ضمن حدود سرعة القراءة",
+     "تدقيق الأسماء والمصطلحات والنصوص الظاهرة على الشاشة وفق دليل الأسلوب",
+     "تعديل الملفات بناءً على ملاحظات المحرر"
+    ]
+   },
+   "needs": {
+    "en": [
+     "Degree in translation or languages, and one to three years translating or subtitling",
+     "Excellent written Arabic and strong working English",
+     "Familiar with subtitle software such as Subtitle Edit or Aegisub"
+    ],
+    "ar": [
+     "شهادة في الترجمة أو اللغات، مع خبرة من سنة إلى ثلاث سنوات في الترجمة أو الترجمة المرئية",
+     "عربية مكتوبة ممتازة وإنكليزية عملية قوية",
+     "إلمام ببرامج الترجمة المرئية مثل Subtitle Edit أو Aegisub"
+    ]
+   },
+   "provides": {
+    "en": [
+     "Part-time hours you set yourself within weekly deadlines",
+     "A style guide and feedback from an Arabic editor on every file",
+     "Work from anywhere in Syria"
+    ],
+    "ar": [
+     "ساعات عمل جزئية تحددها بنفسك ضمن مواعيد التسليم الأسبوعية",
+     "دليل أسلوب وملاحظات من محرر لغة عربية على كل ملف",
+     "العمل من أي مكان في سوريا"
+    ]
+   },
+   "tags": "subtitles subtitling translation translator arabic documentary remote part-time ترجمة مترجم وثائقي عن بعد",
+   "daysAgo": 12
+  },
+  {
+   "company": "Abu Abdo",
+   "title": {
+    "en": "Kitchen Assistant: Preparation, Cleaning and Stock",
+    "ar": "مساعد مطبخ للتحضير والتنظيف والمخزون"
+   },
+   "gov": "aleppo",
+   "place": {
+    "en": "Aleppo",
+    "ar": "حلب"
+   },
+   "type": "full",
+   "level": "entry",
+   "mode": "onsite",
+   "pay": [
+    16000,
+    21000
+   ],
+   "langs": [
+    "ar"
+   ],
+   "recruits": [],
+   "anyFaculty": false,
+   "noDegree": true,
+   "support": false,
+   "openings": 2,
+   "summary": {
+    "en": "A full-time first job in a kitchen, helping the cooks with preparation, cleaning and stock. No degree or previous experience is needed: you will learn food hygiene and the kitchen's routines on the job.",
+    "ar": "فرصة عمل أولى بدوام كامل في مطبخ، لمساعدة الطهاة في التحضير والتنظيف وترتيب المخزون. لا تُشترط شهادة ولا خبرة سابقة، إذ ستتعلم قواعد سلامة الغذاء ونظام المطبخ أثناء العمل."
+   },
+   "duties": {
+    "en": [
+     "Wash, peel and chop vegetables and prepare ingredients for each shift",
+     "Keep work surfaces, tools and floors clean through the day",
+     "Receive deliveries, store them correctly and rotate stock",
+     "Wash dishes and kitchen equipment"
+    ],
+    "ar": [
+     "غسل الخضار وتقشيرها وتقطيعها وتجهيز المكونات لكل وردية",
+     "الحفاظ على نظافة أسطح العمل والأدوات والأرضيات طوال اليوم",
+     "استلام البضائع الواردة وتخزينها بالطريقة الصحيحة وتدوير المخزون",
+     "غسل الأطباق وأدوات المطبخ"
+    ]
+   },
+   "needs": {
+    "en": [
+     "No degree or previous experience needed",
+     "Able to stand through long shifts and lift boxes",
+     "Punctual, tidy and willing to learn hygiene rules"
+    ],
+    "ar": [
+     "لا تُشترط شهادة أو خبرة سابقة",
+     "القدرة على الوقوف لساعات طويلة وحمل الصناديق",
+     "الالتزام بالمواعيد والنظافة والاستعداد لتعلّم قواعد السلامة الغذائية"
+    ]
+   },
+   "provides": {
+    "en": [
+     "On-the-job training in food hygiene and preparation",
+     "A meal during each shift",
+     "Work clothes provided"
+    ],
+    "ar": [
+     "تدريب أثناء العمل على سلامة الغذاء والتحضير",
+     "وجبة خلال كل وردية",
+     "يُقدَّم لباس العمل"
+    ]
+   },
+   "tags": "kitchen assistant cook prep cleaning stock food entry مطبخ مساعد طبخ تحضير تنظيف",
+   "daysAgo": 1
+  },
+  {
+   "company": "Abu Abdo",
+   "title": {
+    "en": "Evening-Shift Cashier (Part-time)",
+    "ar": "أمين صندوق للوردية المسائية (دوام جزئي)"
+   },
+   "gov": "damascus",
+   "place": {
+    "en": "Damascus",
+    "ar": "دمشق"
+   },
+   "type": "part",
+   "level": "entry",
+   "mode": "onsite",
+   "pay": [
+    9000,
+    12000
+   ],
+   "langs": [
+    "ar"
+   ],
+   "recruits": [],
+   "anyFaculty": false,
+   "noDegree": true,
+   "support": false,
+   "openings": 1,
+   "summary": {
+    "en": "A part-time evening job at the till, serving customers quickly and keeping the register accurate to the end of the shift. No degree is needed, and you will be trained on the till system before your first shift.",
+    "ar": "عمل بدوام جزئي في الوردية المسائية على الصندوق، لخدمة الزبائن بسرعة وضبط الصندوق بدقة حتى نهاية الوردية. لا تُشترط شهادة، وستتدرب على نظام الصندوق قبل ورديتك الأولى."
+   },
+   "duties": {
+    "en": [
+     "Take customers' orders and enter them correctly in the sales system",
+     "Hand over receipts and answer questions about the menu",
+     "Count and close the till with the supervisor at the end of the shift",
+     "Keep the till area clean and supplied"
+    ],
+    "ar": [
+     "استلام طلبات الزبائن وإدخالها بدقة في نظام البيع",
+     "تسليم الإيصالات والرد على أسئلة الزبائن حول قائمة الطعام",
+     "جرد الصندوق وإغلاقه مع المشرف في نهاية الوردية",
+     "الحفاظ على نظافة منطقة الصندوق وتزويدها بما يلزم"
+    ]
+   },
+   "needs": {
+    "en": [
+     "No degree needed; basic arithmetic and care with numbers",
+     "Available for evening shifts, including weekends",
+     "Polite and calm with customers at busy times"
+    ],
+    "ar": [
+     "لا تُشترط شهادة، مع إلمام بالحساب الأساسي ودقة في الأرقام",
+     "التفرغ للورديات المسائية بما فيها عطلة نهاية الأسبوع",
+     "اللباقة والهدوء مع الزبائن في أوقات الذروة"
+    ]
+   },
+   "provides": {
+    "en": [
+     "Training on the till system before you start",
+     "Fixed evening hours that suit students and people with a day job",
+     "A meal during each shift"
+    ],
+    "ar": [
+     "تدريب على نظام الصندوق قبل بدء العمل",
+     "ساعات مسائية ثابتة تناسب الطلاب ومن لديهم عمل نهاري",
+     "وجبة خلال كل وردية"
+    ]
+   },
+   "tags": "cashier evening part-time till counter customer service shift أمين صندوق كاشير مسائي جزئي",
+   "daysAgo": 4
+  },
+  {
+   "company": "Cali Restaurant",
+   "title": {
+    "en": "Restaurant Server, Seasonal Seafront Branch",
+    "ar": "نادل في فرع موسمي على الواجهة البحرية"
+   },
+   "gov": "tartus",
+   "place": {
+    "en": "Tartus, on the seafront",
+    "ar": "طرطوس، على الواجهة البحرية"
+   },
+   "type": "full",
+   "level": "entry",
+   "mode": "onsite",
+   "pay": [
+    17000,
+    22000
+   ],
+   "langs": [
+    "ar"
+   ],
+   "recruits": [],
+   "anyFaculty": false,
+   "noDegree": true,
+   "support": false,
+   "openings": 3,
+   "summary": {
+    "en": "A full-time seasonal job serving tables at a seafront branch through the summer season. No degree or experience is needed: you will be trained on the menu, table service and hygiene before the season opens.",
+    "ar": "عمل موسمي بدوام كامل في خدمة الطاولات بفرع على الواجهة البحرية خلال موسم الصيف. لا تُشترط شهادة ولا خبرة، وستتدرب على قائمة الطعام وأصول الخدمة والنظافة قبل افتتاح الموسم."
+   },
+   "duties": {
+    "en": [
+     "Greet guests, show them to their tables and take orders accurately",
+     "Serve food and drinks and check on tables during the meal",
+     "Clear and reset tables quickly at busy times",
+     "Help set up and close the outdoor seating each day"
+    ],
+    "ar": [
+     "استقبال الضيوف وإرشادهم إلى طاولاتهم وتسجيل الطلبات بدقة",
+     "تقديم الطعام والمشروبات ومتابعة الطاولات خلال الوجبة",
+     "رفع الأطباق وتجهيز الطاولات بسرعة في أوقات الذروة",
+     "المساعدة في تجهيز الجلسة الخارجية وإغلاقها يومياً"
+    ]
+   },
+   "needs": {
+    "en": [
+     "No degree or previous experience needed",
+     "Friendly, quick on your feet and able to work in summer heat",
+     "Available for evening and weekend shifts for the whole season"
+    ],
+    "ar": [
+     "لا تُشترط شهادة أو خبرة سابقة",
+     "البشاشة وخفة الحركة والقدرة على العمل في حر الصيف",
+     "التفرغ للورديات المسائية وعطلات نهاية الأسبوع طوال الموسم"
+    ]
+   },
+   "provides": {
+    "en": [
+     "Training in table service before the season opens",
+     "A meal during each shift and a work uniform",
+     "Transport allowance for late shifts"
+    ],
+    "ar": [
+     "تدريب على أصول خدمة الطاولات قبل افتتاح الموسم",
+     "وجبة خلال كل وردية وزي عمل",
+     "بدل مواصلات للورديات المتأخرة"
+    ]
+   },
+   "tags": "waiter server restaurant seasonal summer seafront hospitality tables نادل جرسون مطعم موسمي صيف طرطوس",
+   "daysAgo": 6
+  },
+  {
+   "company": "Syrian Arab Red Crescent",
+   "title": {
+    "en": "First Aid Trainer, Community and Volunteer Courses",
+    "ar": "مدرب إسعافات أولية للدورات المجتمعية ودورات المتطوعين"
+   },
+   "gov": "deirezzor",
+   "place": {
+    "en": "Field locations across Deir ez-Zor",
+    "ar": "مواقع ميدانية في أنحاء محافظة دير الزور"
+   },
+   "type": "contract",
+   "level": "entry",
+   "mode": "onsite",
+   "pay": [
+    70000,
+    90000
+   ],
+   "langs": [
+    "ar"
+   ],
+   "recruits": [
+    [
+     "furat",
+     "nursing"
+    ]
+   ],
+   "anyFaculty": false,
+   "noDegree": false,
+   "support": false,
+   "openings": 1,
+   "summary": {
+    "en": "A contract for a recent nursing or health graduate to run basic first aid courses for community groups and new volunteers. You will lead hands-on sessions, keep training kits ready and record attendance and results, with a shadowing period before you teach alone.",
+    "ar": "عقد لخريج حديث في التمريض أو المجالات الصحية لتقديم دورات الإسعافات الأولية الأساسية للمجموعات المحلية والمتطوعين الجدد. ستقدّم جلسات تطبيقية، وتحافظ على جاهزية حقائب التدريب، وتوثّق الحضور والنتائج، مع فترة مرافقة قبل أن تدرّب بمفردك."
+   },
+   "duties": {
+    "en": [
+     "Deliver basic first aid courses through demonstration and hands-on practice",
+     "Adapt sessions for schools, community centres and volunteer teams",
+     "Keep manikins and training kits clean, complete and ready",
+     "Record attendance and test results after each course"
+    ],
+    "ar": [
+     "تقديم دورات الإسعافات الأولية الأساسية بالعرض العملي والتطبيق المباشر",
+     "تكييف الجلسات بما يناسب المدارس والمراكز المجتمعية وفرق المتطوعين",
+     "الحفاظ على دمى الإنعاش وحقائب التدريب نظيفة ومكتملة وجاهزة",
+     "تسجيل الحضور ونتائج الاختبار بعد كل دورة"
+    ]
+   },
+   "needs": {
+    "en": [
+     "Degree or diploma in nursing or another health field",
+     "Recent graduates welcome; teaching or volunteering experience is a plus",
+     "Clear spoken Arabic and at ease leading groups"
+    ],
+    "ar": [
+     "شهادة جامعية أو دبلوم في التمريض أو أحد المجالات الصحية",
+     "يُرحَّب بالخريجين الجدد، وتُعدّ الخبرة في التدريب أو التطوع ميزة إضافية",
+     "التحدث بعربية واضحة والارتياح في قيادة المجموعات"
+    ]
+   },
+   "provides": {
+    "en": [
+     "Trainer preparation before you lead your first course",
+     "Transport to course locations across the governorate",
+     "Health insurance for the length of the contract"
+    ],
+    "ar": [
+     "تأهيل تدريبي قبل أن تقود دورتك الأولى",
+     "وسيلة نقل إلى مواقع الدورات في أنحاء المحافظة",
+     "تأمين صحي طوال مدة العقد"
+    ]
+   },
+   "tags": "first aid trainer training nursing health community volunteers courses إسعافات أولية مدرب تمريض تطوع دورات",
+   "daysAgo": 7
+  },
+  {
+   "company": "Syrian Arab Red Crescent",
+   "title": {
+    "en": "Warehouse Officer, Relief Items",
+    "ar": "مسؤول مستودع المواد الإغاثية"
+   },
+   "gov": "latakia",
+   "place": {
+    "en": "Latakia",
+    "ar": "اللاذقية"
+   },
+   "type": "full",
+   "level": "junior",
+   "mode": "onsite",
+   "pay": [
+    75000,
+    95000
+   ],
+   "langs": [
+    "ar"
+   ],
+   "recruits": [],
+   "anyFaculty": false,
+   "noDegree": false,
+   "support": false,
+   "openings": 1,
+   "summary": {
+    "en": "Run the day-to-day work of a relief warehouse in Latakia: receiving, storing and releasing food parcels, hygiene kits and household items. You keep stock records accurate and make sure every dispatch matches an approved distribution plan.",
+    "ar": "إدارة العمل اليومي في مستودع للمواد الإغاثية في اللاذقية، من استلام السلال الغذائية وحقائب النظافة والمواد المنزلية إلى تخزينها وصرفها. تحافظ على دقة سجلات المخزون وتتأكد من مطابقة كل شحنة خارجة لخطة توزيع معتمدة."
+   },
+   "duties": {
+    "en": [
+     "Receive incoming shipments, check them against delivery notes and record any damage or shortfall",
+     "Keep stock cards and the warehouse spreadsheet up to date every day",
+     "Prepare dispatches and hand them to distribution teams against signed requests",
+     "Run the monthly stock count and keep the store clean, dry and safely stacked"
+    ],
+    "ar": [
+     "استلام الشحنات الواردة ومطابقتها مع إشعارات التسليم وتسجيل أي تلف أو نقص",
+     "تحديث بطاقات المخزون وجدول بيانات المستودع يومياً",
+     "تجهيز الشحنات الخارجة وتسليمها لفرق التوزيع بموجب طلبات موقّعة",
+     "إجراء الجرد الشهري والحفاظ على نظافة المستودع وجفافه ورصّ المواد بطريقة آمنة"
+    ]
+   },
+   "needs": {
+    "en": [
+     "Degree or institute diploma in business, logistics or a related field",
+     "One to three years in a warehouse, store or supply role",
+     "Confident with spreadsheets and careful with records"
+    ],
+    "ar": [
+     "شهادة جامعية أو شهادة معهد في إدارة الأعمال أو الخدمات اللوجستية أو مجال قريب",
+     "خبرة من سنة إلى ثلاث سنوات في مستودع أو مخزن أو في أعمال الإمداد",
+     "إتقان جداول البيانات والدقة في حفظ السجلات"
+    ]
+   },
+   "provides": {
+    "en": [
+     "Training in humanitarian warehouse and stock standards",
+     "Safety equipment and a fixed day shift"
+    ],
+    "ar": [
+     "تدريب على معايير المستودعات والمخزون في العمل الإنساني",
+     "معدات سلامة ودوام نهاري ثابت"
+    ]
+   },
+   "tags": "warehouse stock relief logistics storekeeper inventory humanitarian latakia مستودع مخزون إغاثة جرد اللاذقية",
+   "daysAgo": 9
+  },
+  {
+   "company": "Cham Construction",
+   "title": {
+    "en": "Site Engineer, Residential Building Project",
+    "ar": "مهندس موقع في مشروع بناء سكني"
+   },
+   "gov": "rifdimashq",
+   "place": {
+    "en": "Project site in Rural Damascus",
+    "ar": "موقع المشروع في ريف دمشق"
+   },
+   "type": "full",
+   "level": "junior",
+   "mode": "onsite",
+   "pay": [
+    90000,
+    130000
+   ],
+   "langs": [
+    "ar"
+   ],
+   "recruits": [
+    [
+     "damascus",
+     "civil"
+    ]
+   ],
+   "anyFaculty": false,
+   "noDegree": false,
+   "support": true,
+   "openings": 1,
+   "summary": {
+    "en": "Day-to-day site engineering on a residential building project in Rural Damascus. You set out axes and levels, check formwork and reinforcement before each pour, and keep the site diary and progress reports for the project manager.",
+    "ar": "أعمال هندسة الموقع اليومية في مشروع بناء سكني في ريف دمشق. تتولى توقيع المحاور والمناسيب، وفحص القوالب والتسليح قبل كل صبّة، وتدوين يومية الموقع وإعداد تقارير سير العمل لمدير المشروع."
+   },
+   "duties": {
+    "en": [
+     "Set out axes and levels and check the work against the approved drawings",
+     "Inspect formwork and reinforcement before every concrete pour",
+     "Supervise subcontractors and keep daily records of labour, plant and materials",
+     "Prepare quantity sheets for completed work and weekly progress reports"
+    ],
+    "ar": [
+     "توقيع المحاور والمناسيب ومطابقة التنفيذ مع المخططات المعتمدة",
+     "فحص القوالب والتسليح قبل كل صبّة خرسانية",
+     "الإشراف على مقاولي الباطن وتسجيل العمالة والآليات والمواد يومياً",
+     "إعداد كشوف كميات الأعمال المنجزة وتقارير سير العمل الأسبوعية"
+    ]
+   },
+   "needs": {
+    "en": [
+     "Degree in civil engineering",
+     "One to three years on building sites",
+     "Reads structural drawings with ease and can use AutoCAD"
+    ],
+    "ar": [
+     "شهادة في الهندسة المدنية",
+     "خبرة من سنة إلى ثلاث سنوات في مواقع البناء",
+     "قراءة المخططات الإنشائية بسهولة واستخدام برنامج أوتوكاد"
+    ]
+   },
+   "provides": {
+    "en": [
+     "Daily transport to the site from central Damascus",
+     "Safety boots, helmet and high-visibility vest",
+     "Close guidance from the project manager"
+    ],
+    "ar": [
+     "نقل يومي إلى الموقع من وسط دمشق",
+     "حذاء أمان وخوذة وسترة عاكسة",
+     "توجيه مباشر من مدير المشروع"
+    ]
+   },
+   "tags": "site engineer civil construction building residential concrete autocad مهندس موقع مدني إنشاءات خرسانة",
+   "daysAgo": 5
+  },
+  {
+   "company": "Cham Construction",
+   "title": {
+    "en": "Building Electrician",
+    "ar": "كهربائي أبنية"
+   },
+   "gov": "homs",
+   "place": {
+    "en": "Building sites in Homs",
+    "ar": "مواقع بناء في حمص"
+   },
+   "type": "full",
+   "level": "entry",
+   "mode": "onsite",
+   "pay": [
+    30000,
+    40000
+   ],
+   "langs": [
+    "ar"
+   ],
+   "recruits": [],
+   "anyFaculty": false,
+   "noDegree": true,
+   "support": false,
+   "openings": 3,
+   "summary": {
+    "en": "Install the wiring in apartments under construction in Homs, from conduits and boxes to panels, sockets and lighting. This is an entry-level role: you work under a senior electrician and learn the trade on site. No degree needed.",
+    "ar": "تنفيذ التمديدات الكهربائية في شقق قيد الإنشاء في حمص، من تمديد المواسير والعلب إلى تركيب اللوحات والمقابس والإنارة. الوظيفة مناسبة للمبتدئين، إذ تعمل تحت إشراف كهربائي خبير وتتعلّم المهنة في الموقع. لا تُشترط شهادة جامعية."
+   },
+   "duties": {
+    "en": [
+     "Lay conduits and boxes in walls and slabs following the electrical drawings",
+     "Pull cables and wire sockets, switches and light points",
+     "Help mount and connect apartment distribution boards",
+     "Test circuits with the senior electrician and tidy the work area each day"
+    ],
+    "ar": [
+     "تمديد المواسير والعلب في الجدران والأسقف وفق المخططات الكهربائية",
+     "سحب الكابلات وتوصيل المقابس والمفاتيح ونقاط الإنارة",
+     "المساعدة في تركيب لوحات توزيع الشقق وتوصيلها",
+     "اختبار الدارات مع الكهربائي الخبير وترتيب مكان العمل يومياً"
+    ]
+   },
+   "needs": {
+    "en": [
+     "No degree needed; a vocational certificate in electrical work is welcome",
+     "Some hands-on wiring experience, even informal, or a real wish to learn",
+     "Careful with safety and comfortable working on ladders and scaffolding"
+    ],
+    "ar": [
+     "لا تُشترط شهادة جامعية، وتُعدّ الشهادة المهنية في الكهرباء ميزة إضافية",
+     "بعض الخبرة العملية في التمديدات الكهربائية ولو كانت غير رسمية، أو رغبة جادة في التعلّم",
+     "الالتزام بقواعد السلامة والقدرة على العمل على السلالم والسقالات"
+    ]
+   },
+   "provides": {
+    "en": [
+     "On-the-job training from a senior electrician",
+     "Tools and safety equipment on site"
+    ],
+    "ar": [
+     "تدريب أثناء العمل على يد كهربائي خبير",
+     "عُدّة العمل ومعدات السلامة في الموقع"
+    ]
+   },
+   "tags": "electrician electrical wiring construction building installation apprentice homs كهربائي كهرباء تمديدات بناء حمص",
+   "daysAgo": 2
+  },
+  {
+   "company": "UNDP Syria",
+   "title": {
+    "en": "Livelihoods Recovery Officer, Rubble Removal and Small Business",
+    "ar": "مسؤول سبل العيش والتعافي: إزالة الأنقاض ودعم المشاريع الصغيرة"
+   },
+   "gov": "aleppo",
+   "place": {
+    "en": "Field locations across Aleppo governorate",
+    "ar": "مواقع ميدانية في عموم محافظة حلب"
+   },
+   "type": "contract",
+   "level": "mid",
+   "mode": "onsite",
+   "pay": [
+    250000,
+    320000
+   ],
+   "langs": [
+    "ar",
+    "en"
+   ],
+   "recruits": [
+    [
+     "aleppo",
+     "economics"
+    ],
+    [
+     "aleppo",
+     "civil"
+    ]
+   ],
+   "anyFaculty": false,
+   "noDegree": false,
+   "support": false,
+   "openings": 1,
+   "summary": {
+    "en": "A fixed-term contract to plan and follow up livelihoods work across Aleppo governorate: rubble removal that creates short-term jobs, and help for small businesses getting back on their feet. You spend much of the week in the field with local councils and communities, and report on progress in English.",
+    "ar": "عقد محدد المدة لتخطيط أنشطة سبل العيش ومتابعتها في عموم محافظة حلب: إزالة الأنقاض بما يوفّر فرص عمل قصيرة الأجل، ومساندة المشاريع الصغيرة حتى تعود إلى العمل. تقضي معظم أيام الأسبوع في الميدان مع المجالس المحلية والمجتمعات، وتكتب تقارير سير العمل بالإنكليزية."
+   },
+   "duties": {
+    "en": [
+     "Plan rubble removal sites with engineers and local councils, with safety and sorting rules in place",
+     "Select small businesses for support against clear, published criteria and follow their progress",
+     "Visit sites every week and check that work and attendance records are complete",
+     "Write progress reports and short case notes in English"
+    ],
+    "ar": [
+     "تخطيط مواقع إزالة الأنقاض مع المهندسين والمجالس المحلية، مع ضمان تطبيق قواعد السلامة وفرز المواد",
+     "اختيار المشاريع الصغيرة المستفيدة من الدعم وفق معايير واضحة ومعلنة ومتابعة تقدّمها",
+     "زيارة المواقع أسبوعياً والتحقق من اكتمال سجلات العمل والحضور",
+     "كتابة تقارير سير العمل وملاحظات موجزة عن الحالات بالإنكليزية"
+    ]
+   },
+   "needs": {
+    "en": [
+     "Degree in economics, civil engineering or a related field",
+     "Three to seven years in livelihoods, early recovery or community projects",
+     "Working English for reports and meetings"
+    ],
+    "ar": [
+     "شهادة في الاقتصاد أو الهندسة المدنية أو مجال قريب",
+     "خبرة من ثلاث إلى سبع سنوات في سبل العيش أو التعافي المبكر أو المشاريع المجتمعية",
+     "إنكليزية عملية لكتابة التقارير وحضور الاجتماعات"
+    ]
+   },
+   "provides": {
+    "en": [
+     "A fixed-term contract with a clear scope of work",
+     "Safety training before field work starts",
+     "Health insurance for the length of the contract"
+    ],
+    "ar": [
+     "عقد محدد المدة بمهام واضحة",
+     "تدريب على السلامة قبل بدء العمل الميداني",
+     "تأمين صحي طوال مدة العقد"
+    ]
+   },
+   "tags": "livelihoods recovery rubble small business community field contract aleppo سبل العيش تعافي أنقاض مشاريع حلب",
+   "daysAgo": 10
+  },
+  {
+   "company": "Lattakia Labs",
+   "title": {
+    "en": "Frontend Developer (JavaScript)",
+    "ar": "مطوّر واجهات أمامية (JavaScript)"
+   },
+   "gov": "latakia",
+   "place": {
+    "en": "Latakia",
+    "ar": "اللاذقية"
+   },
+   "type": "full",
+   "level": "junior",
+   "mode": "hybrid",
+   "pay": [
+    120000,
+    180000
+   ],
+   "langs": [
+    "ar",
+    "en"
+   ],
+   "recruits": [
+    [
+     "latakia",
+     "informatics"
+    ],
+    [
+     "hiast",
+     "informatics"
+    ]
+   ],
+   "anyFaculty": false,
+   "noDegree": false,
+   "support": false,
+   "openings": 1,
+   "summary": {
+    "en": "Build and maintain web apps in JavaScript, turning designs into fast, easy-to-use screens that work well on low-end phones. The role is hybrid: part of the week on site in Latakia and the rest from home.",
+    "ar": "بناء تطبيقات الويب بلغة JavaScript وصيانتها، وتحويل التصاميم إلى واجهات سريعة وسهلة الاستخدام تعمل جيداً على الهواتف محدودة المواصفات. العمل هجين: جزء من الأسبوع في اللاذقية وبقية الأيام من المنزل."
+   },
+   "duties": {
+    "en": [
+     "Build interface components from designs in JavaScript, HTML and CSS",
+     "Keep pages fast and usable on slow connections and small screens",
+     "Review teammates' code and write tests for your own",
+     "Work with backend developers to connect screens to APIs"
+    ],
+    "ar": [
+     "بناء مكوّنات الواجهة انطلاقاً من التصاميم باستخدام JavaScript وHTML وCSS",
+     "الحفاظ على سرعة الصفحات وسهولة استخدامها مع الاتصال البطيء والشاشات الصغيرة",
+     "مراجعة شيفرة الزملاء وكتابة اختبارات للشيفرة التي تكتبها",
+     "التعاون مع مطوّري الواجهات الخلفية لربط الشاشات بواجهات برمجة التطبيقات"
+    ]
+   },
+   "needs": {
+    "en": [
+     "Degree in informatics, computer engineering or a related field",
+     "One to three years building web front ends in JavaScript",
+     "Working English for documentation and code reviews"
+    ],
+    "ar": [
+     "شهادة في المعلوماتية أو هندسة الحاسوب أو مجال قريب",
+     "خبرة من سنة إلى ثلاث سنوات في تطوير واجهات الويب بلغة JavaScript",
+     "إنكليزية عملية لقراءة التوثيق ومراجعات الشيفرة"
+    ]
+   },
+   "provides": {
+    "en": [
+     "A hybrid schedule with set days on site",
+     "A laptop for work",
+     "Time each week for learning"
+    ],
+    "ar": [
+     "دوام هجين بأيام حضور محددة",
+     "حاسوب محمول للعمل",
+     "وقت أسبوعي مخصص للتعلّم"
+    ]
+   },
+   "tags": "frontend developer javascript web html css hybrid latakia مطور واجهات برمجة ويب اللاذقية",
+   "daysAgo": 3
+  },
+  {
+   "company": "Lattakia Labs",
+   "title": {
+    "en": "Software Testing Intern (Remote)",
+    "ar": "متدرب في اختبار البرمجيات (عن بُعد)"
+   },
+   "gov": "remote",
+   "place": {
+    "en": "Remote, from anywhere in Syria",
+    "ar": "عن بُعد، من أي مكان في سوريا"
+   },
+   "type": "intern",
+   "level": "student",
+   "mode": "remote",
+   "pay": [
+    15000,
+    15000
+   ],
+   "langs": [
+    "ar",
+    "en"
+   ],
+   "recruits": [
+    [
+     "svu",
+     "informatics"
+    ]
+   ],
+   "anyFaculty": false,
+   "noDegree": false,
+   "support": false,
+   "openings": 2,
+   "summary": {
+    "en": "A remote internship for informatics students who want to learn software testing. You test web and mobile apps before release, write clear bug reports and see how a development team works, all from home.",
+    "ar": "تدريب عن بُعد لطلاب المعلوماتية الراغبين في تعلّم اختبار البرمجيات. تختبر تطبيقات الويب والهاتف قبل إطلاقها، وتكتب تقارير أخطاء واضحة، وتتعرّف على طريقة عمل فريق التطوير، وكل ذلك من المنزل."
+   },
+   "duties": {
+    "en": [
+     "Run test cases on web and mobile apps and record the results",
+     "Write clear bug reports with steps, screenshots and the expected behaviour",
+     "Retest fixed bugs and help keep the test checklist up to date"
+    ],
+    "ar": [
+     "تنفيذ حالات الاختبار على تطبيقات الويب والهاتف وتسجيل النتائج",
+     "كتابة تقارير أخطاء واضحة تتضمن الخطوات ولقطات الشاشة والسلوك المتوقع",
+     "إعادة اختبار الأخطاء بعد إصلاحها والمساعدة في تحديث قائمة الاختبارات"
+    ]
+   },
+   "needs": {
+    "en": [
+     "Currently studying informatics or a related subject",
+     "A computer and an internet connection good enough for a short daily call",
+     "Working English for reading tasks and writing bug reports"
+    ],
+    "ar": [
+     "طالب حالياً في المعلوماتية أو تخصص قريب",
+     "حاسوب واتصال إنترنت يكفي لمكالمة يومية قصيرة",
+     "إنكليزية عملية لقراءة المهام وكتابة تقارير الأخطاء"
+    ]
+   },
+   "provides": {
+    "en": [
+     "A monthly stipend",
+     "A mentor who reviews your work every week",
+     "Flexible hours around your lectures and exams"
+    ],
+    "ar": [
+     "مكافأة شهرية",
+     "مشرف يراجع عملك كل أسبوع",
+     "ساعات مرنة تراعي المحاضرات والامتحانات"
+    ]
+   },
+   "tags": "software testing qa intern internship remote student bugs informatics اختبار برمجيات تدريب طالب معلوماتية",
+   "daysAgo": 6
+  },
+  {
+   "company": "Sheikh Najjar Textiles",
+   "title": {
+    "en": "Sewing Machine Operator, Garment Workshop",
+    "ar": "عامل ماكينة خياطة في ورشة ألبسة"
+   },
+   "gov": "aleppo",
+   "place": {
+    "en": "Aleppo",
+    "ar": "حلب"
+   },
+   "type": "full",
+   "level": "entry",
+   "mode": "onsite",
+   "pay": [
+    18000,
+    24000
+   ],
+   "langs": [
+    "ar"
+   ],
+   "recruits": [],
+   "anyFaculty": false,
+   "noDegree": true,
+   "support": false,
+   "openings": 15,
+   "summary": {
+    "en": "Sew garments on industrial machines in a production workshop in Aleppo, working on a line with a supervisor who checks quality. No degree needed: if you can sew on a straight-stitch or overlock machine, or want to learn, you can apply.",
+    "ar": "خياطة الألبسة على ماكينات صناعية في ورشة إنتاج في حلب، ضمن خط إنتاج بإشراف مسؤول يتابع جودة العمل. لا تُشترط شهادة جامعية: إذا كنت تجيد العمل على ماكينة الدرزة أو الحبكة، أو ترغب في التعلّم، يمكنك التقدّم."
+   },
+   "duties": {
+    "en": [
+     "Sew garment parts on a straight-stitch or overlock machine to the line's daily target",
+     "Check your own seams and fix faults before passing work on",
+     "Keep your machine clean and report breakdowns to the mechanic"
+    ],
+    "ar": [
+     "خياطة قطع الألبسة على ماكينة الدرزة أو الحبكة وفق الإنتاج اليومي المطلوب من الخط",
+     "فحص الدرزات بنفسك وإصلاح العيوب قبل تمرير القطع إلى المرحلة التالية",
+     "الحفاظ على نظافة الماكينة وإبلاغ الميكانيكي عن الأعطال"
+    ]
+   },
+   "needs": {
+    "en": [
+     "No degree needed",
+     "Some sewing experience, or the patience to learn during a short training period",
+     "Able to work a full day shift on a production line"
+    ],
+    "ar": [
+     "لا تُشترط شهادة جامعية",
+     "خبرة بسيطة في الخياطة، أو الصبر على التعلّم خلال فترة تدريب قصيرة",
+     "القدرة على العمل وردية نهارية كاملة على خط إنتاج"
+    ]
+   },
+   "provides": {
+    "en": [
+     "Training on industrial machines at the start",
+     "A fixed day shift"
+    ],
+    "ar": [
+     "تدريب على الماكينات الصناعية في البداية",
+     "وردية نهارية ثابتة"
+    ]
+   },
+   "tags": "sewing machine operator garment textile tailoring factory production aleppo خياطة ماكينة ألبسة نسيج حلب",
+   "daysAgo": 2
+  },
+  {
+   "company": "Katakit",
+   "title": {
+    "en": "Weekend Sales Assistant (Part-Time)",
+    "ar": "مساعد مبيعات في عطلة نهاية الأسبوع (دوام جزئي)"
+   },
+   "gov": "hama",
+   "place": {
+    "en": "Hama",
+    "ar": "حماة"
+   },
+   "type": "part",
+   "level": "entry",
+   "mode": "onsite",
+   "pay": [
+    8000,
+    11000
+   ],
+   "langs": [
+    "ar"
+   ],
+   "recruits": [],
+   "anyFaculty": false,
+   "noDegree": true,
+   "support": false,
+   "openings": 2,
+   "summary": {
+    "en": "A part-time role on Fridays and Saturdays: serving customers in the shop, keeping shelves full and the sales floor tidy. No degree or previous experience needed, and it suits someone who studies or works on weekdays.",
+    "ar": "عمل بدوام جزئي يومَي الجمعة والسبت، يشمل خدمة الزبائن في المحل وتعبئة الرفوف والحفاظ على ترتيب صالة البيع. لا تُشترط شهادة جامعية ولا خبرة سابقة، ويناسب من يدرس أو يعمل في بقية أيام الأسبوع."
+   },
+   "duties": {
+    "en": [
+     "Greet customers, help them choose and pack their orders",
+     "Restock shelves and displays and check expiry dates",
+     "Keep the counter and sales floor clean and tidy"
+    ],
+    "ar": [
+     "استقبال الزبائن ومساعدتهم في الاختيار وتغليف طلباتهم",
+     "إعادة تعبئة الرفوف وواجهات العرض والتحقق من تواريخ الصلاحية",
+     "الحفاظ على نظافة منضدة البيع والصالة وترتيبهما"
+    ]
+   },
+   "needs": {
+    "en": [
+     "No degree or previous experience needed",
+     "Friendly with customers and comfortable standing for a full shift",
+     "Available every Friday and Saturday"
+    ],
+    "ar": [
+     "لا تُشترط شهادة جامعية ولا خبرة سابقة",
+     "اللباقة في التعامل مع الزبائن والقدرة على الوقوف طوال الوردية",
+     "التفرّغ كل يوم جمعة وسبت"
+    ]
+   },
+   "provides": {
+    "en": [
+     "Short training on the products and customer service",
+     "A fixed weekend schedule that fits around study or other work"
+    ],
+    "ar": [
+     "تدريب قصير على المنتجات وخدمة الزبائن",
+     "دوام ثابت في عطلة نهاية الأسبوع يتناسب مع الدراسة أو عمل آخر"
+    ]
+   },
+   "tags": "sales assistant weekend part-time retail shop customer hama مبيعات دوام جزئي محل زبائن حماة",
+   "daysAgo": 5
+  },
+  {
+   "company": "Ibn Zuhr Pharmacies",
+   "title": {
+    "en": "Pharmacist, Neighbourhood Branch",
+    "ar": "صيدلاني في فرع داخل حيّ سكني"
+   },
+   "gov": "sweida",
+   "place": {
+    "en": "As-Suwayda city",
+    "ar": "مدينة السويداء"
+   },
+   "type": "full",
+   "level": "junior",
+   "mode": "onsite",
+   "pay": [
+    45000,
+    60000
+   ],
+   "langs": [
+    "ar"
+   ],
+   "recruits": [
+    [
+     "damascus",
+     "pharmacy"
+    ]
+   ],
+   "anyFaculty": false,
+   "noDegree": false,
+   "support": false,
+   "openings": 1,
+   "summary": {
+    "en": "Run the dispensing counter at a neighbourhood pharmacy branch in As-Suwayda. You check and dispense prescriptions, advise patients on the safe use of medicines and keep stock and records in order.",
+    "ar": "تولّي صرف الأدوية في فرع صيدلية داخل حيّ سكني في السويداء. تتحقق من الوصفات الطبية وتصرفها، وتقدّم للمرضى النصح حول الاستخدام الآمن للأدوية، وتحافظ على انتظام المخزون والسجلات."
+   },
+   "duties": {
+    "en": [
+     "Check prescriptions for dose, interactions and allergies before dispensing",
+     "Explain to each patient how and when to take their medicine",
+     "Order stock, watch expiry dates and store medicines at the right temperature",
+     "Keep the register of controlled medicines accurate"
+    ],
+    "ar": [
+     "التحقق من الجرعات والتداخلات الدوائية والحساسية قبل صرف الوصفة",
+     "شرح طريقة تناول الدواء ومواعيده لكل مريض",
+     "طلب الأدوية ومتابعة تواريخ الصلاحية وحفظها في درجة الحرارة المناسبة",
+     "الحفاظ على دقة سجل الأدوية الخاضعة للرقابة"
+    ]
+   },
+   "needs": {
+    "en": [
+     "Degree in pharmacy and a licence to practise in Syria",
+     "One to three years in a community or hospital pharmacy",
+     "Patient and clear when explaining treatment"
+    ],
+    "ar": [
+     "شهادة في الصيدلة وترخيص بمزاولة المهنة في سوريا",
+     "خبرة من سنة إلى ثلاث سنوات في صيدلية عامة أو صيدلية مستشفى",
+     "الصبر والوضوح في شرح العلاج للمرضى"
+    ]
+   },
+   "provides": {
+    "en": [
+     "Fixed shifts agreed a week in advance",
+     "Support from an experienced pharmacist during the first weeks"
+    ],
+    "ar": [
+     "ورديات ثابتة يُتفق عليها مسبقاً بأسبوع",
+     "دعم من صيدلاني ذي خبرة خلال الأسابيع الأولى"
+    ]
+   },
+   "tags": "pharmacist pharmacy dispensing prescriptions medicines community licence sweida صيدلاني صيدلية أدوية وصفات السويداء",
+   "daysAgo": 8
+  },
+  {
+   "company": "Barada Logistics",
+   "title": {
+    "en": "Forklift Driver, Distribution Warehouse",
+    "ar": "سائق رافعة شوكية في مستودع توزيع"
+   },
+   "gov": "rifdimashq",
+   "place": {
+    "en": "Rural Damascus",
+    "ar": "ريف دمشق"
+   },
+   "type": "full",
+   "level": "entry",
+   "mode": "onsite",
+   "pay": [
+    24000,
+    30000
+   ],
+   "langs": [
+    "ar"
+   ],
+   "recruits": [],
+   "anyFaculty": false,
+   "noDegree": true,
+   "support": false,
+   "openings": 2,
+   "summary": {
+    "en": "Load, unload and move pallets with a forklift in a distribution warehouse in Rural Damascus. This is an entry-level role: your forklift driving is checked on the first day and you are trained on the warehouse routines. No degree needed.",
+    "ar": "تحميل المنصّات (الطبالي) وتنزيلها ونقلها بالرافعة الشوكية في مستودع توزيع في ريف دمشق. الوظيفة مناسبة للمبتدئين: تُختبر مهارتك في قيادة الرافعة في اليوم الأول وتتدرّب على إجراءات المستودع. لا تُشترط شهادة جامعية."
+   },
+   "duties": {
+    "en": [
+     "Load and unload trucks safely and on schedule",
+     "Move pallets to the right racks and keep aisles clear",
+     "Do a daily check of the forklift and report any fault",
+     "Log each pallet movement so stock records stay accurate"
+    ],
+    "ar": [
+     "تحميل الشاحنات وتنزيلها بأمان وفي الوقت المحدد",
+     "نقل المنصّات إلى الرفوف الصحيحة وإبقاء الممرات خالية",
+     "الفحص اليومي للرافعة والإبلاغ عن أي عطل",
+     "تسجيل كل حركة للمنصّات حتى تبقى سجلات المخزون دقيقة"
+    ]
+   },
+   "needs": {
+    "en": [
+     "No degree needed",
+     "Can drive a forklift; a little experience is enough",
+     "Follows safety rules and works well in a team"
+    ],
+    "ar": [
+     "لا تُشترط شهادة جامعية",
+     "القدرة على قيادة الرافعة الشوكية، وتكفي خبرة بسيطة",
+     "الالتزام بقواعد السلامة وحسن العمل ضمن فريق"
+    ]
+   },
+   "provides": {
+    "en": [
+     "Safety boots, high-visibility vest and gloves",
+     "Training on warehouse routines and stock logging"
+    ],
+    "ar": [
+     "حذاء أمان وسترة عاكسة وقفازات",
+     "تدريب على إجراءات المستودع وتسجيل المخزون"
+    ]
+   },
+   "tags": "forklift driver warehouse logistics loading pallets distribution damascus رافعة سائق مستودع تحميل لوجستيات",
+   "daysAgo": 4
   }
  ],
  "demoSeeker": {

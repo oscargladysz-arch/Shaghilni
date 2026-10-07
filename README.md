@@ -28,7 +28,7 @@ OTP_DEV_ECHO=true ADMIN_PHONES=+963944000000 npm start
 
 Open http://localhost:3000. Put your own number in `ADMIN_PHONES`.
 
-In development, text messages are printed in the terminal instead of being sent, and `OTP_DEV_ECHO=true` also shows the sign-in code on screen. The first run adds 18 demo listings from 17 demo companies so the board isn't empty (the 19th sample listing has no pay and fails the same posting checks a real listing must pass). Each demo listing says it's a demo, and the Overview dashboard leaves them, and applications to them, out of its numbers. They are never added in production.
+In development, text messages are printed in the terminal instead of being sent, and `OTP_DEV_ECHO=true` also shows the sign-in code on screen. The first run adds 68 demo listings from 32 demo companies so the board isn't empty (one of the 69 sample listings has no pay and fails the same posting checks a real listing must pass). Each demo listing says it's a demo, and the Overview dashboard leaves them, and applications to them, out of its numbers. They are never added in production.
 
 To keep settings in a file instead, copy `.env.example` to `.env` and edit it. The server reads it on start.
 
@@ -176,7 +176,7 @@ server/          Node.js, no dependencies
   lite-assets.js Lite's stylesheet and icons
   seed.js        the sample listings from seed/demo.json (development only, never in production)
   routes/        public, me, resume, recruit, employer, team, campus, events, admin, insights
-seed/            demo.json: the 17 sample companies and 19 sample listings
+seed/            demo.json: the 32 sample companies and 69 sample listings
 public/          the interface: plain JavaScript, bundled and gzipped at start-up
   js/engine.js   matching, Arabic search, posting checks, resume builder and fact guard
   js/app*.js     views for job seekers, employers, career offices and admins

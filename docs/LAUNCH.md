@@ -63,7 +63,7 @@ No item marked owner, lawyer or provider is ever ticked by an agent.
 
 | # | Item | Owner | How to verify | Status |
 |---|---|---|---|---|
-| F1 | What happens to the sample data (remove, or replace the real organisations' names; staging), decision D1. | owner | `docs/agent/QUESTIONS.md`. | Done (D1: stays, development and demo only; never in production) |
+| F1 | What happens to the sample data (remove, or replace the real organisations' names; staging), decision D1. | owner | `docs/agent/QUESTIONS.md`. | Done (D1: stays, development and demo only; never in production; 50 more sample listings added, 68 of 69 published in development) |
 | F2 | The two real names in the demo accounts (a relief society, an event venue) replaced with fictional ones. | agent | `grep -n "Red Crescent\|Four Seasons" server/demo.js` finds nothing. | Not needed (D1: the real names stay in development-only data) |
 | F3 | Which universities issue student email, and their domains. | owner | Admin → Universities → Student email lists them. | Open |
 | F4 | Who screens companies against the OFAC list; every company screened before verification. | owner | The compliance report's sanctions column (filled in since Stage 3, D-07) and the admin's Audit log tab log. | Open |

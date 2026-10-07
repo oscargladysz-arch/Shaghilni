@@ -1,6 +1,6 @@
 /* Demo data: the sample listings of seed/demo.json as verified demo companies, so a fresh development install is not
-   empty. A sample listing goes through the same posting checks as a real one (18 of the 19 pass: one has no pay) and
-   its invented contact person is never loaded (D-15, pending owner decision D1).
+   empty. A sample listing goes through the same posting checks as a real one (68 of the 69 pass: one has no pay) and
+   its invented contact person is never loaded (D-15; owner decision D1: development and demo only, 50 listings added).
    Demo rows are flagged is_demo and never counted in the admin metrics. Set SEED_DEMO=false to skip in development.
    Never seeded in production (server/config.js gates seedDemo on NODE_ENV); a production database that still holds
    demo rows is reported at start-up and on the admin Insights screen until npm run demo:remove has run. */

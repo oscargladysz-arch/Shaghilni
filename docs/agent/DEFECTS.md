@@ -897,6 +897,14 @@ Two lenses (regressions against 45adb63, tests and docs truth) read `git diff 45
 | D-172 | P2 | Recorded (held-out measurement); the flagged part is now a recorded reviewer check (P2-6) | On 200 held-out lines written after the last fix, c78122c leaves 9 of 90 demands silent (10%; 45adb63 56.7%, c17cd3b 20%, 0776158 12.2%), none of them a line c17cd3b got right: a cost put on the worker without a payment word («الفيزا على العامل», «تحاليل الشهادة الصحية بتكون على الموظف», "Candidates are responsible for the cost of their medical tests", "must fund their own visa"), a commission deducted from pay ("The placement agency charges one month's salary", «عمولة المكتب راتب أول شهر»), colloquial forms («بيندفع») and «تأمين نقدي مطلوب». 2 of 110 legitimate lines are refused, both school-fee duties under the main-text rule (D-164); 9 of 110 carry a reviewer flag. A word list will always leave such a residue; the reviewer reads every listing, and since P2-6 a fee flag must be confirmed as read before approval | held-out check |
 | D-171 | P2 | **FIXED** (`server/validate.js`: a negated or "push" demand is a flag; the flag reads «تكاليف», «مصاريف», «يدفعها», «على حسابه», "paid by"; fee-corpus extended with the fresh set) | The seventh fix (a72e8b0) was tuned to its own corpus: on 273 fresh lines it refused 31 legitimate ones and left 38 demands silent, worse than both 45adb63 and c17cd3b (a narrowed negation list, a cross-comma match, a lookahead that dropped demands) | independent check |
 
+## D1 · the 50 sample listings
+
+The merge's own checks (posting checks, a stricter money-word scan than the test's, the full suite) on `d1/sample-listings`. One listing title said "Cash Assistance … Registration", which a reader skimming the board can take for "pay cash to register"; it became "Assistance Programme Assistant, Registration and Follow-up" before the merge.
+
+| # | Sev | Status | Title | Lens |
+|---|---|---|---|---|
+| D-173 | P3 | Recorded (proposed fix: set `returnees` per listing in `seed/demo.json` and drop the category rule at `server/seed.js:51`; not done here, R16: it changes the D-13 rule and its tests) | `seedDemo` marks every multinational demo company's listings as welcoming returnees, so with the 13 international organisations added for D1 the "For returnees" pill is on 38 of the 68 sample listings (6 of 18 before) and the filter shows most of the board in development; production never seeds them | D1 merge |
+
 ## Merged duplicates
 
 No two of the 30 verified candidates are the same defect, so no IDs were merged. Overlaps recorded so nobody re-reports them:
