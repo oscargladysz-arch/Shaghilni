@@ -128,8 +128,10 @@ export function registerEmployer(r, deps) {
     if (j.status !== "closed") fail(409, "bad_state");
     if (c.status !== "verified") fail(409, "company_not_verified");
     const check = checkJob(core, J(j.data) || {}); if (check.fee) fail(422, "fee_requested", check.fee);   // a listing that asks candidates for money never goes back on the board (D-174)
-    db.run("UPDATE jobs SET status = ?, updated_at = ? WHERE id = ?", j.published_at ? "published" : "draft", now(), j.id);
-    audit(ctx.user.id, "job.reopened", "job", j.id, null);
+    const last = db.get("SELECT action FROM audit WHERE entity = 'job' AND entity_id = ? AND action IN ('job.created', 'job.updated', 'job.submitted', 'job.rejected', 'job.approved', 'job.closed', 'job.reopened') ORDER BY id DESC LIMIT 1", j.id);
+    const live = j.published_at && (!last || ["job.approved", "job.closed", "job.reopened"].includes(last.action));   // only text a reviewer approved last goes back on the board: a row the deletion before D-174 closed with an unreviewed edit is a draft again (D-188)
+    db.run("UPDATE jobs SET status = ?, updated_at = ? WHERE id = ?", live ? "published" : "draft", now(), j.id);
+    audit(ctx.user.id, "job.reopened", "job", j.id, live ? null : { to: "draft" });
     return { job: jobsOf(c, undefined, ctx.user.lang).find(x => x.id === j.id) };
   });
 

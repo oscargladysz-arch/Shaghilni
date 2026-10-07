@@ -70,13 +70,17 @@ export function registerAdmin(r, deps) {
   r.post("/api/admin/companies/:id/reject", admin, ctx => setCompany(ctx, "rejected"));
   r.post("/api/admin/companies/:id/suspend", admin, ctx => setCompany(ctx, "suspended"));
 
+  let fresh = new Map();   // pending listing id → [updated_at, flags]: computed once per version, since the word lists change only with a restart (D-189)
   r.get("/api/admin/jobs", admin, ctx => {
     const status = ctx.query.get("status") || "pending";
     const rows = db.all(`SELECT j.*, c.data AS c_data, c.status AS c_status, c.id AS c_id FROM jobs j JOIN companies c ON c.id = j.company_id
       WHERE j.status = ? AND j.is_demo = 0 ORDER BY COALESCE(j.submitted_at, j.updated_at) ASC`, status);
-    const counts = applicantCounts(db, rows.map(x => x.id));
-    return { jobs: rows.map(j => ({ ...employerJobOut(j, companyOut({ id: j.c_id, data: j.c_data, status: j.c_status }), counts.get(j.id) || {}),
-      ...(j.status === "pending" ? { flags: checkJob(core, J(j.data) || {}).flags } : {}), companyStatus: j.c_status })) };   // a pending listing shows the flags approval will check, not those of an older word list (D-179)
+    const counts = applicantCounts(db, rows.map(x => x.id)), seen = new Map();
+    const flagsOf = j => { const c = fresh.get(j.id), f = c && c[0] === j.updated_at ? c[1] : checkJob(core, J(j.data) || {}).flags; seen.set(j.id, [j.updated_at, f]); return f; };
+    const jobs = rows.map(j => ({ ...employerJobOut(j, companyOut({ id: j.c_id, data: j.c_data, status: j.c_status }), counts.get(j.id) || {}),
+      ...(j.status === "pending" ? { flags: flagsOf(j) } : {}), companyStatus: j.c_status }));   // a pending listing shows the flags approval will check, not those of an older word list (D-179)
+    if (status === "pending") fresh = seen;
+    return { jobs };
   });
   r.post("/api/admin/jobs/:id/approve", admin, ctx => {
     const j = db.get("SELECT j.*, c.status AS c_status FROM jobs j JOIN companies c ON c.id = j.company_id WHERE j.id = ?", Number(ctx.params.id));

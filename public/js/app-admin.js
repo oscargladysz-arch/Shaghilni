@@ -94,7 +94,7 @@ async function admAct(act, el) {
     case "adm-approve": { const j = (ADM.jobs || []).find(x => x.id === id) || {}, fee = (j.flags || []).find(f => f.type === "fee"), box = $("#fee-" + id);
       if (fee && (!box || !box.checked)) { toast({ title: t("err_fee_check_required"), ic: "alert" }); if (box) box.focus(); break; }   // the server refuses it too (P2-6)
       run(() => api.post(`/api/admin/jobs/${id}/approve`, { ...(fee ? { feeChecked: true, feeWord: fee.word } : {}), submittedAt: j.submittedAt, note: note("#note-j" + id) })
-        .catch(err => { if (err && (err.code === "job_changed" || err.code === "fee_check_required")) renderAdmin(); throw err; }).then(loadJobs).then(rescore), "tPublished"); break; }   // a listing changed since it was read: the queue is drawn again (D-175)
+        .catch(err => { if (err && ["job_changed", "fee_check_required", "bad_state", "company_not_verified"].includes(err.code)) renderAdmin(); throw err; }).then(loadJobs).then(rescore), "tPublished"); break; }   // a listing changed since it was read, or was handled elsewhere: the queue is drawn again (D-175, D-192)
     case "adm-jreject": run(() => api.post(`/api/admin/jobs/${id}/reject`, { note: note("#note-j" + id) }), "tSentBack"); break;
     case "adm-confirm": { const pg = $("#hp-" + id); run(() => api.post(`/api/admin/applications/${id}/confirm-hire`, { programmeId: pg && pg.value ? Number(pg.value) : null }), "tConfirmed"); break; }
     case "adm-plan-set": case "adm-charge": case "adm-prog-add": billingAct(act, el); break;

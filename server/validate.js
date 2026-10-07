@@ -165,9 +165,9 @@ export function checkJob(core, j) {
   return { missing, fee: fee || null, flags };
 }
 
+/* A flagged word as the audit log keeps it: a run of nine digits or more, however it is separated, is masked as a phone number; a sum or a date stays as the reviewer read it (R12, D-176, D-190). */
+export const hideNumbers = s => String(s).replace(/\+?[\d٠-٩۰-۹][\d٠-٩۰-۹\s\-–—‐‑−().\/_·٬٫\u200e\u200f\u061c]*[\d٠-٩۰-۹]/g, m => ((m.match(/[\d٠-٩۰-۹]/g) || []).length >= 9 ? "•••" : m));
 /* A saved search for job alerts: only known filters, and a short keyword. */
-/* A flagged word as the audit log keeps it: a run of digits long enough to be a phone number is masked (R12, D-176). */
-export const hideNumbers = s => String(s).replace(/\+?[\d٠-٩۰-۹][\d٠-٩۰-۹\s\-().]{5,}[\d٠-٩۰-۹]/g, "•••");
 export const ALERT_TABS = ["intern", "domestic", "multinational", "entry", "returnees"];
 export function sanitizeAlert(core, m) {
   m = m && typeof m === "object" ? m : {};
