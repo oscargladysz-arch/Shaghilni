@@ -187,7 +187,7 @@ test("admin: verification needs sanctions screening; review publishes listings",
   await employer.put(`/api/employer/jobs/${employerJobId}`, { job: JOB, submit: true });
   assert.equal((await admin.post(`/api/admin/jobs/${employerJobId}/approve`)).status, 200);
   const board = (await client().get("/api/jobs")).body.jobs;
-  assert.equal(board.length, 19, "18 sample listings plus the one just approved");
+  assert.equal(board.length, 69, "68 sample listings plus the one just approved");
   const live = board.find(x => x.id === employerJobId);
   assert.equal(live.title.en, "Junior accountant");
   assert.equal(live.hasWhatsapp, true);
@@ -226,13 +226,13 @@ test("pipeline: status moves are checked, seekers are texted, hires need confirm
 
 test("edits send live listings and renamed companies back to review", async () => {
   await employer.put(`/api/employer/jobs/${employerJobId}`, { job: { ...JOB, openings: 3 } });
-  assert.equal((await client().get("/api/jobs")).body.jobs.length, 18, "an edited listing leaves the board until reviewed");
+  assert.equal((await client().get("/api/jobs")).body.jobs.length, 68, "an edited listing leaves the board until reviewed");
   await employer.post(`/api/employer/jobs/${employerJobId}/submit`);
   await admin.post(`/api/admin/jobs/${employerJobId}/approve`);
   await employer.put("/api/employer/company", { company: { name: { en: "Beit Accounting Group", ar: "بيت المحاسبة" }, sector: "finance", gov: "damascus",
     regNo: "DM-12345", contactName: "Rami", whatsapp: "0955 666 777" } });
   assert.equal((await employer.get("/api/employer")).body.company.status, "pending");
-  assert.equal((await client().get("/api/jobs")).body.jobs.length, 18, "a company under re-verification has no live listings");
+  assert.equal((await client().get("/api/jobs")).body.jobs.length, 68, "a company under re-verification has no live listings");
 });
 
 test("resume suggestions: own bullets only, and the fact guard filters Claude's output", async () => {
