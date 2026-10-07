@@ -126,7 +126,7 @@ Stage 3 gate per task (brief): plan, tests, adversarial review notes, integratio
 | P2-2 admin listing edit | `GO P2-2` | Absent today (`admin.js:71,81`). Define whether an edit returns the listing to review; after S3-3 the employer path does. |
 | P2-3 design notes | `GO P2-3` | Inputs: D-27 numbers; `server/http.js:100-110` in-memory limiter; `server/auth.js:27` in-memory PoW list; D7 for Lite events/Telegram/public resume links. |
 | P2-4 QNB adapter | `GO P2-4` after D4 | `docs/PAYMENTS_ADAPTER.md` from S2-5 is the contract. |
-| P2-5 fictional sample names | `GO P2-5` after D1 | Covers `seed/demo.json` names and 19 `contact` persons (D-15), `server/demo.js:87,151`, and `seed/demo.json:2003` `demoSeeker` dead data (U-193). |
+| P2-5 fictional sample names | Not needed (D1 answered: the real names stay in development-only data) | Covers `seed/demo.json` names and 19 `contact` persons (D-15), `server/demo.js:87,151`, and `seed/demo.json:2003` `demoSeeker` dead data (U-193). |
 | P2-6 fee flag acknowledged before approval | Done (owner `GO P2-6`, 7 October 2026, branch `p2-6/fee-acknowledgement`) | `POST /api/admin/jobs/:id/approve` refuses a listing with a `fee` flag unless the body carries `feeChecked: true` (422 `fee_check_required`), and `job.approved` records `{ feeChecked: true, feeWord }`; the admin card shows a check box beside the flag (`adFeeChecked`) and Approve sends it only once ticked. Tests: policy-admin and plans (P2-6). |
 | P3 human-only | never by agents | Rows live in `docs/LAUNCH.md` (S1-4): lawyer review + governing law (D6); named data-protection person; prices (D2); university email domains; SMS provider test on Syrian networks (D3); entity and payment route (D4); provider spend caps; external scans; backup restore; manual OFAC per company; employment-office licence; TalkBack on real phones; native Arabic review of `ARABIC_REVIEW.md`; domain/DNS/hosting; Docker image build + healthcheck `wget` check; `--env-file` precedence check. |
 
@@ -154,7 +154,7 @@ Stage 0 merged to main (needs a push target: QUESTIONS Q8)
     → Stage 2: S2-0 → S2-1 → {S2-2 (9 families), S2-3, S2-4, S2-5, S2-6 in parallel} → S2-7 → gate → owner merges
       → Stage 3: S3-1 → S3-2 → S3-3 → S3-4 → S3-5 → S3-6 → S3-7 → S3-8 → S3-9 → S3-10 → S3-11 → S3-12 → (S3-13) → gate → owner merges
         → Stage 4: {S4-1, S4-2 in parallel, read-only} → serial fixes → S4-3 → S4-4 → S4-6 → S4-5 → gate
-Owner decisions: D1 gates only P2-5 and the S3-2 D-15 default; D4 gates P2-4; D6 gates nothing (proposals only); D2/D3/D5/D7 gate nothing in code.
+Owner decisions: D1 (answered: stay) gated only P2-5 and the S3-2 D-15 default; D4 gates P2-4; D6 gates nothing (proposals only); D2/D3/D5/D7 gate nothing in code.
 ```
 
 ## 8 · Every Stage 0 defect placed

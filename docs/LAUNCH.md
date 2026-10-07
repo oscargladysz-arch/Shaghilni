@@ -34,7 +34,7 @@ No item marked owner, lawyer or provider is ever ticked by an agent.
 | # | Item | Owner | How to verify | Status |
 |---|---|---|---|---|
 | C1 | A lawyer reviews the privacy notice and terms (`public/js/legal.js`, shown at `/#/privacy` and `/#/terms`, and at `/lite/privacy` and `/lite/terms`) under Syrian Law No. 12 of 2024, including a governing-law clause. Any change bumps `TERMS_VERSION` and moves `server/retention.js` and SECURITY.md with it. | lawyer, owner | Signed-off wording; `docs/agent/LEGAL_PROPOSALS.md` is the agenda of known gaps. | Open |
-| C2 | `LEGAL_NAME` and `CONTACT_EMAIL` set to the real operating entity and a monitored mailbox. | owner | The scanner's `Legal name:` and `Privacy contact:` lines. | Blocked on D4 and D6 |
+| C2 | `LEGAL_NAME` and `CONTACT_EMAIL` set to the real operating entity and a monitored mailbox. | owner | The scanner's `Legal name:` and `Privacy contact:` lines. | Blocked on D4 and D6 (D6 deferred by the owner) |
 | C3 | A named person responsible for personal data, and a breach plan. | owner | Written down and named in the privacy notice if the lawyer asks for it. | Open |
 | C4 | The employment-office licence application is under way. | owner | | Open |
 | C5 | Native Arabic review of every new or changed string. | owner, reviewer | Every row of `docs/agent/ARABIC_REVIEW.md` ticked. | Open (49 rows so far) |
@@ -44,7 +44,7 @@ No item marked owner, lawyer or provider is ever ticked by an agent.
 
 | # | Item | Owner | How to verify | Status |
 |---|---|---|---|---|
-| D1 | SMS provider chosen (`textbee` or `twilio`, decision D3) and tested on Syrian networks with your own number, plus one diaspora number. | owner, provider | Sign in from both; note delivery times. | Open |
+| D1 | SMS provider chosen (`textbee` or `twilio`, decision D3) and tested on Syrian networks with your own number, plus one diaspora number. | owner, provider | Sign in from both; note delivery times. | Open (D3 answered: textbee; the test is to run) |
 | D2 | Provider spend caps: an Anthropic monthly limit; Twilio geographic permissions limited to the countries in `SMS_ALLOWED_PREFIXES` plus a usage alert; a textbee plan that fits the volume. | owner, provider | Screenshots of each setting. | Open |
 | D3 | Plan prices (`PLAN_PRO_PRICE`, `PLAN_ENTERPRISE_PRICE`; monthly card prices only with a card provider), decision D2. | owner | The Plans page shows them. | Blocked on D2 |
 | D4 | The Syrian entity or local partner that receives Syrian pounds, and the entity that invoices in US dollars, decision D4. | owner | | Blocked on D4 |
@@ -63,8 +63,8 @@ No item marked owner, lawyer or provider is ever ticked by an agent.
 
 | # | Item | Owner | How to verify | Status |
 |---|---|---|---|---|
-| F1 | What happens to the sample data (remove, or replace the real organisations' names; staging), decision D1. | owner | `docs/agent/QUESTIONS.md`. | Blocked on D1 |
-| F2 | The two real names in the demo accounts (a relief society, an event venue) replaced with fictional ones. | agent | `grep -n "Red Crescent\|Four Seasons" server/demo.js` finds nothing. | Open (after D1) |
+| F1 | What happens to the sample data (remove, or replace the real organisations' names; staging), decision D1. | owner | `docs/agent/QUESTIONS.md`. | Done (D1: stays, development and demo only; never in production) |
+| F2 | The two real names in the demo accounts (a relief society, an event venue) replaced with fictional ones. | agent | `grep -n "Red Crescent\|Four Seasons" server/demo.js` finds nothing. | Not needed (D1: the real names stay in development-only data) |
 | F3 | Which universities issue student email, and their domains. | owner | Admin → Universities → Student email lists them. | Open |
 | F4 | Who screens companies against the OFAC list; every company screened before verification. | owner | The compliance report's sanctions column (filled in since Stage 3, D-07) and the admin's Audit log tab log. | Open |
 | F5 | The "invoiced by our US company" copy removed from the app and the README (no entity exists). | agent | README in Stage 1; the two app strings in Stage 3 (D-20); security test 18 keeps it out. | Done |
